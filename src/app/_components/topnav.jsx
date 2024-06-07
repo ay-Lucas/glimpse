@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ModeToggle } from "./mode-toggle";
+import { ThemeToggle } from "./theme-toggle";
 import { Button } from "@/components/ui/button";
 import { BsGithub } from "react-icons/bs";
 export function TopNav() {
@@ -9,10 +9,12 @@ export function TopNav() {
         <div>Glimpse</div>
         <section className="flex space-x-4 items-center">
           <Button variant="ghost" size="icon">
-            <BsGithub size={23} />
+            <Link href="https://github.com/ay-Lucas">
+              <BsGithub size={20} />
+            </Link>
           </Button>
-          <ModeToggle />
-          <Button asChild>
+          <ThemeToggle />
+          <Button asChild size="sm">
             <Link href="/login">Login</Link>
           </Button>
         </section>
