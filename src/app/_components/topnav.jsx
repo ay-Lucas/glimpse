@@ -1,10 +1,22 @@
-import { LoginButton } from "./loginbutton";
-
+import Link from "next/link";
+import { ModeToggle } from "./mode-toggle";
+import { Button } from "@/components/ui/button";
+import { BsGithub } from "react-icons/bs";
 export function TopNav() {
   return (
-    <nav className="flex w-full items-center justify-between border-b p-4 text-xl font-semibold">
-      <div>Glimpse</div>
-      <LoginButton />
-    </nav>
+    <div className="border-b">
+      <nav className="mx-auto flex max-w-screen-2xl items-center justify-between p-2.5 text-xl font-semibold ">
+        <div>Glimpse</div>
+        <section className="flex space-x-4 items-center">
+          <Button variant="ghost" size="icon">
+            <BsGithub size={23} />
+          </Button>
+          <ModeToggle />
+          <Button asChild>
+            <Link href="/login">Login</Link>
+          </Button>
+        </section>
+      </nav>
+    </div>
   );
 }

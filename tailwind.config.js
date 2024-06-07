@@ -1,5 +1,5 @@
-import { fontFamily } from "tailwindcss/defaultTheme";
-
+import defaultTheme from "tailwindcss/defaultTheme";
+export const plugins = [require("tailwindcss-animate")];
 /** @type {import('tailwindcss').Config} */
 export const darkMode = ["class"];
 export const content = [
@@ -19,7 +19,7 @@ export const theme = {
   },
   extend: {
     fontFamily: {
-      sans: ["var(--font-sans)", ...fontFamily.sans],
+      sans: ["var(--font-sans)", ...defaultTheme.fontFamily.sans],
     },
     colors: {
       border: "hsl(var(--border))",
@@ -77,5 +77,3 @@ export const theme = {
     },
   },
 };
-export const plugins = [require("tailwindcss-animate")];
-
