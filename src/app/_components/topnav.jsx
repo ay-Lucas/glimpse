@@ -15,7 +15,7 @@ export function TopNav() {
           </Button>
           <ThemeToggle />
           <Button asChild size="sm">
-            <Link href="/login">Login</Link>
+            <Link href="/login">Sign in</Link>
           </Button>
         </section>
       </nav>
