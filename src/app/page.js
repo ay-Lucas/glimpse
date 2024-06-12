@@ -4,7 +4,7 @@ export default async function HomePage() {
     <main className="relative">
       <Background />
       {/* </div> */}
-      <div className="relative z-50 flex h-screen flex-col md:flex-row md:overflow-hidden">
+      <div className="relative flex h-screen flex-col md:flex-row md:overflow-hidden">
         {/* <div className="h-full w-full text-center text-2xl"> */}
       </div>
     </main>
