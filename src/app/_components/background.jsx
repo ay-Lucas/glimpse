@@ -18,20 +18,23 @@ export function Background() {
   }, [isReady]);
 
   return (
-    <div className="fixed top-0 left-0 w-full h-full z-[-1] duration-300 ease-in overflow-hidden">
-      {images.map((url, i) => (
-        <Image
-          fill
-          src={`/${url}`}
-          alt={`Background image ${i + 1}`}
-          key={i}
-          quality={100}
-          sizes="100vw"
-          className={`object-cover transition from-background duration-1000 ${i === index ? "bg-gray-400 blur-0 opacity-100" : "opacity-0"}`}
-          // ${isReady ? "duration-100 scale-100 bg-gray-400 blur-0" : "scale-120 blur-md"}`}
-          onLoad={onLoadCallback}
-        />
-      ))}
+    <div className="fixed top-0 left-0 w-full h-full duration-300 ease-in overflow-hidden bg-gradient-to-t bg-blend-overlay from-gray-200 to-gray-950">
+      {/* <div className="bg-gray-900 opacity-50 h-full"> */}
+      <div className="opacity-50">
+        {images.map((url, i) => (
+          <Image
+            fill
+            src={`/${url}`}
+            alt={`Background image ${i + 1}`}
+            key={i}
+            quality={100}
+            sizes="100vw"
+            className={`object-cover transition from-background duration-1000 ${i === index ? "bg-gray-400 blur-0 opacity-100" : "opacity-0"}`}
+            // ${isReady ? "duration-100 scale-100 bg-gray-400 blur-0" : "scale-120 blur-md"}`}
+            onLoad={onLoadCallback}
+          />
+        ))}
+      </div>
     </div>
   );
 }

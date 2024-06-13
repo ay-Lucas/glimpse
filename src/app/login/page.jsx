@@ -7,7 +7,7 @@ export default async function HomePage() {
   return (
     <main className="flex flex-col">
       <Background />
-      <div className="flex flex-col pt-48 space-y-10">
+      <div className="flex flex-col pt-64 space-y-10 z-10">
         <h1 className="font-extrabold text-7xl mx-auto ">Glimpse</h1>
         <LoginForm />
       </div>
