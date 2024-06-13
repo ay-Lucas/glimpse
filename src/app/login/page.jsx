@@ -1,5 +1,5 @@
-import { LoginForm } from "./login-form";
-import { Background } from "@/app/_components/background";
+import { LoginForm } from "@/components/login-form";
+import { Background } from "@/components/background";
 
 export const dynamic = "force-dynamic";
 

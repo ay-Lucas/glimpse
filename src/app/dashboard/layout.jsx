@@ -1,4 +1,4 @@
-import { TopNav } from "./_components/topnav";
+import { TopNav } from "@components/topnav";
 
 export const metadata = {
   title: "Create Next App",
