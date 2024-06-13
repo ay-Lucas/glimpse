@@ -12,30 +12,26 @@ export default function Background() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      console.log("useEffect loaded");
       setIndex((prevIndex) => (prevIndex + 1) % images.length);
     }, 10000); // Switch image every 10 seconds
     return () => clearInterval(interval);
-  }, []);
+  }, [isReady]);
 
-  {
-    /* <div className="fixed top-0 left-0 w-full h-full"> */
-  }
   return (
-    <div className="fixed top-0 left-0 w-full h-full z-[-1] bg-black from-black transition duration-300 ease-in overflow-hidden">
-      <Image
-        fill
-        src={`/${images[index]}`}
-        alt={`Background image ${index + 1}`}
-        quality={100}
-        sizes="100vw"
-        // className="object-cover opacity-70"
-        className={`object-cover opacity-70 bg-gray-400 transition duration-1000 ${
-          isReady ? "scale-100 bg-gray-400 blur-0" : "scale-120 blur-2xl"
-        }`}
-        onLoad={onLoadCallback}
-        // placeholder="blur"
-      />
+    <div className="fixed top-0 left-0 w-full h-full z-[-1] duration-300 ease-in overflow-hidden">
+      {images.map((url, i) => (
+        <Image
+          fill
+          src={`/${url}`}
+          alt={`Background image ${i + 1}`}
+          key={i}
+          quality={100}
+          sizes="100vw"
+          className={`object-cover transition from-background duration-1000 ${i === index ? "bg-gray-400 blur-0 opacity-100" : "opacity-0"}`}
+          // ${isReady ? "duration-100 scale-100 bg-gray-400 blur-0" : "scale-120 blur-md"}`}
+          onLoad={onLoadCallback}
+        />
+      ))}
     </div>
   );
 }
