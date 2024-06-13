@@ -2,7 +2,7 @@
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { backgroundImages as images } from "@/lib/constants";
-export default function Background() {
+export function Background() {
   const [index, setIndex] = useState(0);
   const [isReady, setIsReady] = useState(false);
 

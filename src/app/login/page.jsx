@@ -1,10 +1,16 @@
 import { LoginForm } from "./login-form";
+import { Background } from "@/app/_components/background";
+
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   return (
     <main className="flex flex-col">
-      <LoginForm />
+      <Background />
+      <div className="flex flex-col pt-48 space-y-10">
+        <h1 className="font-extrabold text-7xl mx-auto ">Glimpse</h1>
+        <LoginForm />
+      </div>
     </main>
   );
 }

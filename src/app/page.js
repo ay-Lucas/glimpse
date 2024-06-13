@@ -1,4 +1,4 @@
-import Background from "./_components/background";
+import { Background } from "./_components/background";
 export default async function HomePage() {
   return (
     <main className="relative">
