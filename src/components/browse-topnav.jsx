@@ -4,7 +4,9 @@ import { ThemeToggle } from "./theme-toggle";
 import { Button } from "@/components/ui/button";
 import { BsGithub } from "react-icons/bs";
 import { AvatarDropdown } from "./avatar-dropdown";
+import { Search } from "./search";
 import "@/styles/globals.css";
+
 export function TopNav({ loggedIn = false }) {
   return (
     <div className="fixed top-0 left-0 right-0 border-b z-10 backdrop-blur-lg">
@@ -13,6 +15,7 @@ export function TopNav({ loggedIn = false }) {
           <Link href="/">Glimpse</Link>
         </div>
         <section className="flex space-x-4 items-center">
+          <Search />
           <Button variant="ghost" size="icon">
             <Link href="https://github.com/ay-Lucas">
               <BsGithub size={20} />

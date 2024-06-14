@@ -9,7 +9,7 @@ const fontSans = FontSans({
 
 export const metadata = {
   title: "Glimpse",
-  description: "TV and Movie recommendations",
+  description: "Discover new Movies & TV Shows",
 };
 
 export default function RootLayout({ children }) {
