@@ -1,4 +1,4 @@
-import { TopNav } from "@components/topnav";
+import { TopNav } from "@/components/browse-topnav";
 
 export const metadata = {
   title: "Create Next App",
@@ -10,7 +10,6 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body>
         <TopNav />
-        <SideNav />
         {children}
       </body>
     </html>
