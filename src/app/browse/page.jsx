@@ -1,7 +1,13 @@
+import { ImageCarousel } from "@/components/image-carousel";
+import { getBackgrounds } from "@/components/backdrops";
+
 export default async function HomePage() {
+  const thumbnails = await getBackgrounds();
   return (
-    <main className="relative">
-      <div className="relative flex h-screen flex-col md:flex-row md:overflow-hidden"></div>
+    <main className="w-full mx-auto space-y-5">
+      <ImageCarousel images={thumbnails} />
+      <ImageCarousel images={thumbnails} />
+      <ImageCarousel images={thumbnails} />
     </main>
   );
 }

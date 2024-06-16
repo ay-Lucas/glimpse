@@ -9,7 +9,7 @@ import "@/styles/globals.css";
 
 export function TopNav({ loggedIn = false }) {
   return (
-    <div className="fixed top-0 left-0 right-0 border-b z-10 backdrop-blur-lg">
+    <div className="sticky top-0 left-0 right-0 border-b z-10 backdrop-blur-lg">
       <nav className="mx-auto flex max-w-screen-2xl items-center justify-between p-2.5 text-xl font-semibold ">
         <div>
           <Link href="/">Glimpse</Link>
