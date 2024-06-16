@@ -1,4 +1,4 @@
-import { ImageCarousel } from "@/components/image-carousel";
+import { ImageCarousel } from "./_components/image-carousel";
 import { getBackgrounds } from "@/components/backdrops";
 
 export default async function HomePage() {

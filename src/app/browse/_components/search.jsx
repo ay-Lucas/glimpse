@@ -1,4 +1,4 @@
-import { Input } from "./ui/input";
+import { Input } from "@/components/ui/input";
 import { IoSearchOutline } from "react-icons/io5";
 import "@/styles/globals.css";
 
