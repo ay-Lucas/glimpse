@@ -8,32 +8,31 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 
-export function ImageCarousel({ images }) {
+export function ImageCarousel({ images, title }) {
   return (
     <Carousel
-      className="mx-auto w-11/12 "
+      className="block mx-auto w-11/12 "
       opts={{
-        slidesToScroll: 3,
+        slidesToScroll: 5,
         watchDrag: false,
-        // duration: 10,
-        // dragThreshold: 100,
-        // dragFree: true,
       }}
     >
-      {/* <CarouselContent className="pl-1 w-full"> */}
+      <h2 className="pb-4 text-xl font-bold">{title}</h2>
       <CarouselContent className="-ml-1">
-        {/* <CarouselItem key={i} className="lg:basis-auto"> */}
         {images.map((url, i) => (
-          <CarouselItem key={i} className="pl-1 md:basis-1/6 lg:basis-1/5 ">
+          <CarouselItem
+            key={i}
+            className="pl-1 pr-4 md:basis-1/6 lg:basis-[14%] sm:basis-1/3 transform-gpu hover:opacity-75 transition duration-200 hover:scale-110 "
+          >
             <Image
-              width={320}
-              height={180}
+              width={220}
+              height={330}
               src={`${url}`}
               alt={`Background image ${i + 1}`}
               key={i}
-              quality={100}
+              quality={50}
               sizes="(max-width: 768px) 100vw, 33vw"
-              className={`transition from-background duration-1000 rounded-xl hover:bg-gray-300`}
+              className={`transition duration-200 rounded-xl`}
             />
           </CarouselItem>
         ))}
