@@ -1,4 +1,5 @@
 import { ImageCarousel } from "./_components/image-carousel";
+// import { ImageCarousel } from "./_components/poster-carousel";
 import { options, shuffle, bubbleSort } from "@/lib/utils";
 
 const baseUrl = "https://api.themoviedb.org/3";
@@ -27,8 +28,8 @@ function sortPopular(array, minPopularity = 0) {
 
 export default async function HomePage() {
   const [tvRes, movieRes] = await Promise.all([
-    getTrendingTv("day"),
-    getTrendingMovies("day"),
+    getTrendingTv("week"),
+    getTrendingMovies("week"),
   ]);
   const trendingTv = sortPopular(tvRes.results, MIN_POPULARITY);
   const trendingMovies = sortPopular(movieRes.results, MIN_POPULARITY);

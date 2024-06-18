@@ -14,17 +14,14 @@ export function ImageCarousel({ data, title }) {
     <Carousel
       className="relative block mx-auto w-11/12 "
       opts={{
-        slidesToScroll: 5,
+        slidesToScroll: 3,
         watchDrag: false,
       }}
     >
-      <h2 className="pb-4 text-xl font-bold">{title}</h2>
+      <h2 className="pb-4 pl-3 text-xl font-bold">{title}</h2>
       <CarouselContent className="-ml-1">
         {data.map((item, i) => (
-          <CarouselItem
-            key={i}
-            className="pr-4 md:basis-1/6 lg:basis-[14%] sm:basis-1/3 hover:scale-110 transition duration-200  "
-          >
+          <CarouselItem key={i} className="pr-3 basis-auto group shadow-2xl">
             <Card data={item} index={i} />
           </CarouselItem>
         ))}
