@@ -1,7 +1,6 @@
 import { ImageCarousel } from "./_components/image-carousel";
 import { options, shuffle, bubbleSort } from "@/lib/utils";
 
-const baseImageUrl = "https://image.tmdb.org/t/p/original";
 const baseUrl = "https://api.themoviedb.org/3";
 const MIN_POPULARITY = 200;
 const MIN_TRENDING_POPULARITY = 100;
@@ -36,32 +35,15 @@ export default async function HomePage() {
 
   const trendingTvAndMovies = tvRes.results.concat(movieRes.results);
   const trending = sortPopular(trendingTvAndMovies, MIN_TRENDING_POPULARITY);
-  console.log(trendingTv);
+  console.log(trendingMovies);
   // const trending = shuffle(trendingTvAndMovies);
 
   return (
     <main className="mt-1">
       <div className="mx-auto space-y-4 overflow-visible">
-        <ImageCarousel
-          images={
-            trending.map((item) => `${baseImageUrl}${item.poster_path}`) ?? []
-          }
-          title="Trending"
-        />
-        <ImageCarousel
-          images={
-            trendingTv.map((show) => `${baseImageUrl}${show.poster_path}`) ?? []
-          }
-          title="TV Shows"
-        />
-        <ImageCarousel
-          images={
-            trendingMovies.map(
-              (movie) => `${baseImageUrl}${movie.poster_path}`,
-            ) ?? []
-          }
-          title="Movies"
-        />
+        <ImageCarousel data={trending} title="Trending" />
+        <ImageCarousel data={trendingTv} title="TV Shows" />
+        <ImageCarousel data={trendingMovies} title="Movies" />
       </div>
     </main>
   );
