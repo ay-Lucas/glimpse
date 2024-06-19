@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/carousel";
 
 import { Card } from "./card";
+import Link from "next/link";
 
 export function ImageCarousel({ data, title }) {
   return (
@@ -22,7 +23,15 @@ export function ImageCarousel({ data, title }) {
       <CarouselContent className="-ml-1">
         {data.map((item, i) => (
           <CarouselItem key={i} className="pr-3 basis-auto group shadow-2xl">
-            <Card data={item} index={i} />
+            <Link
+              href={
+                item.media_type === "tv"
+                  ? `/tv/${item.id}`
+                  : `/movie/${item.id}`
+              }
+            >
+              <Card data={item} index={i} />
+            </Link>
           </CarouselItem>
         ))}
       </CarouselContent>
