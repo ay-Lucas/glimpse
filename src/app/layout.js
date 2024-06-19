@@ -28,7 +28,6 @@ export default function RootLayout({ children }) {
           enableSystem
           disableTransitionOnChange
         >
-          <TopNav />
           {children}
         </ThemeProvider>
       </body>
