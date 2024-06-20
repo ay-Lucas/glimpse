@@ -1,5 +1,7 @@
 import Image from "next/image";
+import "@/styles/globals.css";
 import { options } from "@/lib/utils";
+import TmdbLogo from "@/../public/tmdb-logo.svg";
 const baseUrl = "https://api.themoviedb.org/3";
 async function getData(id) {
   const res = await fetch(`${baseUrl}/movie/${id}`, options);
@@ -10,21 +12,40 @@ export default async function Movie({ params }) {
   const data = await getData(params.id);
   console.log(data);
   return (
-    <main className="w-full h-full overflow-auto flex-grow">
-      <div className="z-[-1] absolute top-0 left-0 w-full h-full duration-300 ease-in overflow-hidden bg-gradient-to-t bg-blend-overlay from-gray-900 to-gray-950">
-        <div className="absolute top-0 left-0 w-full h-full opacity-40">
+    <main>
+      <div className="absolute left-0 top-0 h-full w-full">
+        <div className="relative h-[500px]">
+          <div className="absolute h-full w-full left-0 top-0 bg-gradient-to-t from-background to-transparent" />
           <Image
             fill
-            src={`https://image.tmdb.org/t/p/original${data.poster_path}`}
+            src={`https://image.tmdb.org/t/p/original${data.backdrop_path}`}
             quality={100}
-            className={`object-cover pointer-events-none`}
+            className={`object-cover pointer-events-none z-[-1]`}
           />
         </div>
       </div>
-      <div className="flex mx-auto z-1">
-        <div className="text-xl">{data.title}</div>
-        <div className="text-md">{data.overview}</div>
-        <div className="w-80 h-40"></div>
+      <div className="relative container px-60 items-end h-full">
+        <div className="grid grid-cols-2 lg:grid-cols-4 z-10 mt-72">
+          <div className="col-span-1">
+            <Image
+              quality={100}
+              width={200}
+              height={300}
+              className={`pointer-events-none rounded-xl object-cover`}
+              src={`https://image.tmdb.org/t/p/original${data.poster_path}`}
+            />
+          </div>
+          <div className="col-span-3">
+            <h2 className="text-4xl">{data.title}</h2>
+            <div className="flex flex-row items-center">
+              <span className="mr-3 text-lg">
+                {data.vote_average.toPrecision(2)}
+              </span>
+              <Image src={TmdbLogo} className="w-[30px] h-[30px]" />
+            </div>
+            <div className="text-lg">{data.overview}</div>
+          </div>
+        </div>
       </div>
     </main>
   );
