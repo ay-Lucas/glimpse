@@ -21,6 +21,8 @@ export default async function Movie({ params }) {
             src={`https://image.tmdb.org/t/p/original${data.backdrop_path}`}
             quality={100}
             className={`object-cover pointer-events-none z-[-1]`}
+            priority
+            alt="header image"
           />
         </div>
       </div>
@@ -33,6 +35,8 @@ export default async function Movie({ params }) {
               height={300}
               className={`pointer-events-none rounded-xl object-cover`}
               src={`https://image.tmdb.org/t/p/original${data.poster_path}`}
+              priority
+              alt="poster image"
             />
           </div>
           <div className="col-span-3">
@@ -41,7 +45,12 @@ export default async function Movie({ params }) {
               <span className="mr-3 text-lg">
                 {data.vote_average.toPrecision(2)}
               </span>
-              <Image src={TmdbLogo} className="w-[30px] h-[30px]" />
+              <Image
+                src={TmdbLogo}
+                className="w-[30px] h-[30px]"
+                priority
+                alt="tmdb logo"
+              />
             </div>
             <div className="text-lg">{data.overview}</div>
           </div>

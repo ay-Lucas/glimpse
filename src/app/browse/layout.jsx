@@ -1,4 +1,4 @@
-import { TopNav } from "./_components/browse-topnav";
+import { TopNav } from "@/components/topnav";
 
 export const metadata = {
   title: "Glimpse",
