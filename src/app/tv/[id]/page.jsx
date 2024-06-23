@@ -12,7 +12,7 @@ export default async function Tv({ params }) {
   const data = await getData(params.id);
   console.log(data);
   return (
-    <main>
+    <main className="h-screen w-full">
       <div>
         <div className="absolute top-0 left-0 w-full h-full">
           <div className="absolute h-full w-full left-0 top-0 bg-gradient-to-t from-background from-30%" />
@@ -27,8 +27,8 @@ export default async function Tv({ params }) {
           />
         </div>
       </div>
-      <div className="relative container px-60 items-end h-full">
-        <div className="grid grid-cols-2 lg:grid-cols-4 z-10 mt-72">
+      <div className="flex relative container px-60 items-center h-full">
+        <div className="grid grid-cols-2 lg:grid-cols-4 z-10">
           <div className="col-span-1">
             <Image
               quality={100}

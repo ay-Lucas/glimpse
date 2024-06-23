@@ -22,7 +22,7 @@ export function ImageCarousel({ data, title }) {
       <h2 className="pb-4 pl-3 text-xl font-bold">{title}</h2>
       <CarouselContent className="-ml-1">
         {data.map((item, i) => (
-          <CarouselItem key={i} className="pr-3 basis-auto group shadow-2xl">
+          <CarouselItem key={i} className="pr-3 basis-auto group">
             <Link
               href={
                 item.media_type === "tv"
