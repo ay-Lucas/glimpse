@@ -13,16 +13,17 @@ export default async function Tv({ params }) {
   console.log(data);
   return (
     <main>
-      <div className="absolute left-0 top-0 h-full w-full">
-        <div className="relative h-[500px]">
-          <div className="absolute h-full w-full left-0 top-0 bg-gradient-to-t from-background to-transparent" />
+      <div>
+        <div className="absolute top-0 left-0 w-full h-full">
+          <div className="absolute h-full w-full left-0 top-0 bg-gradient-to-t from-background from-30%" />
           <Image
             fill
             src={`https://image.tmdb.org/t/p/original${data.backdrop_path}`}
             quality={100}
             className={`object-cover pointer-events-none z-[-1]`}
+            alt="header image"
             priority
-            alt="background image"
+            sizes="100vw"
           />
         </div>
       </div>

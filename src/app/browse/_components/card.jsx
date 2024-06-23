@@ -18,8 +18,9 @@ export function Card({ data, index }) {
         alt={`Background image ${index + 1}`}
         key={index}
         quality={20}
-        sizes="100vw"
+        sizes="(max-width: 300px) 10vw, 20vw"
         className={`rounded-xl border-2 border-gray-600 object-cover`}
+        priority
       />
     </div>
   );

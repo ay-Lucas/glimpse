@@ -1,5 +1,4 @@
 import { ImageCarousel } from "./_components/image-carousel";
-// import { ImageCarousel } from "./_components/poster-carousel";
 import { options, shuffle, bubbleSort } from "@/lib/utils";
 
 const baseUrl = "https://api.themoviedb.org/3";
