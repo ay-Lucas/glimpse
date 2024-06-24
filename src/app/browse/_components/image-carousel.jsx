@@ -13,16 +13,18 @@ import Link from "next/link";
 export function ImageCarousel({ data, title }) {
   return (
     <Carousel
-      className="relative block mx-auto w-11/12 "
+      className="relative block mx-auto w-11/12"
       opts={{
-        slidesToScroll: 3,
+        slidesToScroll: 5,
+        align: "start",
+        duration: 15,
         watchDrag: false,
       }}
     >
-      <h2 className="pb-4 pl-3 text-xl font-bold">{title}</h2>
+      <h2 className="pb-4 pl-6 text-xl font-bold">{title}</h2>
       <CarouselContent className="-ml-1">
         {data.map((item, i) => (
-          <CarouselItem key={i} className="pr-3 basis-auto group">
+          <CarouselItem key={i} className="pl-7 basis-auto group">
             <Link
               href={
                 item.media_type === "tv"
@@ -30,7 +32,11 @@ export function ImageCarousel({ data, title }) {
                   : `/movie/${item.id}`
               }
             >
-              <Card data={item} index={i} />
+              <Card
+                data={item}
+                index={i}
+                variant={title === "Trending" ? "numbered" : "default"}
+              />
             </Link>
           </CarouselItem>
         ))}

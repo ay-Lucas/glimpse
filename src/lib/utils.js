@@ -20,7 +20,7 @@ export const options = {
     accept: "application/json",
     Authorization: `Bearer ${process.env.NEXT_PUBLIC_TMDB_ACCESS_TOKEN}`,
   },
-  // cache: "force-cache",
+  cache: "force-cache",
 };
 
 // sorts trending movies and tv objects

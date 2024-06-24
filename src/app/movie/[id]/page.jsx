@@ -2,15 +2,23 @@ import Image from "next/image";
 import "@/styles/globals.css";
 import { options } from "@/lib/utils";
 import TmdbLogo from "@/../public/tmdb-logo.svg";
+import { Review } from "@/components/review";
 const baseUrl = "https://api.themoviedb.org/3";
 async function getData(id) {
   const res = await fetch(`${baseUrl}/movie/${id}`, options);
   return res.json();
 }
 
+async function getReviews(id) {
+  const res = await fetch(`${baseUrl}/movie/${id}/reviews`, options);
+  return res.json();
+}
+
 export default async function Movie({ params }) {
   const data = await getData(params.id);
-  console.log(data);
+  const reviews = await getReviews(params.id);
+  // console.log(data);
+  // console.log(reviews);
   return (
     <main>
       <div>
@@ -44,7 +52,7 @@ export default async function Movie({ params }) {
             <h2 className="text-4xl">{data.title}</h2>
             <div className="flex flex-row items-center">
               <span className="mr-3 text-lg">
-                {data.vote_average.toPrecision(2)}
+                {`${data.vote_average.toPrecision(2) * 10}%`}
               </span>
               <Image
                 src={TmdbLogo}
@@ -54,6 +62,14 @@ export default async function Movie({ params }) {
               />
             </div>
             <div className="text-lg">{data.overview}</div>
+          </div>
+        </div>
+        <div className="pt-5">
+          <h2 className="text-3xl pb-5">Reviews</h2>
+          <div className="space-y-3">
+            {reviews.results.map((review, index) => (
+              <Review review={review} key={index} />
+            ))}
           </div>
         </div>
       </div>
