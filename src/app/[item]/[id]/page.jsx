@@ -2,44 +2,47 @@ import Image from "next/image";
 import "@/styles/globals.css";
 import { options } from "@/lib/utils";
 import TmdbLogo from "@/../public/tmdb-logo.svg";
-import { Review } from "@/components/review";
+import { Reviews } from "../_components/reviews";
+
 const baseUrl = "https://api.themoviedb.org/3";
-async function getData(id) {
-  const res = await fetch(`${baseUrl}/movie/${id}`, options);
+
+async function getData(params) {
+  const res = await fetch(`${baseUrl}/${params.item}/${params.id}`, options);
   return res.json();
 }
 
-async function getReviews(id) {
-  const res = await fetch(`${baseUrl}/movie/${id}/reviews`, options);
+async function getReviews(params) {
+  const res = await fetch(
+    `${baseUrl}/${params.item}/${params.id}/reviews`,
+    options,
+  );
   return res.json();
 }
 
-export default async function Movie({ params }) {
-  const data = await getData(params.id);
-  const reviews = await getReviews(params.id);
-  console.log(reviews);
+export default async function ItemPage({ params }) {
+  const data = await getData(params);
+  const reviews = await getReviews(params);
+  // console.log(params);
+  // console.log(reviews);
 
   const options = {
     year: "numeric",
     month: "numeric",
     day: "numeric",
   };
-  // console.log(reviews);
   return (
-    <main>
-      <div>
-        <div className="absolute top-0 left-0 w-full h-full">
-          <div className="absolute h-full w-full left-0 top-0 bg-gradient-to-t from-background from-30%" />
-          <Image
-            fill
-            src={`https://image.tmdb.org/t/p/original${data.backdrop_path}`}
-            quality={100}
-            className={`object-cover pointer-events-none z-[-1]`}
-            alt="header image"
-            priority
-            sizes="100vw"
-          />
-        </div>
+    <main className="absolute top-0 left-0 w-full h-full">
+      <div className="absolute top-0 left-0 w-full h-full">
+        <div className="absolute h-full w-full left-0 top-0 bg-gradient-to-t from-background from-30%" />
+        <Image
+          fill
+          src={`https://image.tmdb.org/t/p/original${data.backdrop_path}`}
+          quality={100}
+          className={`object-cover pointer-events-none -z-10`}
+          alt="header image"
+          priority
+          sizes="100vw"
+        />
       </div>
       <div className="relative container px-60 items-end h-full">
         <div className="grid grid-cols-2 lg:grid-cols-4 z-10 mt-72">
@@ -55,10 +58,10 @@ export default async function Movie({ params }) {
             />
           </div>
           <div className="col-span-3">
-            <h2 className="text-4xl">{data.title}</h2>
+            <h2 className="text-4xl">{data.name || data.title}</h2>
             <div className="flex flex-row items-center">
               <span className="mr-2 text-lg">
-                {`${data && data.vote_average.toPrecision(2) * 10}%`}
+                {`${data.vote_average && data.vote_average.toPrecision(2) * 10}%`}
               </span>
               <Image
                 src={TmdbLogo}
@@ -68,7 +71,9 @@ export default async function Movie({ params }) {
               />
               <div className="text-lg pl-3">
                 {data &&
-                  new Date(data.release_date).toLocaleDateString(options)}
+                  new Date(
+                    data.first_air_date || data.release_date,
+                  ).toLocaleDateString(options)}
               </div>
             </div>
             <div className="text-lg">{data.overview}</div>
@@ -80,8 +85,8 @@ export default async function Movie({ params }) {
             ({reviews.results.length})
           </span>
           <div className="space-y-3">
-            {reviews.results.map((review, index) => (
-              <Review review={review} key={index} />
+            {reviews.results.map((reviews, index) => (
+              <Reviews data={reviews} key={index} />
             ))}
           </div>
         </div>

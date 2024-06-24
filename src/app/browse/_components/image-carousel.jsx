@@ -26,11 +26,12 @@ export function ImageCarousel({ data, title }) {
         {data.map((item, i) => (
           <CarouselItem key={i} className="pl-7 basis-auto group">
             <Link
-              href={
-                item.media_type === "tv"
-                  ? `/tv/${item.id}`
-                  : `/movie/${item.id}`
-              }
+              href={`/${item.media_type}/${item.id}`}
+              // href={
+              //   item.media_type === "tv"
+              //     ? `/tv/${item.id}`
+              //     : `/movie/${item.id}`
+              //}
             >
               <Card
                 data={item}
