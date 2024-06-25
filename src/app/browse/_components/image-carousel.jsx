@@ -1,4 +1,5 @@
-import * as React from "react";
+import { Card } from "./card";
+import Link from "next/link";
 import {
   Carousel,
   CarouselContent,
@@ -6,9 +7,6 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-
-import { Card } from "./card";
-import Link from "next/link";
 
 export function ImageCarousel({ data, title }) {
   return (
@@ -25,14 +23,7 @@ export function ImageCarousel({ data, title }) {
       <CarouselContent className="-ml-1">
         {data.map((item, i) => (
           <CarouselItem key={i} className="pl-7 basis-auto group">
-            <Link
-              href={`/${item.media_type}/${item.id}`}
-              // href={
-              //   item.media_type === "tv"
-              //     ? `/tv/${item.id}`
-              //     : `/movie/${item.id}`
-              //}
-            >
+            <Link href={`/${item.media_type}/${item.id}`}>
               <Card
                 data={item}
                 index={i}
