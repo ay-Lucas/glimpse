@@ -49,7 +49,6 @@ export default async function HomePage() {
   const trending = sortPopular(trendingTvAndMovies, MIN_TRENDING_POPULARITY);
 
   const isMobile = getDeviceType() === "mobile";
-  console.log(isMobile);
   return (
     <main className="mt-1">
       <div className="mx-auto space-y-4 overflow-hidden">

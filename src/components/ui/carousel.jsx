@@ -183,7 +183,6 @@ const CarouselPrevious = React.forwardRef(
         {...props}
       >
         <ChevronLeft size={33} />
-        {/* <ArrowLeft className="h-4 w-4" /> */}
         <span className="sr-only">Previous slide</span>
       </Button>
     );
@@ -212,7 +211,6 @@ const CarouselNext = React.forwardRef(
         {...props}
       >
         <ChevronRight size={33} />
-        {/* <ArrowRight className="h-6 w-6" /> */}
         <span className="sr-only">Next slide</span>
       </Button>
     );

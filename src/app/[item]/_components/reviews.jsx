@@ -20,7 +20,7 @@ export function Reviews({ data }) {
     );
   }, [ref]);
   return (
-    <div className="rounded-md border px-4 pt-2 pb-2 text-md backdrop-blur ">
+    <div className="rounded-md border px-4 pt-2 pb-2 text-md backdrop-blur">
       <div className="pb-1">
         <Link href={data.url}>
           <span className="text-xl">{data.author}</span>
@@ -37,18 +37,21 @@ export function Reviews({ data }) {
         )}
       </div>
       <div
-        className={`text-md text-start leading-6 line-clamp-4 select-text ${isOpen ? "line-clamp-none" : "mb-0"}`}
+        className={`text-md text-start leading-6 line-clamp-4 select-text ${isOpen ? "line-clamp-none" : ""}`}
         ref={ref}
       >
         {data.content}
       </div>
-      {isExpandable && (
-        <button onClick={handleIsOpen}>
-          <ChevronDown
-            className={`absolute dark:brightness-50 right-2 bottom-1 ease-in-out transition-transform duration-300 ${isOpen ? "rotate-180" : ""} ${ref.current && ref.current.clientHeight >= CLAMPED_CLIENT_HEIGHT ? "visible" : "hidden"}`}
-          />
-        </button>
-      )}
+      <div className="flex w-full justify-end">
+        {isExpandable && (
+          <button onClick={handleIsOpen}>
+            <ChevronDown
+              className={`dark:brightness-50   ease-in-out transition-transform duration-300 ${isOpen ? "rotate-180" : ""} ${ref.current && ref.current.clientHeight >= CLAMPED_CLIENT_HEIGHT ? "visible" : "hidden"}`}
+              // className={`absolute dark:brightness-50 right-2 bottom-1 ease-in-out transition-transform duration-300 ${isOpen ? "rotate-180" : ""} ${ref.current && ref.current.clientHeight >= CLAMPED_CLIENT_HEIGHT ? "visible" : "hidden"}`}
+            />
+          </button>
+        )}
+      </div>
     </div>
   );
 }

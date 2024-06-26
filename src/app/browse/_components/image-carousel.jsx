@@ -15,8 +15,8 @@ import { useEffect, useState } from "react";
 function Content({ data, title }) {
   return (
     <>
-      <h2 className="pb-4 pl-6 text-xl font-bold">{title}</h2>
-      <CarouselContent className="-ml-1">
+      <h2 className="pb-4 pl-6 md:pl-0 text-xl font-medium">{title}</h2>
+      <CarouselContent className="-ml-1 md:-ml-14">
         {data.map((item, i) => (
           <CarouselItem key={i} className="pl-7 basis-auto group">
             <Link href={`/${item.media_type}/${item.id}`}>
@@ -29,8 +29,8 @@ function Content({ data, title }) {
           </CarouselItem>
         ))}
       </CarouselContent>
-      <CarouselPrevious className="md:ml-0 ml-8 opacity-80 hover:opacity-100" />
-      <CarouselNext className="lg:mr-0 mr-9 opacity-80 hover:opacity-100" />
+      <CarouselPrevious className="md:ml-0 ml-8 mt-4 opacity-80 hover:opacity-100" />
+      <CarouselNext className="lg:mr-0 mr-9 mt-4 opacity-80 hover:opacity-100" />
     </>
   );
 }
