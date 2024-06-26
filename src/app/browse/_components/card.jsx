@@ -25,7 +25,7 @@ export function Card({ data, index, variant }) {
         src={`https://image.tmdb.org/t/p/original${data.poster_path}`}
         alt={`Background image ${index + 1}`}
         key={index}
-        quality={100}
+        quality={75}
         sizes="(max-width: 768px) 33vw, (max-width: 1080px) 23vw, (max-width: 1200px) 15vw"
         className="object-cover"
         priority

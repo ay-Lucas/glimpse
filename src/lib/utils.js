@@ -40,3 +40,12 @@ export function bubbleSort(arr, n) {
     if (swapped == false) break;
   }
 }
+
+export function sortPopular(array, minPopularity = 0) {
+  if (typeof array === undefined || array.length == 0)
+    throw new Error("Could not sort array: array is undefined or empty");
+  bubbleSort(array, array.length);
+  if (minPopularity > 0)
+    array = array.filter((item) => item.popularity >= minPopularity);
+  return array;
+}

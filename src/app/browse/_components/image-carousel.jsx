@@ -12,14 +12,14 @@ import {
 } from "@/components/ui/carousel";
 import { useEffect, useState } from "react";
 
-function Content({ data, title }) {
+function Content({ data, title, type }) {
   return (
     <>
       <h2 className="pb-4 pl-6 md:pl-0 text-xl font-medium">{title}</h2>
       <CarouselContent className="-ml-1 md:-ml-14">
         {data.map((item, i) => (
           <CarouselItem key={i} className="pl-7 basis-auto group">
-            <Link href={`/${item.media_type}/${item.id}`}>
+            <Link href={`/${item.media_type || type}/${item.id}`}>
               <Card
                 data={item}
                 index={i}
@@ -35,7 +35,12 @@ function Content({ data, title }) {
   );
 }
 
-export function ImageCarousel({ data, title, isMobile: isUserAgentMobile }) {
+export function ImageCarousel({
+  data,
+  title,
+  isMobile: isUserAgentMobile,
+  type,
+}) {
   const isMobile = useMediaQuery(768);
   const [slidesToScroll, setSlidesToScroll] = useState(
     isUserAgentMobile ? 2 : 5,
@@ -53,7 +58,7 @@ export function ImageCarousel({ data, title, isMobile: isUserAgentMobile }) {
         watchDrag: false,
       }}
     >
-      <Content data={data} title={title} />
+      <Content data={data} title={title} type={type} />
     </Carousel>
   );
 }

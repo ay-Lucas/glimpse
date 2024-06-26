@@ -1,6 +1,7 @@
 import Image from "next/image";
 import "@/styles/globals.css";
 import { options } from "@/lib/utils";
+import { dateOptions } from "@/lib/constants";
 import TmdbLogo from "@/../public/tmdb-logo.svg";
 import { Reviews } from "../_components/reviews";
 
@@ -25,11 +26,6 @@ export default async function ItemPage({ params }) {
   // console.log(params);
   // console.log(reviews);
 
-  const options = {
-    year: "numeric",
-    month: "numeric",
-    day: "numeric",
-  };
   return (
     <main className="h-screen relative">
       <div className="h-full w-full">
@@ -77,7 +73,7 @@ export default async function ItemPage({ params }) {
                       {data &&
                         new Date(
                           data.first_air_date || data.release_date,
-                        ).toLocaleDateString(options)}
+                        ).toLocaleDateString(dateOptions)}
                     </div>
                   </div>
                   <div className="text-md md:text-lg font-medium">
