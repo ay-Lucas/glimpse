@@ -1,3 +1,6 @@
+"use client";
+// import dynamic from "next/dynamic";
+import { useMediaQuery } from "@/lib/hooks";
 import { Card } from "./card";
 import Link from "next/link";
 import {
@@ -7,18 +10,11 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { useEffect, useState } from "react";
 
-export function ImageCarousel({ data, title }) {
+function Content({ data, title }) {
   return (
-    <Carousel
-      className="relative block mx-auto w-11/12"
-      opts={{
-        slidesToScroll: 5,
-        align: "start",
-        duration: 15,
-        watchDrag: false,
-      }}
-    >
+    <>
       <h2 className="pb-4 pl-6 text-xl font-bold">{title}</h2>
       <CarouselContent className="-ml-1">
         {data.map((item, i) => (
@@ -33,8 +29,31 @@ export function ImageCarousel({ data, title }) {
           </CarouselItem>
         ))}
       </CarouselContent>
-      <CarouselPrevious />
-      <CarouselNext />
+      <CarouselPrevious className="md:ml-0 ml-8 opacity-80 hover:opacity-100" />
+      <CarouselNext className="lg:mr-0 mr-9 opacity-80 hover:opacity-100" />
+    </>
+  );
+}
+
+export function ImageCarousel({ data, title, isMobile: isUserAgentMobile }) {
+  const isMobile = useMediaQuery(768);
+  const [slidesToScroll, setSlidesToScroll] = useState(
+    isUserAgentMobile ? 2 : 5,
+  );
+  useEffect(() => {
+    isMobile ? setSlidesToScroll(2) : setSlidesToScroll(5);
+  }, [isMobile]);
+  return (
+    <Carousel
+      className="relative block mx-auto w-11/12"
+      opts={{
+        slidesToScroll: slidesToScroll,
+        align: "start",
+        duration: 15,
+        watchDrag: false,
+      }}
+    >
+      <Content data={data} title={title} />
     </Carousel>
   );
 }

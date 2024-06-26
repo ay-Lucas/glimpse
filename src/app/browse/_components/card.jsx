@@ -2,7 +2,7 @@ import Image from "next/image";
 
 export function Card({ data, index, variant }) {
   return (
-    <div className="relative text-xl group-hover:scale-110 transform-gpu transition duration-150 rounded-xl overflow-hidden shadow-2xl w-[190px] h-[284px]">
+    <div className="relative text-xl group-hover:scale-110 transform-gpu transition duration-150 rounded-xl overflow-hidden shadow-2xl w-[142.5px] h-[213px] md:w-[190px] md:h-[284px]">
       <div className="absolute z-10 h-full w-full bg-gradient-to-t from-background from-30% to-gray-300/20 opacity-0 group-hover:opacity-95 transition-opacity transform-gpu duration-300" />
       <div className="absolute z-20 flex h-full w-full items-end opacity-0 group-hover:opacity-100 transition transform-gpu duration-300">
         <div className="p-2">
@@ -26,8 +26,8 @@ export function Card({ data, index, variant }) {
         alt={`Background image ${index + 1}`}
         key={index}
         quality={100}
-        sizes="(max-width: 190px) 5vw, 10vw"
-        className="object-cover "
+        sizes="(max-width: 768px) 33vw, (max-width: 1080px) 23vw, (max-width: 1200px) 15vw"
+        className="object-cover"
         priority
       />
     </div>

@@ -1,4 +1,5 @@
 import { ImageCarousel } from "./_components/image-carousel";
+import { headers } from "next/headers";
 import { options, shuffle, bubbleSort } from "@/lib/utils";
 
 const baseUrl = "https://api.themoviedb.org/3";
@@ -25,6 +26,17 @@ function sortPopular(array, minPopularity = 0) {
   return array;
 }
 
+export const getDeviceType = () => {
+  const headersList = headers();
+  const userAgent = headersList.get("user-agent");
+
+  return userAgent.match(
+    /Android|BlackBerry|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i,
+  )
+    ? "mobile"
+    : "desktop";
+};
+
 export default async function HomePage() {
   const [tvRes, movieRes] = await Promise.all([
     getTrendingTv("week"),
@@ -35,15 +47,19 @@ export default async function HomePage() {
 
   const trendingTvAndMovies = tvRes.results.concat(movieRes.results);
   const trending = sortPopular(trendingTvAndMovies, MIN_TRENDING_POPULARITY);
-  console.log(trendingMovies);
-  // const trending = shuffle(trendingTvAndMovies);
 
+  const isMobile = getDeviceType() === "mobile";
+  console.log(isMobile);
   return (
     <main className="mt-1">
       <div className="mx-auto space-y-4 overflow-hidden">
-        <ImageCarousel data={trending} title="Trending" />
-        <ImageCarousel data={trendingTv} title="TV Shows" />
-        <ImageCarousel data={trendingMovies} title="Movies" />
+        <ImageCarousel data={trending} isMobile={isMobile} title="Trending" />
+        <ImageCarousel data={trendingTv} isMobile={isMobile} title="TV Shows" />
+        <ImageCarousel
+          data={trendingMovies}
+          isMobile={isMobile}
+          title="Movies"
+        />
       </div>
     </main>
   );
