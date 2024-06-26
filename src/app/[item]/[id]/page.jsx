@@ -80,7 +80,9 @@ export default async function ItemPage({ params }) {
                         ).toLocaleDateString(options)}
                     </div>
                   </div>
-                  <div className="text-lg font-medium">{data.overview}</div>
+                  <div className="text-md md:text-lg font-medium">
+                    {data.overview}
+                  </div>
                 </div>
               </div>{" "}
             </div>

@@ -20,7 +20,7 @@ export function Reviews({ data }) {
     );
   }, [ref]);
   return (
-    <div className="rounded-md border px-4 pt-2 pb-2 text-md backdrop-blur">
+    <div className="rounded-md border px-4 pt-2 pb-1 text-md backdrop-blur">
       <div className="pb-1">
         <Link href={data.url}>
           <span className="text-xl">{data.author}</span>
