@@ -40,7 +40,12 @@ export default async function HomePage() {
   return (
     <main className="mt-1">
       <div className="mx-auto space-y-4 overflow-hidden">
-        <ImageCarousel data={trending} isMobile={isMobile} title="Trending" />
+        <ImageCarousel
+          data={trending}
+          variant="labeled"
+          isMobile={isMobile}
+          title="Trending"
+        />
         {/* <ImageCarousel */}
         {/*   data={trendingTv} */}
         {/*   type="movie" */}
