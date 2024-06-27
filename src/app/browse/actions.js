@@ -1,7 +1,6 @@
 import "server-only";
 import { headers } from "next/headers";
-import { options } from "@/lib/utils";
-import { baseApiUrl } from "@/lib/constants";
+import { baseApiUrl, options } from "@/lib/constants";
 export async function getTrendingTv(timeWindow) {
   const res = await fetch(`${baseApiUrl}/trending/tv/${timeWindow}`, options);
   return res.json();
@@ -41,7 +40,7 @@ export async function getUpcomingMovies(page) {
   return res.json();
 }
 
-export const getDeviceType = () => {
+export async function getDeviceType() {
   const headersList = headers();
   const userAgent = headersList.get("user-agent");
 
@@ -50,4 +49,4 @@ export const getDeviceType = () => {
   )
     ? "mobile"
     : "desktop";
-};
+}

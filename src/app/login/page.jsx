@@ -1,6 +1,6 @@
 import { LoginForm } from "@/components/login-form";
-import { Background } from "@/components/background";
-import { getBackgrounds } from "@/components/backdrops";
+import { Background } from "./_components/background";
+import { getBackgrounds } from "./_components/backdrops";
 
 export default async function Login() {
   const backdrops = await getBackgrounds();

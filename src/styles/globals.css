@@ -89,6 +89,16 @@
   }
 }
 
+.blur-img {
+  filter: blur(5px);
+  transition: filter 0.3s ease-in;
+}
+
+.remove-blur {
+  filter: blur(0px);
+  transition: filter 0.3s ease-in;
+}
+
 @layer base {
   * {
     @apply border-border;

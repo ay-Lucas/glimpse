@@ -14,15 +14,6 @@ export function shuffle(array) {
   return array;
 }
 
-export const options = {
-  method: "GET",
-  headers: {
-    accept: "application/json",
-    Authorization: `Bearer ${process.env.NEXT_PUBLIC_TMDB_ACCESS_TOKEN}`,
-  },
-  cache: "force-cache",
-};
-
 // sorts trending movies and tv objects
 export function bubbleSort(arr, n) {
   let i, j, temp;

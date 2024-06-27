@@ -12,3 +12,14 @@ export const dateOptions = {
 };
 
 export const baseApiUrl = "https://api.themoviedb.org/3";
+
+export const baseImageUrl = "https://image.tmdb.org/t/p/original";
+
+export const options = {
+  method: "GET",
+  headers: {
+    accept: "application/json",
+    Authorization: `Bearer ${process.env.TMDB_ACCESS_TOKEN}`,
+  },
+  cache: "force-cache",
+};

@@ -1,19 +1,8 @@
-"use server";
 import { shuffle } from "@/lib/utils";
-const baseImageUrl = "https://image.tmdb.org/t/p/original";
-const trendingTvUrl =
-  "https://api.themoviedb.org/3/trending/tv/day?language=en-US";
-const trendingMoviesUrl =
-  "https://api.themoviedb.org/3/trending/movie/day?language=en-US";
+import { baseApiUrl, options } from "@/lib/constants";
+const trendingTvUrl = `${baseApiUrl}/trending/tv/day?language=en-US`;
+const trendingMoviesUrl = `${baseApiUrl}/trending/movie/day?language=en-US`;
 const MAX_POPULARITY = 250;
-const options = {
-  method: "GET",
-  headers: {
-    accept: "application/json",
-    Authorization: `Bearer ${process.env.NEXT_PUBLIC_TMDB_ACCESS_TOKEN}`,
-  },
-  cache: "force-cache",
-};
 
 export async function getBackgrounds() {
   let [res1, res2] = await Promise.all([

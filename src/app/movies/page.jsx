@@ -8,9 +8,9 @@ import {
 } from "@/app/browse/actions";
 import { isUnique } from "@/lib/utils";
 
-const MIN_TRENDING_POPULARITY = 300;
-const MIN_POPULAR_POPULARITY = 8000;
 export default async function Movies() {
+  const MIN_TRENDING_POPULARITY = 300;
+  const MIN_POPULAR_POPULARITY = 8000;
   const [trendingMovieRes, popularMoviesRes, upcomingMoviesRes] =
     await Promise.all([
       getTrendingMovies("week"),
