@@ -7,7 +7,7 @@ export function Backdrop({ src }) {
     <Image
       fill
       src={src}
-      quality={75}
+      quality={100}
       alt="header image"
       priority
       onLoad={() => setImageLoading(false)}

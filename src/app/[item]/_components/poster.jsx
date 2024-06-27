@@ -5,11 +5,11 @@ export function Poster({ src }) {
   const [isImageLoading, setImageLoading] = useState(true);
   return (
     <Image
-      quality={75}
+      quality={100}
       width={190}
       height={284}
       src={src}
-      sizes="(max-width: 190px) 5vw, 10vw"
+      sizes="(max-width: 768px) 50vw, (max-width: 1200px) 20vw"
       onLoad={() => setImageLoading(false)}
       className={`object-cover rounded-xl mx-auto md:m-0 p-5 md:p-0 ${isImageLoading ? "blur-img" : "remove-blur"}`}
       priority
