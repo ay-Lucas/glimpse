@@ -27,15 +27,16 @@ export default async function ItemPage({ params }) {
   // console.log(reviews);
 
   return (
-    <main className="h-screen relative">
-      <div className="h-full w-full">
-        <div className="absolute left-0 bottom-32 w-full h-full">
-          <div className="absolute h-full w-full left-0 top-0 bg-gradient-to-t from-background from-30% via-background/95 via-40%  to-transparent" />
+    <main>
+      <div>
+        {/* <div className="absolute left-0 bottom-32 w-full h-full bg-black"> */}
+        <div className="absolute h-full w-full bg-gradient-to-t from-background from-30% via-background/95 via-40% to-transparent">
           <Backdrop
             src={`https://image.tmdb.org/t/p/original${data.backdrop_path}`}
           />
+          {/* </div> */}
         </div>
-        <div className="relative container items-end h-full px-5 md:px-40 pt-16">
+        <div className="relative h-screen container items-end px-5 md:px-40 pt-16">
           <div className="md:h-[57%] flex items-end pb-5 md:pt-0">
             <div>
               <div className="flex flex-col md:flex-row h-full md:h-3/4 z-10 md:items-center md:space-x-5">
@@ -67,7 +68,7 @@ export default async function ItemPage({ params }) {
                     {data.overview}
                   </div>
                 </div>
-              </div>{" "}
+              </div>
             </div>
           </div>
           <div className="">
