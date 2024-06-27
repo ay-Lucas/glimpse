@@ -20,7 +20,7 @@ export function Card({ data, index, variant }) {
       {/* )} */}
       {variant === "labeled" ? (
         <div
-          className={`w-14 h-6 top-1 left-1 shadow-xl text-sm font-semibold text-center rounded-2xl z-10 absolute bg-blend-difference ${data.media_type === "tv" ? "bg-blue-500/85" : "bg-green-500/85"}`}
+          className={`border border-gray-300/50 w-14 h-6 top-1 left-1 shadow-xl text-sm font-semibold text-center rounded-2xl z-10 absolute bg-blend-difference ${data.media_type === "tv" ? "bg-blue-500/85" : "bg-green-500/85"}`}
         >
           <span className="align-middle">{data.media_type}</span>
         </div>

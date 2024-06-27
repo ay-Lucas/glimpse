@@ -10,9 +10,9 @@ import {
   getTrendingMovies,
 } from "./actions";
 
-const MIN_POPULARITY = 200;
-const MIN_TRENDING_POPULARITY = 100;
-
+const MIN_POPULARITY = 500;
+const MIN_TRENDING_POPULARITY = 300;
+const MIN_POPULAR_POPULARITY = 8000;
 export default async function HomePage() {
   const [
     trendingTvRes,
@@ -23,60 +23,78 @@ export default async function HomePage() {
   ] = await Promise.all([
     getTrendingTv("week"),
     getTrendingMovies("week"),
-    getPopularTv(),
-    getPopularMovies(),
-    getUpcomingMovies(),
+    getPopularTv(1, MIN_POPULAR_POPULARITY),
+    getPopularMovies(1, MIN_POPULAR_POPULARITY),
+    getUpcomingMovies(1),
   ]);
-  // const trendingTv = sortPopular(trendingTvRes.results, MIN_POPULARITY);
-  // const trendingMovies = sortPopular(trendingMovieRes.results, MIN_POPULARITY);
+  const trendingTv = sortPopular(
+    trendingTvRes.results,
+    MIN_TRENDING_POPULARITY,
+  );
+  const trendingMovies = sortPopular(
+    trendingMovieRes.results,
+    MIN_TRENDING_POPULARITY,
+  );
   const trendingTvAndMovies = trendingTvRes.results.concat(
     trendingMovieRes.results,
   );
 
   const trending = sortPopular(trendingTvAndMovies, MIN_TRENDING_POPULARITY);
   const isMobile = getDeviceType() === "mobile";
+  function isUnique(item, array) {
+    let unique = false;
+    array.forEach((trendingItem) => {
+      if (trendingItem.media_type === "tv" && trendingItem.name === item.name) {
+        return (unique = true);
+      } else if (
+        trendingItem.media_type === "movie" &&
+        trendingItem.title === item.title
+      ) {
+        return (unique = true);
+      }
+    });
+    return !unique;
+    // return item
+  }
+  const filteredPopularTv = popularTvRes.results.filter((item) =>
+    isUnique(item, trending),
+  );
+  const filteredPopularMovie = popularMoviesRes.results.filter((item) =>
+    isUnique(item, trending),
+  );
 
-  console.log(upcomingMoviesRes);
   return (
     <main className="mt-1">
       <div className="mx-auto space-y-4 overflow-hidden">
         <ImageCarousel
-          data={trending}
-          variant="labeled"
-          isMobile={isMobile}
-          title="Trending"
-        />
-        {/* <ImageCarousel */}
-        {/*   data={trendingTv} */}
-        {/*   type="movie" */}
-        {/*   isMobile={isMobile} */}
-        {/*   title="TV Shows" */}
-        {/* /> */}
-        {/* <ImageCarousel */}
-        {/*   data={trendingMovies} */}
-        {/*   type="movie" */}
-        {/*   isMobile={isMobile} */}
-        {/*   title="Movies" */}
-        {/* /> */}
-        <ImageCarousel
-          data={popularTvRes.results}
-          type="tv"
-          isMobile={isMobile}
-          title="Popular Series"
-        />
-
-        <ImageCarousel
-          data={popularMoviesRes.results}
+          data={trendingTv}
           type="movie"
           isMobile={isMobile}
-          title="Popular Movies"
+          title="Trending Series"
         />
-
+        <ImageCarousel
+          data={trendingMovies}
+          type="movie"
+          isMobile={isMobile}
+          title="Trending Movies"
+        />
         <ImageCarousel
           data={upcomingMoviesRes.results}
           type="movie"
           isMobile={isMobile}
           title="Upcoming Movies"
+        />
+        <ImageCarousel
+          data={filteredPopularTv}
+          type="tv"
+          isMobile={isMobile}
+          title="Popular Series"
+        />
+        <ImageCarousel
+          data={filteredPopularMovie}
+          type="movie"
+          isMobile={isMobile}
+          title="Popular Movies"
         />
       </div>
     </main>
