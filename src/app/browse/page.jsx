@@ -1,6 +1,5 @@
-import { ImageCarousel } from "./_components/image-carousel";
-import { options, shuffle, bubbleSort, sortPopular } from "@/lib/utils";
-import { dateOptions } from "@/lib/constants";
+import { ImageCarousel } from "@/components/image-carousel";
+import { sortPopular, isUnique } from "@/lib/utils";
 import {
   getDeviceType,
   getUpcomingMovies,
@@ -8,12 +7,12 @@ import {
   getTrendingTv,
   getPopularMovies,
   getTrendingMovies,
-} from "./actions";
+} from "@/app/browse/actions";
 
 const MIN_POPULARITY = 500;
 const MIN_TRENDING_POPULARITY = 300;
 const MIN_POPULAR_POPULARITY = 8000;
-export default async function HomePage() {
+export default async function Browse() {
   const [
     trendingTvRes,
     trendingMovieRes,
@@ -41,21 +40,6 @@ export default async function HomePage() {
 
   const trending = sortPopular(trendingTvAndMovies, MIN_TRENDING_POPULARITY);
   const isMobile = getDeviceType() === "mobile";
-  function isUnique(item, array) {
-    let unique = false;
-    array.forEach((trendingItem) => {
-      if (trendingItem.media_type === "tv" && trendingItem.name === item.name) {
-        return (unique = true);
-      } else if (
-        trendingItem.media_type === "movie" &&
-        trendingItem.title === item.title
-      ) {
-        return (unique = true);
-      }
-    });
-    return !unique;
-    // return item
-  }
   const filteredPopularTv = popularTvRes.results.filter((item) =>
     isUnique(item, trending),
   );

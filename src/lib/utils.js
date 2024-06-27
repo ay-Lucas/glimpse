@@ -49,3 +49,19 @@ export function sortPopular(array, minPopularity = 0) {
     array = array.filter((item) => item.popularity >= minPopularity);
   return array;
 }
+
+export function isUnique(item, array) {
+  let unique = false;
+  array.forEach((trendingItem) => {
+    if (trendingItem.media_type === "tv" && trendingItem.name === item.name) {
+      return (unique = true);
+    } else if (
+      trendingItem.media_type === "movie" &&
+      trendingItem.title === item.title
+    ) {
+      return (unique = true);
+    }
+  });
+  return !unique;
+  // return item
+}

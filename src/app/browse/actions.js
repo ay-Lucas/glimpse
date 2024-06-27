@@ -1,7 +1,7 @@
 import "server-only";
 import { headers } from "next/headers";
 import { options } from "@/lib/utils";
-import { baseApiUrl, dateOptions } from "@/lib/constants";
+import { baseApiUrl } from "@/lib/constants";
 export async function getTrendingTv(timeWindow) {
   const res = await fetch(`${baseApiUrl}/trending/tv/${timeWindow}`, options);
   return res.json();
