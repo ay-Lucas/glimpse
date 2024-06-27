@@ -12,6 +12,7 @@ const nextConfig = {
         // pathname: "/account123/**",
       },
     ],
+    minimumCacheTTL: 200,
   },
 };
 

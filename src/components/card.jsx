@@ -32,9 +32,8 @@ export function Card({ data, index, variant }) {
       )}
 
       <Image
-        // width={190}
-        // height={284}
-        fill
+        width={195}
+        height={290}
         src={`https://image.tmdb.org/t/p/original${data.poster_path}`}
         alt={`Background image ${index + 1}`}
         key={index}
@@ -42,7 +41,7 @@ export function Card({ data, index, variant }) {
         sizes="(max-width: 768px) 33vw, (max-width: 1080px) 23vw, (max-width: 1200px) 15vw"
         onLoad={() => setImageLoading(false)}
         className={`object-cover transition ${isImageLoading ? "blur-img" : "remove-blur"}`}
-        priority
+        loading="lazy"
       />
     </div>
   );
