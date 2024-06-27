@@ -37,7 +37,7 @@ export function TopNav({ loggedIn = false }) {
           ) : (
             <AvatarDropdown
               avatar={
-                <Avatar className="p-1">
+                <Avatar>
                   <AvatarImage src="https://github.com/shadcn.png" />
                   <AvatarFallback>CN</AvatarFallback>
                 </Avatar>
