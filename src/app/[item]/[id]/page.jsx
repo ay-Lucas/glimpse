@@ -5,10 +5,17 @@ import TmdbLogo from "@/../public/tmdb-logo.svg";
 import { Reviews } from "../_components/reviews";
 import { Backdrop } from "../_components/backdrop";
 import { Poster } from "../_components/poster";
+import { Play } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { VideoPlayer } from "../_components/video-player";
+import Link from "next/link";
 const baseUrl = "https://api.themoviedb.org/3";
 
 async function getData(params) {
-  const res = await fetch(`${baseUrl}/${params.item}/${params.id}`, options);
+  const res = await fetch(
+    `${baseUrl}/${params.item}/${params.id}?append_to_response=videos&language=en-US`,
+    options,
+  );
   return res.json();
 }
 
@@ -23,9 +30,7 @@ async function getReviews(params) {
 export default async function ItemPage({ params }) {
   const data = await getData(params);
   const reviews = await getReviews(params);
-  // console.log(params);
-  // console.log(reviews);
-
+  const youtubeId = data.videos.results[0]?.key;
   return (
     <main>
       <div className="relative h-full w-full">
@@ -62,6 +67,17 @@ export default async function ItemPage({ params }) {
                         ).toLocaleDateString(dateOptions)}
                     </div>
                   </div>
+                  {youtubeId && (
+                    <Link
+                      className="texV-md z-10"
+                      href={`${params.id}/?show=true`}
+                    >
+                      <Button className="p-2" variant="outline">
+                        <Play size={22} className="mr-2" />
+                        Play Trailer
+                      </Button>
+                    </Link>
+                  )}
                   <div className="text-md md:text-lg font-medium">
                     {data.overview}
                   </div>
@@ -69,7 +85,7 @@ export default async function ItemPage({ params }) {
               </div>
             </div>
           </div>
-          <div className="">
+          <div>
             <h2 className="text-3xl pb-5 pr-3 inline-flex">Reviews</h2>
             <span className="text-3xl font-light">
               ({reviews.results.length})
@@ -82,6 +98,7 @@ export default async function ItemPage({ params }) {
           </div>
         </div>
       </div>
+      <VideoPlayer youtubeId={youtubeId} id={params.id} />
     </main>
   );
 }
