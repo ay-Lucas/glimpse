@@ -3,23 +3,31 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { IoClose } from "react-icons/io5";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
 export function VideoPlayer({ youtubeId, id }) {
-  const [isVisible, setVisible] = useState(false);
+  const [isVisible, setVisibility] = useState(false);
   const [params, setParams] = useState(null);
   const searchParams = useSearchParams();
+  const router = useRouter();
 
   useEffect(() => {
     setParams(searchParams.get("show"));
     if (params === "true") {
-      setVisible(true);
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "visible";
-      setVisible(false);
     }
-    console.log(params);
   }, [params, searchParams]);
+
+  function exitPlayer() {
+    setVisibility(false);
+    const timeout = setTimeout(() => {
+      router.replace(`${id}`);
+    }, 200);
+    return () => clearTimeout(timeout);
+  }
 
   // const trailer = `https://invidious.selfhost.live/embed/${data.videos.results[0].key}`;
   const trailer = `https://www.youtube-nocookie.com/embed/${youtubeId}?&autoplay=1`;
@@ -29,24 +37,27 @@ export function VideoPlayer({ youtubeId, id }) {
     <>
       {params && (
         <div
-          className={`fixed top-0 w-full h-full flex justify-center bg-background/80 items-center duration-300 will-change-auto ${isVisible ? "opacity-100 z-10 ease-in" : "ease-out transition-opacity opacity-0 z-10"}`}
-          // className={`fixed top-0 w-full h-full flex justify-center bg-black/80 items-center duration-300 will-change-auto ease-out transition-opacity fade-in-55 z-10"}`}
+          onLoad={() => setVisibility(true)}
+          className={`opacity-0 z-10 fixed top-0 w-full h-full flex justify-center bg-background/80 items-center duration-200 transition-opacity ${isVisible ? "ease-in-out opacity-100" : "ease-in-out opacity-0"}`}
         >
-          <div className="relative bg-black p-8 rounded-lg">
+          <div className="relative bg-black p-8 rounded-lg z-50 ">
             <div className="absolute top-1 right-1 ">
-              <Link href={`./${id}`}>
+              <Button onClick={exitPlayer} variant="ghost" className="p-2">
                 <IoClose size={27} />
-              </Link>
+              </Button>
             </div>
             <iframe
               width="1428"
               height="802"
               src={trailer}
               allowFullScreen
-              allow="autoplay; encrypted-media"
+              allowTransparency
             ></iframe>
           </div>
-          {/* <div className="absolute w-full h-full" /> */}
+          <Link
+            href={`./${id}`}
+            className="absolute top-0 left-0 w-full h-full z-10 cursor-default"
+          />
         </div>
       )}
     </>
