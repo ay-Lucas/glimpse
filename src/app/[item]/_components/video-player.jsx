@@ -40,15 +40,18 @@ export function VideoPlayer({ youtubeId, id }) {
           onLoad={() => setVisibility(true)}
           className={`opacity-0 z-10 fixed top-0 w-full h-full flex justify-center bg-background/80 items-center duration-200 transition-opacity ${isVisible ? "ease-in-out opacity-100" : "ease-in-out opacity-0"}`}
         >
-          <div className="relative bg-black p-8 rounded-lg z-50 ">
+          {/* <div className="relative bg-black p-8 rounded-lg z-50 lg:w-[1428px] lg:h-[803px] md:w-[714px] md:h-[401.5px]"> */}
+          <div className="relative bg-black p-8 rounded-lg z-50">
             <div className="absolute top-1 right-1 ">
               <Button onClick={exitPlayer} variant="ghost" className="p-2">
                 <IoClose size={27} />
               </Button>
             </div>
             <iframe
-              width="1428"
-              height="802"
+              className="lg:w-[1428px] lg:h-[803px] md:w-[714px] md:h-[401.5px] w-[357px] h-[200.75px]"
+              // width="1428"
+              // height="803"
+              // className="w-auto h-auto"
               src={trailer}
               allowFullScreen
               allowTransparency
