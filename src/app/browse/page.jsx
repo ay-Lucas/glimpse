@@ -49,20 +49,30 @@ export default async function Browse() {
 
   return (
     <main className="mt-1">
-      <div className="mx-auto space-y-4 overflow-hidden text-xl md:text-2xl font-bold">
-        <h2 className={`md:pl-12 pl-10`}>Trending Series</h2>
+      <div className="mx-auto space-y-4 overflow-hidden ">
+        <h2 className={`md:pl-12 pl-10 text-xl md:text-2xl font-bold`}>
+          Trending Series
+        </h2>
         <ImageCarousel data={trendingTv} type="movie" isMobile={isMobile} />
-        <h2 className={`md:pl-12 pl-10`}>Trending Movies</h2>
+        <h2 className={`md:pl-12 pl-10 text-xl md:text-2xl font-bold`}>
+          Trending Movies
+        </h2>
         <ImageCarousel data={trendingMovies} type="movie" isMobile={isMobile} />
-        <h2 className={`md:pl-12 pl-10`}>Upcoming Movies</h2>
+        <h2 className={`md:pl-12 pl-10 text-xl md:text-2xl font-bold`}>
+          Upcoming Movies
+        </h2>
         <ImageCarousel
           data={upcomingMoviesRes.results}
           type="movie"
           isMobile={isMobile}
         />
-        <h2 className={`md:pl-12 pl-10`}>Popular Series</h2>
+        <h2 className={`md:pl-12 pl-10 text-xl md:text-2xl font-bold`}>
+          Popular Series
+        </h2>
         <ImageCarousel data={filteredPopularTv} type="tv" isMobile={isMobile} />
-        <h2 className={`md:pl-12 pl-10`}>Popular Movies</h2>
+        <h2 className={`md:pl-12 pl-10 text-xl md:text-2xl font-bold`}>
+          Popular Movies
+        </h2>
         <ImageCarousel
           data={filteredPopularMovie}
           type="movie"

@@ -46,14 +46,17 @@ export default async function ItemPage({ params }) {
   console.log(data);
   return (
     <main>
-      <div className="relative h-full w-full overflow-x-hidden">
-        <div className="absolute h-full w-full bg-gradient-to-t from-background from-30% via-background/95 via-40% to-transparent">
-          <Backdrop
-            src={`https://image.tmdb.org/t/p/original${data.backdrop_path}`}
-          />
+      <div className="h-full w-full overflow-x-hidden">
+        <div className="absolute top-0 left-0 mb-10 w-screen h-screen">
+          <div className="h-full w-full bg-gradient-to-t from-background from-30% via-background/95 via-40% to-transparent">
+            <Backdrop
+              src={`https://image.tmdb.org/t/p/original${data.backdrop_path}`}
+            />
+          </div>
         </div>
-        <div className="h-screen relative container items-end px-5 md:px-40 pt-16">
-          <div className="md:h-[57%] flex items-end pb-5 md:pt-0 ">
+        <div className="h-[5vh] md:h-[25vh]"></div>
+        <div className="relative container items-end px-5 md:px-40 pt-16 ">
+          <div className="flex items-end pb-5 md:pt-0 ">
             <div>
               <div className="flex flex-col md:flex-row h-full md:h-3/4 z-10 md:items-center md:space-x-5">
                 <Poster
