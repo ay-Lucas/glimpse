@@ -17,7 +17,7 @@ export function ImageCarousel({ data, type, isUserAgentMobile, variant }) {
     isUserAgentMobile ? "auto" : 4,
   );
   useEffect(() => {
-    isMobile ? setSlidesToScroll(2) : setSlidesToScroll(5);
+    isMobile ? setSlidesToScroll("auto") : setSlidesToScroll(4);
   }, [isMobile]);
 
   return (

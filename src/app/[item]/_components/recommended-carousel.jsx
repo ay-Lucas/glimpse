@@ -19,16 +19,16 @@ export function RecommendedCarousel({
 }) {
   const isMobile = useMediaQuery(768);
   const [slidesToScroll, setSlidesToScroll] = useState(
-    isUserAgentMobile ? 2 : 5,
+    isUserAgentMobile ? "auto" : 4,
   );
   useEffect(() => {
-    isMobile ? setSlidesToScroll(2) : setSlidesToScroll(5);
+    isMobile ? setSlidesToScroll("auto") : setSlidesToScroll(4);
   }, [isMobile]);
 
   return (
     <Carousel
       opts={{
-        slidesToScroll: "auto",
+        slidesToScroll: slidesToScroll,
         align: "start",
         duration: 15,
         watchDrag: isMobile,
