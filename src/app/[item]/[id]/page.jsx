@@ -43,7 +43,7 @@ export default async function ItemPage({ params }) {
   const youtubeId = data.videos.results[0]?.key;
   const isMobile = getDeviceType() === "mobile";
   const recommendations = await getRecommendations(params);
-  console.log(recommendations);
+  console.log(data);
   return (
     <main>
       <div className="relative h-full w-full overflow-x-hidden">
@@ -65,7 +65,7 @@ export default async function ItemPage({ params }) {
                   </h2>
                   <div className="flex flex-row items-center justify-center md:justify-start">
                     <span className="mr-2 text-lg">
-                      {`${data.vote_average && data.vote_average.toPrecision(2) * 10}%`}
+                      {`${data.vote_average !== null && data.vote_average.toPrecision(2) * 10}%`}
                     </span>
                     <Image
                       src={TmdbLogo}
@@ -98,28 +98,35 @@ export default async function ItemPage({ params }) {
               </div>
             </div>
           </div>
-          {/* <h2 className="text-2xl font-semibold pb-2">Recommended</h2> */}
-          <div className="overflow-x-hidden">
-            <ImageCarousel
-              data={recommendations.results}
-              title={"Recommended"}
-              type={params.item}
-              isMobile={isMobile}
-              size="small"
-              className="mr-[3.75rem] pb-4"
-            />
-          </div>
-          <div>
-            <h2 className="text-3xl pb-5 pr-3 inline-flex">Reviews</h2>
-            <span className="text-3xl font-light">
-              ({reviews.results.length})
-            </span>
-            <div className="space-y-3">
-              {reviews.results.map((reviews, index) => (
-                <Reviews data={reviews} key={index} />
-              ))}
+          {recommendations.results?.length > 0 && (
+            <>
+              <h2 className="text-2xl font-semibold pb-0">Recommended</h2>
+              <div className="overflow-x-hidden">
+                <ImageCarousel
+                  data={recommendations.results}
+                  type={params.item}
+                  isMobile={isMobile}
+                  size="small"
+                  className="mr-[3.75rem] py-4"
+                />
+              </div>
+            </>
+          )}
+          {reviews.results?.length > 0 && (
+            <div>
+              <h2 className="text-2xl font-semibold pb-5 pr-3 inline-flex">
+                Reviews
+              </h2>
+              <span className="text-2xl font-semibold">
+                ({reviews.results.length})
+              </span>
+              <div className="space-y-3">
+                {reviews.results.map((reviews, index) => (
+                  <Reviews data={reviews} key={index} />
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
       <VideoPlayer youtubeId={youtubeId} id={params.id} />

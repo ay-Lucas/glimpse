@@ -31,11 +31,6 @@ export function ImageCarousel({
 
   return (
     <>
-      <h2
-        className={`pb-1 ${size === "small" ? "md:pl-1 pb-4" : "md:pl-14"} pl-6 text-xl font-semibold`}
-      >
-        {title}
-      </h2>
       <Carousel
         className={`relative block mx-auto w-11/12 ${className}`}
         opts={{
