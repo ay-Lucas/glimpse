@@ -8,6 +8,8 @@ import { Poster } from "../_components/poster";
 import { Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { VideoPlayer } from "../_components/video-player";
+import { ImageCarousel } from "@/components/image-carousel";
+import { getDeviceType } from "@/app/browse/actions";
 import Link from "next/link";
 const baseUrl = "https://api.themoviedb.org/3";
 
@@ -27,13 +29,24 @@ async function getReviews(params) {
   return res.json();
 }
 
+async function getRecommendations(params) {
+  const res = await fetch(
+    `${baseUrl}/${params.item}/${params.id}/recommendations`,
+    options,
+  );
+  return res.json();
+}
+
 export default async function ItemPage({ params }) {
   const data = await getData(params);
   const reviews = await getReviews(params);
   const youtubeId = data.videos.results[0]?.key;
+  const isMobile = getDeviceType() === "mobile";
+  const recommendations = await getRecommendations(params);
+  console.log(recommendations);
   return (
     <main>
-      <div className="relative h-full w-full">
+      <div className="relative h-full w-full overflow-x-hidden">
         <div className="absolute h-full w-full bg-gradient-to-t from-background from-30% via-background/95 via-40% to-transparent">
           <Backdrop
             src={`https://image.tmdb.org/t/p/original${data.backdrop_path}`}
@@ -84,6 +97,17 @@ export default async function ItemPage({ params }) {
                 </div>
               </div>
             </div>
+          </div>
+          {/* <h2 className="text-2xl font-semibold pb-2">Recommended</h2> */}
+          <div className="overflow-x-hidden">
+            <ImageCarousel
+              data={recommendations.results}
+              title={"Recommended"}
+              type={params.item}
+              isMobile={isMobile}
+              size="small"
+              className="mr-[3.75rem] pb-4"
+            />
           </div>
           <div>
             <h2 className="text-3xl pb-5 pr-3 inline-flex">Reviews</h2>
