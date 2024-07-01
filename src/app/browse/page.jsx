@@ -1,4 +1,5 @@
 import { ImageCarousel } from "@/components/image-carousel";
+import { RecommendedCarousel } from "../[item]/_components/recommended-carousel";
 import { sortPopular, isUnique } from "@/lib/utils";
 import {
   getDeviceType,
@@ -48,17 +49,17 @@ export default async function Browse() {
   );
 
   return (
-    <main className="mt-1">
-      <div className="mx-auto space-y-4 overflow-hidden ">
-        <h2 className={`md:pl-12 pl-10 text-xl md:text-2xl font-bold`}>
+    <main className="w-full max-w-[1920px]">
+      <div className="mx-auto space-y-1 w-10/12 md:w-[700px] lg:w-[1024px] xl:w-[1775px] select-none pt-5">
+        <h2 className={`pl-3 text-xl md:text-2xl font-bold`}>
           Trending Series
         </h2>
         <ImageCarousel data={trendingTv} type="movie" isMobile={isMobile} />
-        <h2 className={`md:pl-12 pl-10 text-xl md:text-2xl font-bold`}>
+        <h2 className={`pl-3 text-xl md:text-2xl font-bold`}>
           Trending Movies
         </h2>
         <ImageCarousel data={trendingMovies} type="movie" isMobile={isMobile} />
-        <h2 className={`md:pl-12 pl-10 text-xl md:text-2xl font-bold`}>
+        <h2 className={`pl-3 text-xl md:text-2xl font-bold`}>
           Upcoming Movies
         </h2>
         <ImageCarousel
@@ -66,13 +67,9 @@ export default async function Browse() {
           type="movie"
           isMobile={isMobile}
         />
-        <h2 className={`md:pl-12 pl-10 text-xl md:text-2xl font-bold`}>
-          Popular Series
-        </h2>
+        <h2 className={`pl-3 text-xl md:text-2xl font-bold`}>Popular Series</h2>
         <ImageCarousel data={filteredPopularTv} type="tv" isMobile={isMobile} />
-        <h2 className={`md:pl-12 pl-10 text-xl md:text-2xl font-bold`}>
-          Popular Movies
-        </h2>
+        <h2 className={`pl-3 text-xl md:text-2xl font-bold`}>Popular Movies</h2>
         <ImageCarousel
           data={filteredPopularMovie}
           type="movie"

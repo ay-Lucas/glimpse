@@ -6,15 +6,20 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import Link from "next/link";
-import { Card } from "@/components/card";
-import { useState, useEffect } from "react";
 import { useMediaQuery } from "@/lib/hooks";
+import Link from "next/link";
+import { useState, useEffect } from "react";
+import { Card } from "@/components/card";
 
-export function ImageCarousel({ data, type, isUserAgentMobile, variant }) {
+export function RecommendedCarousel({
+  data,
+  type,
+  isUserAgentMobile,
+  variant,
+}) {
   const isMobile = useMediaQuery(768);
   const [slidesToScroll, setSlidesToScroll] = useState(
-    isUserAgentMobile ? "auto" : 4,
+    isUserAgentMobile ? 2 : 5,
   );
   useEffect(() => {
     isMobile ? setSlidesToScroll(2) : setSlidesToScroll(5);
@@ -23,17 +28,17 @@ export function ImageCarousel({ data, type, isUserAgentMobile, variant }) {
   return (
     <Carousel
       opts={{
-        slidesToScroll: slidesToScroll,
+        slidesToScroll: "auto",
         align: "start",
         duration: 15,
         watchDrag: isMobile,
       }}
     >
-      <CarouselContent className="-ml-3">
+      <CarouselContent className="-ml-3 md:-ml-5">
         {data.map((item, i) => (
           <CarouselItem
             key={i}
-            className="basis-1/2 md:basis-1/3 lg:basis-1/5 xl:basis-[12.5%] group"
+            className="basis-1/2 md:basis-1/3 xl:basis-1/4 group"
             // className="pl-7 basis-auto group"
           >
             <Link href={`/${item.media_type || type}/${item.id}`}>
@@ -42,8 +47,8 @@ export function ImageCarousel({ data, type, isUserAgentMobile, variant }) {
           </CarouselItem>
         ))}
       </CarouselContent>
-      <CarouselPrevious className="opacity-80 hover:opacity-100 w-8 h-8 p-1 md:p-0 ml-5 md:m-0 md:w-12 md:h-12" />
-      <CarouselNext className="opacity-80 hover:opacity-100 w-8 h-8 mr-4 p-1 md:p-0 md:m-0 md:w-12 md:h-12" />
+      <CarouselPrevious className="opacity-80 hover:opacity-100 w-8 h-8 ml-5 md:m-0 md:w-12 md:h-12" />
+      <CarouselNext className="opacity-80 hover:opacity-100 w-8 h-8 mr-4 md:m-0 md:w-12 md:h-12" />
     </Carousel>
   );
 }

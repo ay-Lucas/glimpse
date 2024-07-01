@@ -11,6 +11,7 @@ import { VideoPlayer } from "../_components/video-player";
 import { ImageCarousel } from "@/components/image-carousel";
 import { getDeviceType } from "@/app/browse/actions";
 import Link from "next/link";
+import { RecommendedCarousel } from "../_components/recommended-carousel";
 const baseUrl = "https://api.themoviedb.org/3";
 
 async function getData(params) {
@@ -55,8 +56,8 @@ export default async function ItemPage({ params }) {
           </div>
         </div>
         <div className="h-[5vh] md:h-[25vh]"></div>
-        <div className="relative container items-end px-5 md:px-40 pt-16 ">
-          <div className="flex items-end pb-5 md:pt-0 ">
+        <div className="relative container items-end pt-16">
+          <div className="flex items-end pb-5 md:pt-0 px-5 lg:px-40">
             <div>
               <div className="flex flex-col md:flex-row h-full md:h-3/4 z-10 md:items-center md:space-x-5">
                 <Poster
@@ -101,22 +102,20 @@ export default async function ItemPage({ params }) {
               </div>
             </div>
           </div>
+          <h2 className="text-2xl font-semibold px-5 lg:px-40">Recommended</h2>
           {recommendations.results?.length > 0 && (
-            <>
-              <h2 className="text-2xl font-semibold pb-0">Recommended</h2>
-              <div className="overflow-x-hidden">
-                <ImageCarousel
-                  data={recommendations.results}
-                  type={params.item}
-                  isMobile={isMobile}
-                  size="small"
-                  className="mr-[3.75rem] py-4"
-                />
-              </div>
-            </>
+            <div className="relative container px-0 md:px-0 lg:px-[8rem]">
+              <RecommendedCarousel
+                data={recommendations.results}
+                type={params.item}
+                isUserAgentMobile={isMobile}
+                // size="small"
+                // className="mr-[3.75rem] py-4"
+              />
+            </div>
           )}
           {reviews.results?.length > 0 && (
-            <div>
+            <div className="px-5 lg:px-40">
               <h2 className="text-2xl font-semibold pb-5 pr-3 inline-flex">
                 Reviews
               </h2>
