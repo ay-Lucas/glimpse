@@ -16,7 +16,7 @@ const baseUrl = "https://api.themoviedb.org/3";
 
 async function getData(params) {
   const res = await fetch(
-    `${baseUrl}/${params.item}/${params.id}?append_to_response=videos&language=en-US`,
+    `${baseUrl}/${params.item}/${params.id}?append_to_response=videos,releases&language=en-US`,
     options,
   );
   return res.json();
@@ -38,13 +38,40 @@ async function getRecommendations(params) {
   return res.json();
 }
 
+async function getContentRating(type, id) {
+  const res = await fetch(
+    `${baseUrl}/${type}/${id}/${type === "tv" ? "content_ratings" : "releases"}`,
+    options,
+  );
+  return res.json();
+}
+
+function isUsRating(item) {
+  return item.iso_3166_1 === "US" && item !== undefined;
+}
+
+async function getRating(type, id) {
+  let ratingArray, rating;
+  const ratingRes = await getContentRating(type, id);
+  if (type === "tv") {
+    ratingArray = ratingRes.results.filter(isUsRating);
+    rating = ratingArray[0]?.rating;
+  } else if (type === "movie") {
+    ratingArray = ratingRes.countries.filter(isUsRating);
+    rating = ratingArray[0]?.certification;
+  }
+  return rating;
+}
+
 export default async function ItemPage({ params }) {
   const data = await getData(params);
   const reviews = await getReviews(params);
   const youtubeId = data.videos.results[0]?.key;
   const isMobile = getDeviceType() === "mobile";
   const recommendations = await getRecommendations(params);
-  console.log(data);
+  const rating = await getRating(params.item, params.id);
+  console.log(rating);
+
   return (
     <main>
       <div className="h-full w-full overflow-x-hidden">
@@ -67,26 +94,36 @@ export default async function ItemPage({ params }) {
                   <h2 className="text-3xl md:text-5xl font-medium text-center md:text-start">
                     {data.name || data.title}
                   </h2>
-                  <div className="flex flex-row items-center justify-center md:justify-start">
-                    <span className="mr-2 text-lg">
-                      {`${data.vote_average !== null && data.vote_average.toPrecision(2) * 10}%`}
-                    </span>
-                    <Image
-                      src={TmdbLogo}
-                      className="w-[30px] h-[30px]"
-                      priority
-                      alt="tmdb logo"
-                    />
-                    <div className="text-lg pl-3">
+                  <div className="flex flex-row space-x-2 items-center justify-center md:justify-start">
+                    <div className="inline-flex text-lg">
+                      <span className="mr-2">
+                        {`${data.vote_average !== null && data.vote_average.toPrecision(2) * 10}%`}
+                      </span>
+                      <Image
+                        src={TmdbLogo}
+                        className="w-[30px] h-[30px]"
+                        priority
+                        alt="tmdb logo"
+                      />
+                    </div>
+                    <span>•</span>
+                    <div className="text-lg">
                       {data &&
                         new Date(
                           data.first_air_date || data.release_date,
                         ).toLocaleDateString(dateOptions)}
                     </div>
                   </div>
+                  {rating ? (
+                    <div>
+                      Rated <span className="font-semibold">{rating}</span>
+                    </div>
+                  ) : (
+                    <div>Rating Unavailable</div>
+                  )}
                   {youtubeId && (
                     <Link
-                      className="texV-md z-10"
+                      className="text-md z-10"
                       href={`${params.id}/?show=true`}
                     >
                       <Button className="p-2" variant="outline">
