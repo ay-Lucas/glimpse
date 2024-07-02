@@ -25,7 +25,7 @@ export function ImageCarousel({ data, type, isUserAgentMobile, variant }) {
       opts={{
         slidesToScroll: slidesToScroll,
         align: "start",
-        duration: 15,
+        duration: 25,
         watchDrag: isMobile,
       }}
     >

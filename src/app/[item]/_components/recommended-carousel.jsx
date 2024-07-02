@@ -29,8 +29,7 @@ export function RecommendedCarousel({
     <Carousel
       opts={{
         slidesToScroll: slidesToScroll,
-        align: "start",
-        duration: 15,
+        duration: 30,
         watchDrag: isMobile,
       }}
     >
