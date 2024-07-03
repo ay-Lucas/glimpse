@@ -63,6 +63,40 @@ async function getRating(type, id) {
   return rating;
 }
 
+function validateRecommended(type, recommendedRating, rating) {
+  let isValid;
+  const tvRatings = ["TV-Y", "TV-Y7", "TV-G", "TV-PG", "TV-14", "TV-MA"];
+  const movieRatings = ["G", "PG", "PG-13", "R"];
+  if (rating === recommendedRating) isValid = true;
+  else if (type === "movie") {
+    const ratingIndex = movieRatings.findIndex((element) => element === rating);
+    const recommendedIndex = movieRatings.findIndex(
+      (element) => element === recommendedRating,
+    );
+    isValid = Math.abs(ratingIndex - recommendedIndex) <= 1;
+  } else if (type === "tv") {
+    const ratingIndex = tvRatings.findIndex((element) => element === rating);
+    const recommendedIndex = tvRatings.findIndex(
+      (element) => element === recommendedRating,
+    );
+    isValid = Math.abs(ratingIndex - recommendedIndex) <= 1;
+  }
+  return isValid;
+}
+async function getValidRecommendations(type, rating, itemArray) {
+  const result = [];
+  for (let i = 0; i < itemArray.length; i++) {
+    const item = itemArray[i];
+    const recommendedRating = await getRating(type, item.id);
+    if (validateRecommended(type, recommendedRating, rating)) {
+      result.push(item);
+    } else
+      console.log(
+        (item?.name || item?.title) + " is removed. Rated " + recommendedRating,
+      );
+  }
+  return result;
+}
 export default async function ItemPage({ params }) {
   const data = await getData(params);
   const reviews = await getReviews(params);
@@ -70,6 +104,15 @@ export default async function ItemPage({ params }) {
   const isMobile = getDeviceType() === "mobile";
   const recommendations = await getRecommendations(params);
   const rating = await getRating(params.item, params.id);
+  const filteredRecommendations = await getValidRecommendations(
+    params.item,
+    rating,
+    recommendations.results,
+  );
+  // console.log(
+  //   "removed: " +
+  //     (recommendations.results.length - filteredRecommendations.length),
+  // );
   const isReleased =
     new Date(data.first_air_date || data.release_date) < Date.now();
   return (
@@ -150,7 +193,7 @@ export default async function ItemPage({ params }) {
               </h2>
               <div className="relative container px-0 md:px-0 lg:px-[8rem]">
                 <RecommendedCarousel
-                  data={recommendations.results}
+                  data={filteredRecommendations}
                   type={params.item}
                   isUserAgentMobile={isMobile}
                 />
