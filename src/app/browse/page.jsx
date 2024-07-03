@@ -1,5 +1,4 @@
 import { ImageCarousel } from "@/components/image-carousel";
-import { RecommendedCarousel } from "../[item]/_components/recommended-carousel";
 import { sortPopular, isUnique } from "@/lib/utils";
 import {
   getDeviceType,
@@ -47,7 +46,6 @@ export default async function Browse() {
   const filteredPopularMovie = popularMoviesRes.results.filter((item) =>
     isUnique(item, trending),
   );
-
   return (
     <main className="w-full max-w-[1920px]">
       <div className="mx-auto space-y-1 w-10/12 md:w-[700px] lg:w-[1024px] xl:w-[1775px] select-none pt-5">

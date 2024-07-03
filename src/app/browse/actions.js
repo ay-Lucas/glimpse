@@ -32,9 +32,8 @@ export async function getPopularMovies(page, minPopularity) {
 
 export async function getUpcomingMovies(page) {
   const today = new Date().toISOString().split("T")[0];
-  console.log(today);
   const res = await fetch(
-    `${baseApiUrl}/discover/movie?include_adult=false&include_video=false&language=en-US&page=${page}&primary_release_date.gte=${today}&release_date.gte=2024-06-26&sort_by=popularity.desc`,
+    `${baseApiUrl}/discover/movie?include_adult=false&include_video=false&language=en-US&region=US&&page=${page}&primary_release_date.gte=${today}&release_date.gte=2024-06-26&sort_by=popularity.desc`,
     options,
   );
   return res.json();

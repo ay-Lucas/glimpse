@@ -70,7 +70,8 @@ export default async function ItemPage({ params }) {
   const isMobile = getDeviceType() === "mobile";
   const recommendations = await getRecommendations(params);
   const rating = await getRating(params.item, params.id);
-  console.log(rating);
+  const isReleased =
+    new Date(data.first_air_date || data.release_date) < Date.now();
 
   return (
     <main>
@@ -95,18 +96,22 @@ export default async function ItemPage({ params }) {
                     {data.name || data.title}
                   </h2>
                   <div className="flex flex-row space-x-2 items-center justify-center md:justify-start">
-                    <div className="inline-flex text-lg">
-                      <span className="mr-2">
-                        {`${data.vote_average !== null && data.vote_average.toPrecision(2) * 10}%`}
-                      </span>
-                      <Image
-                        src={TmdbLogo}
-                        className="w-[30px] h-[30px]"
-                        priority
-                        alt="tmdb logo"
-                      />
-                    </div>
-                    <span>•</span>
+                    {isReleased && (
+                      <>
+                        <div className="inline-flex text-lg">
+                          <span className="mr-2">
+                            {data.vote_average.toPrecision(2) * 10}%
+                          </span>
+                          <Image
+                            src={TmdbLogo}
+                            className="w-[30px] h-[30px]"
+                            priority
+                            alt="tmdb logo"
+                          />
+                        </div>
+                        <span>•</span>
+                      </>
+                    )}
                     <div className="text-lg">
                       {data &&
                         new Date(
@@ -146,8 +151,6 @@ export default async function ItemPage({ params }) {
                 data={recommendations.results}
                 type={params.item}
                 isUserAgentMobile={isMobile}
-                // size="small"
-                // className="mr-[3.75rem] py-4"
               />
             </div>
           )}
