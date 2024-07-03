@@ -72,7 +72,6 @@ export default async function ItemPage({ params }) {
   const rating = await getRating(params.item, params.id);
   const isReleased =
     new Date(data.first_air_date || data.release_date) < Date.now();
-
   return (
     <main>
       <div className="h-full w-full overflow-x-hidden">
@@ -144,15 +143,19 @@ export default async function ItemPage({ params }) {
               </div>
             </div>
           </div>
-          <h2 className="text-2xl font-semibold px-5 lg:px-40">Recommended</h2>
           {recommendations.results?.length > 0 && (
-            <div className="relative container px-0 md:px-0 lg:px-[8rem]">
-              <RecommendedCarousel
-                data={recommendations.results}
-                type={params.item}
-                isUserAgentMobile={isMobile}
-              />
-            </div>
+            <>
+              <h2 className="text-2xl font-semibold px-5 lg:px-40">
+                Recommended
+              </h2>
+              <div className="relative container px-0 md:px-0 lg:px-[8rem]">
+                <RecommendedCarousel
+                  data={recommendations.results}
+                  type={params.item}
+                  isUserAgentMobile={isMobile}
+                />
+              </div>
+            </>
           )}
           {reviews.results?.length > 0 && (
             <div className="px-5 lg:px-40">
