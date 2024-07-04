@@ -1,6 +1,6 @@
 # Glimpse
 
-Glimpse is a self hosted web app that will help users discover new tv shows and movies. The data is sourced from [TMDB API](https://developer.themoviedb.org).
+Glimpse is a self hosted web app that will help users discover new tv shows and movies.
 
 ## Planned Features:
 
@@ -15,3 +15,9 @@ Glimpse is a self hosted web app that will help users discover new tv shows and 
 ## Inspirations:
 
 - Overseer, Jellyseer
+
+## Attribution
+
+> The data is sourced from [TMDB API](https://developer.themoviedb.org).
+
+![TMDB logo](./public/tmdb-alt-long-logo.svg)
