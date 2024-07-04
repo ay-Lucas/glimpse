@@ -56,3 +56,7 @@ export function isUnique(item, array) {
   return !unique;
   // return item
 }
+
+export function isUsRating(item) {
+  return item.iso_3166_1 === "US" && item !== undefined;
+}

@@ -1,6 +1,8 @@
 import Image from "next/image";
 import "@/styles/globals.css";
-import { dateOptions, options, genres } from "@/lib/constants";
+import { dateOptions } from "@/lib/constants";
+import { getData, getReviews } from "./actions";
+import { isUsRating } from "@/lib/utils";
 import TmdbLogo from "@/../public/tmdb-logo.svg";
 import { Reviews } from "../_components/reviews";
 import { Backdrop } from "../_components/backdrop";
@@ -8,46 +10,8 @@ import { Poster } from "../_components/poster";
 import { Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { VideoPlayer } from "../_components/video-player";
-import { getDeviceType } from "@/app/browse/actions";
 import Link from "next/link";
-import { RecommendedCarousel } from "../_components/recommended-carousel";
-const baseUrl = "https://api.themoviedb.org/3";
-
-async function getData(params) {
-  const res = await fetch(
-    `${baseUrl}/${params.item}/${params.id}?append_to_response=videos,releases,content_ratings&language=en-US`,
-    options,
-  );
-  return res.json();
-}
-
-async function getReviews(params) {
-  const res = await fetch(
-    `${baseUrl}/${params.item}/${params.id}/reviews`,
-    options,
-  );
-  return res.json();
-}
-
-async function getRecommendations(params) {
-  const res = await fetch(
-    `${baseUrl}/${params.item}/${params.id}/recommendations`,
-    options,
-  );
-  return res.json();
-}
-
-async function getContentRating(type, id) {
-  const res = await fetch(
-    `${baseUrl}/${type}/${id}/${type === "tv" ? "content_ratings" : "releases"}`,
-    options,
-  );
-  return res.json();
-}
-
-function isUsRating(item) {
-  return item.iso_3166_1 === "US" && item !== undefined;
-}
+import { Recommended } from "../_components/recommended";
 
 async function getRating(item, type) {
   let ratingArray, rating;
@@ -61,74 +25,11 @@ async function getRating(item, type) {
   return rating;
 }
 
-function validateRecommended(type, recommendedRating, rating, item) {
-  let isValid;
-  const tvRatings = ["TV-Y", "TV-Y7", "TV-G", "TV-PG", "TV-14", "TV-MA"];
-  const movieRatings = ["G", "PG", "PG-13", "R"];
-  const safeRatings = ["TV-Y", "TV-Y7", "TV-G", "TV-PG", "G", "PG", "PG-13"];
-  if (rating === recommendedRating) isValid = true;
-  else if (type === "movie") {
-    const ratingIndex = movieRatings.findIndex((element) => element === rating);
-    const recommendedIndex = movieRatings.findIndex(
-      (element) => element === recommendedRating,
-    );
-    isValid = Math.abs(ratingIndex - recommendedIndex) <= 1;
-  } else if (type === "tv") {
-    const ratingIndex = tvRatings.findIndex((element) => element === rating);
-    const recommendedIndex = tvRatings.findIndex(
-      (element) => element === recommendedRating,
-    );
-    isValid = Math.abs(ratingIndex - recommendedIndex) <= 1;
-  }
-  if (
-    safeRatings.includes(rating) &&
-    item.genre_ids.includes(genres.get("Horror"))
-  )
-    isValid = false;
-  return isValid;
-}
-async function getValidRecommendations(type, rating, itemArray) {
-  const result = [];
-  for (let i = 0; i < itemArray.length; i++) {
-    const item = itemArray[i];
-    if (validateRecommended(type, item.rating, rating, item)) {
-      result.push(item);
-    } else {
-      // console.log(
-      //   (item?.name || item?.title) + " is removed. Rated " + item.rating,
-      // );
-    }
-  }
-  return result;
-}
-
 export default async function ItemPage({ params }) {
-  const data = await getData(params);
+  const data = await getData(params.item, params.id);
   const rating = await getRating(data, params.item);
-  const reviews = await getReviews(params);
+  const reviews = await getReviews(params.item, params.id);
   const youtubeId = data.videos.results[0]?.key;
-  const isMobile = getDeviceType() === "mobile";
-  const recommendationsRes = await getRecommendations(params);
-  const recommendations = await Promise.all(
-    recommendationsRes.results.map(async (item) => {
-      const itemRating = await getContentRating(item.media_type, item.id);
-      if (item.media_type === "tv") {
-        const ratingArray = itemRating.results.filter(isUsRating);
-        item.rating = ratingArray[0]?.rating;
-      } else if (item.media_type === "movie") {
-        const ratingArray = itemRating.countries.filter((item) =>
-          isUsRating(item),
-        );
-        item.rating = ratingArray[0]?.certification;
-      }
-      return item;
-    }),
-  );
-  const filteredRecommendations = await getValidRecommendations(
-    params.item,
-    rating,
-    recommendations,
-  );
   const isReleased =
     new Date(data.first_air_date || data.release_date) < Date.now();
   return (
@@ -202,20 +103,9 @@ export default async function ItemPage({ params }) {
               </div>
             </div>
           </div>
-          {filteredRecommendations?.length > 0 && (
-            <>
-              <h2 className="text-2xl font-semibold px-5 lg:px-40">
-                Recommended
-              </h2>
-              <div className="relative container px-0 md:px-0 lg:px-[8rem]">
-                <RecommendedCarousel
-                  data={filteredRecommendations}
-                  type={params.item}
-                  isUserAgentMobile={isMobile}
-                />
-              </div>
-            </>
-          )}
+          <>
+            <Recommended type={params.item} id={params.id} rating={rating} />
+          </>
           {reviews.results?.length > 0 && (
             <div className="px-5 lg:px-40">
               <h2 className="text-2xl font-semibold pb-5 pr-3 inline-flex">
