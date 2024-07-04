@@ -5,7 +5,7 @@ import {
   getUpcomingMovies,
   getPopularMovies,
   getTrendingMovies,
-} from "@/app/browse/actions";
+} from "@/app/discover/actions";
 import { isUnique } from "@/lib/utils";
 
 export default async function Movies() {

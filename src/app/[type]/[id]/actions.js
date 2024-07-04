@@ -1,3 +1,4 @@
+"server only";
 import { baseApiUrl, options } from "@/lib/constants";
 export async function getData(type, id) {
   const res = await fetch(

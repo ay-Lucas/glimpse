@@ -26,9 +26,9 @@ async function getRating(item, type) {
 }
 
 export default async function ItemPage({ params }) {
-  const data = await getData(params.item, params.id);
-  const rating = await getRating(data, params.item);
-  const reviews = await getReviews(params.item, params.id);
+  const data = await getData(params.type, params.id);
+  const rating = await getRating(data, params.type);
+  const reviews = await getReviews(params.type, params.id);
   const youtubeId = data.videos.results[0]?.key;
   const isReleased =
     new Date(data.first_air_date || data.release_date) < Date.now();
@@ -104,7 +104,7 @@ export default async function ItemPage({ params }) {
             </div>
           </div>
           <>
-            <Recommended type={params.item} id={params.id} rating={rating} />
+            <Recommended type={params.type} id={params.id} rating={rating} />
           </>
           {reviews.results?.length > 0 && (
             <div className="px-5 lg:px-40">

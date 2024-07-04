@@ -1,7 +1,7 @@
 import { permanentRedirect } from "next/navigation";
 export default async function HomePage() {
   function redirect() {
-    permanentRedirect("/browse");
+    permanentRedirect("/discover");
   }
   redirect();
   return (

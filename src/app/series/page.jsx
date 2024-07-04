@@ -4,7 +4,7 @@ import {
   getDeviceType,
   getPopularTv,
   getTrendingTv,
-} from "@/app/browse/actions";
+} from "@/app/discover/actions";
 
 const MIN_POPULARITY = 500;
 const MIN_TRENDING_POPULARITY = 300;

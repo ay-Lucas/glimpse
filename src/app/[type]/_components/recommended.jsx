@@ -1,4 +1,4 @@
-import { getDeviceType } from "@/app/browse/actions";
+import { getDeviceType } from "@/app/discover/actions";
 import { getRecommendations, getContentRating } from "../[id]/actions";
 import { isUsRating } from "@/lib/utils";
 import { genres } from "@/lib/constants";

@@ -7,12 +7,12 @@ import {
   getTrendingTv,
   getPopularMovies,
   getTrendingMovies,
-} from "@/app/browse/actions";
+} from "@/app/discover/actions";
 
 const MIN_POPULARITY = 500;
 const MIN_TRENDING_POPULARITY = 300;
 const MIN_POPULAR_POPULARITY = 8000;
-export default async function Browse() {
+export default async function Discover() {
   const [
     trendingTvRes,
     trendingMovieRes,

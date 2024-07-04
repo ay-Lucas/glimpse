@@ -3,8 +3,8 @@ import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { BsGithub } from "react-icons/bs";
-import { AvatarDropdown } from "@/app/browse/_components/avatar-dropdown";
-import { Search } from "@/app/browse/_components/search";
+import { AvatarDropdown } from "@/app/discover/_components/avatar-dropdown";
+import { Search } from "@/app/discover/_components/search";
 // import "@/styles/globals.css";
 
 export function TopNav({ loggedIn = false }) {
@@ -17,7 +17,7 @@ export function TopNav({ loggedIn = false }) {
         <div className="flex mx-auto md:w-1/3 justify-center">
           <section className="flex flex-nowrap">
             <Button variant="ghost" className="md:text-lg">
-              <Link href="/browse">Browse</Link>
+              <Link href="/discover">Browse</Link>
             </Button>
             <Button variant="ghost" className="md:text-lg">
               <Link href="/movies">Movies</Link>
