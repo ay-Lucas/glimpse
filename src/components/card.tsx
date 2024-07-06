@@ -1,9 +1,9 @@
 "use client";
-import { MovieResult, TvResult } from "@/types/request-types";
+import { MovieResult, PersonResult, TvResult } from "@/types/request-types";
 import Image from "next/image";
 import React from "react";
 interface ICard {
-  data?: MovieResult | TvResult;
+  data?: MovieResult | TvResult | PersonResult;
   index: number;
   variant?: string;
 }
@@ -16,7 +16,7 @@ export function Card({ data, index, variant }: ICard) {
       <div className="absolute z-20 flex h-full w-full items-end opacity-0 group-hover:opacity-100 transition transform-gpu duration-300">
         <div className="p-2">
           <span className="font-bold">{info.name || info.title}</span>
-          <div className="text-sm line-clamp-6">{data?.overview}</div>
+          <div className="text-sm line-clamp-6">{info?.overview!}</div>
         </div>
       </div>
 
@@ -29,9 +29,9 @@ export function Card({ data, index, variant }: ICard) {
       {/* )} */}
       {variant === "labeled" ? (
         <div
-          className={`border border-gray-300/50 w-14 h-6 top-1 left-1 shadow-xl text-sm font-semibold text-center rounded-2xl z-10 absolute bg-blend-difference ${data?.media_type === "tv" ? "bg-blue-500/85" : "bg-green-500/85"}`}
+          className={`border border-gray-300/50 w-14 h-6 top-1 left-1 shadow-xl text-sm font-semibold text-center rounded-2xl z-10 absolute bg-blend-difference ${data?.mediaType === "tv" ? "bg-blue-500/85" : "bg-green-500/85"}`}
         >
-          <span className="align-middle">{data?.media_type}</span>
+          <span className="align-middle">{data?.mediaType}</span>
         </div>
       ) : (
         ""
@@ -40,7 +40,7 @@ export function Card({ data, index, variant }: ICard) {
       <Image
         width={195}
         height={290}
-        src={`https://image.tmdb.org/t/p/original${data?.poster_path}`}
+        src={`https://image.tmdb.org/t/p/original${info?.posterPath}`}
         alt={`Background image ${index + 1}`}
         key={index}
         quality={75}

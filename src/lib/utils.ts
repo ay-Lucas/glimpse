@@ -1,5 +1,12 @@
 import { type ClassValue, clsx } from "clsx";
-import { MovieResult, RatingResponse, TvResult } from "@/types/request-types";
+import {
+  MovieResult,
+  MovieResultsResponse,
+  PersonResult,
+  PopularMoviesResponse,
+  RatingResponse,
+  TvResult,
+} from "@/types/request-types";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -20,8 +27,11 @@ interface Item {
   popularity: number;
 }
 
-export function bubbleSort(arr: MovieResult[] | TvResult[], n: number) {
-  let temp: MovieResult | TvResult;
+export function bubbleSort(
+  arr: Array<MovieResult | TvResult | PersonResult>,
+  n: number,
+) {
+  let temp: MovieResult | TvResult | PersonResult;
   let i, j: number;
   let swapped: boolean;
   for (i = 0; i < n - 1; i++) {
@@ -45,8 +55,8 @@ export function bubbleSort(arr: MovieResult[] | TvResult[], n: number) {
 }
 
 export function sortPopular(
-  array: MovieResult[] | TvResult[],
-  minPopularity: number = 0,
+  array: Array<MovieResult | TvResult | PersonResult>,
+  minPopularity: number,
 ) {
   if (typeof array === undefined || array.length == 0)
     throw new Error("Could not sort array: array is undefined or empty");
@@ -58,14 +68,20 @@ export function sortPopular(
   else return [];
 }
 
-export function isUnique(item: any, array: Array<MovieResult | TvResult>) {
+export function isUnique(
+  item: MovieResult | TvResult,
+  array: Array<MovieResult | TvResult | PersonResult>,
+) {
   let unique = false;
   array.forEach((trendingItem) => {
-    if (trendingItem.media_type === "tv" && trendingItem.name === item?.name) {
+    if (
+      trendingItem.mediaType === "tv" &&
+      trendingItem.name === (item as any)?.name
+    ) {
       return (unique = true);
     } else if (
-      trendingItem.media_type === "movie" &&
-      trendingItem.title === item.title
+      trendingItem.mediaType === "movie" &&
+      trendingItem.title === (item as any).title
     ) {
       return (unique = true);
     }
@@ -75,5 +91,5 @@ export function isUnique(item: any, array: Array<MovieResult | TvResult>) {
 }
 
 export function isUsRating(item: RatingResponse) {
-  return item.iso_3166_1 === "US" && item !== undefined;
+  return item.iso31661 === "US" && item !== undefined;
 }

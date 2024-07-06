@@ -46,6 +46,9 @@ export interface MovieResult {
   popularity?: number;
   voteCount?: number;
   video?: boolean;
+  videos?: {
+    results: Array<Video>;
+  };
   voteAverage?: number;
 }
 
@@ -64,6 +67,9 @@ export interface TvResult {
   voteCount?: number;
   name?: string;
   originalName?: string;
+  videos?: {
+    results: Array<Video>;
+  };
 }
 
 export interface PersonResult {
@@ -387,7 +393,7 @@ export interface AggregateCrew {
 export interface FindRequest extends RequestParams {
   id: string | number;
   language?: string;
-  externalSource: ExternalId;
+  externalSource?: ExternalId;
 }
 
 export interface PaginatedResponse extends Response {
@@ -598,7 +604,7 @@ export interface TrendingRequest extends RequestParams {
 }
 
 export interface TrendingResponse extends PaginatedResponse {
-  results?: Array<MovieResult | TvResult | PersonResult>;
+  results: Array<MovieResult | TvResult | PersonResult>;
 }
 
 export interface MovieResponse extends Response {
@@ -631,7 +637,7 @@ export interface MovieResponse extends Response {
   tagline?: string;
   title?: string;
   video?: boolean;
-  voteAverage?: number;
+  voteAverage: number;
   voteCount?: number;
 }
 
@@ -865,7 +871,7 @@ export interface UpcomingMoviesRequest extends MovieNowPlayingRequest {
 }
 
 export interface UpcomingMoviesResponse extends MovieNowPlayingResponse {
-  results?: Array<MovieResult>;
+  results: Array<MovieResult>;
   dates?: {
     maximum?: string;
     minimum?: string;
@@ -902,7 +908,7 @@ export interface ShowResponse extends Response {
   status?: string;
   tagline?: string;
   type?: string;
-  voteAverage?: number;
+  voteAverage: number;
   voteCount?: number;
 }
 
@@ -1023,6 +1029,23 @@ export interface TvSeasonResponse extends Response {
   seasonNumber?: number;
 }
 
+export interface TvRecommendationsRequest extends IdRequestParams {
+  page?: string;
+}
+
+export interface TvRecommendationsResponse extends PaginatedResponse {
+  results?: Array<TvResult>;
+}
+
+export interface SimilarTvResponse extends TvRecommendationsResponse {}
+
+export interface TvReviewsRequest extends TvRecommendationsRequest {}
+
+export interface TvReviewsResponse extends PaginatedResponse {
+  results?: Array<Review>;
+}
+
+export interface MovieListsRequest extends MovieRecommendationsRequest {}
 export interface TvSeasonChangesResponse extends Response {
   changes?: Array<{
     key?: string;

@@ -1,4 +1,3 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
@@ -32,14 +31,7 @@ export function TopNav({ loggedIn = false }) {
               <Link href="/login">Sign in</Link>
             </Button>
           ) : (
-            <AvatarDropdown
-              avatar={
-                <Avatar>
-                  <AvatarImage src="https://github.com/shadcn.png" />
-                  <AvatarFallback>CN</AvatarFallback>
-                </Avatar>
-              }
-            />
+            <AvatarDropdown />
           )}
         </section>
       </nav>

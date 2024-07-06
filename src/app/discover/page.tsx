@@ -42,11 +42,11 @@ export default async function Discover() {
 
   const trending = sortPopular(trendingTvAndMovies, MIN_TRENDING_POPULARITY);
   const isUserAgentMobile = (await getDeviceType()) === "mobile";
-  const filteredPopularTv = popularTvRes.results.filter((item: TvResult) =>
+  const filteredPopularTv = popularTvRes?.results?.filter((item: TvResult) =>
     isUnique(item, trending),
   );
-  const filteredPopularMovie = popularMoviesRes.results.filter(
-    (item: MovieResult) => isUnique(item, trending),
+  const filteredPopularMovie = popularMoviesRes?.results?.filter(
+    (item: MovieResult | TvResult) => isUnique(item, trending),
   );
   return (
     <main className="w-full max-w-[1920px]">
@@ -80,14 +80,14 @@ export default async function Discover() {
         />
         <h2 className={`pl-3 text-xl md:text-2xl font-bold`}>Popular Series</h2>
         <ImageCarousel
-          data={filteredPopularTv}
+          data={filteredPopularTv!}
           type="tv"
           isUserAgentMobile={isUserAgentMobile}
           variant=""
         />
         <h2 className={`pl-3 text-xl md:text-2xl font-bold`}>Popular Movies</h2>
         <ImageCarousel
-          data={filteredPopularMovie}
+          data={filteredPopularMovie!}
           type="movie"
           isUserAgentMobile={isUserAgentMobile}
           variant=""

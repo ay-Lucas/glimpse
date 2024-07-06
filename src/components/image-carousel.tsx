@@ -10,7 +10,7 @@ import Link from "next/link";
 import { Card } from "@/components/card";
 import { useState, useEffect } from "react";
 import { useMediaQuery } from "@/lib/hooks";
-import { MovieResult, TvResult } from "@/types/request-types";
+import { MovieResult, PersonResult, TvResult } from "@/types/request-types";
 import { ImageCarouselProps } from "@/types/index";
 
 export function ImageCarousel({
@@ -37,13 +37,13 @@ export function ImageCarousel({
       }}
     >
       <CarouselContent className="-ml-3">
-        {data.map((item: MovieResult | TvResult, i: number) => (
+        {data.map((item: MovieResult | TvResult | PersonResult, i: number) => (
           <CarouselItem
             key={i}
             className="basis-1/2 md:basis-1/3 lg:basis-1/5 xl:basis-[12.5%] group"
             // className="pl-7 basis-auto group"
           >
-            <Link href={`/${item.media_type || type}/${item.id}`}>
+            <Link href={`/${item.mediaType || type}/${item.id}`}>
               <Card data={item} index={i} variant={variant} />
             </Link>
           </CarouselItem>

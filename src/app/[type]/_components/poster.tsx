@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import Image from "next/image";
-export function Poster({ src }) {
+export function Poster({ src }: { src: string }) {
   const [isImageLoading, setImageLoading] = useState(true);
   return (
     <Image

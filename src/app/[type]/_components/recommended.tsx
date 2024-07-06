@@ -3,8 +3,14 @@ import { getRecommendations, getContentRating } from "../[id]/actions";
 import { isUsRating } from "@/lib/utils";
 import { genres } from "@/lib/constants";
 import { RecommendedCarousel } from "./recommended-carousel";
+import { MovieResult, PersonResult, TvResult } from "@/types/request-types";
 
-function validateRecommended(type, recommendedRating, rating, item) {
+function validateRecommended(
+  type: "movie" | "tv",
+  recommendedRating: string,
+  rating: string,
+  item: MovieResult | TvResult | undefined,
+) {
   let isValid;
   const tvRatings = ["TV-Y", "TV-Y7", "TV-G", "TV-PG", "TV-14", "TV-MA"];
   const movieRatings = ["G", "PG", "PG-13", "R"];
@@ -25,16 +31,20 @@ function validateRecommended(type, recommendedRating, rating, item) {
   }
   if (
     safeRatings.includes(rating) &&
-    item.genre_ids.includes(genres.get("Horror"))
+    item?.genreIds?.includes(genres.get("Horror") ?? 0)
   )
     isValid = false;
   return isValid;
 }
 
-async function getValidRecommendations(type, rating, itemArray) {
+async function getValidRecommendations(
+  type: "movie" | "tv",
+  rating: string,
+  itemArray: Array<TvResult | MovieResult>,
+) {
   const result = [];
   for (let i = 0; i < itemArray.length; i++) {
-    const item = itemArray[i];
+    const item = itemArray[i] as any;
     if (validateRecommended(type, item.rating, rating, item)) {
       result.push(item);
     } else {
@@ -46,11 +56,19 @@ async function getValidRecommendations(type, rating, itemArray) {
   return result;
 }
 
-export async function Recommended({ type, id, rating }) {
-  const isMobile = getDeviceType() === "mobile";
+export async function Recommended({
+  type,
+  id,
+  rating,
+}: {
+  type: "movie" | "tv";
+  id: number;
+  rating: number;
+}) {
+  const isMobile = (await getDeviceType()) === "mobile";
   const recommendationsRes = await getRecommendations(type, id);
   const recommendations = await Promise.all(
-    recommendationsRes.results.map(async (item) => {
+    recommendationsRes.results?.map(async (item) => {
       const itemRating = await getContentRating(item.media_type, item.id);
       if (item.media_type === "tv") {
         const ratingArray = itemRating.results.filter(isUsRating);

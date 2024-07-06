@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import Image from "next/image";
-export function Backdrop({ src }) {
+export function Backdrop({ src }: { src: string }) {
   const [isImageLoading, setImageLoading] = useState(true);
   return (
     <Image

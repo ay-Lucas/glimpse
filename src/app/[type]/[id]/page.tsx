@@ -12,9 +12,17 @@ import { Button } from "@/components/ui/button";
 import { VideoPlayer } from "../_components/video-player";
 import Link from "next/link";
 import { Recommended } from "../_components/recommended";
+import {
+  MovieResult,
+  Review,
+  TvResult,
+  FindRequest,
+  FindResponse,
+} from "@/types/request-types";
 
-async function getRating(item, type) {
+async function getRating(result: MovieResult | TvResult, type: string) {
   let ratingArray, rating;
+  const item = result as any;
   if (type === "tv") {
     ratingArray = item.content_ratings.results.filter(isUsRating);
     rating = ratingArray[0]?.rating;
@@ -25,20 +33,26 @@ async function getRating(item, type) {
   return rating;
 }
 
-export default async function ItemPage({ params }) {
-  const data = await getData(params.type, params.id);
+export default async function ItemPage({
+  params,
+}: {
+  params: { type: "movie" | "tv"; id: string };
+}) {
+  const data = await getData({ id: params.id }, params.type);
   const rating = await getRating(data, params.type);
-  const reviews = await getReviews(params.type, params.id);
-  const youtubeId = data.videos.results[0]?.key;
-  const isReleased =
-    new Date(data.first_air_date || data.release_date) < Date.now();
+  const reviews = await getReviews({ id: params.id }, params.type);
+  const youtubeId = data.videos?.results[0]?.key;
+  const releaseDate = new Date(
+    (data as any).firstAirDate || (data as any).release_date,
+  ).toLocaleDateString("en-US", dateOptions);
+  const isReleased = releaseDate?.valueOf() ?? 0 < Date.now();
   return (
     <main>
       <div className="h-full w-full overflow-x-hidden">
         <div className="absolute top-0 left-0 mb-10 w-screen h-screen">
           <div className="h-full w-full bg-gradient-to-t from-background from-30% via-background/95 via-40% to-transparent">
             <Backdrop
-              src={`https://image.tmdb.org/t/p/original${data.backdrop_path}`}
+              src={`https://image.tmdb.org/t/p/original${data.backdropPath}`}
             />
           </div>
         </div>
@@ -48,18 +62,18 @@ export default async function ItemPage({ params }) {
             <div>
               <div className="flex flex-col md:flex-row h-full md:h-3/4 z-10 md:items-center md:space-x-5">
                 <Poster
-                  src={`https://image.tmdb.org/t/p/original${data.poster_path}`}
+                  src={`https://image.tmdb.org/t/p/original${data.posterPath}`}
                 />
                 <div className="flex flex-col justify-between space-y-1 items-center md:items-start">
                   <h2 className="text-3xl md:text-5xl font-medium text-center md:text-start">
-                    {data.name || data.title}
+                    {(data as any).name || (data as any).title}
                   </h2>
                   <div className="flex flex-row space-x-2 items-center justify-center md:justify-start">
                     {isReleased && (
                       <>
                         <div className="inline-flex text-lg">
                           <span className="mr-2">
-                            {data.vote_average.toPrecision(2) * 10}%
+                            {data?.voteAverage?.toPrecision(2) ?? 0 * 10}%
                           </span>
                           <Image
                             src={TmdbLogo}
@@ -71,12 +85,7 @@ export default async function ItemPage({ params }) {
                         <span>•</span>
                       </>
                     )}
-                    <div className="text-lg">
-                      {data &&
-                        new Date(
-                          data.first_air_date || data.release_date,
-                        ).toLocaleDateString(dateOptions)}
-                    </div>
+                    <div className="text-lg">{data && `${releaseDate}`}</div>
                   </div>
                   {rating ? (
                     <div>
@@ -106,16 +115,16 @@ export default async function ItemPage({ params }) {
           <>
             <Recommended type={params.type} id={params.id} rating={rating} />
           </>
-          {reviews.results?.length > 0 && (
+          {(reviews.results?.length ?? -1 > 0) && (
             <div className="px-5 lg:px-40">
               <h2 className="text-2xl font-semibold pb-5 pr-3 inline-flex">
                 Reviews
               </h2>
               <span className="text-2xl font-semibold">
-                ({reviews.results.length})
+                ({reviews.results?.length})
               </span>
               <div className="space-y-3">
-                {reviews.results.map((reviews, index) => (
+                {reviews.results?.map((reviews: Review, index: number) => (
                   <Reviews data={reviews} key={index} />
                 ))}
               </div>
