@@ -10,14 +10,21 @@ import Link from "next/link";
 import { Card } from "@/components/card";
 import { useState, useEffect } from "react";
 import { useMediaQuery } from "@/lib/hooks";
+import { MovieResult, TvResult } from "@/types/request-types";
+import { ImageCarouselProps } from "@/types/index";
 
-export function ImageCarousel({ data, type, isUserAgentMobile, variant }) {
+export function ImageCarousel({
+  data,
+  type,
+  isUserAgentMobile,
+  variant,
+}: ImageCarouselProps) {
   const isMobile = useMediaQuery(768);
-  const [slidesToScroll, setSlidesToScroll] = useState(
+  const [slidesToScroll, setSlidesToScroll] = useState<string | number>(
     isUserAgentMobile ? "auto" : 4,
   );
   useEffect(() => {
-    isMobile ? setSlidesToScroll("auto") : setSlidesToScroll(4);
+    setSlidesToScroll(isMobile ? "auto" : 4);
   }, [isMobile]);
 
   return (
@@ -30,7 +37,7 @@ export function ImageCarousel({ data, type, isUserAgentMobile, variant }) {
       }}
     >
       <CarouselContent className="-ml-3">
-        {data.map((item, i) => (
+        {data.map((item: MovieResult | TvResult, i: number) => (
           <CarouselItem
             key={i}
             className="basis-1/2 md:basis-1/3 lg:basis-1/5 xl:basis-[12.5%] group"

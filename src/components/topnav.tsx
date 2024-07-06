@@ -2,10 +2,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
-import { BsGithub } from "react-icons/bs";
 import { AvatarDropdown } from "@/app/discover/_components/avatar-dropdown";
-import { Search } from "@/app/discover/_components/search";
-// import "@/styles/globals.css";
 
 export function TopNav({ loggedIn = false }) {
   return (

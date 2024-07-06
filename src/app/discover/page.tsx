@@ -3,11 +3,10 @@ import { sortPopular, isUnique } from "@/lib/utils";
 import {
   getDeviceType,
   getUpcomingMovies,
-  getPopularTv,
-  getTrendingTv,
-  getPopularMovies,
-  getTrendingMovies,
+  getPopular,
+  getTrending,
 } from "@/app/discover/actions";
+import { MovieResult, TvResult, TrendingRequest } from "@/types/request-types";
 
 const MIN_POPULARITY = 500;
 const MIN_TRENDING_POPULARITY = 300;
@@ -20,11 +19,14 @@ export default async function Discover() {
     popularMoviesRes,
     upcomingMoviesRes,
   ] = await Promise.all([
-    getTrendingTv("week"),
-    getTrendingMovies("week"),
-    getPopularTv(1, MIN_POPULAR_POPULARITY),
-    getPopularMovies(1, MIN_POPULAR_POPULARITY),
-    getUpcomingMovies(1),
+    getTrending({ mediaType: "tv", timeWindow: "day" }),
+    getTrending({ mediaType: "movie", timeWindow: "day" }),
+    getPopular({ page: 1, "vote_average.gte": MIN_POPULAR_POPULARITY }, "tv"),
+    getPopular(
+      { page: 1, "vote_average.gte": MIN_POPULAR_POPULARITY },
+      "movie",
+    ),
+    getUpcomingMovies({ page: 1 }),
   ]);
   const trendingTv = sortPopular(
     trendingTvRes.results,
@@ -39,12 +41,12 @@ export default async function Discover() {
   );
 
   const trending = sortPopular(trendingTvAndMovies, MIN_TRENDING_POPULARITY);
-  const isMobile = getDeviceType() === "mobile";
-  const filteredPopularTv = popularTvRes.results.filter((item) =>
+  const isUserAgentMobile = (await getDeviceType()) === "mobile";
+  const filteredPopularTv = popularTvRes.results.filter((item: TvResult) =>
     isUnique(item, trending),
   );
-  const filteredPopularMovie = popularMoviesRes.results.filter((item) =>
-    isUnique(item, trending),
+  const filteredPopularMovie = popularMoviesRes.results.filter(
+    (item: MovieResult) => isUnique(item, trending),
   );
   return (
     <main className="w-full max-w-[1920px]">
@@ -52,26 +54,43 @@ export default async function Discover() {
         <h2 className={`pl-3 text-xl md:text-2xl font-bold`}>
           Trending Series
         </h2>
-        <ImageCarousel data={trendingTv} type="movie" isMobile={isMobile} />
+        <ImageCarousel
+          data={trendingTv}
+          type="movie"
+          isUserAgentMobile={isUserAgentMobile}
+          variant=""
+        />
         <h2 className={`pl-3 text-xl md:text-2xl font-bold`}>
           Trending Movies
         </h2>
-        <ImageCarousel data={trendingMovies} type="movie" isMobile={isMobile} />
+        <ImageCarousel
+          data={trendingMovies}
+          type="movie"
+          isUserAgentMobile={isUserAgentMobile}
+          variant=""
+        />
         <h2 className={`pl-3 text-xl md:text-2xl font-bold`}>
           Upcoming Movies
         </h2>
         <ImageCarousel
           data={upcomingMoviesRes.results}
           type="movie"
-          isMobile={isMobile}
+          isUserAgentMobile={isUserAgentMobile}
+          variant=""
         />
         <h2 className={`pl-3 text-xl md:text-2xl font-bold`}>Popular Series</h2>
-        <ImageCarousel data={filteredPopularTv} type="tv" isMobile={isMobile} />
+        <ImageCarousel
+          data={filteredPopularTv}
+          type="tv"
+          isUserAgentMobile={isUserAgentMobile}
+          variant=""
+        />
         <h2 className={`pl-3 text-xl md:text-2xl font-bold`}>Popular Movies</h2>
         <ImageCarousel
           data={filteredPopularMovie}
           type="movie"
-          isMobile={isMobile}
+          isUserAgentMobile={isUserAgentMobile}
+          variant=""
         />
       </div>
     </main>

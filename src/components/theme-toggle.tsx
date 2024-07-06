@@ -10,8 +10,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { ButtonHTMLAttributes, HTMLAttributes } from "react";
+import { HtmlProps } from "next/dist/shared/lib/html-context.shared-runtime";
 
-export function ThemeToggle({ className }) {
+// export interface ButtonProps
+//   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+// }
+export function ThemeToggle({ className }: { className: string }) {
   const { setTheme } = useTheme();
 
   return (

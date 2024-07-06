@@ -15,7 +15,7 @@ export const baseApiUrl = "https://api.themoviedb.org/3";
 
 export const baseImageUrl = "https://image.tmdb.org/t/p/original";
 
-export const options = {
+export const options: RequestInit = {
   method: "GET",
   headers: {
     accept: "application/json",
