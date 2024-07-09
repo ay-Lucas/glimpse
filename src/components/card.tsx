@@ -12,11 +12,8 @@ interface ICard {
 // type Data = Record<Poster, Url>;
 
 export function Card({ data, index, variant }: ICard) {
-  type DataKeys = "name" | "title" | "overview" | "media_type" | "poster_path";
-  // const info: Record<DataKeys, string> = data?.media_type!;
   const info = data as any;
   const [isImageLoading, setImageLoading] = useState(true);
-  console.log(data);
   return (
     <div className="relative text-xl group-hover:scale-110 transform-gpu transition duration-150 rounded-xl overflow-hidden shadow-2xl w-[142.5px] h-[213px] md:w-[190px] md:h-[284px] flex mx-auto">
       <div className="absolute z-10 h-full w-full bg-gradient-to-t from-background from-30% to-gray-300/20 opacity-0 group-hover:opacity-95 transition-opacity transform-gpu duration-300" />

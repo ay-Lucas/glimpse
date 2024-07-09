@@ -89,5 +89,5 @@ export function isUnique(
 }
 
 export function isUsRating(item: RatingResponse) {
-  return item.iso31661 === "US" && item !== undefined;
+  return item.iso_3166_1 === "US" && item !== undefined;
 }

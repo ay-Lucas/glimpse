@@ -10,7 +10,7 @@ import { isUnique } from "@/lib/utils";
 
 export default async function Movies() {
   const MIN_TRENDING_POPULARITY = 300;
-  const MIN_POPULAR_POPULARITY = 8000;
+  const MIN_POPULAR_POPULARITY = 5;
   const [trendingMovieRes, popularMoviesRes, upcomingMoviesRes] =
     await Promise.all([
       getTrending({ media_type: "movie", time_window: "day" }),

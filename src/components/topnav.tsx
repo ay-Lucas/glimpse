@@ -26,9 +26,6 @@ export function TopNav({ loggedIn = false }) {
         <section className="flex md:w-1/3 justify-end  space-x-4 items-center group-active:bg-background/70">
           {/* <Search /> */}
           {/* <ThemeToggle className="hidden md:visible" /> */}
-          <Button asChild size="sm">
-            <Link href="/login">Sign in</Link>
-          </Button>
           {/* {loggedIn ? ( */}
           <Button asChild size="sm">
             <Link href="/login">Sign in</Link>

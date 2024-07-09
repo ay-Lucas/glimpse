@@ -4,7 +4,7 @@ import { getDeviceType, getPopular, getTrending } from "@/app/discover/actions";
 
 const MIN_POPULARITY = 500;
 const MIN_TRENDING_POPULARITY = 300;
-const MIN_POPULAR_POPULARITY = 8000;
+const MIN_POPULAR_POPULARITY = 5;
 export default async function Browse() {
   const [trendingTvRes, popularTvRes] = await Promise.all([
     getTrending({ media_type: "tv", time_window: "day" }),

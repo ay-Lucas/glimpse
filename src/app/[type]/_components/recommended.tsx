@@ -55,10 +55,6 @@ async function getValidRecommendations(
   }
   return result;
 }
-interface ResultWithRating {
-  result: MovieResult | TvResult;
-  rating?: string;
-}
 
 export async function Recommended({
   type,
@@ -74,22 +70,16 @@ export async function Recommended({
   const recommendations = await Promise.all(
     recommendationsRes.results?.map(async (item: MovieResult | TvResult) => {
       const itemRating = await getContentRating(item.media_type, item.id ?? 0);
-      let resultWithRating: ResultWithRating = { result: item, rating: "" };
       if (item.media_type === "tv") {
         const ratingArray = itemRating.results?.filter(isUsRating) ?? [];
-        resultWithRating = { result: item, rating: ratingArray[0]?.rating };
-        // item.rating = ratingArray[0]?.rating;
+        (item as any).rating = ratingArray[0]?.rating;
       } else if (item.media_type === "movie") {
         const ratingArray = itemRating.countries.filter(
           (item: RatingResponse) => isUsRating(item),
         );
-        resultWithRating = {
-          result: item,
-          rating: ratingArray[0]?.certification,
-        };
-        // item.rating = ratingArray[0]?.certification;
+        (item as any).rating = ratingArray[0]?.certification;
       }
-      return resultWithRating;
+      return item;
     }),
   );
 

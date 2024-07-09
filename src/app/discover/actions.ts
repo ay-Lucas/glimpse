@@ -2,6 +2,7 @@ import { headers } from "next/headers";
 import { baseApiUrl, options } from "@/lib/constants";
 import {
   DiscoverMovieRequest,
+  DiscoverMovieResponse,
   DiscoverTvRequest,
   DiscoverTvResponse,
   TrendingRequest,
@@ -23,11 +24,12 @@ export async function getTrending(
 export async function getPopular(
   request: DiscoverMovieRequest | DiscoverTvRequest,
   mediaType: "movie" | "tv",
-): Promise<DiscoverTvResponse | DiscoverTvResponse> {
+): Promise<DiscoverTvResponse | DiscoverMovieResponse> {
   const res = await fetch(
-    `${baseApiUrl}/discover/${mediaType}?include_adult=false&language=en-US&page=${request.page}&sort_by=popularity.desc&vote_average.gte=${request["vote_average.gte"]}&with_original_language=en`,
+    `${baseApiUrl}/discover/${mediaType}?include_adult=false&language=en-US&region=US&page=${request.page}&sort_by=popularity.desc&vote_average.gte=${request["vote_average.gte"]}&with_original_language=en`,
     options,
   );
+  console.log(res);
   return res.json();
 }
 

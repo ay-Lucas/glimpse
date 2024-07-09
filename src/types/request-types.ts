@@ -544,8 +544,8 @@ export interface DiscoverMovieRequest extends RequestParams {
   year?: number;
   "vote_count.gte"?: number;
   "vote_count.lte"?: number;
-  "vote_average.gte"?: number;
-  "vote_average.lte"?: number;
+  "vote_average.gte"?: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
+  "vote_average.lte"?: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
   with_cast?: string;
   with_crew?: string;
   with_people?: string;
@@ -575,8 +575,8 @@ export interface DiscoverTvRequest extends RequestParams {
   first_air_date_year?: number;
   page?: number;
   timezone?: string;
-  "vote_average.gte"?: number;
-  "vote_average.lte"?: number;
+  "vote_average.gte"?: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
+  "vote_average.lte"?: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
   "vote_count.gte"?: number;
   with_genres?: string;
   with_networks?: string;
@@ -938,7 +938,7 @@ export interface ShowChangesResponse extends Response {
 }
 
 export interface RatingResponse {
-  iso31661?: string;
+  iso_3166_1?: string;
   rating?: string;
 }
 

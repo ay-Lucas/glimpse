@@ -11,12 +11,8 @@ import { Card } from "@/components/card";
 import { useState, useEffect } from "react";
 import { useMediaQuery } from "@/lib/hooks";
 import { MovieResult, PersonResult, TvResult } from "@/types/request-types";
-interface ImageCarouselProps {
-  data: Array<MovieResult | PersonResult | TvResult>;
-  type: string;
-  isUserAgentMobile: boolean;
-  variant: string;
-}
+import { ImageCarouselProps } from "@/types";
+
 export function ImageCarousel({
   data,
   type,
@@ -29,7 +25,6 @@ export function ImageCarousel({
   );
   useEffect(() => {
     setSlidesToScroll(isMobile ? "auto" : 4);
-    console.log(data);
   }, [isMobile]);
 
   return (

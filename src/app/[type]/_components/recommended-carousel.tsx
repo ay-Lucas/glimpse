@@ -11,6 +11,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { Card } from "@/components/card";
 import { ImageCarouselProps } from "@/types/index";
+
 export function RecommendedCarousel({
   data,
   type,

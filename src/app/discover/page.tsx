@@ -10,7 +10,7 @@ import { MovieResult, TvResult } from "@/types/request-types";
 
 const MIN_POPULARITY = 500;
 const MIN_TRENDING_POPULARITY = 300;
-const MIN_POPULAR_POPULARITY = 8000;
+const VOTE_AVERAGE_GTE = 6;
 export default async function Discover() {
   const [
     trendingTvRes,
@@ -21,11 +21,8 @@ export default async function Discover() {
   ] = await Promise.all([
     getTrending({ media_type: "tv", time_window: "day" }),
     getTrending({ media_type: "movie", time_window: "day" }),
-    getPopular({ page: 1, "vote_average.gte": MIN_POPULAR_POPULARITY }, "tv"),
-    getPopular(
-      { page: 1, "vote_average.gte": MIN_POPULAR_POPULARITY },
-      "movie",
-    ),
+    getPopular({ page: 1, "vote_average.gte": VOTE_AVERAGE_GTE }, "tv"),
+    getPopular({ page: 1, "vote_average.gte": VOTE_AVERAGE_GTE }, "movie"),
     getUpcomingMovies({ page: 1 }),
   ]);
   const trendingTv = sortPopular(
@@ -42,12 +39,13 @@ export default async function Discover() {
 
   const trending = sortPopular(trendingTvAndMovies, MIN_TRENDING_POPULARITY);
   const isUserAgentMobile = (await getDeviceType()) === "mobile";
-  const filteredPopularTv = popularTvRes?.results?.filter((item: TvResult) =>
-    isUnique(item, trending),
+  const filteredPopularTv = popularTvRes?.results?.filter(
+    (item: TvResult | MovieResult) => isUnique(item, trending),
   );
   const filteredPopularMovie = popularMoviesRes?.results?.filter(
     (item: MovieResult | TvResult) => isUnique(item, trending),
   );
+  console.log(popularMoviesRes);
   return (
     <main className="w-full max-w-[1920px]">
       <div className="mx-auto space-y-1 w-10/12 md:w-[700px] lg:w-[1024px] xl:w-[1775px] select-none pt-5">
