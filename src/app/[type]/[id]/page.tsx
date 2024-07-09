@@ -12,13 +12,7 @@ import { Button } from "@/components/ui/button";
 import { VideoPlayer } from "../_components/video-player";
 import Link from "next/link";
 import { Recommended } from "../_components/recommended";
-import {
-  MovieResult,
-  Review,
-  TvResult,
-  FindRequest,
-  FindResponse,
-} from "@/types/request-types";
+import { MovieResult, Review, TvResult } from "@/types/request-types";
 
 async function getRating(result: MovieResult | TvResult, type: string) {
   let ratingArray, rating;
@@ -36,7 +30,7 @@ async function getRating(result: MovieResult | TvResult, type: string) {
 export default async function ItemPage({
   params,
 }: {
-  params: { type: "movie" | "tv"; id: string };
+  params: { type: "movie" | "tv"; id: number };
 }) {
   const data = await getData({ id: params.id }, params.type);
   const rating = await getRating(data, params.type);
@@ -52,7 +46,7 @@ export default async function ItemPage({
         <div className="absolute top-0 left-0 mb-10 w-screen h-screen">
           <div className="h-full w-full bg-gradient-to-t from-background from-30% via-background/95 via-40% to-transparent">
             <Backdrop
-              src={`https://image.tmdb.org/t/p/original${data.backdropPath}`}
+              src={`https://image.tmdb.org/t/p/original${data.backdrop_path}`}
             />
           </div>
         </div>
@@ -62,7 +56,7 @@ export default async function ItemPage({
             <div>
               <div className="flex flex-col md:flex-row h-full md:h-3/4 z-10 md:items-center md:space-x-5">
                 <Poster
-                  src={`https://image.tmdb.org/t/p/original${data.posterPath}`}
+                  src={`https://image.tmdb.org/t/p/original${data.poster_path}`}
                 />
                 <div className="flex flex-col justify-between space-y-1 items-center md:items-start">
                   <h2 className="text-3xl md:text-5xl font-medium text-center md:text-start">
@@ -73,7 +67,7 @@ export default async function ItemPage({
                       <>
                         <div className="inline-flex text-lg">
                           <span className="mr-2">
-                            {data?.voteAverage?.toPrecision(2) ?? 0 * 10}%
+                            {data?.vote_average?.toPrecision(2) ?? 0 * 10}%
                           </span>
                           <Image
                             src={TmdbLogo}
@@ -132,7 +126,7 @@ export default async function ItemPage({
           )}
         </div>
       </div>
-      <VideoPlayer youtubeId={youtubeId} id={params.id} />
+      <VideoPlayer youtubeId={youtubeId ?? ""} id={params.id} />
     </main>
   );
 }

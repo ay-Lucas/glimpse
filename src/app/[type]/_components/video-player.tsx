@@ -6,9 +6,15 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
-export function VideoPlayer({ youtubeId, id }) {
+export function VideoPlayer({
+  youtubeId,
+  id,
+}: {
+  youtubeId: string;
+  id: number;
+}) {
   const [isVisible, setVisibility] = useState(false);
-  const [params, setParams] = useState(null);
+  const [params, setParams] = useState<string | null>(null);
   const searchParams = useSearchParams();
   const router = useRouter();
 

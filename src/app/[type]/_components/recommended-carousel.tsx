@@ -40,7 +40,7 @@ export function RecommendedCarousel({
             className="basis-1/2 md:basis-1/3 xl:basis-1/4 group"
             // className="pl-7 basis-auto group"
           >
-            <Link href={`/${item.mediaType || type}/${item.id}`}>
+            <Link href={`/${item.media_type || type}/${item.id}`}>
               <Card data={item} index={i} variant={variant} />
             </Link>
           </CarouselItem>

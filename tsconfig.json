@@ -12,9 +12,9 @@
     "lib": [
       "dom",
       "dom.iterable",
-      "es2022"
+      "esnext"
     ],
-    "target": "es2022",
+    "target": "esnext",
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,

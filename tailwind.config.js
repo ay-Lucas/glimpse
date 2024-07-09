@@ -1,12 +1,13 @@
 import defaultTheme from "tailwindcss/defaultTheme";
 export const plugins = [require("tailwindcss-animate")];
 /** @type {import('tailwindcss').Config} */
+//@ts-ignore
 export const darkMode = ["class"];
 export const content = [
-  "./pages/**/*.{js,jsx}",
-  "./components/**/*.{js,jsx}",
-  "./app/**/*.{js,jsx}",
-  "./src/**/*.{js,jsx}",
+  "./pages/**/*.{ts,tsx}",
+  "./components/**/*.{ts,tsx}",
+  "./app/**/*.{ts,tsx}",
+  "./src/**/*.{ts,tsx}",
 ];
 export const prefix = "";
 export const theme = {

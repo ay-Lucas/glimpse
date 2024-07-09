@@ -14,7 +14,7 @@ export async function getTrending(
   request: TrendingRequest,
 ): Promise<TrendingResponse> {
   const res = await fetch(
-    `${baseApiUrl}/trending/${request.mediaType}/${request.timeWindow}`,
+    `${baseApiUrl}/trending/${request.media_type}/${request.time_window}`,
     options,
   );
   return res.json();

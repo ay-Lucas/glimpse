@@ -1,8 +1,8 @@
 export enum HttpMethod {
-  get = "get",
-  post = "post",
-  put = "put",
-  delete = "delete",
+  Get = "get",
+  Post = "post",
+  Put = "put",
+  Delete = "delete",
 }
 
 export interface Endpoint {
@@ -19,15 +19,15 @@ export interface EndpointGroup {
 export interface Request {
   id?: string | number;
   language?: string;
-  requestToken?: string;
+  request_token?: string;
 }
 
 export interface Response {}
 
 export interface AuthenticationToken extends Response {
   success?: boolean;
-  expiresAt?: string;
-  requestToken?: string;
+  expires_at?: string;
+  request_token?: string;
 }
 
 export interface RequestParams {
@@ -36,11 +36,11 @@ export interface RequestParams {
 }
 
 export interface SessionRequestParams extends RequestParams {
-  requestToken: string;
+  request_token: string;
 }
 
 export interface SessionResponse extends Response {
-  sessionId?: string;
+  session_id?: string;
 }
 
 export interface RequestOptions {
@@ -56,16 +56,16 @@ export interface Genre {
 export interface ProductionCompany {
   name?: string;
   id?: number;
-  logoPath?: string;
-  originCountry?: string;
+  logo_path?: string;
+  origin_country?: string;
 }
 
 export interface ProductionCountry {
   name?: string;
-  iso31661?: string;
+  iso_3166_1?: string;
 }
 
 export interface SpokenLanguage {
-  iso6391?: string;
+  iso_639_1?: string;
   name?: string;
 }

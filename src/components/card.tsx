@@ -1,15 +1,22 @@
 "use client";
 import { MovieResult, PersonResult, TvResult } from "@/types/request-types";
 import Image from "next/image";
-import React from "react";
+import { useState } from "react";
 interface ICard {
   data?: MovieResult | TvResult | PersonResult;
   index: number;
   variant?: string;
 }
+
+// type Url = MovieResult | TvResult | PersonResult;
+// type Data = Record<Poster, Url>;
+
 export function Card({ data, index, variant }: ICard) {
+  type DataKeys = "name" | "title" | "overview" | "media_type" | "poster_path";
+  // const info: Record<DataKeys, string> = data?.media_type!;
   const info = data as any;
-  const [isImageLoading, setImageLoading] = React.useState(true);
+  const [isImageLoading, setImageLoading] = useState(true);
+  console.log(data);
   return (
     <div className="relative text-xl group-hover:scale-110 transform-gpu transition duration-150 rounded-xl overflow-hidden shadow-2xl w-[142.5px] h-[213px] md:w-[190px] md:h-[284px] flex mx-auto">
       <div className="absolute z-10 h-full w-full bg-gradient-to-t from-background from-30% to-gray-300/20 opacity-0 group-hover:opacity-95 transition-opacity transform-gpu duration-300" />
@@ -29,9 +36,9 @@ export function Card({ data, index, variant }: ICard) {
       {/* )} */}
       {variant === "labeled" ? (
         <div
-          className={`border border-gray-300/50 w-14 h-6 top-1 left-1 shadow-xl text-sm font-semibold text-center rounded-2xl z-10 absolute bg-blend-difference ${data?.mediaType === "tv" ? "bg-blue-500/85" : "bg-green-500/85"}`}
+          className={`border border-gray-300/50 w-14 h-6 top-1 left-1 shadow-xl text-sm font-semibold text-center rounded-2xl z-10 absolute bg-blend-difference ${data?.media_type === "tv" ? "bg-blue-500/85" : "bg-green-500/85"}`}
         >
-          <span className="align-middle">{data?.mediaType}</span>
+          <span className="align-middle">{data?.media_type}</span>
         </div>
       ) : (
         ""
@@ -40,7 +47,7 @@ export function Card({ data, index, variant }: ICard) {
       <Image
         width={195}
         height={290}
-        src={`https://image.tmdb.org/t/p/original${info?.posterPath}`}
+        src={`https://image.tmdb.org/t/p/original${info.poster_path}`}
         alt={`Background image ${index + 1}`}
         key={index}
         quality={75}

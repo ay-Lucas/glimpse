@@ -2,15 +2,8 @@
 import { baseApiUrl, options } from "@/lib/constants";
 import {
   FindRequest,
-  FindResponse,
-  MovieRecommendationsRequest,
-  MovieRecommendationsResponse,
   MovieResult,
   MovieReviewsResponse,
-  RatingRequest,
-  RatingResponse,
-  TvRecommendationsRequest,
-  TvRecommendationsResponse,
   TvResult,
   TvReviewsResponse,
 } from "@/types/request-types";
@@ -37,23 +30,17 @@ export async function getReviews(
   return res.json();
 }
 
-export async function getRecommendations(
-  request: MovieRecommendationsRequest | TvRecommendationsRequest,
-  type: "tv" | "movie",
-): Promise<MovieRecommendationsResponse | TvRecommendationsResponse> {
+export async function getRecommendations(id: number, type: "tv" | "movie") {
   const res = await fetch(
-    `${baseApiUrl}/${type}/${request.id}/recommendations`,
+    `${baseApiUrl}/${type}/${id}/recommendations`,
     options,
   );
   return res.json();
 }
 
-export async function getContentRating(
-  request: RatingRequest,
-  type: "tv" | "movie",
-): Promise<RatingResponse> {
+export async function getContentRating(type: "tv" | "movie", id: number) {
   const res = await fetch(
-    `${baseApiUrl}/${type}/${request.id}/${type === "tv" ? "content_ratings" : "releases"}`,
+    `${baseApiUrl}/${type}/${id}/${type === "tv" ? "content_ratings" : "releases"}`,
     options,
   );
   return res.json();

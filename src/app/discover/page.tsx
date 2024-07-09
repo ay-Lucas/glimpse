@@ -6,7 +6,7 @@ import {
   getPopular,
   getTrending,
 } from "@/app/discover/actions";
-import { MovieResult, TvResult, TrendingRequest } from "@/types/request-types";
+import { MovieResult, TvResult } from "@/types/request-types";
 
 const MIN_POPULARITY = 500;
 const MIN_TRENDING_POPULARITY = 300;
@@ -19,8 +19,8 @@ export default async function Discover() {
     popularMoviesRes,
     upcomingMoviesRes,
   ] = await Promise.all([
-    getTrending({ mediaType: "tv", timeWindow: "day" }),
-    getTrending({ mediaType: "movie", timeWindow: "day" }),
+    getTrending({ media_type: "tv", time_window: "day" }),
+    getTrending({ media_type: "movie", time_window: "day" }),
     getPopular({ page: 1, "vote_average.gte": MIN_POPULAR_POPULARITY }, "tv"),
     getPopular(
       { page: 1, "vote_average.gte": MIN_POPULAR_POPULARITY },
@@ -29,15 +29,15 @@ export default async function Discover() {
     getUpcomingMovies({ page: 1 }),
   ]);
   const trendingTv = sortPopular(
-    trendingTvRes.results,
+    trendingTvRes.results!,
     MIN_TRENDING_POPULARITY,
   );
   const trendingMovies = sortPopular(
-    trendingMovieRes.results,
+    trendingMovieRes.results!,
     MIN_TRENDING_POPULARITY,
   );
-  const trendingTvAndMovies = trendingTvRes.results.concat(
-    trendingMovieRes.results,
+  const trendingTvAndMovies = trendingTvRes.results!.concat(
+    trendingMovieRes.results!,
   );
 
   const trending = sortPopular(trendingTvAndMovies, MIN_TRENDING_POPULARITY);
@@ -56,7 +56,7 @@ export default async function Discover() {
         </h2>
         <ImageCarousel
           data={trendingTv}
-          type="movie"
+          type="tv"
           isUserAgentMobile={isUserAgentMobile}
           variant=""
         />
@@ -73,7 +73,7 @@ export default async function Discover() {
           Upcoming Movies
         </h2>
         <ImageCarousel
-          data={upcomingMoviesRes.results}
+          data={upcomingMoviesRes.results!}
           type="movie"
           isUserAgentMobile={isUserAgentMobile}
           variant=""

@@ -11,8 +11,12 @@ import { Card } from "@/components/card";
 import { useState, useEffect } from "react";
 import { useMediaQuery } from "@/lib/hooks";
 import { MovieResult, PersonResult, TvResult } from "@/types/request-types";
-import { ImageCarouselProps } from "@/types/index";
-
+interface ImageCarouselProps {
+  data: Array<MovieResult | PersonResult | TvResult>;
+  type: string;
+  isUserAgentMobile: boolean;
+  variant: string;
+}
 export function ImageCarousel({
   data,
   type,
@@ -25,6 +29,7 @@ export function ImageCarousel({
   );
   useEffect(() => {
     setSlidesToScroll(isMobile ? "auto" : 4);
+    console.log(data);
   }, [isMobile]);
 
   return (
@@ -43,7 +48,7 @@ export function ImageCarousel({
             className="basis-1/2 md:basis-1/3 lg:basis-1/5 xl:basis-[12.5%] group"
             // className="pl-7 basis-auto group"
           >
-            <Link href={`/${item.mediaType || type}/${item.id}`}>
+            <Link href={`/${type}/${item.id}`}>
               <Card data={item} index={i} variant={variant} />
             </Link>
           </CarouselItem>

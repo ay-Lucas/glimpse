@@ -12,7 +12,7 @@ export interface IdRequestParams extends RequestParams {
 }
 
 export interface AppendToResponseRequest {
-  append_to_response?: string;
+  appendToResponse?: string;
 }
 
 export interface IdAppendToResponseRequest
@@ -28,7 +28,7 @@ export interface IdPagedRequestParams extends IdRequestParams {
 }
 
 export interface WatchProvidersParams extends RequestParams {
-  watch_region?: string;
+  watchRegion?: string;
 }
 
 export interface MovieResult {
@@ -46,10 +46,10 @@ export interface MovieResult {
   popularity?: number;
   vote_count?: number;
   video?: boolean;
-  vote_average?: number;
   videos?: {
     results: Array<Video>;
   };
+  vote_average?: number;
 }
 
 export interface TvResult {
@@ -83,65 +83,65 @@ export interface PersonResult {
 }
 
 export interface EpisodeResult extends SimpleEpisode {
-  media_type: "tv_episode";
+  mediaType: "tv_episode";
   runtime?: string;
 }
 
 export interface Person {
   birthday?: string | null;
-  known_for_department?: string;
+  knownForDepartment?: string;
   deathday?: null | string;
   id?: number;
   name?: string;
-  also_known_as?: string[];
+  alsoKnownAs?: string[];
   gender?: number;
   biography?: string;
   popularity?: number;
-  place_of_birth?: string | null;
-  profile_path?: string | null;
+  placeOfBirth?: string | null;
+  profilePath?: string | null;
   adult?: boolean;
-  imdb_id?: string;
+  imdbId?: string;
   homepage?: null | string;
 }
 
 export interface Image {
-  base_url?: string;
-  secure_base_url?: string;
-  backdrop_sizes?: Array<string>;
-  logo_sizes?: Array<string>;
-  poster_sizes?: Array<string>;
-  profile_sizes?: Array<string>;
-  still_sizes?: Array<string>;
+  baseUrl?: string;
+  secureBaseUrl?: string;
+  backdropSizes?: Array<string>;
+  logoSizes?: Array<string>;
+  posterSizes?: Array<string>;
+  profileSizes?: Array<string>;
+  stillSizes?: Array<string>;
 }
 
 interface BaseImage {
-  aspect_ratio?: number;
-  file_path?: string;
+  aspectRatio?: number;
+  filePath?: string;
   height?: number;
-  vote_average?: number;
-  vote_count?: number;
+  voteAverage?: number;
+  voteCount?: number;
   width?: number;
 }
 
 export interface Logo extends BaseImage {
   id?: string;
-  file_type?: ".svg" | ".png";
+  fileType?: ".svg" | ".png";
 }
 
 export interface Backdrop extends BaseImage {
-  iso_639_1?: string;
+  iso6391?: string;
 }
 
 export interface Profile extends BaseImage {
-  iso_639_1?: string;
+  iso6391?: string;
 }
 
 export interface Poster extends BaseImage {
-  iso_639_1?: string;
+  iso6391?: string;
 }
 
 export interface TitleLogo extends BaseImage {
-  iso_639_1?: string;
+  iso6391?: string;
 }
 
 export interface Keyword {
@@ -151,20 +151,20 @@ export interface Keyword {
 
 export interface ReleaseDate {
   certification?: string;
-  iso_639_1?: string;
-  release_date?: string;
+  iso6391?: string;
+  releaseDate?: string;
   type?: number;
   note?: string;
 }
 
 export interface Video {
   id?: string;
-  iso_639_1?: string;
-  iso_3166_1?: string;
+  iso6391?: string;
+  iso31661?: string;
   key?: string;
   name?: string;
   official?: boolean;
-  published_at?: string;
+  publishedAt?: string;
   site?: string;
   size?: 360 | 480 | 720 | 1080;
   type?:
@@ -177,10 +177,10 @@ export interface Video {
 }
 
 export interface Translation {
-  iso_3166_1?: string;
-  iso_639_1?: string;
+  iso31661?: string;
+  iso6391?: string;
   name?: string;
-  english_name?: string;
+  englishName?: string;
   data?: {
     name?: string;
     overview?: string;
@@ -193,95 +193,95 @@ export interface Company {
   headquarters?: string;
   homepage?: string;
   id?: number;
-  logo_path?: string;
+  logoPath?: string;
   name?: string;
-  origin_country?: string;
-  parent_company?: null | object;
+  originCountry?: string;
+  parentCompany?: null | object;
 }
 
 export interface SimpleEpisode {
-  air_date?: string;
-  episode_number?: number;
+  airDate?: string;
+  episodeNumber?: number;
   id?: number;
   name?: string;
   order?: number;
   overview?: string;
-  production_code?: string;
+  productionCode?: string;
   rating?: number;
-  season_number?: number;
-  show_id?: number;
-  still_path?: string;
-  vote_average?: number;
-  vote_count?: number;
+  seasonNumber?: number;
+  showId?: number;
+  stillPath?: string;
+  voteAverage?: number;
+  voteCount?: number;
 }
 
 export interface Network {
   name?: string;
   id?: number;
-  logo_path?: string;
-  origin_country?: string;
+  logoPath?: string;
+  originCountry?: string;
 }
 
 export interface SimpleSeason {
-  air_date?: string;
-  episode_count?: number;
+  airDate?: string;
+  episodeCount?: number;
   id?: number;
   name?: string;
   overview?: string;
-  poster_path?: string;
-  season_number?: number;
+  posterPath?: string;
+  seasonNumber?: number;
 }
 
 export interface SimplePerson {
   id?: number;
-  credit_id?: string;
+  creditId?: string;
   name?: string;
   gender?: number;
-  profile_path?: string;
+  profilePath?: string;
 }
 
 export interface Cast {
   adult?: boolean;
-  cast_id?: number;
+  castId?: number;
   character?: string;
-  credit_id?: string;
+  creditId?: string;
   gender?: number | null;
   id?: number;
-  known_for_department?: string;
+  knownForDepartment?: string;
   name?: string;
   order?: number;
-  original_name?: string;
+  originalName?: string;
   popularity?: number;
-  profile_path?: string | null;
+  profilePath?: string | null;
 }
 
 export interface Crew {
   adult?: boolean;
-  credit_id?: string;
+  creditId?: string;
   department?: string;
   gender?: number | null;
   id?: number;
-  known_for_department?: string;
+  knownForDepartment?: string;
   job?: string;
   name?: string;
-  original_name?: string;
+  originalName?: string;
   popularity?: number;
-  profile_path?: string | null;
+  profilePath?: string | null;
 }
 
 export interface Country {
-  iso_3166_1?: string;
-  english_name?: string;
+  iso31661?: string;
+  englishName?: string;
 }
 
 export interface Language {
-  iso_639_1?: string;
-  english_name?: string;
+  iso6391?: string;
+  englishName?: string;
   name?: string;
 }
 
 export interface Timezone {
-  iso_3166_1?: string;
+  iso31661?: string;
   zones?: string[];
 }
 
@@ -291,123 +291,123 @@ export interface Job {
 }
 
 export interface Episode {
-  air_date?: string;
+  airDate?: string;
   crew?: Array<Crew>;
-  episode_number?: number;
-  guest_stars?: GuestStar[];
+  episodeNumber?: number;
+  guestStars?: GuestStar[];
   name?: string;
   overview?: string;
   id?: number;
-  production_code?: string | null;
+  productionCode?: string | null;
   runtime?: number;
-  season_number?: number;
-  still_path?: string | null;
-  vote_average?: number;
-  vote_count?: number;
+  seasonNumber?: number;
+  stillPath?: string | null;
+  voteAverage?: number;
+  voteCount?: number;
 }
 
 export enum ExternalId {
-  ImdbId = "imdb_id",
-  Freebase_Mid = "freebase_mid",
-  FreebaseId = "freebase_id",
-  TvdbId = "tvdb_id",
-  TvrageId = "tvrage_id",
-  FacebookId = "facebook_id",
-  TwitterId = "twitter_id",
-  InstagramId = "instagram_id",
+  imdbId = "imdb_id",
+  freebaseMid = "freebase_mid",
+  freebaseId = "freebase_id",
+  tvdbId = "tvdb_id",
+  tvrageId = "tvrage_id",
+  facebookId = "facebook_id",
+  twitterId = "twitter_id",
+  instagramId = "instagram_id",
 }
 
 export interface ConfigurationResponse extends Response {
-  change_keys: string[];
+  changeKeys: string[];
   images: {
-    base_url?: string;
-    secure_base_url?: string;
-    backdrop_sizes?: string[];
-    logo_sizes?: string[];
-    poster_sizes?: string[];
-    profile_sizes?: string[];
-    still_sizes?: string[];
+    baseUrl?: string;
+    secureBaseUrl?: string;
+    backdropSizes?: string[];
+    logoSizes?: string[];
+    posterSizes?: string[];
+    profileSizes?: string[];
+    stillSizes?: string[];
   };
 }
 
 export interface MovieList {
   description?: string;
-  favorite_count?: number;
+  favoriteCount?: number;
   id?: number;
-  item_count?: number;
-  iso_639_1?: string;
-  list_type?: string;
+  itemCount?: number;
+  iso6391?: string;
+  listType?: string;
   name?: string;
-  poster_path?: null | string;
+  posterPath?: null | string;
 }
 
 export interface GuestStar {
   id?: number;
   name?: string;
-  credit_id?: string;
+  creditId?: string;
   character?: string;
   order?: number;
-  profile_path?: string | null;
+  profilePath?: string | null;
 }
 
 export interface Role {
-  credit_id?: string;
+  creditId?: string;
   character?: string;
-  episode_count?: number;
+  episodeCount?: number;
 }
 
 export interface AggregateCast {
   adult?: boolean;
   gender?: number;
   id?: number;
-  known_for_department?: string;
+  knownForDepartment?: string;
   name?: string;
-  original_name?: string;
+  originalName?: string;
   popularity?: number;
-  profile_path?: string;
+  profilePath?: string;
   roles?: Role[];
-  total_episode_count?: number;
+  totalEpisodeCount?: number;
   order?: number;
 }
 
 export interface AggregateJob {
-  credit_id?: string;
+  creditId?: string;
   job?: string;
-  episode_count?: number;
+  episodeCount?: number;
 }
 
 export interface AggregateCrew {
   adult?: boolean;
   gender?: number;
   id?: number;
-  known_for_department?: string;
+  knownForDepartment?: string;
   name?: string;
-  original_name?: string;
+  originalName?: string;
   popularity?: number;
-  profile_path?: string;
+  profilePath?: string;
   jobs?: AggregateJob[];
   department?: string;
-  total_episode_count?: number;
+  totalEpisodeCount?: number;
 }
 
 export interface FindRequest extends RequestParams {
   id: string | number;
   language?: string;
-  external_source?: ExternalId;
+  externalSource?: ExternalId;
 }
 
 export interface PaginatedResponse extends Response {
   page?: number;
-  total_results?: number;
-  total_pages?: number;
+  totalResults?: number;
+  totalPages?: number;
 }
 
 export interface FindResponse extends Response {
-  movie_results: Array<MovieResult>;
-  tv_results: Array<TvResult>;
-  person_results: Array<PersonResult>;
-  tv_episode_results: Array<EpisodeResult>;
-  tv_season_results: Array<object>;
+  movieResults: Array<MovieResult>;
+  tvResults: Array<TvResult>;
+  // personResults: Array<}>;
+  tvEpisodeResults: Array<EpisodeResult>;
+  tvSeasonResults: Array<object>;
 }
 
 export interface SearchRequest extends RequestParams {
@@ -418,7 +418,7 @@ export interface SearchRequest extends RequestParams {
 export interface SearchCompanyResponse extends PaginatedResponse {
   results?: Array<{
     id?: number;
-    logo_path?: string;
+    logoPath?: string;
     name?: string;
   }>;
 }
@@ -426,9 +426,9 @@ export interface SearchCompanyResponse extends PaginatedResponse {
 export interface SearchCollectionResponse extends PaginatedResponse {
   results?: Array<{
     id?: number;
-    backdrop_path?: string;
+    backdropPath?: string;
     name?: string;
-    poster_path?: string;
+    posterPath?: string;
   }>;
 }
 
@@ -440,10 +440,10 @@ export interface SearchKeywordResponse extends PaginatedResponse {
 }
 
 export interface SearchMovieRequest extends SearchRequest {
-  include_adult?: boolean;
+  includeAdult?: boolean;
   region?: string;
   year?: number;
-  primary_release_year?: number;
+  primaryReleaseYear?: number;
 }
 
 export interface MovieResultsResponse extends PaginatedResponse {
@@ -451,21 +451,21 @@ export interface MovieResultsResponse extends PaginatedResponse {
 }
 
 export interface SearchMultiRequest extends SearchRequest {
-  include_adult?: boolean;
+  includeAdult?: boolean;
   region?: string;
 }
 
 export interface SearchMultiResponse extends PaginatedResponse {
-  results?: Array<MovieResult | TvResult | PersonResult>;
+  // results?: Array<MovieResult | TvResult | }>;
 }
 
 export interface SearchPersonResponse extends PaginatedResponse {
-  results?: Array<PersonResult>;
+  // results?: Array<}>;
 }
 
 export interface SearchTvRequest extends SearchRequest {
-  include_adult?: boolean;
-  first_air_date_year?: number;
+  includeAdult?: boolean;
+  firstAirDateYear?: number;
 }
 
 export interface EpisodeResultsResponse extends PaginatedResponse {
@@ -513,7 +513,7 @@ export interface CollectionTranslationsResponse extends Response {
 
 export interface DiscoverMovieRequest extends RequestParams {
   region?: string;
-  sort_by?:
+  sortBy?:
     | "popularity.asc"
     | "popularity.desc"
     | "release_date.asc"
@@ -528,38 +528,38 @@ export interface DiscoverMovieRequest extends RequestParams {
     | "vote_average.desc"
     | "vote_count.asc"
     | "vote_count.desc";
-  certification_country?: string;
+  certificationCountry?: string;
   certification?: string;
   "certification.lte"?: string;
   "certification.gte"?: string;
-  include_adult?: boolean;
-  include_video?: boolean;
+  includeAdult?: boolean;
+  includeVideo?: boolean;
   page?: number;
-  primary_release_year?: number;
+  primaryReleaseYear?: number;
   "primary_release_date.gte"?: string;
   "primary_release_date.lte"?: string;
   "release_date.gte"?: string;
   "release_date.lte"?: string;
-  with_release_type?: string;
+  withReleaseType?: string;
   year?: number;
   "vote_count.gte"?: number;
   "vote_count.lte"?: number;
   "vote_average.gte"?: number;
   "vote_average.lte"?: number;
-  with_cast?: string;
-  with_crew?: string;
-  with_people?: string;
-  with_companies?: string;
-  with_genres?: string;
-  without_genres?: string;
-  with_keywords?: string;
-  without_keywords?: string;
+  withCast?: string;
+  withCrew?: string;
+  withPeople?: string;
+  withCompanies?: string;
+  withGenres?: string;
+  withoutGenres?: string;
+  withKeywords?: string;
+  withoutKeywords?: string;
   "with_runtime.gte"?: number;
   "with_runtime.lte"?: number;
-  with_original_language?: string;
-  with_watch_providers?: string;
-  watch_region?: string;
-  with_watch_monetization_types?: string;
+  withOriginalLanguage?: string;
+  withWatchProviders?: string;
+  watchRegion?: string;
+  withWatchMonetizationTypes?: string;
 }
 
 export interface DiscoverMovieResponse extends PaginatedResponse {
@@ -567,31 +567,31 @@ export interface DiscoverMovieResponse extends PaginatedResponse {
 }
 
 export interface DiscoverTvRequest extends RequestParams {
-  sort_by?: string;
+  sortBy?: string;
   "air_date.gte"?: string;
   "air_date.lte"?: string;
   "first_air_date.gte"?: string;
   "first_air_date.lte"?: string;
-  first_air_date_year?: number;
+  firstAirDateYear?: number;
   page?: number;
   timezone?: string;
   "vote_average.gte"?: number;
   "vote_average.lte"?: number;
   "vote_count.gte"?: number;
-  with_genres?: string;
-  with_networks?: string;
-  without_genres?: string;
+  withGenres?: string;
+  withNetworks?: string;
+  withoutGenres?: string;
   "with_runtime.gte"?: number;
   "with_runtime.lte"?: number;
-  include_null_first_air_dates?: boolean;
-  with_original_language?: string;
-  without_keywords?: string;
-  screened_theatrically?: boolean;
-  with_companies?: string;
-  with_keywords?: string;
-  with_watch_providers?: string;
-  watch_region?: string;
-  with_watch_monetization_types?: string;
+  includeNullFirstAirDates?: boolean;
+  withOriginalLanguage?: string;
+  withoutKeywords?: string;
+  screenedTheatrically?: boolean;
+  withCompanies?: string;
+  withKeywords?: string;
+  withWatchProviders?: string;
+  watchRegion?: string;
+  withWatchMonetizationTypes?: string;
 }
 
 export interface DiscoverTvResponse extends PaginatedResponse {
@@ -599,34 +599,34 @@ export interface DiscoverTvResponse extends PaginatedResponse {
 }
 
 export interface TrendingRequest extends RequestParams {
-  media_type: "all" | "movie" | "tv" | "person";
-  time_window: "day" | "week";
+  mediaType: "all" | "movie" | "tv" | "person";
+  timeWindow: "day" | "week";
 }
 
 export interface TrendingResponse extends PaginatedResponse {
-  results?: Array<MovieResult | TvResult | PersonResult>;
+  // results: Array<MovieResult | TvResult | }>;
 }
 
 export interface MovieResponse extends Response {
   adult?: boolean;
-  backdrop_path?: string;
-  belongs_to_collection?: object;
+  backdropPath?: string;
+  belongsToCollection?: object;
   budget?: number;
   genres?: Array<Genre>;
   homepage?: string;
   id?: number;
-  imdb_id?: string;
-  original_language?: string;
-  original_title?: string;
+  imdbId?: string;
+  originalLanguage?: string;
+  originalTitle?: string;
   overview?: string;
   popularity?: number;
-  poster_path?: string;
-  production_companies?: Array<ProductionCompany>;
-  production_countries?: Array<ProductionCountry>;
-  release_date?: string;
+  posterPath?: string;
+  productionCompanies?: Array<ProductionCompany>;
+  productionCountries?: Array<ProductionCountry>;
+  releaseDate?: string;
   revenue?: number;
   runtime?: number;
-  spoken_languages?: Array<SpokenLanguage>;
+  spokenLanguages?: Array<SpokenLanguage>;
   status?:
     | "Rumored"
     | "Planned"
@@ -637,8 +637,8 @@ export interface MovieResponse extends Response {
   tagline?: string;
   title?: string;
   video?: boolean;
-  vote_average?: number;
-  vote_count?: number;
+  voteAverage: number;
+  voteCount?: number;
 }
 
 export interface MovieAccountStateResponse extends Response {
@@ -655,15 +655,15 @@ export interface MovieAlternativeTitlesRequest extends IdRequestParams {
 export interface MovieAlternativeTitlesResponse extends Response {
   id?: number;
   titles?: Array<{
-    iso_3166_1?: string;
+    iso31661?: string;
     title?: string;
     type?: string;
   }>;
 }
 
 export interface ChangesRequest extends IdRequestParams {
-  start_date?: string;
-  end_date?: string;
+  startDate?: string;
+  endDate?: string;
   page?: number;
 }
 
@@ -684,10 +684,10 @@ export interface WatchProviderCountry {
 }
 
 export interface WatchProvider {
-  display_priority?: number;
-  logo_path?: string;
-  provider_id?: number;
-  provider_name?: string;
+  displayPriority?: number;
+  logoPath?: string;
+  providerId?: number;
+  providerName?: string;
 }
 
 export interface WatchProviderListResponse {
@@ -697,52 +697,52 @@ export interface WatchProviderListResponse {
 export interface WatchProviderResponse {
   id?: number;
   results?: {
-    AR?: WatchProviderCountry;
-    AT?: WatchProviderCountry;
-    AU?: WatchProviderCountry;
-    BE?: WatchProviderCountry;
-    BR?: WatchProviderCountry;
-    CA?: WatchProviderCountry;
-    CH?: WatchProviderCountry;
-    CL?: WatchProviderCountry;
-    CO?: WatchProviderCountry;
-    CZ?: WatchProviderCountry;
-    DE?: WatchProviderCountry;
-    DK?: WatchProviderCountry;
-    EC?: WatchProviderCountry;
-    EE?: WatchProviderCountry;
-    ES?: WatchProviderCountry;
-    FI?: WatchProviderCountry;
-    FR?: WatchProviderCountry;
-    GB?: WatchProviderCountry;
-    GR?: WatchProviderCountry;
-    HU?: WatchProviderCountry;
-    ID?: WatchProviderCountry;
-    IE?: WatchProviderCountry;
-    IN?: WatchProviderCountry;
-    IT?: WatchProviderCountry;
-    JP?: WatchProviderCountry;
-    KR?: WatchProviderCountry;
-    LT?: WatchProviderCountry;
-    LV?: WatchProviderCountry;
-    MX?: WatchProviderCountry;
-    MY?: WatchProviderCountry;
-    NL?: WatchProviderCountry;
-    NO?: WatchProviderCountry;
-    NZ?: WatchProviderCountry;
-    PE?: WatchProviderCountry;
-    PH?: WatchProviderCountry;
-    PL?: WatchProviderCountry;
-    PT?: WatchProviderCountry;
-    RO?: WatchProviderCountry;
-    RU?: WatchProviderCountry;
-    SE?: WatchProviderCountry;
-    SG?: WatchProviderCountry;
-    TH?: WatchProviderCountry;
-    TR?: WatchProviderCountry;
-    US?: WatchProviderCountry;
-    VE?: WatchProviderCountry;
-    ZA?: WatchProviderCountry;
+    ar?: WatchProviderCountry;
+    at?: WatchProviderCountry;
+    au?: WatchProviderCountry;
+    be?: WatchProviderCountry;
+    br?: WatchProviderCountry;
+    ca?: WatchProviderCountry;
+    ch?: WatchProviderCountry;
+    cl?: WatchProviderCountry;
+    co?: WatchProviderCountry;
+    cz?: WatchProviderCountry;
+    de?: WatchProviderCountry;
+    dk?: WatchProviderCountry;
+    ec?: WatchProviderCountry;
+    ee?: WatchProviderCountry;
+    es?: WatchProviderCountry;
+    fi?: WatchProviderCountry;
+    fr?: WatchProviderCountry;
+    gb?: WatchProviderCountry;
+    gr?: WatchProviderCountry;
+    hu?: WatchProviderCountry;
+    id?: WatchProviderCountry;
+    ie?: WatchProviderCountry;
+    in?: WatchProviderCountry;
+    it?: WatchProviderCountry;
+    jp?: WatchProviderCountry;
+    kr?: WatchProviderCountry;
+    lt?: WatchProviderCountry;
+    lv?: WatchProviderCountry;
+    mx?: WatchProviderCountry;
+    my?: WatchProviderCountry;
+    nl?: WatchProviderCountry;
+    no?: WatchProviderCountry;
+    nz?: WatchProviderCountry;
+    pe?: WatchProviderCountry;
+    ph?: WatchProviderCountry;
+    pl?: WatchProviderCountry;
+    pt?: WatchProviderCountry;
+    ro?: WatchProviderCountry;
+    ru?: WatchProviderCountry;
+    se?: WatchProviderCountry;
+    sg?: WatchProviderCountry;
+    th?: WatchProviderCountry;
+    tr?: WatchProviderCountry;
+    us?: WatchProviderCountry;
+    ve?: WatchProviderCountry;
+    za?: WatchProviderCountry;
   };
 }
 
@@ -753,9 +753,9 @@ export interface MovieChangesResponse extends Response {
       id?: string;
       action?: string;
       time?: string;
-      iso_639_1?: string;
+      iso6391?: string;
       value?: string;
-      original_value?: string;
+      originalValue?: string;
     }>;
   }>;
 }
@@ -773,15 +773,15 @@ export interface AggregateCreditsResponse extends Response {
 }
 
 export interface MovieExternalIdsResponse extends Response {
-  imdb_id?: string | null;
-  facebook_id?: string | null;
-  instagram_id?: string | null;
-  twitter_id?: string | null;
+  imdbId?: string | null;
+  facebookId?: string | null;
+  instagramId?: string | null;
+  twitterId?: string | null;
   id?: number;
 }
 
 export interface MovieImagesRequest extends IdRequestParams {
-  include_image_language?: string;
+  includeImageLanguage?: string;
 }
 
 export interface MovieImagesResponse extends Response {
@@ -799,8 +799,8 @@ export interface MovieKeywordResponse extends Response {
 export interface MovieReleaseDatesResponse extends Response {
   id?: number;
   results?: Array<{
-    iso_3166_1?: string;
-    release_dates?: Array<ReleaseDate>;
+    iso31661?: string;
+    releaseDates?: Array<ReleaseDate>;
   }>;
 }
 
@@ -839,8 +839,8 @@ export interface RatingRequest extends IdRequestParams {
 }
 
 export interface PostResponse extends Response {
-  status_code?: number;
-  status_message?: string;
+  statusCode?: number;
+  statusMessage?: string;
 }
 
 export interface MovieNowPlayingRequest {
@@ -871,7 +871,7 @@ export interface UpcomingMoviesRequest extends MovieNowPlayingRequest {
 }
 
 export interface UpcomingMoviesResponse extends MovieNowPlayingResponse {
-  results?: Array<MovieResult>;
+  results: Array<MovieResult>;
   dates?: {
     maximum?: string;
     minimum?: string;
@@ -879,37 +879,37 @@ export interface UpcomingMoviesResponse extends MovieNowPlayingResponse {
 }
 
 export interface ShowResponse extends Response {
-  backdrop_path?: string | null;
-  created_by?: Array<SimplePerson>;
-  episode_run_time?: number[];
-  first_air_date?: string;
+  backdropPath?: string | null;
+  createdBy?: Array<SimplePerson>;
+  episodeRunTime?: number[];
+  firstAirDate?: string;
   genres?: Array<Genre>;
   homepage?: string;
   id?: number;
-  in_production?: boolean;
+  inProduction?: boolean;
   languages?: string[];
-  last_air_date?: string;
-  last_episode_to_air?: SimpleEpisode;
+  lastAirDate?: string;
+  lastEpisodeToAir?: SimpleEpisode;
   name?: string;
-  next_episode_to_air?: SimpleEpisode;
+  nextEpisodeToAir?: SimpleEpisode;
   networks?: Array<Network>;
-  number_of_episodes?: number;
-  number_of_seasons?: number;
-  origin_country?: string[];
-  original_language?: string;
-  original_name?: string;
+  numberOfEpisodes?: number;
+  numberOfSeasons?: number;
+  originCountry?: string[];
+  originalLanguage?: string;
+  originalName?: string;
   overview?: string;
   popularity?: number;
-  poster_path?: string | null;
-  production_companies?: Array<ProductionCompany>;
-  production_countries?: Array<ProductionCountry>;
+  posterPath?: string | null;
+  productionCompanies?: Array<ProductionCompany>;
+  productionCountries?: Array<ProductionCountry>;
   seasons?: Array<SimpleSeason>;
-  spoken_languages?: Array<SpokenLanguage>;
+  spokenLanguages?: Array<SpokenLanguage>;
   status?: string;
   tagline?: string;
   type?: string;
-  vote_average?: number;
-  vote_count?: number;
+  voteAverage: number;
+  voteCount?: number;
 }
 
 export interface ShowAccountStatesResponse extends Response {
@@ -923,7 +923,7 @@ export interface ShowAlternativeTitlesResponse extends Response {
   id?: number;
   results?: Array<{
     title?: string;
-    iso_3166_1?: string;
+    iso31661?: string;
     type?: string;
   }>;
 }
@@ -932,7 +932,7 @@ export interface ShowChangesResponse extends Response {
   id?: number;
   results?: Array<{
     title?: string;
-    iso_3166_1?: string;
+    iso31661?: string;
     type?: string;
   }>;
 }
@@ -943,18 +943,15 @@ export interface RatingResponse {
 }
 
 export interface ShowContentRatingResponse extends Response {
-  results?: Array<{
-    iso_3166_1?: string;
-    rating?: string;
-  }>;
+  results?: Array<RatingResponse>;
   id?: number;
 }
 
 export interface TvEpisodeGroupsResponse extends Response {
   results?: Array<{
     description?: string;
-    episode_count?: number;
-    group_count?: number;
+    episodeCount?: number;
+    groupCount?: number;
     id?: string;
     name?: string;
     network?: null | Network;
@@ -962,14 +959,14 @@ export interface TvEpisodeGroupsResponse extends Response {
 }
 
 export interface TvExternalIdsResponse extends Response {
-  imdb_id?: string | null;
-  freebase_mid?: string | null;
-  freebase_id?: string | null;
-  tvdb_id?: number | null;
-  tvrage_id?: number | null;
-  facebook_id?: string | null;
-  instagram_id?: string | null;
-  twitter_id?: string | null;
+  imdbId?: string | null;
+  freebaseMid?: string | null;
+  freebaseId?: string | null;
+  tvdbId?: number | null;
+  tvrageId?: number | null;
+  facebookId?: string | null;
+  instagramId?: string | null;
+  twitterId?: string | null;
   id?: number;
 }
 
@@ -997,8 +994,8 @@ export interface TvScreenTheatricallyResponse extends Response {
   id?: number;
   results?: Array<{
     id?: number;
-    episode_number?: number;
-    season_number?: number;
+    episodeNumber?: number;
+    seasonNumber?: number;
   }>;
 }
 
@@ -1012,26 +1009,43 @@ export interface TvTranslationsResponse extends Response {
 }
 
 export interface TvSeasonRequest extends IdAppendToResponseRequest {
-  season_number: number;
+  seasonNumber: number;
 }
 
 export interface TvAggregateCreditsRequest {
   id: number;
-  season_number: number;
+  seasonNumber: number;
   language?: string;
 }
 
 export interface TvSeasonResponse extends Response {
   _id?: string;
-  air_date?: string;
+  airDate?: string;
   episodes?: Array<Episode>;
   name?: string;
   overview?: string;
   id?: number;
-  poster_path?: string | null;
-  season_number?: number;
+  posterPath?: string | null;
+  seasonNumber?: number;
 }
 
+export interface TvRecommendationsRequest extends IdRequestParams {
+  page?: string;
+}
+
+export interface TvRecommendationsResponse extends PaginatedResponse {
+  results?: Array<TvResult>;
+}
+
+export interface SimilarTvResponse extends TvRecommendationsResponse {}
+
+export interface TvReviewsRequest extends TvRecommendationsRequest {}
+
+export interface TvReviewsResponse extends PaginatedResponse {
+  results?: Array<Review>;
+}
+
+export interface MovieListsRequest extends MovieRecommendationsRequest {}
 export interface TvSeasonChangesResponse extends Response {
   changes?: Array<{
     key?: string;
@@ -1042,11 +1056,11 @@ export interface TvSeasonChangesResponse extends Response {
       value?:
         | string
         | {
-            episode_id?: number;
-            episode_number?: number;
+            episodeId?: number;
+            episodeNumber?: number;
           };
-      iso_639_1?: string;
-      original_value?: string;
+      iso6391?: string;
+      originalValue?: string;
     }>;
   }>;
 }
@@ -1055,7 +1069,7 @@ export interface TvSeasonAccountStatesResponse extends Response {
   id?: number;
   results?: Array<{
     id?: number;
-    episode_number?: number;
+    episodeNumber?: number;
     rated?:
       | boolean
       | {
@@ -1065,10 +1079,10 @@ export interface TvSeasonAccountStatesResponse extends Response {
 }
 
 export interface TvSeasonExternalIdsResponse extends Response {
-  freebase_mid?: string | null;
-  freebase_id?: null | string;
-  tvdb_id?: number | null;
-  tvrage_id?: null | number;
+  freebaseMid?: string | null;
+  freebaseId?: null | string;
+  tvdbId?: number | null;
+  tvrageId?: null | number;
   id?: number;
 }
 
@@ -1078,7 +1092,7 @@ export interface TvSeasonImagesResponse extends Response {
 }
 
 export interface EpisodeRequest extends TvSeasonRequest {
-  episode_number: number;
+  episodeNumber: number;
 }
 
 export interface EpisodeChangesResponse extends Response {
@@ -1089,7 +1103,7 @@ export interface EpisodeChangesResponse extends Response {
       action?: string;
       time?: string;
       value?: string;
-      iso_639_1?: string;
+      iso6391?: string;
     }>;
   }>;
 }
@@ -1100,20 +1114,20 @@ export interface EpisodeAccountStatesResponse extends Response {
 }
 
 export interface EpisodeCreditsResponse extends CreditsResponse {
-  guest_stars?: Array<GuestStar>;
+  guestStars?: Array<GuestStar>;
 }
 
 export interface EpisodeExternalIdsResponse extends Response {
-  imdb_id?: string | null;
-  freebase_mid?: string | null;
-  freebase_id?: string | null;
-  tvdb_id?: number | null;
-  tvrage_id?: number | null;
+  imdbId?: string | null;
+  freebaseMid?: string | null;
+  freebaseId?: string | null;
+  tvdbId?: number | null;
+  tvrageId?: number | null;
   id?: number;
 }
 
 interface EpisodeImage extends BaseImage {
-  iso_639_1?: null | string;
+  iso6391?: null | string;
 }
 
 export interface EpisodeImagesResponse extends Response {
@@ -1124,10 +1138,10 @@ export interface EpisodeImagesResponse extends Response {
 export interface EpisodeTranslationsResponse extends Response {
   id?: number;
   translations?: Array<{
-    iso_3166_1?: string;
-    iso_639_1?: string;
+    iso31661?: string;
+    iso6391?: string;
     name?: string;
-    english_name?: string;
+    englishName?: string;
     data?: {
       name?: string;
       overview?: string;
@@ -1143,8 +1157,8 @@ export interface EpisodeVideosResponse extends Response {
   id?: number;
   results: Array<{
     id?: string;
-    iso_639_1?: string;
-    iso_3166_1?: string;
+    iso6391?: string;
+    iso31661?: string;
     key?: string;
     name?: string;
     site?: string;
@@ -1168,9 +1182,9 @@ export interface PersonChangesResponse extends Response {
       id?: string;
       action?: string;
       time?: string;
-      original_value?: {
+      originalValue?: {
         profile?: {
-          file_path?: string;
+          filePath?: string;
         };
       };
     }>;
@@ -1263,64 +1277,64 @@ export interface PersonCombinedCreditsResponse extends Response {
   id?: number;
   cast?: Array<{
     id?: number;
-    original_language?: string;
-    episode_count?: number;
+    originalLanguage?: string;
+    episodeCount?: number;
     overview?: string;
-    origin_country?: string[];
-    original_name?: string;
-    genre_ids?: number[];
+    originCountry?: string[];
+    originalName?: string;
+    genreIds?: number[];
     name?: string;
-    media_type?: string;
-    poster_path?: string | null;
-    first_air_date?: string;
-    vote_average?: number | number;
-    vote_count?: number;
+    mediaType?: string;
+    posterPath?: string | null;
+    firstAirDate?: string;
+    voteAverage?: number | number;
+    voteCount?: number;
     character?: string;
-    backdrop_path?: string | null;
+    backdropPath?: string | null;
     popularity?: number;
-    credit_id?: string;
-    original_title?: string;
+    creditId?: string;
+    originalTitle?: string;
     video?: boolean;
-    release_date?: string;
+    releaseDate?: string;
     title?: string;
     adult?: boolean;
   }>;
   crew?: Array<{
     id?: number;
     department?: string;
-    original_language?: string;
-    episode_count?: number;
+    originalLanguage?: string;
+    episodeCount?: number;
     job?: string;
     overview?: string;
-    origin_country?: string[];
-    original_name?: string;
-    vote_count?: number;
+    originCountry?: string[];
+    originalName?: string;
+    voteCount?: number;
     name?: string;
-    media_type?: string;
+    mediaType?: string;
     popularity?: number;
-    credit_id?: string;
-    backdrop_path?: string | null;
-    first_air_date?: string;
-    vote_average?: number;
-    genre_ids?: number[];
-    poster_path?: string | null;
-    original_title?: string;
+    creditId?: string;
+    backdropPath?: string | null;
+    firstAirDate?: string;
+    voteAverage?: number;
+    genreIds?: number[];
+    posterPath?: string | null;
+    originalTitle?: string;
     video?: boolean;
     title?: string;
     adult?: boolean;
-    release_date?: string;
+    releaseDate?: string;
   }>;
 }
 
 export interface PersonExternalIdsResponse extends Response {
-  imdb_id?: string | null;
-  facebook_id?: null | string;
-  freebase_mid?: string | null;
-  freebase_id?: null | string;
-  tvrage_id?: number | null;
-  twitter_id?: null | string;
+  imdbId?: string | null;
+  facebookId?: null | string;
+  freebaseMid?: string | null;
+  freebaseId?: null | string;
+  tvrageId?: number | null;
+  twitterId?: null | string;
   id: number;
-  instagram_id?: string | null;
+  instagramId?: string | null;
 }
 
 export interface PersonImagesResponse extends Response {
@@ -1330,8 +1344,8 @@ export interface PersonImagesResponse extends Response {
 
 interface PersonTaggedImage extends BaseImage {
   id?: string;
-  iso_639_1?: null | string;
-  image_type?: string;
+  iso6391?: null | string;
+  imageType?: string;
   media?: MovieResult | TvResult;
 }
 
@@ -1343,44 +1357,44 @@ export interface PersonTaggedImagesResponse extends PaginatedResponse {
 export interface PersonTranslationsResponse extends PaginatedResponse {
   id?: number;
   translations?: Array<{
-    iso_639_1?: string;
-    iso_3166_1?: string;
+    iso6391?: string;
+    iso31661?: string;
     name?: string;
     data?: {
       biography?: string;
     };
-    english_name?: string;
+    englishName?: string;
   }>;
 }
 
 export interface PersonPopularResponse extends PaginatedResponse {
   results?: Array<{
-    profile_path?: string;
+    profilePath?: string;
     adult?: boolean;
     id?: number;
-    known_for?: MovieResult | TvResult;
+    knownFor?: MovieResult | TvResult;
     name?: string;
     popularity?: number;
   }>;
 }
 
 export interface CreditDetailsResponse extends Response {
-  credit_type?: string;
+  creditType?: string;
   department?: string;
   job?: string;
   media?: {
     id?: number;
     name?: string;
-    original_name?: string;
+    originalName?: string;
     character?: string;
     episodes?: Array<SimpleEpisode>;
     seasons?: Array<{
-      air_date?: string;
-      poster_path?: string;
-      season_number?: number;
+      airDate?: string;
+      posterPath?: string;
+      seasonNumber?: number;
     }>;
   };
-  media_type?: string;
+  mediaType?: string;
   id?: string;
   person?: {
     name?: string;
@@ -1389,25 +1403,25 @@ export interface CreditDetailsResponse extends Response {
 }
 
 export interface ListsDetailResponse extends Response {
-  created_by?: string;
+  createdBy?: string;
   description?: string;
-  favorite_count?: number;
+  favoriteCount?: number;
   id?: string;
   items?: Array<MovieResult>;
-  item_count?: number;
-  iso_639_1?: string;
+  itemCount?: number;
+  iso6391?: string;
   name?: string;
-  poster_path?: string | null;
+  posterPath?: string | null;
 }
 
 export interface ListStatusParams extends RequestParams {
   id: string | number;
-  movie_id: number;
+  movieId: number;
 }
 
 export interface ListsStatusResponse extends Response {
   id?: string;
-  item_present?: boolean;
+  itemPresent?: boolean;
 }
 
 export interface CreateListParams extends RequestParams {
@@ -1417,14 +1431,14 @@ export interface CreateListParams extends RequestParams {
 }
 
 export interface CreateListResponse extends Response {
-  status_message?: string;
+  statusMessage?: string;
   success?: boolean;
-  status_code?: number;
-  list_id?: number;
+  statusCode?: number;
+  listId?: number;
 }
 
 export interface CreateListItemParams extends IdRequestParams {
-  media_id: number;
+  mediaId: number;
 }
 
 export interface ClearListParams extends IdRequestParams {
@@ -1441,7 +1455,7 @@ export interface KeywordResponse extends Response {
 }
 
 export interface KeywordMoviesParams extends IdRequestParams {
-  include_adult?: boolean;
+  includeAdult?: boolean;
 }
 
 export interface CompanyAlternativeNamesResponse extends Response {
@@ -1464,39 +1478,39 @@ export interface AccountInfoResponse extends Response {
       hash?: string;
     };
   };
-  iso_639_1?: string;
-  iso_3166_1?: string;
+  iso6391?: string;
+  iso31661?: string;
   name?: string;
-  include_adult?: boolean;
+  includeAdult?: boolean;
   username?: string;
 }
 
 export interface AccountListsResponse extends PaginatedResponse {
   results?: Array<{
     description?: string;
-    favorite_count?: number;
+    favoriteCount?: number;
     id?: number;
-    item_count?: number;
-    iso_639_1?: string;
-    list_type?: string;
+    itemCount?: number;
+    iso6391?: string;
+    listType?: string;
     name?: string;
-    poster_path?: null;
+    posterPath?: null;
   }>;
 }
 
 export interface AccountMediaRequest extends PagedRequestParams {
-  sort_by?: "created_at.asc" | "created_at.desc";
+  sortBy?: "created_at.asc" | "created_at.desc";
 }
 
 export interface MarkAsFavoriteRequest extends IdRequestParams {
-  media_type: "movie" | "tv";
-  media_id: number;
+  mediaType: "movie" | "tv";
+  mediaId: number;
   favorite: boolean;
 }
 
 export interface AccountWatchlistRequest extends IdRequestParams {
-  media_type: "movie" | "tv";
-  media_id: number;
+  mediaType: "movie" | "tv";
+  mediaId: number;
   watchlist: boolean;
 }
 
@@ -1508,15 +1522,15 @@ export interface Certification {
 
 export interface CertificationsResponse extends Response {
   certifications?: {
-    US?: Certification[];
-    CA?: Certification[];
-    DE?: Certification[];
-    GB?: Certification[];
-    AU?: Certification[];
-    BR?: Certification[];
-    FR?: Certification[];
-    NZ?: Certification[];
-    IN?: Certification[];
+    us?: Certification[];
+    ca?: Certification[];
+    de?: Certification[];
+    gb?: Certification[];
+    au?: Certification[];
+    br?: Certification[];
+    fr?: Certification[];
+    nz?: Certification[];
+    in?: Certification[];
   };
 }
 
@@ -1527,23 +1541,17 @@ export interface NetworkResponse extends Response {
   homepage?: string;
   id?: number;
   name?: string;
-  origin_country?: string;
+  originCountry?: string;
 }
 
 export interface Review {
   id?: string;
   author?: string;
-  author_details?: {
-    name: string;
-    username: string;
-    avatar_path: string;
-    rating?: number;
-  };
   content?: string;
-  iso_639_1?: string;
-  media_id?: number;
-  media_title?: string;
-  media_type?: string;
+  iso6391?: string;
+  mediaId?: number;
+  mediaTitle?: string;
+  mediaType?: string;
   url?: string;
 }
 
@@ -1551,8 +1559,8 @@ export interface EpisodeGroupResponse extends Response {
   id?: string;
   name?: string;
   description?: string;
-  episode_count?: number;
-  group_count?: number;
+  episodeCount?: number;
+  groupCount?: number;
   groups?: Array<{
     id?: string;
     name?: string;

@@ -5,8 +5,10 @@ import { Star } from "lucide-react";
 import { ChevronDown } from "lucide-react";
 import { useRef } from "react";
 import Link from "next/link";
-export function Reviews({ data }) {
-  const ref = useRef(null);
+import { Review } from "@/types/request-types";
+
+export function Reviews({ data }: { data: Review }) {
+  const ref = useRef<HTMLDivElement>(null);
   const CLAMPED_CLIENT_HEIGHT = 96;
   const [isOpen, setIsOpen] = useState(false);
   const [isExpandable, setExpandable] = useState(false);
@@ -15,17 +17,17 @@ export function Reviews({ data }) {
     setIsOpen(!isOpen);
   };
   useEffect(() => {
-    setExpandable(
-      ref.current && ref.current.clientHeight >= CLAMPED_CLIENT_HEIGHT,
-    );
+    setExpandable((ref.current?.clientHeight ?? 0) >= CLAMPED_CLIENT_HEIGHT);
   }, []);
   return (
     <div className="rounded-md border px-4 pt-2 pb-1 text-md backdrop-blur">
       <div className="pb-1">
-        <Link href={data.url}>
-          <span className="text-xl">{data.author}</span>
-        </Link>
-        {data.author_details.rating && (
+        {data.url && (
+          <Link href={data.url}>
+            <span className="text-xl">{data.author}</span>
+          </Link>
+        )}
+        {data.author_details?.rating && (
           <span className="flex pt-1 text-md">
             <div className="flex pr-1 items-center">
               <span className="pr-1">

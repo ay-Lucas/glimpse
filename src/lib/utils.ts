@@ -1,9 +1,7 @@
 import { type ClassValue, clsx } from "clsx";
 import {
   MovieResult,
-  MovieResultsResponse,
   PersonResult,
-  PopularMoviesResponse,
   RatingResponse,
   TvResult,
 } from "@/types/request-types";
@@ -14,13 +12,13 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 // Fisher-Yates algorithm
-// export function shuffle(array: number[]) {
-//   for (let i = array.length - 1; i > 0; i--) {
-//     const j = Math.floor(Math.random() * (i + 1));
-//     [array[i], array[j]] = [array[j], array[i]];
-//   }
-//   return array;
-// }
+export function shuffle(array: string[]) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i] as any, array[j] as any] = [array[j], array[i]];
+  }
+  return array;
+}
 
 // sorts trending movies and tv objects
 interface Item {
@@ -75,12 +73,12 @@ export function isUnique(
   let unique = false;
   array.forEach((trendingItem) => {
     if (
-      trendingItem.mediaType === "tv" &&
+      trendingItem.media_type === "tv" &&
       trendingItem.name === (item as any)?.name
     ) {
       return (unique = true);
     } else if (
-      trendingItem.mediaType === "movie" &&
+      trendingItem.media_type === "movie" &&
       trendingItem.title === (item as any).title
     ) {
       return (unique = true);

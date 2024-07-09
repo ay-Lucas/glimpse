@@ -3,7 +3,7 @@ import { getRecommendations, getContentRating } from "../[id]/actions";
 import { isUsRating } from "@/lib/utils";
 import { genres } from "@/lib/constants";
 import { RecommendedCarousel } from "./recommended-carousel";
-import { MovieResult, PersonResult, TvResult } from "@/types/request-types";
+import { MovieResult, RatingResponse, TvResult } from "@/types/request-types";
 
 function validateRecommended(
   type: "movie" | "tv",
@@ -31,7 +31,7 @@ function validateRecommended(
   }
   if (
     safeRatings.includes(rating) &&
-    item?.genreIds?.includes(genres.get("Horror") ?? 0)
+    item?.genre_ids?.includes(genres.get("Horror") ?? 0)
   )
     isValid = false;
   return isValid;
@@ -55,6 +55,10 @@ async function getValidRecommendations(
   }
   return result;
 }
+interface ResultWithRating {
+  result: MovieResult | TvResult;
+  rating?: string;
+}
 
 export async function Recommended({
   type,
@@ -63,23 +67,29 @@ export async function Recommended({
 }: {
   type: "movie" | "tv";
   id: number;
-  rating: number;
+  rating: string;
 }) {
   const isMobile = (await getDeviceType()) === "mobile";
-  const recommendationsRes = await getRecommendations(type, id);
+  const recommendationsRes = await getRecommendations(id, type);
   const recommendations = await Promise.all(
-    recommendationsRes.results?.map(async (item) => {
-      const itemRating = await getContentRating(item.media_type, item.id);
+    recommendationsRes.results?.map(async (item: MovieResult | TvResult) => {
+      const itemRating = await getContentRating(item.media_type, item.id ?? 0);
+      let resultWithRating: ResultWithRating = { result: item, rating: "" };
       if (item.media_type === "tv") {
-        const ratingArray = itemRating.results.filter(isUsRating);
-        item.rating = ratingArray[0]?.rating;
+        const ratingArray = itemRating.results?.filter(isUsRating) ?? [];
+        resultWithRating = { result: item, rating: ratingArray[0]?.rating };
+        // item.rating = ratingArray[0]?.rating;
       } else if (item.media_type === "movie") {
-        const ratingArray = itemRating.countries.filter((item) =>
-          isUsRating(item),
+        const ratingArray = itemRating.countries.filter(
+          (item: RatingResponse) => isUsRating(item),
         );
-        item.rating = ratingArray[0]?.certification;
+        resultWithRating = {
+          result: item,
+          rating: ratingArray[0]?.certification,
+        };
+        // item.rating = ratingArray[0]?.certification;
       }
-      return item;
+      return resultWithRating;
     }),
   );
 
@@ -99,6 +109,7 @@ export async function Recommended({
               data={filteredRecommendations}
               type={type}
               isUserAgentMobile={isMobile}
+              variant=""
             />
           </div>
         </>

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
-import { AvatarDropdown } from "@/app/discover/_components/avatar-dropdown";
+// import { AvatarDropdown } from "@/app/discover/_components/avatar-dropdown";
 
 export function TopNav({ loggedIn = false }) {
   return (
@@ -25,14 +25,17 @@ export function TopNav({ loggedIn = false }) {
         </div>
         <section className="flex md:w-1/3 justify-end  space-x-4 items-center group-active:bg-background/70">
           {/* <Search /> */}
-          <ThemeToggle className="hidden md:visible" />
-          {loggedIn ? (
-            <Button asChild size="sm">
-              <Link href="/login">Sign in</Link>
-            </Button>
-          ) : (
-            <AvatarDropdown />
-          )}
+          {/* <ThemeToggle className="hidden md:visible" /> */}
+          <Button asChild size="sm">
+            <Link href="/login">Sign in</Link>
+          </Button>
+          {/* {loggedIn ? ( */}
+          <Button asChild size="sm">
+            <Link href="/login">Sign in</Link>
+          </Button>
+          {/* ) : ( */}
+          {/*   <AvatarDropdown /> */}
+          {/* )} */}
         </section>
       </nav>
     </div>
