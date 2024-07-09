@@ -45,7 +45,6 @@ export default async function Discover() {
   const filteredPopularMovie = popularMoviesRes?.results?.filter(
     (item: MovieResult | TvResult) => isUnique(item, trending),
   );
-  console.log(popularMoviesRes);
   return (
     <main className="w-full max-w-[1920px]">
       <div className="mx-auto space-y-1 w-10/12 md:w-[700px] lg:w-[1024px] xl:w-[1775px] select-none pt-5">

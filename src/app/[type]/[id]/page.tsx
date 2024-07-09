@@ -37,9 +37,11 @@ export default async function ItemPage({
   const reviews = await getReviews({ id: params.id }, params.type);
   const youtubeId = data.videos?.results[0]?.key;
   const releaseDate = new Date(
-    (data as any).firstAirDate || (data as any).release_date,
-  ).toLocaleDateString("en-US", dateOptions);
-  const isReleased = releaseDate?.valueOf() ?? 0 < Date.now();
+    (data as any).first_air_date || (data as any).release_date,
+  );
+  console.log(releaseDate.valueOf());
+  // console.log((data as any).first_air_date, (data as any).release_date);
+  const isReleased = releaseDate ? releaseDate.valueOf() < Date.now() : false;
   return (
     <main>
       <div className="h-full w-full overflow-x-hidden">
@@ -65,9 +67,9 @@ export default async function ItemPage({
                   <div className="flex flex-row space-x-2 items-center justify-center md:justify-start">
                     {isReleased && (
                       <>
-                        <div className="inline-flex text-lg">
+                        <div className="inline-flex items-center">
                           <span className="mr-2">
-                            {data?.vote_average?.toPrecision(2) ?? 0 * 10}%
+                            {((data?.vote_average ?? 0) * 10).toFixed(0)}%
                           </span>
                           <Image
                             src={TmdbLogo}
@@ -79,10 +81,20 @@ export default async function ItemPage({
                         <span>•</span>
                       </>
                     )}
-                    <div className="text-lg">{data && `${releaseDate}`}</div>
+                    <div className="">
+                      {isReleased
+                        ? `${new Intl.DateTimeFormat("us", {
+                            // dayPeriod: "long",
+                            timeZone: "UTC",
+                            month: "short",
+                            year: "numeric",
+                            day: "numeric",
+                          }).format(releaseDate)}`
+                        : "Date Unavailable"}
+                    </div>
                   </div>
                   {rating ? (
-                    <div>
+                    <div className="">
                       Rated <span className="font-semibold">{rating}</span>
                     </div>
                   ) : (
@@ -93,7 +105,7 @@ export default async function ItemPage({
                       className="text-md z-10"
                       href={`${params.id}/?show=true`}
                     >
-                      <Button className="p-2" variant="outline">
+                      <Button className="p-2 mt-1" variant="outline">
                         <Play size={22} className="mr-2" />
                         Play Trailer
                       </Button>

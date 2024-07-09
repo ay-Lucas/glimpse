@@ -29,7 +29,6 @@ export async function getPopular(
     `${baseApiUrl}/discover/${mediaType}?include_adult=false&language=en-US&region=US&page=${request.page}&sort_by=popularity.desc&vote_average.gte=${request["vote_average.gte"]}&with_original_language=en`,
     options,
   );
-  console.log(res);
   return res.json();
 }
 
