@@ -8,9 +8,6 @@ interface ICard {
   variant?: string;
 }
 
-// type Url = MovieResult | TvResult | PersonResult;
-// type Data = Record<Poster, Url>;
-
 export function Card({ data, index, variant }: ICard) {
   const info = data as any;
   const [isImageLoading, setImageLoading] = useState(true);
@@ -48,7 +45,7 @@ export function Card({ data, index, variant }: ICard) {
         alt={`Background image ${index + 1}`}
         key={index}
         quality={75}
-        sizes="(max-width: 768px) 33vw, (max-width: 1080px) 23vw, (max-width: 1200px) 15vw"
+        // sizes="(max-width: 768px) 33vw, (max-width: 1080px) 23vw, (max-width: 1200px) 15vw"
         onLoad={() => setImageLoading(false)}
         className={`object-cover transition ${isImageLoading ? "blur-img" : "remove-blur"}`}
         loading="eager"
