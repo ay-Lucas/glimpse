@@ -5,25 +5,27 @@ import {
   getUpcomingMovies,
   getPopular,
   getTrending,
+  getTrendingPages,
 } from "@/app/discover/actions";
 import { isUnique } from "@/lib/utils";
 
 export default async function Movies() {
   const MIN_TRENDING_POPULARITY = 300;
-  const MIN_POPULAR_POPULARITY = 5;
+  const MIN_POPULAR_POPULARITY = 2;
+  const NUMBER_OF_PAGES = 3;
   const [trendingMovieRes, popularMoviesRes, upcomingMoviesRes] =
     await Promise.all([
-      getTrending({ media_type: "movie", time_window: "day" }),
+      getTrendingPages(
+        { media_type: "movie", time_window: "day", page: 1 },
+        NUMBER_OF_PAGES,
+      ),
       getPopular(
         { page: 1, "vote_average.gte": MIN_POPULAR_POPULARITY },
         "movie",
       ),
       getUpcomingMovies({ page: 1 }),
     ]);
-  const trendingMovies = sortPopular(
-    trendingMovieRes.results!,
-    MIN_TRENDING_POPULARITY,
-  );
+  const trendingMovies = sortPopular(trendingMovieRes, MIN_TRENDING_POPULARITY);
 
   const isMobile = (await getDeviceType()) === "mobile";
 
