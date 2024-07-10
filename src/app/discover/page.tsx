@@ -5,12 +5,14 @@ import {
   getUpcomingMovies,
   getPopular,
   getTrending,
+  getTrendingPages,
 } from "@/app/discover/actions";
 import { MovieResult, TvResult } from "@/types/request-types";
 
 const MIN_POPULARITY = 500;
-const MIN_TRENDING_POPULARITY = 300;
+const MIN_TRENDING_POPULARITY = 200;
 const VOTE_AVERAGE_GTE = 6;
+const NUMBER_OF_PAGES = 3;
 export default async function Discover() {
   const [
     trendingTvRes,
@@ -19,23 +21,22 @@ export default async function Discover() {
     popularMoviesRes,
     upcomingMoviesRes,
   ] = await Promise.all([
-    getTrending({ media_type: "tv", time_window: "day" }),
-    getTrending({ media_type: "movie", time_window: "day" }),
+    getTrendingPages(
+      { media_type: "tv", time_window: "day", page: 1 },
+      NUMBER_OF_PAGES,
+    ),
+    getTrendingPages(
+      { media_type: "movie", time_window: "day", page: 1 },
+      NUMBER_OF_PAGES,
+    ),
+    // getTrendingPages({ media_type: "movie", time_window: "week", page: 1 }),
     getPopular({ page: 1, "vote_average.gte": VOTE_AVERAGE_GTE }, "tv"),
     getPopular({ page: 1, "vote_average.gte": VOTE_AVERAGE_GTE }, "movie"),
     getUpcomingMovies({ page: 1 }),
   ]);
-  const trendingTv = sortPopular(
-    trendingTvRes.results!,
-    MIN_TRENDING_POPULARITY,
-  );
-  const trendingMovies = sortPopular(
-    trendingMovieRes.results!,
-    MIN_TRENDING_POPULARITY,
-  );
-  const trendingTvAndMovies = trendingTvRes.results!.concat(
-    trendingMovieRes.results!,
-  );
+  const trendingTv = sortPopular(trendingTvRes, MIN_TRENDING_POPULARITY);
+  const trendingMovies = sortPopular(trendingMovieRes, MIN_TRENDING_POPULARITY);
+  const trendingTvAndMovies = trendingTvRes.concat(trendingMovieRes);
 
   const trending = sortPopular(trendingTvAndMovies, MIN_TRENDING_POPULARITY);
   const isUserAgentMobile = (await getDeviceType()) === "mobile";
@@ -45,6 +46,7 @@ export default async function Discover() {
   const filteredPopularMovie = popularMoviesRes?.results?.filter(
     (item: MovieResult | TvResult) => isUnique(item, trending),
   );
+  // console.log(getTrendingPages({ media_type: "tv", time_window: "day", page: 1}));
   return (
     <main className="w-full max-w-[1920px]">
       <div className="mx-auto space-y-1 w-10/12 md:w-[700px] lg:w-[1024px] xl:w-[1775px] select-none pt-5">

@@ -59,7 +59,7 @@ export function sortPopular(
   if (typeof array === undefined || array.length == 0)
     throw new Error("Could not sort array: array is undefined or empty");
   bubbleSort(array, array.length);
-  if (minPopularity > 0)
+  if (minPopularity > -1)
     return array.filter(
       (item) => item.popularity && item.popularity >= minPopularity,
     );

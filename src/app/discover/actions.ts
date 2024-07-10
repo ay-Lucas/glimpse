@@ -5,8 +5,10 @@ import {
   DiscoverMovieResponse,
   DiscoverTvRequest,
   DiscoverTvResponse,
+  MovieResult,
   TrendingRequest,
   TrendingResponse,
+  TvResult,
   UpcomingMoviesRequest,
   UpcomingMoviesResponse,
 } from "@/types/request-types";
@@ -15,10 +17,29 @@ export async function getTrending(
   request: TrendingRequest,
 ): Promise<TrendingResponse> {
   const res = await fetch(
-    `${baseApiUrl}/trending/${request.media_type}/${request.time_window}`,
+    `${baseApiUrl}/trending/${request.media_type}/${request.time_window}?&page=${request.page}`,
     options,
   );
   return res.json();
+}
+
+export async function getTrendingPages(
+  request: TrendingRequest,
+  numberOfPages: number,
+) {
+  const requests = [];
+  for (let i = 0; i < numberOfPages; i++) {
+    requests.push(
+      getTrending({
+        media_type: request.media_type,
+        time_window: request.time_window,
+        page: i + 1,
+      }),
+    );
+  }
+  const array = await Promise.all(requests);
+  const arrays = array.flatMap((page) => page.results);
+  return arrays;
 }
 
 export async function getPopular(

@@ -601,10 +601,11 @@ export interface DiscoverTvResponse extends PaginatedResponse {
 export interface TrendingRequest extends RequestParams {
   media_type: "all" | "movie" | "tv" | "person";
   time_window: "day" | "week";
+  page: number;
 }
 
 export interface TrendingResponse extends PaginatedResponse {
-  results?: Array<MovieResult | TvResult | PersonResult>;
+  results: Array<MovieResult | TvResult | PersonResult>;
 }
 
 export interface MovieResponse extends Response {
