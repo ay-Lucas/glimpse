@@ -3,7 +3,6 @@ import { sortPopular, isUnique } from "@/lib/utils";
 import {
   getDeviceType,
   getPopular,
-  getTrending,
   getTrendingPages,
 } from "@/app/discover/actions";
 

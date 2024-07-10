@@ -4,7 +4,6 @@ import {
   getDeviceType,
   getUpcomingMovies,
   getPopular,
-  getTrending,
   getTrendingPages,
 } from "@/app/discover/actions";
 import { isUnique } from "@/lib/utils";

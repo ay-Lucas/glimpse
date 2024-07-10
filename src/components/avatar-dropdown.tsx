@@ -37,7 +37,10 @@ export function AvatarDropdown() {
       <DropdownMenuTrigger asChild>
         <button className="focus-visible:outline-none">
           <Avatar>
-            <AvatarImage src="https://github.com/shadcn.png" />
+            <AvatarImage
+              src="https://github.com/shadcn.png"
+              className="w-10 rounded-3xl"
+            />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
         </button>
