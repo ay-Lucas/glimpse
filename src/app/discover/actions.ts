@@ -5,10 +5,8 @@ import {
   DiscoverMovieResponse,
   DiscoverTvRequest,
   DiscoverTvResponse,
-  MovieResult,
   TrendingRequest,
   TrendingResponse,
-  TvResult,
   UpcomingMoviesRequest,
   UpcomingMoviesResponse,
 } from "@/types/request-types";

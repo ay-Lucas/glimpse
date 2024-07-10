@@ -1,10 +1,5 @@
 import { type ClassValue, clsx } from "clsx";
-import {
-  MovieResult,
-  PersonResult,
-  RatingResponse,
-  TvResult,
-} from "@/types/request-types";
+import { MovieResult, RatingResponse, TvResult } from "@/types/request-types";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -25,11 +20,8 @@ interface Item {
   popularity: number;
 }
 
-export function bubbleSort(
-  arr: Array<MovieResult | TvResult | PersonResult>,
-  n: number,
-) {
-  let temp: MovieResult | TvResult | PersonResult;
+export function bubbleSort(arr: Array<MovieResult | TvResult>, n: number) {
+  let temp: MovieResult | TvResult;
   let i, j: number;
   let swapped: boolean;
   for (i = 0; i < n - 1; i++) {
@@ -53,7 +45,21 @@ export function bubbleSort(
 }
 
 export function sortPopular(
-  array: Array<MovieResult | TvResult | PersonResult>,
+  array: Array<MovieResult | TvResult>,
+  minPopularity: number,
+) {
+  if (typeof array === undefined || array.length == 0)
+    throw new Error("Could not sort array: array is undefined or empty");
+  bubbleSort(array, array.length);
+  if (minPopularity > -1)
+    return array.filter(
+      (item) => item.popularity && item.popularity >= minPopularity,
+    );
+  else return [];
+}
+
+export function filterList(
+  array: Array<MovieResult | TvResult>,
   minPopularity: number,
 ) {
   if (typeof array === undefined || array.length == 0)
@@ -68,7 +74,7 @@ export function sortPopular(
 
 export function isUnique(
   item: MovieResult | TvResult,
-  array: Array<MovieResult | TvResult | PersonResult>,
+  array: Array<MovieResult | TvResult>,
 ) {
   let unique = false;
   array.forEach((trendingItem) => {

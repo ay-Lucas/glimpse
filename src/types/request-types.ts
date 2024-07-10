@@ -605,7 +605,7 @@ export interface TrendingRequest extends RequestParams {
 }
 
 export interface TrendingResponse extends PaginatedResponse {
-  results: Array<MovieResult | TvResult | PersonResult>;
+  results: Array<MovieResult | TvResult>;
 }
 
 export interface MovieResponse extends Response {

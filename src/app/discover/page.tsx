@@ -10,9 +10,11 @@ import {
 import { MovieResult, TvResult } from "@/types/request-types";
 
 const MIN_POPULARITY = 500;
-const MIN_TRENDING_POPULARITY = 200;
+const MIN_TRENDING_POPULARITY = 100;
 const VOTE_AVERAGE_GTE = 6;
-const NUMBER_OF_PAGES = 3;
+const NUMBER_OF_PAGES = 10;
+const TRENDING_YEARS_OLD = 3;
+
 export default async function Discover() {
   const [
     trendingTvRes,
@@ -22,7 +24,7 @@ export default async function Discover() {
     upcomingMoviesRes,
   ] = await Promise.all([
     getTrendingPages(
-      { media_type: "tv", time_window: "day", page: 1 },
+      { media_type: "tv", time_window: "week", page: 1 },
       NUMBER_OF_PAGES,
     ),
     getTrendingPages(
@@ -34,19 +36,31 @@ export default async function Discover() {
     getPopular({ page: 1, "vote_average.gte": VOTE_AVERAGE_GTE }, "movie"),
     getUpcomingMovies({ page: 1 }),
   ]);
-  const trendingTv = sortPopular(trendingTvRes, MIN_TRENDING_POPULARITY);
-  const trendingMovies = sortPopular(trendingMovieRes, MIN_TRENDING_POPULARITY);
-  const trendingTvAndMovies = trendingTvRes.concat(trendingMovieRes);
+  // const trendingTv = sortPopular(trendingTvRes, MIN_TRENDING_POPULARITY);
+  const minDate = new Date().setFullYear(
+    new Date().getFullYear() - TRENDING_YEARS_OLD,
+  );
+  const trendingTv = trendingTvRes.filter(
+    (item) =>
+      item.original_language === "en" &&
+      (item.popularity ?? 0) > MIN_TRENDING_POPULARITY &&
+      new Date((item as any).first_air_date).valueOf() > minDate,
+  );
+  const trendingMovies = trendingMovieRes.filter(
+    (item) =>
+      item.original_language === "en" &&
+      (item.popularity ?? 0) > MIN_TRENDING_POPULARITY &&
+      new Date((item as any).release_date).valueOf() > minDate,
+  );
+  const trendingTvAndMovies = trendingTv.concat(trendingMovies);
 
-  const trending = sortPopular(trendingTvAndMovies, MIN_TRENDING_POPULARITY);
   const isUserAgentMobile = (await getDeviceType()) === "mobile";
   const filteredPopularTv = popularTvRes?.results?.filter(
-    (item: TvResult | MovieResult) => isUnique(item, trending),
+    (item: TvResult | MovieResult) => isUnique(item, trendingTvAndMovies),
   );
   const filteredPopularMovie = popularMoviesRes?.results?.filter(
-    (item: MovieResult | TvResult) => isUnique(item, trending),
+    (item: MovieResult | TvResult) => isUnique(item, trendingTvAndMovies),
   );
-  // console.log(getTrendingPages({ media_type: "tv", time_window: "day", page: 1}));
   return (
     <main className="w-full max-w-[1920px]">
       <div className="mx-auto space-y-1 w-10/12 md:w-[700px] lg:w-[1024px] xl:w-[1775px] select-none pt-5">
