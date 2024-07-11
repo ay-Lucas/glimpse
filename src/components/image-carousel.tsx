@@ -1,56 +1,75 @@
 "use client";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
 import Link from "next/link";
 import { Card } from "@/components/card";
-import { useState, useEffect } from "react";
-import { useMediaQuery } from "@/lib/hooks";
 import { MovieResult, PersonResult, TvResult } from "@/types/request-types";
 import { ImageCarouselProps } from "@/types";
-
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
 export function ImageCarousel({
   data,
   type,
   isUserAgentMobile,
   variant,
 }: ImageCarouselProps) {
-  const isMobile = useMediaQuery(768);
-  const [slidesToScroll, setSlidesToScroll] = useState<string | number>(
-    isUserAgentMobile ? "auto" : 4,
-  );
-  useEffect(() => {
-    setSlidesToScroll(isMobile ? "auto" : 4);
-  }, [isMobile]);
-
   return (
-    <Carousel
-      opts={{
-        slidesToScroll: slidesToScroll,
-        align: "start",
-        duration: 25,
-        watchDrag: isMobile,
-      }}
-    >
-      <CarouselContent className="-ml-3">
-        {data.map((item: MovieResult | TvResult | PersonResult, i: number) => (
-          <CarouselItem
-            key={i}
-            className="basis-1/2 md:basis-1/3 lg:basis-1/5 xl:basis-[12.5%] group"
-            // className="pl-7 basis-auto group"
-          >
-            <Link href={`/${type}/${item.id}`}>
-              <Card data={item} index={i} variant={variant} />
-            </Link>
-          </CarouselItem>
-        ))}
-      </CarouselContent>
-      <CarouselPrevious className="opacity-80 hover:opacity-100 w-8 h-8 p-1 md:p-0 ml-5 md:m-0 md:w-12 md:h-12" />
-      <CarouselNext className="opacity-80 hover:opacity-100 w-8 h-8 mr-4 p-1 md:p-0 md:m-0 md:w-12 md:h-12" />
-    </Carousel>
+    <>
+      <div>
+        <Swiper
+          slidesPerView={1}
+          speed={500}
+          spaceBetween={10}
+          navigation={{
+            disabledClass: "opacity-40",
+          }}
+          breakpoints={{
+            300: {
+              slidesPerView: 2,
+              slidesPerGroup: 2,
+              spaceBetween: 20,
+            },
+            500: {
+              slidesPerView: 3,
+              slidesPerGroup: 3,
+              spaceBetween: 20,
+            },
+            768: {
+              slidesPerView: 4,
+              slidesPerGroup: 4,
+              spaceBetween: 40,
+            },
+            1100: {
+              slidesPerView: 5,
+              slidesPerGroup: 5,
+              spaceBetween: 20,
+            },
+            1300: {
+              slidesPerView: 6,
+              slidesPerGroup: 3,
+              spaceBetween: 20,
+            },
+            1460: {
+              slidesPerView: 7,
+              slidesPerGroup: 3,
+              spaceBetween: 20,
+            },
+          }}
+          modules={[Navigation]}
+          className="mySwiper"
+          style={{ overflow: "visible" }}
+        >
+          {data.map(
+            (item: MovieResult | TvResult | PersonResult, i: number) => (
+              <SwiperSlide key={i} className="group">
+                <Link href={`/${type}/${item.id}`}>
+                  <Card data={item} index={i} variant={variant} />
+                </Link>
+              </SwiperSlide>
+            ),
+          )}
+        </Swiper>
+      </div>
+    </>
   );
 }

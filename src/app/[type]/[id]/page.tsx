@@ -121,7 +121,7 @@ export default async function ItemPage({
           <>
             <Recommended type={params.type} id={params.id} rating={rating} />
           </>
-          {(reviews.results?.length ?? -1 > 0) && (
+          {(reviews.results?.length ?? -1) > 0 && (
             <div className="px-5 lg:px-40">
               <h2 className="text-2xl font-semibold pb-5 pr-3 inline-flex">
                 Reviews

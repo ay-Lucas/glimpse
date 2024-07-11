@@ -62,8 +62,9 @@ export default async function Discover() {
     (item: MovieResult | TvResult) => isUnique(item, trendingTvAndMovies),
   );
   return (
-    <main className="w-full max-w-[1920px]">
-      <div className="mx-auto space-y-1 w-10/12 md:w-[700px] lg:w-[1024px] xl:w-[1775px] select-none pt-5">
+    <main className="w-screen max-w-[1920px] mx-auto">
+      {/* <div className="mx-auto space-y-1 w-10/12 md:w-[700px] lg:w-[1024px] xl:w-[1775px] select-none pt-5"> */}
+      <div className="px-10 space-y-3 pt-5 overflow-hidden">
         <h2 className={`pl-3 text-xl md:text-2xl font-bold`}>
           Trending Series
         </h2>
