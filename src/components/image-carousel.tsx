@@ -5,7 +5,7 @@ import { MovieResult, PersonResult, TvResult } from "@/types/request-types";
 import { ImageCarouselProps } from "@/types";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Swiper as SwiperCore } from "swiper/types";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
@@ -20,6 +20,17 @@ export function ImageCarousel({
   userAgent,
 }: ImageCarouselProps) {
   const swiperRef = useRef<SwiperCore>();
+  const [isPrevDisabled, setPrevDisabled] = useState(true);
+  const [isNextDisabled, setNextDisabled] = useState(false);
+
+  const handleSlideChange = () => {
+    if (swiperRef.current?.isBeginning) setPrevDisabled(true);
+    else if (swiperRef.current?.isEnd) setNextDisabled(true);
+    else {
+      setPrevDisabled(false);
+      setNextDisabled(false);
+    }
+  };
 
   return (
     <>
@@ -30,6 +41,7 @@ export function ImageCarousel({
             <Button
               size="icon"
               variant="ghost"
+              className={`transition-opacity ${isPrevDisabled ? "opacity-30" : "opacity-100"}`}
               onClick={() => swiperRef.current?.slidePrev()}
             >
               <ChevronLeft />
@@ -37,7 +49,7 @@ export function ImageCarousel({
             <Button
               size="icon"
               variant="ghost"
-              className="swiper-nagivation-next"
+              className={`transition-opacity ${isNextDisabled ? "opacity-30" : "opacity-100"}`}
               onClick={() => swiperRef.current?.slideNext()}
             >
               <ChevronRight />
@@ -50,6 +62,7 @@ export function ImageCarousel({
           spaceBetween={10}
           threshold={5}
           userAgent={userAgent}
+          onSlideChange={handleSlideChange}
           onBeforeInit={(swiper) => {
             swiperRef.current = swiper;
           }}
@@ -85,7 +98,6 @@ export function ImageCarousel({
               slidesPerView: 7,
               slidesPerGroup: 4,
               spaceBetween: 20,
-              // preventInteractionOnTransition: false,
             },
           }}
           modules={[Navigation]}
