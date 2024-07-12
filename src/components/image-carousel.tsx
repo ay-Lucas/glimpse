@@ -5,7 +5,7 @@ import { MovieResult, PersonResult, TvResult } from "@/types/request-types";
 import { ImageCarouselProps } from "@/types";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Swiper as SwiperCore } from "swiper/types";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
@@ -34,9 +34,11 @@ export function ImageCarousel({
 
   return (
     <>
-      <div>
+      <div className="">
         <div className="space-x-2 flex justify-between pb-2">
-          <h2 className={`text-xl md:text-2xl font-bold pb-3`}>{title}</h2>
+          <h2 className={`text-xl md:text-2xl font-bold pb-3 md:pl-7`}>
+            {title}
+          </h2>
           <div>
             <Button
               size="icon"
@@ -72,32 +74,32 @@ export function ImageCarousel({
             300: {
               slidesPerView: 2,
               slidesPerGroup: 2,
-              spaceBetween: 20,
+              spaceBetween: 30,
             },
-            500: {
+            600: {
               slidesPerView: 3,
               slidesPerGroup: 3,
-              spaceBetween: 20,
+              spaceBetween: 10,
             },
-            768: {
+            868: {
               slidesPerView: 4,
               slidesPerGroup: 4,
-              spaceBetween: 40,
+              spaceBetween: 10,
             },
             1100: {
               slidesPerView: 5,
               slidesPerGroup: 5,
-              spaceBetween: 20,
+              spaceBetween: 10,
             },
             1300: {
               slidesPerView: 6,
               slidesPerGroup: 6,
-              spaceBetween: 20,
+              spaceBetween: 10,
             },
-            1460: {
+            1500: {
               slidesPerView: 7,
               slidesPerGroup: 4,
-              spaceBetween: 20,
+              spaceBetween: 10,
             },
           }}
           modules={[Navigation]}
