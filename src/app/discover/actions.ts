@@ -62,13 +62,19 @@ export async function getUpcomingMovies(
   return res.json();
 }
 
-export async function getDeviceType(): Promise<string> {
+// export async function getDeviceType(): Promise<string> {
+//   const headersList = headers();
+//   const userAgent = headersList.get("user-agent") ?? "WPDesktop";
+//
+//   return userAgent.match(
+//     /Android|BlackBerry|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i,
+//   )
+//     ? "mobile"
+//     : "desktop";
+// }
+export async function getDeviceType() {
   const headersList = headers();
-  const userAgent = headersList.get("user-agent") ?? "WPDesktop";
+  const userAgent = headersList.get("user-agent");
 
-  return userAgent.match(
-    /Android|BlackBerry|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i,
-  )
-    ? "mobile"
-    : "desktop";
+  return userAgent;
 }

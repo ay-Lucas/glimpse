@@ -54,56 +54,45 @@ export default async function Discover() {
   );
   const trendingTvAndMovies = trendingTv.concat(trendingMovies);
 
-  const isUserAgentMobile = (await getDeviceType()) === "mobile";
   const filteredPopularTv = popularTvRes?.results?.filter(
     (item: TvResult | MovieResult) => isUnique(item, trendingTvAndMovies),
   );
   const filteredPopularMovie = popularMoviesRes?.results?.filter(
     (item: MovieResult | TvResult) => isUnique(item, trendingTvAndMovies),
   );
+  const userAgent = await getDeviceType();
   return (
     <main className="w-screen max-w-[1920px] mx-auto">
-      {/* <div className="mx-auto space-y-1 w-10/12 md:w-[700px] lg:w-[1024px] xl:w-[1775px] select-none pt-5"> */}
       <div className="px-10 space-y-3 pt-5 overflow-hidden">
-        <h2 className={`pl-3 text-xl md:text-2xl font-bold`}>
-          Trending Series
-        </h2>
         <ImageCarousel
           data={trendingTv}
           type="tv"
-          isUserAgentMobile={isUserAgentMobile}
+          title="Trending Series"
           variant=""
+          userAgent={userAgent}
         />
-        <h2 className={`pl-3 text-xl md:text-2xl font-bold`}>
-          Trending Movies
-        </h2>
         <ImageCarousel
           data={trendingMovies}
           type="movie"
-          isUserAgentMobile={isUserAgentMobile}
+          title="Trending Movies"
           variant=""
         />
-        <h2 className={`pl-3 text-xl md:text-2xl font-bold`}>
-          Upcoming Movies
-        </h2>
         <ImageCarousel
           data={upcomingMoviesRes.results!}
           type="movie"
-          isUserAgentMobile={isUserAgentMobile}
+          title="Upcoming Movies"
           variant=""
         />
-        <h2 className={`pl-3 text-xl md:text-2xl font-bold`}>Popular Series</h2>
         <ImageCarousel
           data={filteredPopularTv!}
           type="tv"
-          isUserAgentMobile={isUserAgentMobile}
+          title="Popular Series"
           variant=""
         />
-        <h2 className={`pl-3 text-xl md:text-2xl font-bold`}>Popular Movies</h2>
         <ImageCarousel
           data={filteredPopularMovie!}
           type="movie"
-          isUserAgentMobile={isUserAgentMobile}
+          title="Popular Movies"
           variant=""
         />
       </div>

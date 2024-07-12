@@ -10,14 +10,20 @@ import { useMediaQuery } from "@/lib/hooks";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { Card } from "@/components/card";
-import { ImageCarouselProps } from "@/types/index";
+import { MovieResult, PersonResult, TvResult } from "@/types/request-types";
+
+interface RecommendedCarouselProps {
+  data: Array<MovieResult | TvResult | PersonResult>;
+  type: string;
+  variant: string;
+  isUserAgentMobile: boolean;
+}
 
 export function RecommendedCarousel({
   data,
   type,
   isUserAgentMobile,
-  variant,
-}: ImageCarouselProps) {
+}: RecommendedCarouselProps) {
   const isMobile = useMediaQuery(768);
   const [slidesToScroll, setSlidesToScroll] = useState(
     isUserAgentMobile ? "auto" : 4,
@@ -42,7 +48,7 @@ export function RecommendedCarousel({
             // className="pl-7 basis-auto group"
           >
             <Link href={`/${item.media_type || type}/${item.id}`}>
-              <Card data={item} index={i} variant={variant} />
+              <Card data={item} index={i} />
             </Link>
           </CarouselItem>
         ))}

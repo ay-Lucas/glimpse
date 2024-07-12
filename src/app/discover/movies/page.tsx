@@ -35,25 +35,22 @@ export default async function Movies() {
   return (
     <main className="w-full max-w-[1920px]">
       <div className="mx-auto space-y-1 w-10/12 md:w-[700px] lg:w-[1024px] xl:w-[1775px] select-none pt-5">
-        <h2 className={`pl-3 text-xl md:text-2xl font-bold`}>Trending</h2>
         <ImageCarousel
           data={trendingMovies}
           type="movie"
-          isUserAgentMobile={isMobile}
+          title="Trending"
           variant=""
         />
-        <h2 className={`pl-3 text-xl md:text-2xl font-bold`}>Popular</h2>
         <ImageCarousel
           data={filteredPopularMovie!}
           type="movie"
-          isUserAgentMobile={isMobile}
+          title="Popular"
           variant=""
         />
-        <h2 className={`pl-3 text-xl md:text-2xl font-bold`}>Upcoming</h2>
         <ImageCarousel
           data={upcomingMoviesRes.results!}
           type="movie"
-          isUserAgentMobile={isMobile}
+          title="Upcoming"
           variant=""
         />
       </div>

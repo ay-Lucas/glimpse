@@ -99,7 +99,7 @@
 
 .remove-blur {
   filter: blur(0px);
-  transition: filter 0.2s ease-in;
+  transition: filter 0.1s ease-in;
 }
 
 @layer base {

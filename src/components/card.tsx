@@ -51,7 +51,7 @@ export function Card({ data, index, variant, className }: CardProps) {
         // sizes="(max-width: 768px) 33vw, (max-width: 1080px) 23vw, (max-width: 1200px) 15vw"
         onLoad={() => setImageLoading(false)}
         className={`object-cover transition ${isImageLoading ? "blur-img" : "remove-blur"}`}
-        loading="eager"
+        loading="lazy"
       />
     </div>
   );

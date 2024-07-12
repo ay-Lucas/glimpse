@@ -4,25 +4,57 @@ import { Card } from "@/components/card";
 import { MovieResult, PersonResult, TvResult } from "@/types/request-types";
 import { ImageCarouselProps } from "@/types";
 import { Swiper, SwiperSlide } from "swiper/react";
+import { Swiper as SwiperCore } from "swiper/types";
+import { useRef } from "react";
 import { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
+import { Button } from "./ui/button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+
 export function ImageCarousel({
   data,
   type,
-  isUserAgentMobile,
+  title,
   variant,
+  userAgent,
 }: ImageCarouselProps) {
+  const swiperRef = useRef<SwiperCore>();
+
   return (
     <>
       <div>
+        <div className="space-x-2 flex justify-between pb-2">
+          <h2 className={`text-xl md:text-2xl font-bold pb-3`}>{title}</h2>
+          <div>
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={() => swiperRef.current?.slidePrev()}
+            >
+              <ChevronLeft />
+            </Button>
+            <Button
+              size="icon"
+              variant="ghost"
+              className="swiper-nagivation-next"
+              onClick={() => swiperRef.current?.slideNext()}
+            >
+              <ChevronRight />
+            </Button>
+          </div>
+        </div>
         <Swiper
           slidesPerView={1}
-          speed={500}
+          speed={750}
           spaceBetween={10}
-          navigation={{
-            disabledClass: "opacity-40",
+          threshold={5}
+          userAgent={userAgent}
+          onBeforeInit={(swiper) => {
+            swiperRef.current = swiper;
           }}
+          simulateTouch={false}
+          lazyPreloadPrevNext={4}
           breakpoints={{
             300: {
               slidesPerView: 2,
@@ -46,13 +78,14 @@ export function ImageCarousel({
             },
             1300: {
               slidesPerView: 6,
-              slidesPerGroup: 3,
+              slidesPerGroup: 6,
               spaceBetween: 20,
             },
             1460: {
               slidesPerView: 7,
-              slidesPerGroup: 3,
+              slidesPerGroup: 4,
               spaceBetween: 20,
+              // preventInteractionOnTransition: false,
             },
           }}
           modules={[Navigation]}
