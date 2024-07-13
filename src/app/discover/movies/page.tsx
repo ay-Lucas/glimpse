@@ -35,23 +35,16 @@ export default async function Movies() {
   return (
     <main className="w-full max-w-[1920px]">
       <div className="mx-auto space-y-1 w-10/12 md:w-[700px] lg:w-[1024px] xl:w-[1775px] select-none pt-5">
-        <ImageCarousel
-          data={trendingMovies}
-          type="movie"
-          title="Trending"
-          variant=""
-        />
+        <ImageCarousel data={trendingMovies} type="movie" title="Trending" />
         <ImageCarousel
           data={filteredPopularMovie!}
           type="movie"
           title="Popular"
-          variant=""
         />
         <ImageCarousel
           data={upcomingMoviesRes.results!}
           type="movie"
           title="Upcoming"
-          variant=""
         />
       </div>
     </main>

@@ -7,9 +7,10 @@ interface CardProps {
   index: number;
   variant?: string;
   className?: string;
+  loading: "lazy" | "eager";
 }
 
-export function Card({ data, index, variant, className }: CardProps) {
+export function Card({ data, index, variant, className, loading }: CardProps) {
   const info = data as any;
   const [isImageLoading, setImageLoading] = useState(true);
   return (
@@ -51,7 +52,7 @@ export function Card({ data, index, variant, className }: CardProps) {
         // sizes="(max-width: 768px) 33vw, (max-width: 1080px) 23vw, (max-width: 1200px) 15vw"
         onLoad={() => setImageLoading(false)}
         className={`object-cover transition ${isImageLoading ? "blur-img" : "remove-blur"}`}
-        loading="lazy"
+        loading={loading}
       />
     </div>
   );

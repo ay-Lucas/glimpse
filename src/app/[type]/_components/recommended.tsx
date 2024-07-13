@@ -116,9 +116,9 @@ export async function Recommended({
           title="Recommended"
           data={filteredRecommendations}
           type={type}
-          variant=""
           customBreakPoints={customBreakPoints.breakpoints}
           className="md:-ml-10"
+          loading="lazy"
         />
       )}
     </>

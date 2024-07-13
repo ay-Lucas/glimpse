@@ -5,7 +5,7 @@ import { MovieResult, PersonResult, TvResult } from "@/types/request-types";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Swiper as SwiperCore } from "swiper/types";
 import { SwiperOptions } from "swiper/types";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
@@ -16,13 +16,14 @@ export interface ImageCarouselProps {
   data: Array<MovieResult | TvResult | PersonResult>;
   type: string;
   title: string;
-  variant: string;
+  variant?: string;
   userAgent?: string | null;
   customBreakPoints?: {
     [width: number]: SwiperOptions;
     [ratio: string]: SwiperOptions;
   };
   className?: string;
+  loading?: "lazy" | "eager";
 }
 
 const defaultBreakpoints: SwiperOptions = {
@@ -68,6 +69,7 @@ export function ImageCarousel({
   userAgent,
   customBreakPoints,
   className,
+  loading = "lazy",
 }: ImageCarouselProps) {
   const swiperRef = useRef<SwiperCore>();
   const [isPrevDisabled, setPrevDisabled] = useState(true);
@@ -130,7 +132,12 @@ export function ImageCarousel({
             (item: MovieResult | TvResult | PersonResult, i: number) => (
               <SwiperSlide key={i} className="group">
                 <Link href={`/${type}/${item.id}`}>
-                  <Card data={item} index={i} variant={variant} />
+                  <Card
+                    data={item}
+                    index={i}
+                    variant={variant}
+                    loading={loading}
+                  />
                 </Link>
               </SwiperSlide>
             ),

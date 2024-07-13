@@ -68,32 +68,27 @@ export default async function Discover() {
           data={trendingTv}
           type="tv"
           title="Trending Series"
-          variant=""
           userAgent={userAgent}
         />
         <ImageCarousel
           data={trendingMovies}
           type="movie"
           title="Trending Movies"
-          variant=""
         />
         <ImageCarousel
           data={upcomingMoviesRes.results!}
           type="movie"
           title="Upcoming Movies"
-          variant=""
         />
         <ImageCarousel
           data={filteredPopularTv!}
           type="tv"
           title="Popular Series"
-          variant=""
         />
         <ImageCarousel
           data={filteredPopularMovie!}
           type="movie"
           title="Popular Movies"
-          variant=""
         />
       </div>
     </main>

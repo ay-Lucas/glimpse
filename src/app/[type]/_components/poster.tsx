@@ -13,6 +13,7 @@ export function Poster({ src }: { src: string }) {
       onLoad={() => setImageLoading(false)}
       className={`object-cover rounded-xl mx-auto md:m-0 p-5 md:p-0 ${isImageLoading ? "blur-img" : "remove-blur"}`}
       priority
+      loading="eager"
       alt="poster image"
     />
   );
