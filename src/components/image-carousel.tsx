@@ -31,20 +31,20 @@ const defaultBreakpoints: SwiperOptions = {
     300: {
       slidesPerView: 2,
       slidesPerGroup: 1,
-      spaceBetween: 10,
-      speed: 100,
+      spaceBetween: 20,
+      speed: 500,
+      cssMode: true,
     },
     600: {
       slidesPerView: 3,
       slidesPerGroup: 1,
       spaceBetween: 30,
-      // speed: 200,
+      cssMode: true,
     },
     868: {
       slidesPerView: 4,
       slidesPerGroup: 4,
       spaceBetween: 30,
-      // speed: 300,
     },
     1100: {
       slidesPerView: 5,
@@ -92,7 +92,7 @@ export function ImageCarousel({
 
   return (
     <>
-      <div className={`${className ?? ""}`}>
+      <div className={`${className ?? ""} overflow-visible`}>
         <div className="space-x-2 flex justify-between pb-2">
           <h2 className={`text-2xl font-bold pb-3 md:pl-7`}>{title}</h2>
           <div className="whitespace-nowrap">
@@ -121,6 +121,8 @@ export function ImageCarousel({
           freeMode={{
             enabled: true,
             sticky: false,
+            momentumRatio: 1,
+            momentumBounceRatio: 1,
           }}
           simulateTouch={false}
           userAgent={userAgent}
@@ -129,7 +131,7 @@ export function ImageCarousel({
             swiperRef.current = swiper;
           }}
           breakpoints={breakPoints}
-          lazyPreloadPrevNext={1}
+          lazyPreloadPrevNext={3}
           modules={[Navigation, FreeMode]}
           className="mySwiper"
           style={{ overflow: "visible" }}
