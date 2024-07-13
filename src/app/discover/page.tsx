@@ -63,7 +63,7 @@ export default async function Discover() {
   const userAgent = await getDeviceType();
   return (
     <main className="w-screen max-w-[1920px] mx-auto">
-      <div className="px-10 space-y-3 pt-5 overflow-hidden">
+      <div className="px-0 lg:px-10 space-y-3 pt-5 overflow-hidden">
         <ImageCarousel
           data={trendingTv}
           type="tv"

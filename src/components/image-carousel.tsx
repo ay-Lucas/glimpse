@@ -11,7 +11,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import { Button } from "./ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-
+import "@/styles/globals.css";
 export interface ImageCarouselProps {
   data: Array<MovieResult | TvResult | PersonResult>;
   type: string;
@@ -34,8 +34,9 @@ const defaultBreakpoints: SwiperOptions = {
       spaceBetween: 20,
       speed: 500,
       cssMode: true,
+      slidesOffsetBefore: 0,
     },
-    600: {
+    500: {
       slidesPerView: 3,
       slidesPerGroup: 1,
       spaceBetween: 30,
@@ -43,8 +44,9 @@ const defaultBreakpoints: SwiperOptions = {
     },
     868: {
       slidesPerView: 4,
-      slidesPerGroup: 4,
+      slidesPerGroup: 1,
       spaceBetween: 30,
+      cssMode: true,
     },
     1100: {
       slidesPerView: 5,
@@ -92,10 +94,10 @@ export function ImageCarousel({
 
   return (
     <>
-      <div className={`${className ?? ""} overflow-visible`}>
+      <div className={`${className ?? ""}`}>
         <div className="space-x-2 flex justify-between pb-2">
-          <h2 className={`text-2xl font-bold pb-3 md:pl-7`}>{title}</h2>
-          <div className="whitespace-nowrap">
+          <h2 className={`text-2xl font-bold pb-3 ml-6 md:ml-7`}>{title}</h2>
+          <div className="whitespace-nowrap opacity-0 lg:opacity-100">
             <Button
               size="icon"
               variant="ghost"
