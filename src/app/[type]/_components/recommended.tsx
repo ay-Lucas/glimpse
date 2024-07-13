@@ -2,9 +2,29 @@ import { getDeviceType } from "@/app/discover/actions";
 import { getRecommendations, getContentRating } from "../[id]/actions";
 import { isUsRating } from "@/lib/utils";
 import { genres } from "@/lib/constants";
-import { RecommendedCarousel } from "./recommended-carousel";
 import { MovieResult, RatingResponse, TvResult } from "@/types/request-types";
+import { ImageCarousel } from "@/components/image-carousel";
+import { SwiperOptions } from "swiper/types";
 
+const customBreakPoints: SwiperOptions = {
+  breakpoints: {
+    350: {
+      slidesPerView: 2,
+      slidesPerGroup: 2,
+      spaceBetween: 30,
+    },
+    868: {
+      slidesPerView: 3,
+      slidesPerGroup: 3,
+      spaceBetween: 10,
+    },
+    1200: {
+      slidesPerView: 4,
+      slidesPerGroup: 4,
+      spaceBetween: 10,
+    },
+  },
+};
 function validateRecommended(
   type: "movie" | "tv",
   recommendedRating: string,
@@ -92,17 +112,14 @@ export async function Recommended({
   return (
     <>
       {filteredRecommendations?.length > 0 && (
-        <>
-          <h2 className="text-2xl font-semibold px-5 lg:px-40">Recommended</h2>
-          <div className="relative container px-0 md:px-0 lg:px-[8rem]">
-            <RecommendedCarousel
-              data={filteredRecommendations}
-              type={type}
-              isUserAgentMobile={isMobile}
-              variant=""
-            />
-          </div>
-        </>
+        <ImageCarousel
+          title="Recommended"
+          data={filteredRecommendations}
+          type={type}
+          variant=""
+          customBreakPoints={customBreakPoints.breakpoints}
+          className="md:-ml-10"
+        />
       )}
     </>
   );

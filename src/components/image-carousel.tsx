@@ -2,15 +2,63 @@
 import Link from "next/link";
 import { Card } from "@/components/card";
 import { MovieResult, PersonResult, TvResult } from "@/types/request-types";
-import { ImageCarouselProps } from "@/types";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Swiper as SwiperCore } from "swiper/types";
-import { useRef, useState } from "react";
+import { SwiperOptions } from "swiper/types";
+import { useEffect, useRef, useState } from "react";
 import { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import { Button } from "./ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+
+export interface ImageCarouselProps {
+  data: Array<MovieResult | TvResult | PersonResult>;
+  type: string;
+  title: string;
+  variant: string;
+  userAgent?: string | null;
+  customBreakPoints?: {
+    [width: number]: SwiperOptions;
+    [ratio: string]: SwiperOptions;
+  };
+  className?: string;
+}
+
+const defaultBreakpoints: SwiperOptions = {
+  breakpoints: {
+    300: {
+      slidesPerView: 2,
+      slidesPerGroup: 2,
+      spaceBetween: 30,
+    },
+    600: {
+      slidesPerView: 3,
+      slidesPerGroup: 3,
+      spaceBetween: 10,
+    },
+    868: {
+      slidesPerView: 4,
+      slidesPerGroup: 4,
+      spaceBetween: 10,
+    },
+    1100: {
+      slidesPerView: 5,
+      slidesPerGroup: 5,
+      spaceBetween: 10,
+    },
+    1300: {
+      slidesPerView: 6,
+      slidesPerGroup: 6,
+      spaceBetween: 10,
+    },
+    1500: {
+      slidesPerView: 7,
+      slidesPerGroup: 4,
+      spaceBetween: 10,
+    },
+  },
+};
 
 export function ImageCarousel({
   data,
@@ -18,10 +66,15 @@ export function ImageCarousel({
   title,
   variant,
   userAgent,
+  customBreakPoints,
+  className,
 }: ImageCarouselProps) {
   const swiperRef = useRef<SwiperCore>();
   const [isPrevDisabled, setPrevDisabled] = useState(true);
   const [isNextDisabled, setNextDisabled] = useState(false);
+  const [breakPoints, setBreakPoints] = useState(
+    customBreakPoints ?? defaultBreakpoints.breakpoints,
+  );
 
   const handleSlideChange = () => {
     if (swiperRef.current?.isBeginning) setPrevDisabled(true);
@@ -34,12 +87,10 @@ export function ImageCarousel({
 
   return (
     <>
-      <div className="">
+      <div className={`${className ?? ""}`}>
         <div className="space-x-2 flex justify-between pb-2">
-          <h2 className={`text-xl md:text-2xl font-bold pb-3 md:pl-7`}>
-            {title}
-          </h2>
-          <div>
+          <h2 className={`text-2xl font-bold pb-3 md:pl-7`}>{title}</h2>
+          <div className="whitespace-nowrap">
             <Button
               size="icon"
               variant="ghost"
@@ -69,39 +120,8 @@ export function ImageCarousel({
             swiperRef.current = swiper;
           }}
           simulateTouch={false}
+          breakpoints={breakPoints}
           lazyPreloadPrevNext={4}
-          breakpoints={{
-            300: {
-              slidesPerView: 2,
-              slidesPerGroup: 2,
-              spaceBetween: 30,
-            },
-            600: {
-              slidesPerView: 3,
-              slidesPerGroup: 3,
-              spaceBetween: 10,
-            },
-            868: {
-              slidesPerView: 4,
-              slidesPerGroup: 4,
-              spaceBetween: 10,
-            },
-            1100: {
-              slidesPerView: 5,
-              slidesPerGroup: 5,
-              spaceBetween: 10,
-            },
-            1300: {
-              slidesPerView: 6,
-              slidesPerGroup: 6,
-              spaceBetween: 10,
-            },
-            1500: {
-              slidesPerView: 7,
-              slidesPerGroup: 4,
-              spaceBetween: 10,
-            },
-          }}
           modules={[Navigation]}
           className="mySwiper"
           style={{ overflow: "visible" }}

@@ -54,7 +54,7 @@ export default async function ItemPage({
         </div>
         <div className="h-[5vh] md:h-[25vh]"></div>
         <div className="relative container items-end pt-16">
-          <div className="flex items-end pb-5 md:pt-0 px-5 lg:px-40">
+          <div className="items-end pb-5 md:pt-0 px-5 lg:px-40">
             <div>
               <div className="flex flex-col md:flex-row h-full md:h-3/4 z-10 md:items-center md:space-x-5">
                 <Poster
@@ -117,10 +117,10 @@ export default async function ItemPage({
                 </div>
               </div>
             </div>
+            <div className="pt-3 md:pl-3 pb-4">
+              <Recommended type={params.type} id={params.id} rating={rating} />
+            </div>
           </div>
-          <>
-            <Recommended type={params.type} id={params.id} rating={rating} />
-          </>
           {(reviews.results?.length ?? -1) > 0 && (
             <div className="px-5 lg:px-40">
               <h2 className="text-2xl font-semibold pb-5 pr-3 inline-flex">
