@@ -6,7 +6,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Swiper as SwiperCore } from "swiper/types";
 import { SwiperOptions } from "swiper/types";
 import { useRef, useState } from "react";
-import { Navigation } from "swiper/modules";
+import { FreeMode, Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import { Button } from "./ui/button";
@@ -30,28 +30,31 @@ const defaultBreakpoints: SwiperOptions = {
   breakpoints: {
     300: {
       slidesPerView: 2,
-      spaceBetween: 30,
-      freeMode: true,
+      slidesPerGroup: 1,
+      spaceBetween: 10,
+      speed: 100,
     },
     600: {
       slidesPerView: 3,
-      spaceBetween: 10,
-      freeMode: true,
+      slidesPerGroup: 1,
+      spaceBetween: 30,
+      // speed: 200,
     },
     868: {
       slidesPerView: 4,
-      spaceBetween: 10,
-      freeMode: true,
+      slidesPerGroup: 4,
+      spaceBetween: 30,
+      // speed: 300,
     },
     1100: {
       slidesPerView: 5,
       slidesPerGroup: 5,
-      spaceBetween: 10,
+      spaceBetween: 30,
     },
     1300: {
       slidesPerView: 6,
       slidesPerGroup: 6,
-      spaceBetween: 10,
+      spaceBetween: 30,
     },
     1500: {
       slidesPerView: 7,
@@ -115,16 +118,19 @@ export function ImageCarousel({
           slidesPerView={1}
           speed={750}
           spaceBetween={10}
-          threshold={5}
+          freeMode={{
+            enabled: true,
+            sticky: false,
+          }}
+          simulateTouch={false}
           userAgent={userAgent}
           onSlideChange={handleSlideChange}
           onBeforeInit={(swiper) => {
             swiperRef.current = swiper;
           }}
-          simulateTouch={false}
           breakpoints={breakPoints}
-          lazyPreloadPrevNext={4}
-          modules={[Navigation]}
+          lazyPreloadPrevNext={1}
+          modules={[Navigation, FreeMode]}
           className="mySwiper"
           style={{ overflow: "visible" }}
         >
