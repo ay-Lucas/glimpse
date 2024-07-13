@@ -30,18 +30,18 @@ const defaultBreakpoints: SwiperOptions = {
   breakpoints: {
     300: {
       slidesPerView: 2,
-      slidesPerGroup: 2,
       spaceBetween: 30,
+      freeMode: true,
     },
     600: {
       slidesPerView: 3,
-      slidesPerGroup: 3,
       spaceBetween: 10,
+      freeMode: true,
     },
     868: {
       slidesPerView: 4,
-      slidesPerGroup: 4,
       spaceBetween: 10,
+      freeMode: true,
     },
     1100: {
       slidesPerView: 5,
