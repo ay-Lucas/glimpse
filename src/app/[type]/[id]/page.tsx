@@ -1,6 +1,5 @@
 import Image from "next/image";
 import "@/styles/globals.css";
-import { dateOptions } from "@/lib/constants";
 import { getData, getReviews } from "./actions";
 import { isUsRating } from "@/lib/utils";
 import TmdbLogo from "@/../public/tmdb-logo.svg";
@@ -12,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { VideoPlayer } from "../_components/video-player";
 import Link from "next/link";
 import { Recommended } from "../_components/recommended";
-import { MovieResult, Review, TvResult } from "@/types/request-types";
+import { MovieResult, Review, TvResult, Video } from "@/types/request-types";
 
 async function getRating(result: MovieResult | TvResult, type: string) {
   let ratingArray, rating;
@@ -27,6 +26,20 @@ async function getRating(result: MovieResult | TvResult, type: string) {
   return rating;
 }
 
+function getTrailer(videoArray: Array<Video>) {
+  const trailer: Array<Video> = videoArray.filter(
+    (video) => video.type === "Trailer",
+  );
+  if (trailer?.length !== 0) {
+    return trailer[0];
+  } else {
+    const teaser: Array<Video> = videoArray.filter(
+      (video) => video.type === "Teaser",
+    );
+    return teaser[0];
+  }
+}
+
 export default async function ItemPage({
   params,
 }: {
@@ -35,12 +48,10 @@ export default async function ItemPage({
   const data = await getData({ id: params.id }, params.type);
   const rating = await getRating(data, params.type);
   const reviews = await getReviews({ id: params.id }, params.type);
-  const youtubeId = data.videos?.results[0]?.key;
   const releaseDate = new Date(
     (data as any).first_air_date || (data as any).release_date,
   );
-  console.log(releaseDate.valueOf());
-  // console.log((data as any).first_air_date, (data as any).release_date);
+  const video = getTrailer(data.videos?.results!);
   const isReleased = releaseDate ? releaseDate.valueOf() < Date.now() : false;
   return (
     <main>
@@ -100,7 +111,7 @@ export default async function ItemPage({
                   ) : (
                     <div>Rating Unavailable</div>
                   )}
-                  {youtubeId && (
+                  {video?.key && (
                     <Link
                       className="text-md z-10"
                       href={`${params.id}/?show=true`}
@@ -138,7 +149,7 @@ export default async function ItemPage({
           )}
         </div>
       </div>
-      <VideoPlayer youtubeId={youtubeId ?? ""} id={params.id} />
+      <VideoPlayer youtubeId={video?.key ?? ""} id={params.id} />
     </main>
   );
 }
