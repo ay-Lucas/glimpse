@@ -14,10 +14,10 @@ export function Card({ data, index, variant, className }: CardProps) {
   const [isImageLoading, setImageLoading] = useState(true);
   return (
     <div
-      className={`${className ?? ""} relative text-xl group-hover:scale-110 transform-gpu transition duration-150 rounded-xl overflow-hidden shadow-2xl w-[142.5px] h-[213px] md:w-[190px] md:h-[284px] flex mx-auto z-50 select-none`}
+      className={`${className ?? ""} relative text-xl md:group-hover:scale-110 transform-gpu transition duration-150 rounded-xl overflow-hidden shadow-2xl w-[142.5px] h-[213px] md:w-[190px] md:h-[284px] flex mx-auto z-50 select-none`}
     >
-      <div className="absolute z-10 h-full w-full bg-gradient-to-t from-background from-30% to-gray-300/20 opacity-0 group-hover:opacity-95 transition-opacity transform-gpu duration-300" />
-      <div className="absolute z-20 flex h-full w-full items-end opacity-0 group-hover:opacity-100 transition transform-gpu duration-300">
+      <div className="absolute z-10 h-full w-full bg-gradient-to-t from-background from-30% to-gray-300/20 opacity-0 md:group-hover:opacity-95 transition-opacity transform-gpu duration-300" />
+      <div className="absolute z-20 flex h-full w-full items-end opacity-0 md:group-hover:opacity-100 transition transform-gpu duration-300">
         <div className="p-2">
           <span className="font-bold">{info.name || info.title}</span>
           <div className="text-sm line-clamp-6">{info?.overview!}</div>
