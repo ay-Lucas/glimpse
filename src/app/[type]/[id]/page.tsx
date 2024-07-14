@@ -128,7 +128,8 @@ export default async function ItemPage({
                 </div>
               </div>
             </div>
-            <div className="pt-3 md:pl-3 pb-4">
+            <h2 className={`text-2xl font-bold -mb-9 pt-3`}>Recommended</h2>
+            <div className="pt-2 md:pl-3 pb-4">
               <Recommended type={params.type} id={params.id} rating={rating} />
             </div>
           </div>

@@ -5,7 +5,7 @@ import { MovieResult, PersonResult, TvResult } from "@/types/request-types";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Swiper as SwiperCore } from "swiper/types";
 import { SwiperOptions } from "swiper/types";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FreeMode, Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
@@ -15,7 +15,7 @@ import "@/styles/globals.css";
 export interface ImageCarouselProps {
   data: Array<MovieResult | TvResult | PersonResult>;
   type: string;
-  title: string;
+  title?: string;
   variant?: string;
   userAgent?: string | null;
   customBreakPoints?: {
@@ -92,11 +92,20 @@ export function ImageCarousel({
     }
   };
 
+  useEffect(() => {
+    if (swiperRef.current?.isLocked) {
+      setNextDisabled(true);
+      setPrevDisabled(true);
+    }
+  }, []);
+
   return (
     <>
       <div className={`${className ?? ""}`}>
         <div className="space-x-2 flex justify-between pb-2">
-          <h2 className={`text-2xl font-bold pb-3 ml-6 md:ml-7`}>{title}</h2>
+          <h2 className={`text-2xl font-bold pb-3 ml-6 md:ml-7`}>
+            {title && title}
+          </h2>
           <div className="whitespace-nowrap opacity-0 lg:opacity-100">
             <Button
               size="icon"

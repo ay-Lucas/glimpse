@@ -112,14 +112,15 @@ export async function Recommended({
   return (
     <>
       {filteredRecommendations?.length > 0 && (
-        <ImageCarousel
-          title="Recommended"
-          data={filteredRecommendations}
-          type={type}
-          customBreakPoints={customBreakPoints.breakpoints}
-          className="md:-ml-10"
-          loading="lazy"
-        />
+        <>
+          <ImageCarousel
+            data={filteredRecommendations}
+            type={type}
+            customBreakPoints={customBreakPoints.breakpoints}
+            className="md:-ml-11"
+            loading="lazy"
+          />
+        </>
       )}
     </>
   );
