@@ -398,8 +398,8 @@ export interface FindRequest extends RequestParams {
 
 export interface PaginatedResponse extends Response {
   page?: number;
-  total_results?: number;
-  total_pages?: number;
+  total_results: number;
+  total_pages: number;
 }
 
 export interface FindResponse extends Response {
