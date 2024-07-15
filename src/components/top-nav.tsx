@@ -3,7 +3,6 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { AvatarDropdown } from "./avatar-dropdown";
 import { Search } from "./search";
-import { getMultiSearch } from "@/app/discover/actions";
 export async function TopNav({ loggedIn = false }) {
   return (
     <div className="sticky top-0 left-0 border-b border-transparent/10 z-10 backdrop-blur-sm bg-background/80">
@@ -12,7 +11,7 @@ export async function TopNav({ loggedIn = false }) {
           <Link className="hidden lg:inline" href="/">
             Glimpse
           </Link>
-          <Search getMultiSearch={getMultiSearch} />
+          <Search />
         </section>
         <div className="hidden md:flex md:opacity-100 items-center justify-center">
           <Button variant="ghost" className="md:text-lg">

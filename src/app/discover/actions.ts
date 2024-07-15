@@ -65,15 +65,6 @@ export async function getUpcomingMovies(
   return res.json();
 }
 
-export async function getMultiSearch(
-  request: SearchMultiRequest,
-): Promise<SearchMultiResponse> {
-  const res = await fetch(
-    `${baseApiUrl}/search/multi?query=${request.query}&include_adult=${request.include_adult}&language=${request.language}&page=${request.page}`,
-    options,
-  );
-  return res.json();
-}
 // export async function getDeviceType(): Promise<string> {
 //   const headersList = headers();
 //   const userAgent = headersList.get("user-agent") ?? "WPDesktop";
