@@ -11,7 +11,7 @@ import { Card } from "@/components/card";
 import Link from "next/link";
 import { NextRequest } from "next/server";
 
-export async function getMultiSearch(
+async function getMultiSearch(
   request: SearchMultiRequest,
 ): Promise<SearchMultiResponse> {
   const res = await fetch(
@@ -26,7 +26,6 @@ export default async function SearchPage({
   searchParams?: { query: string; page?: string };
 }) {
   if (searchParams === undefined || searchParams.query === "") throw Error;
-  console.log(searchParams?.query);
   const res = await getMultiSearch({
     query: searchParams.query,
     region: "en-US",

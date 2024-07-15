@@ -45,7 +45,7 @@ export function Card({ data, index, variant, className, loading }: CardProps) {
       <Image
         width={195}
         height={290}
-        src={`https://image.tmdb.org/t/p/original${info.poster_path}`}
+        src={`https://image.tmdb.org/t/p/original/${info.poster_path ?? info.profile_path}`}
         alt={`Background image ${index + 1}`}
         key={index}
         quality={75}
