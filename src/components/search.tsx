@@ -40,22 +40,16 @@ export function Search({
   };
 
   return (
-    <div className="group">
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <button className="pr-3">
-            <IoSearchOutline size={25} />
-          </button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent side="right">
-          <Input
-            className={`w-72 h-8 md:bg-secondary/80 bg-secondary border-gray-500 border transition-opacity ease-in-out duration-300"`}
-            onKeyDown={handleEnter}
-            onChange={(e) => setValue(e.target.value)}
-            placeholder="Search for a series or movie"
-          />
-        </DropdownMenuContent>
-      </DropdownMenu>
+    <div className="group flex">
+      <button className="pr-3">
+        <IoSearchOutline size={25} />
+      </button>
+      <Input
+        className={`w-72 h-8 md:bg-secondary/80 bg-secondary border-gray-500 border transition-opacity ease-in-out duration-300 "`}
+        onKeyDown={handleEnter}
+        onChange={(e) => setValue(e.target.value)}
+        placeholder="Search for a series or movie"
+      />
     </div>
   );
 }

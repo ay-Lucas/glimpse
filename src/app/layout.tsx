@@ -2,8 +2,9 @@ import { Inter as FontSans } from "next/font/google";
 import "@/styles/globals.css";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/theme-provider";
-import { TopNav } from "@/components/topnav";
+import { TopNav } from "@/components/top-nav";
 import { Footer } from "@/components/footer";
+import { BottomNav } from "@/components/bottom-nav";
 const fontSans = FontSans({
   subsets: ["latin"],
   variable: "--font-sans",
@@ -35,8 +36,9 @@ export default function RootLayout({
         >
           <TopNav />
           {children}
+          <Footer />
+          <BottomNav />
         </ThemeProvider>
-        <Footer />
       </body>
     </html>
   );

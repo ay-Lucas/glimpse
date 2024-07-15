@@ -14,9 +14,9 @@ export async function TopNav({ loggedIn = false }) {
           </Link>
           <Search getMultiSearch={getMultiSearch} />
         </section>
-        <div className="items-center flex justify-center">
+        <div className="w-0 opacity-0 md:w-full md:opacity-100 items-center flex justify-center">
           <Button variant="ghost" className="md:text-lg">
-            <Link href="/discover">Browse</Link>
+            <Link href="/discover">Discover</Link>
           </Button>
           <Button variant="ghost" className="md:text-lg">
             <Link href="/discover/movies">Movies</Link>
