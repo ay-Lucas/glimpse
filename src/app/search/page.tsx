@@ -12,6 +12,7 @@ import { Card } from "@/components/card";
 import Link from "next/link";
 import { NextRequest } from "next/server";
 
+const MAX_PAGES = 10;
 async function getMultiSearch(
   request: SearchMultiRequest,
 ): Promise<SearchMultiResponse> {
@@ -64,14 +65,14 @@ export default async function SearchPage({
     id: "",
   };
   const res = await getMultiSearch(params);
-  const allRes = await getMultiSearchPages(params, res, 10);
+  const allRes = await getMultiSearchPages(params, res, MAX_PAGES);
   const filteredRes = allRes.filter(
     (item: any) => item.poster_path || item.profile_path || item.backdrop_path,
   );
   return (
     <main>
-      <div className="container pt-10">
-        <div className="flex flex-wrap justify-center gap-8">
+      <div className="md:container pt-10">
+        <div className="flex flex-wrap flex-shrink justify-center md:gap-8 gap-4">
           {filteredRes && filteredRes.length > 0 ? (
             filteredRes.map(
               (
