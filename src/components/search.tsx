@@ -2,12 +2,10 @@
 import { Input } from "@/components/ui/input";
 import { IoSearchOutline } from "react-icons/io5";
 import "@/styles/globals.css";
-import { options } from "@/lib/constants";
 import { useState } from "react";
 import { SearchMultiRequest, SearchMultiResponse } from "@/types/request-types";
 import { useRouter } from "next/navigation";
-import { DropdownMenu } from "@radix-ui/react-dropdown-menu";
-import { DropdownMenuContent, DropdownMenuTrigger } from "./ui/dropdown-menu";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 
 export function Search({
   getMultiSearch,
@@ -40,16 +38,22 @@ export function Search({
   };
 
   return (
-    <div className="group flex">
-      <button className="pr-3">
-        <IoSearchOutline size={25} />
-      </button>
-      <Input
-        className={`w-72 h-8 md:bg-secondary/80 bg-secondary border-gray-500 border transition-opacity ease-in-out duration-300 "`}
-        onKeyDown={handleEnter}
-        onChange={(e) => setValue(e.target.value)}
-        placeholder="Search for a series or movie"
-      />
-    </div>
+    <Popover>
+      <PopoverTrigger>
+        <IoSearchOutline size={24} />
+      </PopoverTrigger>
+      <PopoverContent
+        side="right"
+        onPointerDownOutside={(e) => e.preventDefault()}
+        sideOffset={24}
+      >
+        <Input
+          className={`h-8 w-64 md:w-52 lg:w-64 md:bg-secondary/80 bg-secondary border-gray-500 border transition-opacity ease-in-out duration-300 "`}
+          onKeyDown={handleEnter}
+          onChange={(e) => setValue(e.target.value)}
+          placeholder="Search for a series or movie"
+        />
+      </PopoverContent>
+    </Popover>
   );
 }
