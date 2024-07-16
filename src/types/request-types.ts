@@ -37,7 +37,7 @@ export interface MovieResult {
   overview?: string;
   release_date?: string;
   genre_ids?: Array<number>;
-  id?: number;
+  id: number;
   media_type: "movie";
   original_title?: string;
   original_language?: string;
@@ -55,7 +55,7 @@ export interface MovieResult {
 export interface TvResult {
   poster_path?: string;
   popularity?: number;
-  id?: number;
+  id: number;
   overview?: string;
   backdrop_path?: string;
   vote_average?: number;

@@ -54,7 +54,6 @@ export default async function ItemPage({
   const video = getTrailer(data.videos?.results!);
   const isReleased = releaseDate ? releaseDate.valueOf() < Date.now() : false;
   const recommendationsRes = await getRecommendations(params.id, params.type);
-  console.log(recommendationsRes);
   // console.log(data);
   return (
     <main>

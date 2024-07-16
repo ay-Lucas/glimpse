@@ -89,7 +89,9 @@ export async function Recommended({
 }) {
   const recommendations = await Promise.all(
     data.map(async (item: MovieResult | TvResult) => {
-      const itemRating = await getContentRating(item.media_type, item.id ?? 0);
+      // Make exception for undefined id
+      if (item.id === undefined) return item;
+      const itemRating = await getContentRating(item.media_type, item.id);
       if (item.media_type === "tv") {
         const ratingArray = itemRating.results?.filter(isUsRating) ?? [];
         (item as any).rating = ratingArray[0]?.rating;
