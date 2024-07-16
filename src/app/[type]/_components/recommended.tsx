@@ -79,18 +79,16 @@ async function getValidRecommendations(
 }
 
 export async function Recommended({
-  type,
-  id,
   rating,
+  type,
+  data,
 }: {
-  type: "movie" | "tv";
-  id: number;
   rating: string;
+  type: "tv" | "movie";
+  data: Array<MovieResult | TvResult>;
 }) {
-  const isMobile = (await getDeviceType()) === "mobile";
-  const recommendationsRes = await getRecommendations(id, type);
   const recommendations = await Promise.all(
-    recommendationsRes.results?.map(async (item: MovieResult | TvResult) => {
+    data.map(async (item: MovieResult | TvResult) => {
       const itemRating = await getContentRating(item.media_type, item.id ?? 0);
       if (item.media_type === "tv") {
         const ratingArray = itemRating.results?.filter(isUsRating) ?? [];

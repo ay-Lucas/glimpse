@@ -1,6 +1,6 @@
 import Image from "next/image";
 import "@/styles/globals.css";
-import { getData, getReviews } from "./actions";
+import { getData, getRecommendations, getReviews } from "./actions";
 import { isUsRating } from "@/lib/utils";
 import TmdbLogo from "@/../public/tmdb-logo.svg";
 import { Reviews } from "../_components/reviews";
@@ -53,7 +53,9 @@ export default async function ItemPage({
   );
   const video = getTrailer(data.videos?.results!);
   const isReleased = releaseDate ? releaseDate.valueOf() < Date.now() : false;
-  console.log(data);
+  const recommendationsRes = await getRecommendations(params.id, params.type);
+  console.log(recommendationsRes);
+  // console.log(data);
   return (
     <main>
       <div className="h-full w-full overflow-x-hidden">
@@ -144,10 +146,18 @@ export default async function ItemPage({
                 </div>
               </div>
             </div>
-            <h2 className={`text-2xl font-bold -mb-9 pt-3`}>Recommended</h2>
-            <div className="pt-2 pb-4 pl-8 md:pl-3 -ml-8 md:ml-0 md:w-full w-screen">
-              <Recommended type={params.type} id={params.id} rating={rating} />
-            </div>
+            {recommendationsRes.total_results > 0 && (
+              <>
+                <h2 className={`text-2xl font-bold -mb-9 pt-3`}>Recommended</h2>
+                <div className="pt-2 pb-4 pl-8 md:pl-3 -ml-8 md:ml-0 md:w-full w-screen">
+                  <Recommended
+                    data={recommendationsRes.results}
+                    type={params.type}
+                    rating={rating}
+                  />
+                </div>
+              </>
+            )}
           </div>
           {(reviews.results?.length ?? -1) > 0 && (
             <div className="px-0 lg:px-40">
