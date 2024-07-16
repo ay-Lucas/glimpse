@@ -1,0 +1,24 @@
+version: "3"
+
+services:
+  glimpse:
+    container_name: glimpse
+    build:
+      context: ./
+      dockerfile: prod.Dockerfile
+      args:
+        TMDB_API_KEY: ${TMDB_API_KEY}
+        TMDB_ACCESS_TOKEN: ${TMDB_ACCESS_TOKEN}
+    restart: always
+    ports:
+      - 3000:3000
+    #networks:
+    #  - my_network
+
+  # Add more containers below (nginx, postgres, etc.)
+# Define a network, which allows containers to communicate
+# with each other, by using their container name as a hostname
+
+#networks:
+#  my_network:
+#    external: true

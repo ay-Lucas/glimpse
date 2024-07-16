@@ -15,6 +15,7 @@ const nextConfig = {
     ],
     minimumCacheTTL: 200,
   },
+  output: "standalone",
 };
 
 export default nextConfig;

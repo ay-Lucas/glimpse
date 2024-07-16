@@ -1,0 +1,32 @@
+version: "3.8"
+
+services:
+  glimpse:
+    container_name: glimpse
+    build:
+      context: ./
+      dockerfile: dev.Dockerfile
+
+    # Set environment variables directly in the docker-compose file
+    environment:
+      TMDB_API_KEY: ${TMDB_API_KEY}
+      TMDB_ACCESS_TOKEN: ${TMDB_ACCESS_TOKEN}
+
+    # Set environment variables based on the .env file
+    env_file:
+      - .env.local
+    volumes:
+      - ./src:/app/src
+      - ./public:/app/public
+    restart: always
+    ports:
+      - 3000:3000
+    # networks:
+    #   - my_network
+
+  # Add more containers below (nginx, postgres, etc.)
+# Define a network, which allows containers to communicate
+# with each other, by using their container name as a hostname
+# networks:
+#   my_network:
+#     external: true
