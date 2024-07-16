@@ -11,12 +11,14 @@ const customBreakPoints: SwiperOptions = {
     350: {
       slidesPerView: 2,
       slidesPerGroup: 2,
-      spaceBetween: 30,
+      spaceBetween: 10,
+      cssMode: true,
     },
-    868: {
+    500: {
       slidesPerView: 3,
       slidesPerGroup: 3,
       spaceBetween: 10,
+      cssMode: true,
     },
     1200: {
       slidesPerView: 4,
