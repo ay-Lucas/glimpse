@@ -53,6 +53,7 @@ export default async function ItemPage({
   );
   const video = getTrailer(data.videos?.results!);
   const isReleased = releaseDate ? releaseDate.valueOf() < Date.now() : false;
+  console.log(data);
   return (
     <main>
       <div className="h-full w-full overflow-x-hidden">
@@ -72,9 +73,22 @@ export default async function ItemPage({
                   src={`https://image.tmdb.org/t/p/original${data.poster_path}`}
                 />
                 <div className="flex flex-col justify-between space-y-1 items-center md:items-start">
-                  <h2 className="text-3xl md:text-5xl font-medium text-center md:text-start">
+                  <h2 className="text-3xl md:text-5xl font-medium text-center md:text-start pb-2">
                     {(data as any).name || (data as any).title}
                   </h2>
+
+                  <div className="flex flex-wrap justify-center space-x-2">
+                    {(data as any).genres?.map(
+                      (genre: { id: number; name: string }, index: number) => (
+                        <ul
+                          key={index}
+                          className="bg-gray-700/60 shadow-lg rounded-lg px-2 select-none"
+                        >
+                          {genre.name}
+                        </ul>
+                      ),
+                    )}
+                  </div>
                   <div className="flex flex-row space-x-2 items-center justify-center md:justify-start">
                     {isReleased && (
                       <>
@@ -111,6 +125,7 @@ export default async function ItemPage({
                   ) : (
                     <div>Rating Unavailable</div>
                   )}
+
                   {video?.key && (
                     <Link
                       className="text-md z-10"
@@ -122,6 +137,7 @@ export default async function ItemPage({
                       </Button>
                     </Link>
                   )}
+                  <br />
                   <div className="text-md md:text-lg font-medium">
                     {data.overview}
                   </div>
