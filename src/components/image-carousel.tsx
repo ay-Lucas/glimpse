@@ -1,7 +1,12 @@
 "use client";
 import Link from "next/link";
 import { Card } from "@/components/card";
-import { MovieResult, PersonResult, TvResult } from "@/types/request-types";
+import {
+  Cast,
+  MovieResult,
+  PersonResult,
+  TvResult,
+} from "@/types/request-types";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Swiper as SwiperCore } from "swiper/types";
 import { SwiperOptions } from "swiper/types";
@@ -12,22 +17,20 @@ import "swiper/css/navigation";
 import { Button } from "./ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import "@/styles/globals.css";
+
 export interface ImageCarouselProps {
-  data: Array<MovieResult | TvResult | PersonResult>;
-  type: string;
+  data: Array<MovieResult | TvResult | PersonResult | Cast>;
+  type: "tv" | "movie" | "person" | "tv-page" | "person-page";
   title?: string;
   variant?: string;
   userAgent?: string | null;
-  customBreakPoints?: {
-    [width: number]: SwiperOptions;
-    [ratio: string]: SwiperOptions;
-  };
+  breakpoints?: "default" | "page";
   className?: string;
   loading?: "lazy" | "eager";
 }
 
-const defaultBreakpoints: SwiperOptions = {
-  breakpoints: {
+const carouselBreakpoints = {
+  default: {
     300: {
       slidesPerView: 2,
       slidesPerGroup: 1,
@@ -64,6 +67,25 @@ const defaultBreakpoints: SwiperOptions = {
       spaceBetween: 10,
     },
   },
+  page: {
+    350: {
+      slidesPerView: 2,
+      slidesPerGroup: 2,
+      spaceBetween: 10,
+      cssMode: true,
+    },
+    500: {
+      slidesPerView: 3,
+      slidesPerGroup: 3,
+      spaceBetween: 10,
+      cssMode: true,
+    },
+    1200: {
+      slidesPerView: 4,
+      slidesPerGroup: 4,
+      spaceBetween: 10,
+    },
+  },
 };
 
 export function ImageCarousel({
@@ -72,16 +94,13 @@ export function ImageCarousel({
   title,
   variant,
   userAgent,
-  customBreakPoints,
   className,
+  breakpoints = "default",
   loading = "lazy",
 }: ImageCarouselProps) {
   const swiperRef = useRef<SwiperCore>();
   const [isPrevDisabled, setPrevDisabled] = useState(true);
   const [isNextDisabled, setNextDisabled] = useState(false);
-  const [breakPoints, setBreakPoints] = useState(
-    customBreakPoints ?? defaultBreakpoints.breakpoints,
-  );
 
   const handleSlideChange = () => {
     if (swiperRef.current?.isBeginning) setPrevDisabled(true);
@@ -141,14 +160,18 @@ export function ImageCarousel({
           onBeforeInit={(swiper) => {
             swiperRef.current = swiper;
           }}
-          breakpoints={breakPoints}
+          breakpoints={
+            breakpoints === "page"
+              ? carouselBreakpoints.page
+              : carouselBreakpoints.default
+          }
           lazyPreloadPrevNext={3}
           modules={[Navigation, FreeMode]}
           className="mySwiper"
           style={{ overflow: "visible" }}
         >
           {data.map(
-            (item: MovieResult | TvResult | PersonResult, i: number) => (
+            (item: MovieResult | TvResult | PersonResult | Cast, i: number) => (
               <SwiperSlide key={i} className="group">
                 <Link href={`/${type}/${item.id}`}>
                   <Card

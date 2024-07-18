@@ -1,9 +1,16 @@
 "use client";
-import { MovieResult, PersonResult, TvResult } from "@/types/request-types";
+import { CardTypes, CardTypes1 } from "@/types";
+import {
+  Cast,
+  MovieResult,
+  PersonResult,
+  TvResult,
+} from "@/types/request-types";
 import Image from "next/image";
 import { useState } from "react";
 interface CardProps {
-  data?: MovieResult | TvResult | PersonResult;
+  // data?: MovieResult | TvResult | PersonResult | Cast;
+  [key: string]: any;
   index: number;
   variant?: string;
   className?: string;
@@ -14,6 +21,7 @@ export function Card({ data, index, variant, className, loading }: CardProps) {
   const info = data as any;
   const [isImageLoading, setImageLoading] = useState(true);
   const imagePath = info.poster_path ?? info.profile_path ?? info.backdrop_path;
+  const cast: Cast = {};
   return (
     <div
       className={`${className ?? ""} relative text-xl md:group-hover:scale-110 transform-gpu transition duration-150 rounded-xl overflow-hidden shadow-2xl w-[142.5px] h-[213px] md:w-[190px] md:h-[284px] flex mx-auto z-50 select-none`}

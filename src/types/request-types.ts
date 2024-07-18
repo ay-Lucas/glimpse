@@ -50,6 +50,7 @@ export interface MovieResult {
   videos?: {
     results: Array<Video>;
   };
+  credits?: CreditsResponse;
 }
 
 export interface TvResult {
@@ -70,6 +71,7 @@ export interface TvResult {
   videos?: {
     results: Array<Video>;
   };
+  credits: CreditsResponse;
 }
 
 export interface PersonResult {

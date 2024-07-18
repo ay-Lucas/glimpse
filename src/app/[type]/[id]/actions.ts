@@ -13,7 +13,7 @@ export async function getData(
   type: "tv" | "movie",
 ): Promise<MovieResult | TvResult> {
   const res = await fetch(
-    `${baseApiUrl}/${type}/${request.id}?append_to_response=videos,releases,content_ratings&language=en-US`,
+    `${baseApiUrl}/${type}/${request.id}?append_to_response=videos,releases,content_ratings,credits&language=en-US`,
     options,
   );
   return res.json();

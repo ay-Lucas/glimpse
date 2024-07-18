@@ -12,6 +12,7 @@ import { VideoPlayer } from "../_components/video-player";
 import Link from "next/link";
 import { Recommended } from "../_components/recommended";
 import { MovieResult, Review, TvResult, Video } from "@/types/request-types";
+import { ImageCarousel } from "@/components/image-carousel";
 
 async function getRating(result: MovieResult | TvResult, type: string) {
   let ratingArray, rating;
@@ -54,7 +55,8 @@ export default async function ItemPage({
   const video = getTrailer(data.videos?.results!);
   const isReleased = releaseDate ? releaseDate.valueOf() < Date.now() : false;
   const recommendationsRes = await getRecommendations(params.id, params.type);
-  // console.log(data);
+  const cast1 = data.credits?.cast;
+  console.log(cast1);
   return (
     <main>
       <div className="h-full w-full overflow-x-hidden">
@@ -145,6 +147,19 @@ export default async function ItemPage({
                 </div>
               </div>
             </div>
+            {data.credits?.cast && (
+              <>
+                <h2 className={`text-2xl font-bold -mb-9 pt-3`}>Cast</h2>
+                <div className="pt-2 pb-4 pl-8 md:pl-3 -ml-8 md:ml-0 md:w-full w-screen">
+                  <ImageCarousel
+                    data={data.credits?.cast!}
+                    type="person"
+                    breakpoints="page"
+                    className="md:-ml-11"
+                  />
+                </div>
+              </>
+            )}
             {recommendationsRes.total_results > 0 && (
               <>
                 <h2 className={`text-2xl font-bold -mb-9 pt-3`}>Recommended</h2>

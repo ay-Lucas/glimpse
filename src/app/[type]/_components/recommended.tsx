@@ -6,27 +6,6 @@ import { MovieResult, RatingResponse, TvResult } from "@/types/request-types";
 import { ImageCarousel } from "@/components/image-carousel";
 import { SwiperOptions } from "swiper/types";
 
-const customBreakPoints: SwiperOptions = {
-  breakpoints: {
-    350: {
-      slidesPerView: 2,
-      slidesPerGroup: 2,
-      spaceBetween: 10,
-      cssMode: true,
-    },
-    500: {
-      slidesPerView: 3,
-      slidesPerGroup: 3,
-      spaceBetween: 10,
-      cssMode: true,
-    },
-    1200: {
-      slidesPerView: 4,
-      slidesPerGroup: 4,
-      spaceBetween: 10,
-    },
-  },
-};
 function validateRecommended(
   type: "movie" | "tv",
   recommendedRating: string,
@@ -118,9 +97,9 @@ export async function Recommended({
           <ImageCarousel
             data={filteredRecommendations}
             type={type}
-            customBreakPoints={customBreakPoints.breakpoints}
             className="md:-ml-11"
             loading="lazy"
+            breakpoints="page"
           />
         </>
       )}
