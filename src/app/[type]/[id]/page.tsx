@@ -159,17 +159,19 @@ export default async function ItemPage({
                 <h2 className={`text-2xl font-bold -mb-9 pt-3`}>Cast</h2>
                 <div className="pt-2 pb-4 pl-8 md:pl-3 -ml-8 md:ml-0 md:w-full w-screen">
                   <ImageCarousel
-                    items={data.credits.cast.map((item: Cast, i: number) => (
-                      <Link href={`/person/${item.id}`}>
-                        <CastCard
-                          name={item.name}
-                          character={item.character}
-                          imagePath={item.profile_path!}
-                          index={i}
-                          loading="lazy"
-                        />
-                      </Link>
-                    ))}
+                    items={data.credits.cast.map(
+                      (item: Cast, index: number) => (
+                        <Link href={`/person/${item.id}`} key={index}>
+                          <CastCard
+                            name={item.name}
+                            character={item.character}
+                            imagePath={item.profile_path!}
+                            index={index}
+                            loading="lazy"
+                          />
+                        </Link>
+                      ),
+                    )}
                     breakpoints="cast"
                     className="md:-ml-6"
                   />
