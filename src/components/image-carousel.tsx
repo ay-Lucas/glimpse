@@ -1,16 +1,7 @@
 "use client";
-import Link from "next/link";
-import { Card } from "@/components/card";
-import {
-  Cast,
-  MovieResult,
-  PersonResult,
-  TvResult,
-} from "@/types/request-types";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Swiper as SwiperCore } from "swiper/types";
-import { SwiperOptions } from "swiper/types";
-import { useEffect, useRef, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { FreeMode, Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
@@ -19,7 +10,6 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import "@/styles/globals.css";
 
 export interface ImageCarouselProps {
-  data: Array<MovieResult | TvResult | PersonResult | Cast>;
   type: "tv" | "movie" | "person" | "tv-page" | "person-page";
   title?: string;
   variant?: string;
@@ -27,6 +17,7 @@ export interface ImageCarouselProps {
   breakpoints?: "default" | "page";
   className?: string;
   loading?: "lazy" | "eager";
+  items: Array<ReactNode>;
 }
 
 const carouselBreakpoints = {
@@ -89,14 +80,11 @@ const carouselBreakpoints = {
 };
 
 export function ImageCarousel({
-  data,
-  type,
   title,
-  variant,
   userAgent,
   className,
   breakpoints = "default",
-  loading = "lazy",
+  items,
 }: ImageCarouselProps) {
   const swiperRef = useRef<SwiperCore>();
   const [isPrevDisabled, setPrevDisabled] = useState(true);
@@ -170,20 +158,11 @@ export function ImageCarousel({
           className="mySwiper"
           style={{ overflow: "visible" }}
         >
-          {data.map(
-            (item: MovieResult | TvResult | PersonResult | Cast, i: number) => (
-              <SwiperSlide key={i} className="group">
-                <Link href={`/${type}/${item.id}`}>
-                  <Card
-                    data={item}
-                    index={i}
-                    variant={variant}
-                    loading={loading}
-                  />
-                </Link>
-              </SwiperSlide>
-            ),
-          )}
+          {items.map((item: ReactNode, i: number) => (
+            <SwiperSlide key={i} className="group">
+              {item}
+            </SwiperSlide>
+          ))}
         </Swiper>
       </div>
     </>

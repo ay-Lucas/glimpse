@@ -11,8 +11,17 @@ import { Button } from "@/components/ui/button";
 import { VideoPlayer } from "../_components/video-player";
 import Link from "next/link";
 import { Recommended } from "../_components/recommended";
-import { MovieResult, Review, TvResult, Video } from "@/types/request-types";
+import {
+  Cast,
+  CreditsResponse,
+  MovieResult,
+  Review,
+  TvResult,
+  Video,
+} from "@/types/request-types";
 import { ImageCarousel } from "@/components/image-carousel";
+import { Card } from "@/components/card";
+import { CastCard } from "@/components/cast-card";
 
 async function getRating(result: MovieResult | TvResult, type: string) {
   let ratingArray, rating;
@@ -57,6 +66,7 @@ export default async function ItemPage({
   const recommendationsRes = await getRecommendations(params.id, params.type);
   const cast1 = data.credits?.cast;
   console.log(cast1);
+  // console.log(data.aggregate_credits?.crew);
   return (
     <main>
       <div className="h-full w-full overflow-x-hidden">
@@ -152,7 +162,17 @@ export default async function ItemPage({
                 <h2 className={`text-2xl font-bold -mb-9 pt-3`}>Cast</h2>
                 <div className="pt-2 pb-4 pl-8 md:pl-3 -ml-8 md:ml-0 md:w-full w-screen">
                   <ImageCarousel
-                    data={data.credits?.cast!}
+                    items={data.credits.cast.map((item: Cast, i: number) => (
+                      <Link href={`/person/${item.id}`}>
+                        <CastCard
+                          name={item.name}
+                          character={item.character}
+                          imagePath={item.profile_path!}
+                          index={i}
+                          loading="lazy"
+                        />
+                      </Link>
+                    ))}
                     type="person"
                     breakpoints="page"
                     className="md:-ml-11"

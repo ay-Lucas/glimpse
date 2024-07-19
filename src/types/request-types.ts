@@ -51,6 +51,7 @@ export interface MovieResult {
     results: Array<Video>;
   };
   credits?: CreditsResponse;
+  aggregate_credits?: AggregateCreditsResponse;
 }
 
 export interface TvResult {
@@ -72,6 +73,7 @@ export interface TvResult {
     results: Array<Video>;
   };
   credits: CreditsResponse;
+  aggregate_credits?: AggregateCreditsResponse;
 }
 
 export interface PersonResult {

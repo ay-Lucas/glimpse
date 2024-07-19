@@ -1,10 +1,10 @@
-import { getDeviceType } from "@/app/discover/actions";
-import { getRecommendations, getContentRating } from "../[id]/actions";
+import { getContentRating } from "../[id]/actions";
 import { isUsRating } from "@/lib/utils";
 import { genres } from "@/lib/constants";
 import { MovieResult, RatingResponse, TvResult } from "@/types/request-types";
 import { ImageCarousel } from "@/components/image-carousel";
-import { SwiperOptions } from "swiper/types";
+import Link from "next/link";
+import { Card } from "@/components/card";
 
 function validateRecommended(
   type: "movie" | "tv",
@@ -48,10 +48,6 @@ async function getValidRecommendations(
     const item = itemArray[i] as any;
     if (validateRecommended(type, item.rating, rating, item)) {
       result.push(item);
-    } else {
-      // console.log(
-      //   (item?.name || item?.title) + " is removed. Rated " + item.rating,
-      // );
     }
   }
   return result;
@@ -89,13 +85,40 @@ export async function Recommended({
     rating,
     recommendations,
   );
-
   return (
     <>
       {filteredRecommendations?.length > 0 && (
         <>
           <ImageCarousel
-            data={filteredRecommendations}
+            items={filteredRecommendations.map(
+              (item: MovieResult | TvResult, index: number) => {
+                let card: React.ReactNode;
+                switch (item.media_type) {
+                  case "movie":
+                    card = (
+                      <Card
+                        title={item.title}
+                        overview={item.overview}
+                        imagePath={item.poster_path}
+                      />
+                    );
+                    break;
+                  case "tv":
+                    card = (
+                      <Card
+                        title={item.name}
+                        overview={item.overview}
+                        imagePath={item.poster_path}
+                      />
+                    );
+                }
+                return (
+                  <Link href={`/${item.media_type}/${item.id}`} key={index}>
+                    {card}
+                  </Link>
+                );
+              },
+            )}
             type={type}
             className="md:-ml-11"
             loading="lazy"
