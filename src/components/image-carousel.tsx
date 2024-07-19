@@ -1,6 +1,6 @@
 "use client";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Swiper as SwiperCore } from "swiper/types";
+import { Swiper as SwiperCore, SwiperOptions } from "swiper/types";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { FreeMode, Navigation } from "swiper/modules";
 import "swiper/css";
@@ -10,11 +10,10 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import "@/styles/globals.css";
 
 export interface ImageCarouselProps {
-  type: "tv" | "movie" | "person" | "tv-page" | "person-page";
   title?: string;
   variant?: string;
   userAgent?: string | null;
-  breakpoints?: "default" | "page";
+  breakpoints?: "default" | "page" | "cast";
   className?: string;
   loading?: "lazy" | "eager";
   items: Array<ReactNode>;
@@ -77,6 +76,25 @@ const carouselBreakpoints = {
       spaceBetween: 10,
     },
   },
+  cast: {
+    350: {
+      slidesPerView: 2,
+      slidesPerGroup: 2,
+      spaceBetween: 10,
+      cssMode: true,
+    },
+    500: {
+      slidesPerView: 3,
+      slidesPerGroup: 3,
+      spaceBetween: 10,
+      cssMode: true,
+    },
+    1200: {
+      slidesPerView: 5,
+      slidesPerGroup: 5,
+      spaceBetween: 10,
+    },
+  },
 };
 
 export function ImageCarousel({
@@ -105,6 +123,23 @@ export function ImageCarousel({
       setPrevDisabled(true);
     }
   }, []);
+
+  let breakpointsOption: {
+    [width: number]: SwiperOptions;
+    [ratio: string]: SwiperOptions;
+  };
+
+  switch (breakpoints) {
+    case "page":
+      breakpointsOption = carouselBreakpoints.page;
+      break;
+    case "cast":
+      breakpointsOption = carouselBreakpoints.cast;
+      break;
+    default:
+      breakpointsOption = carouselBreakpoints.default;
+      break;
+  }
 
   return (
     <>
@@ -148,11 +183,7 @@ export function ImageCarousel({
           onBeforeInit={(swiper) => {
             swiperRef.current = swiper;
           }}
-          breakpoints={
-            breakpoints === "page"
-              ? carouselBreakpoints.page
-              : carouselBreakpoints.default
-          }
+          breakpoints={breakpointsOption}
           lazyPreloadPrevNext={3}
           modules={[Navigation, FreeMode]}
           className="mySwiper"

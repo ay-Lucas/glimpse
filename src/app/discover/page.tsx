@@ -8,12 +8,45 @@ import {
   getTrendingPages,
 } from "@/app/discover/actions";
 import { MovieResult, TvResult } from "@/types/request-types";
+import { Card } from "@/components/card";
+import Link from "next/link";
 
 const MIN_POPULARITY = 500;
 const MIN_TRENDING_POPULARITY = 100;
 const VOTE_AVERAGE_GTE = 6;
 const NUMBER_OF_PAGES = 10;
 const TRENDING_YEARS_OLD = 3;
+
+export function makeCarouselCards(data: Array<TvResult | MovieResult>) {
+  return data.map((item: MovieResult | TvResult, index: number) => {
+    let card: React.ReactNode;
+    switch (item.media_type) {
+      case "tv":
+        card = (
+          <Card
+            title={item.name}
+            overview={item.overview}
+            imagePath={item.poster_path}
+          />
+        );
+        break;
+      case "movie":
+        card = (
+          <Card
+            title={item.media_type}
+            overview={item.overview}
+            imagePath={item.poster_path}
+          />
+        );
+        break;
+    }
+    return (
+      <Link href={`/${item.media_type}/${item.id}`} key={index}>
+        {card}
+      </Link>
+    );
+  });
+}
 
 export default async function Discover() {
   const [
@@ -31,7 +64,6 @@ export default async function Discover() {
       { media_type: "movie", time_window: "day", page: 1 },
       NUMBER_OF_PAGES,
     ),
-    // getTrendingPages({ media_type: "movie", time_window: "week", page: 1 }),
     getPopular({ page: 1, "vote_average.gte": VOTE_AVERAGE_GTE }, "tv"),
     getPopular({ page: 1, "vote_average.gte": VOTE_AVERAGE_GTE }, "movie"),
     getUpcomingMovies({ page: 1 }),
@@ -53,41 +85,38 @@ export default async function Discover() {
       new Date((item as any).release_date).valueOf() > minDate,
   );
   const trendingTvAndMovies = trendingTv.concat(trendingMovies);
-
   const filteredPopularTv = popularTvRes?.results?.filter(
     (item: TvResult | MovieResult) => isUnique(item, trendingTvAndMovies),
   );
+  // Discover api endpoint doesn't return media type
+  filteredPopularTv?.forEach((item) => (item.media_type = "tv"));
   const filteredPopularMovie = popularMoviesRes?.results?.filter(
     (item: MovieResult | TvResult) => isUnique(item, trendingTvAndMovies),
   );
-  const userAgent = await getDeviceType();
+  filteredPopularMovie?.forEach((item) => (item.media_type = "movie"));
+  upcomingMoviesRes.results?.forEach((item) => (item.media_type = "movie"));
+
   return (
     <main className="w-screen max-w-[1920px] mx-auto">
       <div className="px-0 lg:px-10 space-y-3 pt-5 overflow-hidden">
         <ImageCarousel
-          data={trendingTv}
-          type="tv"
+          items={makeCarouselCards(trendingTv)}
           title="Trending Series"
-          userAgent={userAgent}
         />
         <ImageCarousel
-          data={trendingMovies}
-          type="movie"
+          items={makeCarouselCards(trendingMovies)}
           title="Trending Movies"
         />
         <ImageCarousel
-          data={upcomingMoviesRes.results!}
-          type="movie"
+          items={makeCarouselCards(upcomingMoviesRes.results!)}
           title="Upcoming Movies"
         />
         <ImageCarousel
-          data={filteredPopularTv!}
-          type="tv"
+          items={makeCarouselCards(filteredPopularTv!)}
           title="Popular Series"
         />
         <ImageCarousel
-          data={filteredPopularMovie!}
-          type="movie"
+          items={makeCarouselCards(filteredPopularMovie!)}
           title="Popular Movies"
         />
       </div>

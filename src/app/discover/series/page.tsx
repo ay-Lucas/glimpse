@@ -5,8 +5,9 @@ import {
   getPopular,
   getTrendingPages,
 } from "@/app/discover/actions";
+import { makeCarouselCards } from "../page";
+import { MovieResult, TvResult } from "@/types/request-types";
 
-const MIN_POPULARITY = 500;
 const MIN_TRENDING_POPULARITY = 300;
 const MIN_POPULAR_POPULARITY = 5;
 export default async function Browse() {
@@ -21,16 +22,20 @@ export default async function Browse() {
   const trendingTv = sortPopular(trendingTvRes, MIN_TRENDING_POPULARITY);
 
   const trending = sortPopular(trendingTv, MIN_TRENDING_POPULARITY);
-  const isMobile = (await getDeviceType()) === "mobile";
-  const filteredPopularTv = popularTvRes.results?.filter((item) =>
-    isUnique(item, trending),
+  const filteredPopularTv = popularTvRes?.results?.filter(
+    (item: TvResult | MovieResult) => isUnique(item, trending),
   );
+  // Discover api endpoint doesn't return media type
+  filteredPopularTv?.forEach((item) => (item.media_type = "tv"));
 
   return (
     <main className="w-full max-w-[1920px]">
       <div className="mx-auto space-y-1 w-10/12 md:w-[700px] lg:w-[1024px] xl:w-[1775px] select-none pt-5">
-        <ImageCarousel data={trendingTv} type="movie" title="Trending" />
-        <ImageCarousel data={filteredPopularTv!} type="tv" title="Popular" />
+        <ImageCarousel items={makeCarouselCards(trending)} title="Trending" />
+        <ImageCarousel
+          items={makeCarouselCards(filteredPopularTv!)}
+          title="Popular"
+        />
       </div>
     </main>
   );

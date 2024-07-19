@@ -64,9 +64,6 @@ export default async function ItemPage({
   const video = getTrailer(data.videos?.results!);
   const isReleased = releaseDate ? releaseDate.valueOf() < Date.now() : false;
   const recommendationsRes = await getRecommendations(params.id, params.type);
-  const cast1 = data.credits?.cast;
-  console.log(cast1);
-  // console.log(data.aggregate_credits?.crew);
   return (
     <main>
       <div className="h-full w-full overflow-x-hidden">
@@ -173,9 +170,8 @@ export default async function ItemPage({
                         />
                       </Link>
                     ))}
-                    type="person"
-                    breakpoints="page"
-                    className="md:-ml-11"
+                    breakpoints="cast"
+                    className="md:-ml-6"
                   />
                 </div>
               </>

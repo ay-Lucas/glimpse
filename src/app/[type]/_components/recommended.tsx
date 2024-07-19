@@ -111,6 +111,7 @@ export async function Recommended({
                         imagePath={item.poster_path}
                       />
                     );
+                    break;
                 }
                 return (
                   <Link href={`/${item.media_type}/${item.id}`} key={index}>
@@ -119,7 +120,6 @@ export async function Recommended({
                 );
               },
             )}
-            type={type}
             className="md:-ml-11"
             loading="lazy"
             breakpoints="page"
