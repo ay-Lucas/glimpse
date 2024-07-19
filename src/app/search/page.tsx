@@ -11,6 +11,7 @@ import { baseApiUrl, options } from "@/lib/constants";
 import { Card } from "@/components/card";
 import Link from "next/link";
 import { NextRequest } from "next/server";
+import { makeCarouselCards } from "../discover/page";
 
 const MAX_PAGES = 10;
 async function getMultiSearch(
@@ -69,25 +70,13 @@ export default async function SearchPage({
   const filteredRes = allRes.filter(
     (item: any) => item.poster_path || item.profile_path || item.backdrop_path,
   );
+  const items: any = filteredRes;
   return (
     <main>
       <div className="md:container pt-10">
         <div className="flex flex-wrap flex-shrink justify-center md:gap-8 gap-4">
           {filteredRes && filteredRes.length > 0 ? (
-            filteredRes.map(
-              (
-                item: MovieResult | TvResult | PersonResult | undefined,
-                i: number,
-              ) => (
-                <Link
-                  key={i}
-                  href={`/${item?.media_type}/${item?.id}`}
-                  className="group z-0"
-                >
-                  <Card data={item} index={i} loading="lazy" />
-                </Link>
-              ),
-            )
+            makeCarouselCards(items)
           ) : (
             <div>No Results</div>
           )}

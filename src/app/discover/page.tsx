@@ -7,7 +7,7 @@ import {
   getTrending,
   getTrendingPages,
 } from "@/app/discover/actions";
-import { MovieResult, TvResult } from "@/types/request-types";
+import { MovieResult, PersonResult, TvResult } from "@/types/request-types";
 import { Card } from "@/components/card";
 import Link from "next/link";
 
@@ -17,35 +17,44 @@ const VOTE_AVERAGE_GTE = 6;
 const NUMBER_OF_PAGES = 10;
 const TRENDING_YEARS_OLD = 3;
 
-export function makeCarouselCards(data: Array<TvResult | MovieResult>) {
-  return data.map((item: MovieResult | TvResult, index: number) => {
-    let card: React.ReactNode;
-    switch (item.media_type) {
-      case "tv":
-        card = (
-          <Card
-            title={item.name}
-            overview={item.overview}
-            imagePath={item.poster_path}
-          />
-        );
-        break;
-      case "movie":
-        card = (
-          <Card
-            title={item.media_type}
-            overview={item.overview}
-            imagePath={item.poster_path}
-          />
-        );
-        break;
-    }
-    return (
-      <Link href={`/${item.media_type}/${item.id}`} key={index}>
-        {card}
-      </Link>
-    );
-  });
+export function makeCarouselCards(
+  data: Array<TvResult | MovieResult | PersonResult>,
+) {
+  return data.map(
+    (item: MovieResult | TvResult | PersonResult, index: number) => {
+      let card: React.ReactNode;
+      switch (item.media_type) {
+        case "tv":
+          card = (
+            <Card
+              title={item.name}
+              overview={item.overview}
+              imagePath={item.poster_path}
+            />
+          );
+          break;
+        case "movie":
+          card = (
+            <Card
+              title={item.media_type}
+              overview={item.overview}
+              imagePath={item.poster_path}
+            />
+          );
+          break;
+        case "person":
+          card = (
+            <Card title={item.name} overview="" imagePath={item.profile_path} />
+          );
+          break;
+      }
+      return (
+        <Link href={`/${item.media_type}/${item.id}`} key={index}>
+          {card}
+        </Link>
+      );
+    },
+  );
 }
 
 export default async function Discover() {
