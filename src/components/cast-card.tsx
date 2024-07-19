@@ -40,9 +40,9 @@ export function CastCard({
         loading={loading}
       />
       {/* </div> */}
-      <div className="flex flex-col items-center pt-1">
-        <div className="font-bold">{name}</div>
-        <div className="text-sm text-center">{character}</div>
+      <div className="flex flex-col items-center text-center pt-1">
+        <div className="font-bold text-md md:text-lg">{name}</div>
+        <div className="text-sm">{character}</div>
       </div>
     </div>
   );
