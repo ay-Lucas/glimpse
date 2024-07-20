@@ -41,7 +41,7 @@ export interface MovieResult {
   media_type: "movie";
   original_title?: string;
   original_language?: string;
-  title?: string;
+  title: string;
   backdrop_path?: string;
   popularity?: number;
   vote_count?: number;
@@ -155,10 +155,10 @@ export interface Keyword {
 
 export interface ReleaseDate {
   certification?: string;
-  iso_639_1?: string;
+  descriptors?: string;
+  iso_3166_1?: string;
+  primary?: boolean;
   release_date?: string;
-  type?: number;
-  note?: string;
 }
 
 export interface Video {
@@ -568,6 +568,7 @@ export interface DiscoverMovieRequest extends RequestParams {
 
 export interface DiscoverMovieResponse extends PaginatedResponse {
   results?: Array<MovieResult>;
+  credits?: CreditsResponse;
 }
 
 export interface DiscoverTvRequest extends RequestParams {
@@ -644,6 +645,13 @@ export interface MovieResponse extends Response {
   video?: boolean;
   vote_average?: number;
   vote_count?: number;
+}
+
+export interface MovieResponseAppended extends MovieResponse {
+  releases: {
+    countries: Array<ReleaseDate>;
+  };
+  videos: VideosResponse;
 }
 
 export interface MovieAccountStateResponse extends Response {
@@ -917,6 +925,14 @@ export interface ShowResponse extends Response {
   vote_count?: number;
 }
 
+export interface ShowResponseAppended extends ShowResponse {
+  content_ratings: {
+    results: Array<RatingResponse>;
+  };
+  videos: VideosResponse;
+  credits?: CreditsResponse;
+}
+
 export interface ShowAccountStatesResponse extends Response {
   id?: number;
   favorite?: boolean;
@@ -943,15 +959,13 @@ export interface ShowChangesResponse extends Response {
 }
 
 export interface RatingResponse {
+  descriptors: Array<String>;
   iso_3166_1?: string;
   rating?: string;
 }
 
 export interface ShowContentRatingResponse extends Response {
-  results?: Array<{
-    iso_3166_1?: string;
-    rating?: string;
-  }>;
+  results?: Array<RatingResponse>;
   id?: number;
 }
 

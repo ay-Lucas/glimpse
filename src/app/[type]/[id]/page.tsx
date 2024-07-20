@@ -1,8 +1,13 @@
 import Image from "next/image";
 import "@/styles/globals.css";
-import { getData, getRecommendations, getReviews } from "./actions";
+import {
+  getData,
+  getMovieData,
+  getPersonData,
+  getRecommendations,
+  getReviews,
+} from "./actions";
 import { isUsRating } from "@/lib/utils";
-import TmdbLogo from "@/../public/tmdb-logo.svg";
 import { Reviews } from "../_components/reviews";
 import { Backdrop } from "../_components/backdrop";
 import { Poster } from "../_components/poster";
@@ -14,20 +19,30 @@ import { Recommended } from "../_components/recommended";
 import {
   Cast,
   CreditsResponse,
+  MovieResponseAppended,
   MovieResult,
+  MovieResultsResponse,
+  MovieReviewsResponse,
+  PersonResult,
   Review,
+  ShowResponseAppended,
   TvResult,
+  TvResultsResponse,
+  TvReviewsResponse,
   Video,
 } from "@/types/request-types";
 import { ImageCarousel } from "@/components/image-carousel";
 import { Card } from "@/components/card";
 import { CastCard } from "@/components/cast-card";
+import { MediaDetails } from "@/components/media-details";
 
-async function getRating(result: MovieResult | TvResult, type: string) {
+async function getRating(
+  result: MovieResponseAppended | ShowResponseAppended,
+  type: string,
+) {
   let ratingArray, rating;
-  const item = result as any;
   if (type === "tv") {
-    ratingArray = item.content_ratings.results.filter(isUsRating);
+    ratingArray = result.content_ratings.results.filter(isUsRating);
     rating = ratingArray[0]?.rating;
   } else if (type === "movie") {
     ratingArray = item.releases.countries.filter(isUsRating);
@@ -50,27 +65,71 @@ function getTrailer(videoArray: Array<Video>) {
   }
 }
 
+interface Item {
+  title?: string;
+  credits?: CreditsResponse;
+  videos?: Array<Video>;
+  backdropPath?: string;
+  posterPath?: string;
+  trailerPath?: string;
+  recommendations?: MovieResultsResponse | TvResultsResponse;
+  reviews?: MovieReviewsResponse | TvReviewsResponse;
+  rating?: string;
+}
+
 export default async function ItemPage({
   params,
 }: {
-  params: { type: "movie" | "tv"; id: number };
+  params: { type: "movie" | "tv" | "person"; id: number };
 }) {
+  let details: React.ReactNode;
+  let pageItem: Item = {};
+  switch (params.type) {
+    case "movie":
+      const movie = await getMovieData({ id: params.id });
+      const ratingArray = movie.releases.countries.filter(
+        (item) => item.iso_3166_1 === "US" && item.certification !== "",
+      );
+      pageItem.rating = ratingArray[0]?.certification;
+      pageItem.reviews = await getReviews(params.type, params.id);
+      pageItem.backdropPath = movie.backdrop_path;
+      pageItem.recommendations = await getRecommendations(
+        params.id,
+        params.type,
+      );
+      // rating = ratingArray[0]?.rating;
+      details = (
+        <MediaDetails
+          title={movie.title!}
+          genres={movie.genres ?? []}
+          rating={pageItem.rating ?? ""}
+          releaseDate={movie.release_date!}
+          overview={movie.overview ?? ""}
+          videoArray={movie.videos.results ?? []}
+          voteAverage={movie.vote_average ?? 0}
+        />
+      );
+      break;
+    case "tv":
+      break;
+    case "person":
+      const data = await getPersonData({ id: params.id });
+      break;
+  }
   const data = await getData({ id: params.id }, params.type);
-  const rating = await getRating(data, params.type);
-  const reviews = await getReviews({ id: params.id }, params.type);
+  // const rating = await getRating(data, params.type);
+  // const reviews = await getReviews(params.type, params.id);
   const releaseDate = new Date(
     (data as any).first_air_date || (data as any).release_date,
   );
-  const video = getTrailer(data.videos?.results!);
-  const isReleased = releaseDate ? releaseDate.valueOf() < Date.now() : false;
-  const recommendationsRes = await getRecommendations(params.id, params.type);
+  // const recommendationsRes = await getRecommendations(params.id, params.type);
   return (
     <main>
       <div className="h-full w-full overflow-x-hidden">
         <div className="absolute top-0 left-0 mb-10 w-screen h-screen">
           <div className="h-full w-full bg-gradient-to-t from-background from-30% via-background/95 via-40% to-transparent">
             <Backdrop
-              src={`https://image.tmdb.org/t/p/original${data.backdrop_path}`}
+              src={`https://image.tmdb.org/t/p/original${pageItem.backdropPath}`}
             />
           </div>
         </div>
@@ -80,86 +139,24 @@ export default async function ItemPage({
             <div>
               <div className="flex flex-col md:flex-row h-full md:h-3/4 z-10 md:items-center md:space-x-5">
                 <Poster
-                  src={`https://image.tmdb.org/t/p/original${data.poster_path}`}
+                  src={`https://image.tmdb.org/t/p/original${pageItem.posterPath}`}
                 />
-                <div className="flex flex-col justify-between space-y-1 items-center md:items-start">
-                  <h2 className="text-3xl md:text-5xl font-medium text-center md:text-start pb-2">
-                    {(data as any).name || (data as any).title}
-                  </h2>
-
-                  <div className="flex flex-wrap justify-center space-x-2">
-                    {(data as any).genres?.map(
-                      (genre: { id: number; name: string }, index: number) => (
-                        <ul
-                          key={index}
-                          className="bg-gray-700/60 shadow-lg rounded-lg px-2 select-none"
-                        >
-                          {genre.name}
-                        </ul>
-                      ),
-                    )}
-                  </div>
-                  <div className="flex flex-row space-x-2 items-center justify-center md:justify-start">
-                    {isReleased && (
-                      <>
-                        <div className="inline-flex items-center">
-                          <span className="mr-2">
-                            {((data?.vote_average ?? 0) * 10).toFixed(0)}%
-                          </span>
-                          <Image
-                            src={TmdbLogo}
-                            className="w-[30px] h-[30px]"
-                            priority
-                            alt="tmdb logo"
-                          />
-                        </div>
-                        <span>•</span>
-                      </>
-                    )}
-                    <div className="">
-                      {isReleased
-                        ? `${new Intl.DateTimeFormat("us", {
-                            // dayPeriod: "long",
-                            timeZone: "UTC",
-                            month: "short",
-                            year: "numeric",
-                            day: "numeric",
-                          }).format(releaseDate)}`
-                        : "Date Unavailable"}
-                    </div>
-                  </div>
-                  {rating ? (
-                    <div className="">
-                      Rated <span className="font-semibold">{rating}</span>
-                    </div>
-                  ) : (
-                    <div>Rating Unavailable</div>
-                  )}
-
-                  {video?.key && (
-                    <Link
-                      className="text-md z-10"
-                      href={`${params.id}/?show=true`}
-                    >
-                      <Button className="p-2 mt-1" variant="outline">
-                        <Play size={22} className="mr-2" />
-                        Play Trailer
-                      </Button>
-                    </Link>
-                  )}
-                  <br />
-                  <div className="text-md md:text-lg font-medium">
-                    {data.overview}
-                  </div>
-                </div>
               </div>
             </div>
-            {data.credits?.cast && (
+            {video?.key && (
+              <Link className="text-md z-10" href={`${params.id}/?show=true`}>
+                <Button className="p-2 mt-1" variant="outline">
+                  <Play size={22} className="mr-2" />
+                  Play Trailer
+                </Button>
+              </Link>
+            )}
+            {pageItem.credits?.cast && (
               <>
                 <h2 className={`text-2xl font-bold -mb-9 pt-3`}>Cast</h2>
                 <div className="pt-2 pb-4 pl-8 md:pl-3 -ml-8 md:ml-0 md:w-full w-screen">
                   <ImageCarousel
-                    items={data.credits.cast.map(
+                    items={pageItem.credits.cast.map(
                       (item: Cast, index: number) => (
                         <Link href={`/person/${item.id}`} key={index}>
                           <CastCard
@@ -178,18 +175,21 @@ export default async function ItemPage({
                 </div>
               </>
             )}
-            {recommendationsRes.total_results > 0 && (
-              <>
-                <h2 className={`text-2xl font-bold -mb-9 pt-3`}>Recommended</h2>
-                <div className="pt-2 pb-4 pl-8 md:pl-3 -ml-8 md:ml-0 md:w-full w-screen">
-                  <Recommended
-                    data={recommendationsRes.results}
-                    type={params.type}
-                    rating={rating}
-                  />
-                </div>
-              </>
-            )}
+            {pageItem.recommendations &&
+              pageItem.recommendations.total_results > 0 && (
+                <>
+                  <h2 className={`text-2xl font-bold -mb-9 pt-3`}>
+                    Recommended
+                  </h2>
+                  <div className="pt-2 pb-4 pl-8 md:pl-3 -ml-8 md:ml-0 md:w-full w-screen">
+                    <Recommended
+                      data={pageItem.recommendations.results!}
+                      type={params.type}
+                      rating={rating}
+                    />
+                  </div>
+                </>
+              )}
           </div>
           {(reviews.results?.length ?? -1) > 0 && (
             <div className="px-0 lg:px-40">
