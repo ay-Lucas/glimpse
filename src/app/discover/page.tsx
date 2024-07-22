@@ -36,7 +36,7 @@ export function makeCarouselCards(
         case "movie":
           card = (
             <Card
-              title={item.media_type}
+              title={item.title}
               overview={item.overview}
               imagePath={item.poster_path}
             />
