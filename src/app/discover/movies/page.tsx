@@ -1,5 +1,4 @@
 import { ImageCarousel } from "@/components/image-carousel";
-import { sortPopular } from "@/lib/utils";
 import {
   getUpcomingMovies,
   getPopular,
@@ -9,7 +8,6 @@ import { isUnique } from "@/lib/utils";
 import { makeCarouselCards } from "../page";
 import { MovieResult, TvResult } from "@/types/request-types";
 
-const MIN_POPULARITY = 500;
 const MIN_TRENDING_POPULARITY = 100;
 const VOTE_AVERAGE_GTE = 6;
 const NUMBER_OF_PAGES = 10;
@@ -25,7 +23,6 @@ export default async function Movies() {
       getPopular({ page: 1, "vote_average.gte": VOTE_AVERAGE_GTE }, "movie"),
       getUpcomingMovies({ page: 1 }),
     ]);
-  // const trendingTv = sortPopular(trendingTvRes, MIN_TRENDING_POPULARITY);
   const minDate = new Date().setFullYear(
     new Date().getFullYear() - TRENDING_YEARS_OLD,
   );

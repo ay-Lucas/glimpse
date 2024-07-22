@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { AvatarDropdown } from "./avatar-dropdown";
 import { Search } from "./search";

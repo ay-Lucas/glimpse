@@ -3,7 +3,6 @@ import { Input } from "@/components/ui/input";
 import { IoSearchOutline } from "react-icons/io5";
 import "@/styles/globals.css";
 import { useState } from "react";
-import { SearchMultiRequest, SearchMultiResponse } from "@/types/request-types";
 import { useRouter } from "next/navigation";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 

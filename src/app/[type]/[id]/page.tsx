@@ -1,4 +1,3 @@
-import Image from "next/image";
 import "@/styles/globals.css";
 import { getData, getRecommendations, getReviews } from "./actions";
 import { Reviews } from "../_components/reviews";

@@ -6,8 +6,6 @@ import {
   DiscoverMovieResponse,
   DiscoverTvRequest,
   DiscoverTvResponse,
-  SearchMultiRequest,
-  SearchMultiResponse,
   TrendingRequest,
   TrendingResponse,
   UpcomingMoviesRequest,

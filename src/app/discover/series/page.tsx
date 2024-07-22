@@ -1,10 +1,6 @@
 import { ImageCarousel } from "@/components/image-carousel";
 import { sortPopular, isUnique } from "@/lib/utils";
-import {
-  getDeviceType,
-  getPopular,
-  getTrendingPages,
-} from "@/app/discover/actions";
+import { getPopular, getTrendingPages } from "@/app/discover/actions";
 import { makeCarouselCards } from "../page";
 import { MovieResult, TvResult } from "@/types/request-types";
 

@@ -1,16 +1,5 @@
-import {
-  MovieResult,
-  PersonResult,
-  SearchMultiRequest,
-  SearchMultiResponse,
-  SearchRequest,
-  TvResult,
-} from "@/types/request-types";
+import { SearchMultiRequest, SearchMultiResponse } from "@/types/request-types";
 import { baseApiUrl, options } from "@/lib/constants";
-// import { useSearchParams } from "next/navigation";
-import { Card } from "@/components/card";
-import Link from "next/link";
-import { NextRequest } from "next/server";
 import { makeCarouselCards } from "../discover/page";
 
 const MAX_PAGES = 10;

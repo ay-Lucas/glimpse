@@ -1,17 +1,14 @@
 import { ImageCarousel } from "@/components/image-carousel";
-import { sortPopular, isUnique } from "@/lib/utils";
+import { isUnique } from "@/lib/utils";
 import {
-  getDeviceType,
   getUpcomingMovies,
   getPopular,
-  getTrending,
   getTrendingPages,
 } from "@/app/discover/actions";
 import { MovieResult, PersonResult, TvResult } from "@/types/request-types";
 import { Card } from "@/components/card";
 import Link from "next/link";
 
-const MIN_POPULARITY = 500;
 const MIN_TRENDING_POPULARITY = 100;
 const VOTE_AVERAGE_GTE = 6;
 const NUMBER_OF_PAGES = 10;
