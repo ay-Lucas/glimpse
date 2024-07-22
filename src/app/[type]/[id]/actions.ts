@@ -22,7 +22,7 @@ import {
 export async function getData(
   request: FindRequest,
   type: "tv" | "movie" | "person",
-): Promise<TvResult | MovieResult | PersonResult> {
+): Promise<MovieResponseAppended | ShowResponseAppended | Person> {
   const res = await fetch(
     `${baseApiUrl}/${type}/${request.id}?append_to_response=videos,releases,content_ratings,credits,aggregate_credits&language=en-US`,
     options,
@@ -76,10 +76,10 @@ export async function getRecommendations(
   return res.json();
 }
 
-// export async function getContentRating(type: "tv" | "movie", id: number) {
-//   const res = await fetch(
-//     `${baseApiUrl}/${type}/${id}/${type === "tv" ? "content_ratings" : "releases"}`,
-//     options,
-//   );
-//   return res.json();
-// }
+export async function getContentRating(type: "tv" | "movie", id: number) {
+  const res = await fetch(
+    `${baseApiUrl}/${type}/${id}/${type === "tv" ? "content_ratings" : "releases"}`,
+    options,
+  );
+  return res.json();
+}

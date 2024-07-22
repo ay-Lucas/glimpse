@@ -81,7 +81,7 @@ export interface PersonResult {
   adult?: boolean;
   id?: number;
   name?: string;
-  media_type: "person";
+  media_type: "person"; // Not provided by api
   popularity?: number;
   known_for?: Array<MovieResult | TvResult>;
 }
@@ -101,11 +101,12 @@ export interface Person {
   gender?: number;
   biography?: string;
   popularity?: number;
-  place_of_birth?: string | null;
-  profile_path?: string | null;
+  place_of_birth?: string;
+  profile_path?: string;
   adult?: boolean;
   imdb_id?: string;
   homepage?: null | string;
+  media_type: "person"; // Not provided by api
 }
 
 export interface Image {
@@ -615,18 +616,18 @@ export interface TrendingResponse extends PaginatedResponse {
 
 export interface MovieResponse extends Response {
   adult?: boolean;
-  backdrop_path?: string;
+  backdrop_path: string;
   belongs_to_collection?: object;
   budget?: number;
-  genres?: Array<Genre>;
+  genres: Array<Genre>;
   homepage?: string;
-  id?: number;
+  id: number;
   imdb_id?: string;
   original_language?: string;
   original_title?: string;
-  overview?: string;
-  popularity?: number;
-  poster_path?: string;
+  overview: string;
+  popularity: number;
+  poster_path: string;
   production_companies?: Array<ProductionCompany>;
   production_countries?: Array<ProductionCountry>;
   release_date?: string;
@@ -641,10 +642,10 @@ export interface MovieResponse extends Response {
     | "Released"
     | "Canceled";
   tagline?: string;
-  title?: string;
+  title: string;
   video?: boolean;
-  vote_average?: number;
-  vote_count?: number;
+  vote_average: number;
+  vote_count: number;
 }
 
 export interface MovieResponseAppended extends MovieResponse {
@@ -652,6 +653,8 @@ export interface MovieResponseAppended extends MovieResponse {
     countries: Array<ReleaseDate>;
   };
   videos: VideosResponse;
+  media_type: "movie"; // Not provided by api
+  credits: CreditsResponse;
 }
 
 export interface MovieAccountStateResponse extends Response {
@@ -892,7 +895,7 @@ export interface UpcomingMoviesResponse extends MovieNowPlayingResponse {
 }
 
 export interface ShowResponse extends Response {
-  backdrop_path?: string | null;
+  backdrop_path?: string;
   created_by?: Array<SimplePerson>;
   episode_run_time?: number[];
   first_air_date?: string;
@@ -913,7 +916,7 @@ export interface ShowResponse extends Response {
   original_name?: string;
   overview?: string;
   popularity?: number;
-  poster_path?: string | null;
+  poster_path?: string;
   production_companies?: Array<ProductionCompany>;
   production_countries?: Array<ProductionCountry>;
   seasons?: Array<SimpleSeason>;
@@ -931,6 +934,7 @@ export interface ShowResponseAppended extends ShowResponse {
   };
   videos: VideosResponse;
   credits?: CreditsResponse;
+  media_type: "tv"; // Not provided by api
 }
 
 export interface ShowAccountStatesResponse extends Response {
