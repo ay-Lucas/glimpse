@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { AvatarDropdown } from "./avatar-dropdown";
 import { Search } from "./search";
+
 export async function TopNav({ loggedIn = false }) {
   return (
     <div className="sticky top-0 left-0 border-b border-transparent/10 z-10 backdrop-blur-sm bg-background/80">
@@ -24,7 +25,6 @@ export async function TopNav({ loggedIn = false }) {
           </Button>
         </div>
         <section className="grid justify-end space-x-4 items-center group-active:bg-background/70 ">
-          {/* <ThemeToggle className="hidden md:visible" /> */}
           {loggedIn ? (
             <Button asChild size="sm">
               <Link href="/login">Sign in</Link>

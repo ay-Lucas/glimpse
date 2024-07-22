@@ -34,11 +34,8 @@ export function VideoPlayer({
     }, 200);
     return () => clearTimeout(timeout);
   }
-
-  // const trailer = `https://invidious.selfhost.live/embed/${data.videos.results[0].key}`;
   const trailer = `https://www.youtube-nocookie.com/embed/${youtubeId}?&autoplay=1`;
-  // const trailer = `https://piped.syncpundit.io/embed/${data.videos.results[0].key}`;
-  // const trailer = `https://piped.selfhost.live/embed/${data.videos.results[0].key}`;
+
   return (
     <>
       {params && (

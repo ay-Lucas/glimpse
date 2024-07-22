@@ -1,5 +1,6 @@
 import { shuffle } from "@/lib/utils";
 import { baseApiUrl, options } from "@/lib/constants";
+
 const trendingTvUrl = `${baseApiUrl}/trending/tv/day?language=en-US`;
 const trendingMoviesUrl = `${baseApiUrl}/trending/movie/day?language=en-US`;
 const MAX_POPULARITY = 250;

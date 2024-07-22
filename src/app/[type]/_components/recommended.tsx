@@ -16,6 +16,7 @@ function validateRecommended(
   const tvRatings = ["TV-Y", "TV-Y7", "TV-G", "TV-PG", "TV-14", "TV-MA"];
   const movieRatings = ["G", "PG", "PG-13", "R"];
   const safeRatings = ["TV-Y", "TV-Y7", "TV-G", "TV-PG", "G", "PG", "PG-13"];
+
   if (rating === recommendedRating) isValid = true;
   else if (type === "movie") {
     const ratingIndex = movieRatings.findIndex((element) => element === rating);

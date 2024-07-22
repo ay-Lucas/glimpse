@@ -3,18 +3,11 @@ import { baseApiUrl, options } from "@/lib/constants";
 import {
   FindRequest,
   IdAppendToResponseRequest,
-  IdPagedRequestParams,
-  MovieResponse,
   MovieResponseAppended,
-  MovieResult,
   MovieResultsResponse,
   MovieReviewsResponse,
   Person,
-  PersonResult,
-  SearchPersonResponse,
-  ShowResponse,
   ShowResponseAppended,
-  TvResult,
   TvResultsResponse,
   TvReviewsResponse,
 } from "@/types/request-types";

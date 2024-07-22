@@ -3,6 +3,7 @@ import { baseApiUrl, options } from "@/lib/constants";
 import { makeCarouselCards } from "../discover/page";
 
 const MAX_PAGES = 10;
+
 async function getMultiSearch(
   request: SearchMultiRequest,
 ): Promise<SearchMultiResponse> {
@@ -60,6 +61,7 @@ export default async function SearchPage({
     (item: any) => item.poster_path || item.profile_path || item.backdrop_path,
   );
   const items: any = filteredRes;
+
   return (
     <main>
       <div className="md:container pt-10">

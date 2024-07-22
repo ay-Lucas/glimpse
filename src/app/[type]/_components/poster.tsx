@@ -3,6 +3,7 @@ import { useState } from "react";
 import Image from "next/image";
 export function Poster({ src }: { src: string }) {
   const [isImageLoading, setImageLoading] = useState(true);
+
   return (
     <Image
       quality={100}

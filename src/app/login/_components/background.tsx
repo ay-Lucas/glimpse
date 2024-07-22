@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import { useState, useEffect } from "react";
+
 export function Background({ images }: { images: Array<String> }) {
   const [index, setIndex] = useState(0);
   useEffect(() => {

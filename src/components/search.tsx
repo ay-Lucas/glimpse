@@ -12,7 +12,6 @@ export function Search() {
 
   const handleEnter = async (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.code === "Enter" && value !== "") {
-      // console.log(value);
       router.push(`/search?query=${value}`);
     }
   };

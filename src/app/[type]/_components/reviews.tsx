@@ -19,6 +19,7 @@ export function Reviews({ data }: { data: Review }) {
   useEffect(() => {
     setExpandable((ref.current?.clientHeight ?? 0) >= CLAMPED_CLIENT_HEIGHT);
   }, []);
+
   return (
     <div className="rounded-md border px-4 pt-2 pb-1 text-md backdrop-blur">
       <div className="pb-1">
