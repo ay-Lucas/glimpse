@@ -120,14 +120,17 @@ export default async function ItemPage({
     <main>
       <div className="h-full w-full overflow-x-hidden">
         <div className="absolute top-0 left-0 mb-10 w-screen h-screen">
-          {item.backdropPath && (
-            <div className="h-full w-full bg-gradient-to-t from-background from-30% via-background/95 via-40% to-transparent">
+          {item.backdropPath ? (
+            <div className="h-full w-full bg-gradient-to-t from-background from-30% via-background/95 via-40% to-transparent ">
               <Backdrop
                 src={`https://image.tmdb.org/t/p/original${item.backdropPath}`}
               />
             </div>
+          ) : (
+            <div className="absolute z-0 top-0 left-0 h-full w-full items-center justify-center bg-gradient-to-b from-background to-background/50 via-gray-900" />
           )}
         </div>
+
         <div className="h-[5vh] md:h-[25vh]"></div>
         <div className="relative px-3 md:container items-end pt-16">
           <div className="items-end pb-5 md:pt-0 px-0 lg:px-40">
