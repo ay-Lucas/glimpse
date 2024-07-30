@@ -11,6 +11,7 @@ import {
   CreditsResponse,
   MovieResultsResponse,
   MovieReviewsResponse,
+  Person,
   Review,
   TvResultsResponse,
   TvReviewsResponse,
@@ -20,6 +21,7 @@ import { ImageCarousel } from "@/components/image-carousel";
 import { CastCard } from "@/components/cast-card";
 import { MediaDetails } from "@/components/media-details";
 import { Genre } from "@/types/types";
+import { PersonDetails } from "@/components/person-details";
 
 function getTrailer(videoArray: Array<Video>) {
   const trailer: Array<Video> = videoArray.filter(
@@ -61,6 +63,8 @@ export default async function ItemPage({
 }) {
   const data = await getData({ id: params.id }, params.type);
   let item: Item = {};
+  let personDetails: boolean = false;
+  let person: Person = { media_type: "person" };
   data.media_type = params.type;
 
   switch (data.media_type) {
@@ -104,12 +108,13 @@ export default async function ItemPage({
       break;
     case "person":
       item = {
-        title: data.name,
-        overview: data.biography,
         posterPath: data.profile_path,
       };
+      person = data;
+      personDetails = true;
       break;
   }
+  const info = data as any;
 
   return (
     <main>
@@ -133,18 +138,30 @@ export default async function ItemPage({
                     src={`https://image.tmdb.org/t/p/original${item.posterPath}`}
                   />
                 )}
-                <MediaDetails
-                  title={item.title ?? ""}
-                  genres={item.genres}
-                  rating={item.rating}
-                  releaseDate={item.releaseDate}
-                  overview={item.overview!}
-                  voteAverage={item.voteAverage ?? 0}
-                  paramsId={params.id}
-                  isVideo={
-                    item.videoPath !== undefined && item.videoPath !== ""
-                  }
-                />
+                {personDetails ? (
+                  <PersonDetails
+                    name={info.name}
+                    biography={person.biography}
+                    birthDate={person.birthday}
+                    deathDay={person.deathday}
+                    popularity={person.popularity}
+                    placeOfBirth={person.place_of_birth}
+                    knownForDept={person.known_for_department}
+                  />
+                ) : (
+                  <MediaDetails
+                    title={item.title ?? ""}
+                    genres={item.genres}
+                    rating={item.rating}
+                    releaseDate={item.releaseDate}
+                    overview={item.overview!}
+                    voteAverage={item.voteAverage ?? 0}
+                    paramsId={params.id}
+                    isVideo={
+                      item.videoPath !== undefined && item.videoPath !== ""
+                    }
+                  />
+                )}
               </div>
             </div>
             {item.credits?.cast && (
