@@ -141,30 +141,32 @@ export default async function ItemPage({
                     src={`https://image.tmdb.org/t/p/original${item.posterPath}`}
                   />
                 )}
-                {personDetails ? (
-                  <PersonDetails
-                    name={info.name}
-                    biography={person.biography}
-                    birthDate={person.birthday}
-                    deathDay={person.deathday}
-                    popularity={person.popularity}
-                    placeOfBirth={person.place_of_birth}
-                    knownForDept={person.known_for_department}
-                  />
-                ) : (
-                  <MediaDetails
-                    title={item.title ?? ""}
-                    genres={item.genres}
-                    rating={item.rating}
-                    releaseDate={item.releaseDate}
-                    overview={item.overview!}
-                    voteAverage={item.voteAverage ?? 0}
-                    paramsId={params.id}
-                    isVideo={
-                      item.videoPath !== undefined && item.videoPath !== ""
-                    }
-                  />
-                )}
+                <div>
+                  {personDetails ? (
+                    <PersonDetails
+                      name={info.name}
+                      biography={person.biography}
+                      birthDate={person.birthday}
+                      deathDay={person.deathday}
+                      popularity={person.popularity}
+                      placeOfBirth={person.place_of_birth}
+                      knownForDept={person.known_for_department}
+                    />
+                  ) : (
+                    <MediaDetails
+                      title={item.title ?? ""}
+                      genres={item.genres}
+                      rating={item.rating}
+                      releaseDate={item.releaseDate}
+                      overview={item.overview!}
+                      voteAverage={item.voteAverage ?? 0}
+                      paramsId={params.id}
+                      isVideo={
+                        item.videoPath !== undefined && item.videoPath !== ""
+                      }
+                    />
+                  )}
+                </div>
               </div>
             </div>
             {item.credits?.cast && (

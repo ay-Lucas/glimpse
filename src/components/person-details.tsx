@@ -17,16 +17,14 @@ function Expandable({ content }: { content: string }) {
     setIsOpen(!isOpen);
   };
   useEffect(() => {
-    setExpandable((ref.current?.clientHeight ?? 0) >= CLAMPED_CLIENT_HEIGHT);
+    setExpandable((ref.current?.clientHeight ?? 0) > CLAMPED_CLIENT_HEIGHT);
     console.log(ref.current?.clientHeight);
   }, []);
   return (
-    <div
-      className={`text-md text-start leading-6 select-text transition-transform ${isOpen ? "max-h-full" : "max-h-48 overflow-hidden "}`}
-    >
-      <span ref={ref} className={`${isOpen ? "" : "line-clamp-6"} `}>
+    <div className={`text-md text-start leading-6 select-text`}>
+      <div ref={ref} className={`${isOpen ? "" : "line-clamp-6"} `}>
         {content}
-      </span>
+      </div>
       <div className="flex w-full justify-end">
         <button onClick={handleIsOpen} disabled={!isExpandable}>
           <ChevronDown
@@ -81,12 +79,15 @@ export function PersonDetails({
     age = years.toString().split(".")[0];
   }
 
+  const role = new Map([["Acting", "Actor"]]);
+
   return (
     <div className="flex flex-col justify-between space-y-1 items-center md:items-start">
       <h2 className="text-3xl md:text-5xl font-medium text-center md:text-start pb-2">
         {deathDay !== null ? `${name} (${birthYear} - ${deathYear})` : name}
       </h2>
       <div className="flex flex-col text-lg items-start justify-center md:justify-start">
+        {knownForDept && <span>{role.get(knownForDept)}</span>}
         {birthDate && (
           <div>
             <span>Born: {formattedBirthDate} </span>
@@ -95,7 +96,6 @@ export function PersonDetails({
         )}
         {deathDay && <span>Died: {formattedDeathDate}</span>}
         {age && <span>Age: {age}</span>}
-        {knownForDept && <span>Known for: {knownForDept}</span>}
         <div className="inline-flex items-center">
           <span className="mr-2">
             Popularity: {Math.round(popularity ?? 0)}
