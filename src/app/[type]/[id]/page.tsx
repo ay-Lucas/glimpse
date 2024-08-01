@@ -69,7 +69,7 @@ export default async function ItemPage({
 
   switch (data.media_type) {
     case "movie":
-      console.log(data.credits.crew);
+      console.log(data);
       item = {
         title: data.title,
         posterPath: data.poster_path,
@@ -170,27 +170,27 @@ export default async function ItemPage({
               </div>
             </div>
             <h2 className="text-2xl font-bold pt-3">Details</h2>
-            <ul className="flex pt-1">
-              <li className="flex">
-                {data.media_type === "tv" ? (
-                  <>
-                    <span className="mr-32">Creators</span>
-                    <span>
-                      {data.created_by?.map((item, index) => (
-                        <Link
-                          href={`/person/${item.id}`}
-                          className="hover:underline"
-                        >
-                          {index === 0 ? "" : ", "}
-                          {item.name}
-                        </Link>
-                      ))}
-                    </span>
-                  </>
-                ) : data.media_type === "movie" ? (
-                  <>
-                    <span className="mr-32">Directors</span>
-                    <span>
+            <div className="grid w-full md:w-1/3 pt-1 bg-secondary/40 rounded-xl p-2 -ml-1">
+              {data.media_type === "tv" ? (
+                <>
+                  <span className="mr-32">Creators</span>
+                  <span>
+                    {data.created_by?.map((item, index) => (
+                      <Link
+                        href={`/person/${item.id}`}
+                        className="hover:underline"
+                      >
+                        {index === 0 ? "" : ", "}
+                        {item.name}
+                      </Link>
+                    ))}
+                  </span>
+                </>
+              ) : data.media_type === "movie" ? (
+                <ul className="space-y-1">
+                  <li className="grid grid-cols-2 border-b">
+                    <div>Directors</div>
+                    <div className="">
                       {data.credits.crew
                         ?.filter((item) => item.job === "Director")
                         .map((item, index) => (
@@ -202,17 +202,50 @@ export default async function ItemPage({
                             {item.name}
                           </Link>
                         ))}
-                    </span>
-                  </>
-                ) : data.media_type === "person" ? (
-                  <>
-                    <span className="mr-32"></span>
-                  </>
-                ) : (
-                  ""
-                )}
-              </li>
-            </ul>
+                    </div>
+                  </li>
+                  {data.revenue !== null && data.revenue !== 0 && (
+                    <li className="grid grid-cols-2 border-b">
+                      <span>Revenue</span>
+                      <span>${data.revenue?.toLocaleString()}</span>
+                    </li>
+                  )}
+                  {data.budget !== null && data.budget !== 0 && (
+                    <li className="grid grid-cols-2 border-b">
+                      <div>Budget</div>
+                      <span>${data.budget?.toLocaleString()}</span>
+                    </li>
+                  )}
+
+                  <li className="grid grid-cols-2 border-b">
+                    <div>Language</div>
+                    <div>{data.spoken_languages?.at(0)?.name}</div>
+                  </li>
+                  <li className="grid grid-cols-2 border-b">
+                    <div>Origin Country</div>
+                    <span>{data.origin_country}</span>
+                  </li>
+                  <li className="grid grid-cols-2 border-b">
+                    <div>Vote Average</div>
+                    <span>{data.vote_average.toFixed(1)}</span>
+                  </li>
+                  <li className="grid grid-cols-2 border-b">
+                    <div>Vote Count</div>
+                    <span>{data.vote_count}</span>
+                  </li>
+                  <li className="grid grid-cols-2">
+                    <div>Popularity</div>
+                    <span>{Math.round(data.popularity)}</span>
+                  </li>
+                </ul>
+              ) : data.media_type === "person" ? (
+                <>
+                  <span className="mr-32"></span>
+                </>
+              ) : (
+                ""
+              )}
+            </div>
             {item.credits?.cast && (
               <>
                 <h2 className={`text-2xl font-bold -mb-9 pt-3`}>Cast</h2>
