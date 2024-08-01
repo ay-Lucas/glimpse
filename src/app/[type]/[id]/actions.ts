@@ -17,7 +17,7 @@ export async function getData(
   type: "tv" | "movie" | "person",
 ): Promise<MovieResponseAppended | ShowResponseAppended | Person> {
   const res = await fetch(
-    `${baseApiUrl}/${type}/${request.id}?append_to_response=videos,releases,content_ratings,credits,aggregate_credits&language=en-US`,
+    `${baseApiUrl}/${type}/${request.id}?append_to_response=videos,releases,content_ratings,credits,aggregate_credits,episode_groups&language=en-US`,
     options,
   );
   return res.json();

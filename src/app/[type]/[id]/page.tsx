@@ -69,6 +69,7 @@ export default async function ItemPage({
 
   switch (data.media_type) {
     case "movie":
+      console.log(data.credits.crew);
       item = {
         title: data.title,
         posterPath: data.poster_path,
@@ -88,6 +89,8 @@ export default async function ItemPage({
       };
       break;
     case "tv":
+      console.log(data?.credits?.crew);
+      console.log(data.created_by);
       item = {
         title: data.name,
         posterPath: data.poster_path,
@@ -115,7 +118,6 @@ export default async function ItemPage({
       break;
   }
   const info = data as any;
-
   return (
     <main>
       <div className="h-full w-full overflow-x-hidden">
@@ -141,34 +143,76 @@ export default async function ItemPage({
                     src={`https://image.tmdb.org/t/p/original${item.posterPath}`}
                   />
                 )}
-                <div>
-                  {personDetails ? (
-                    <PersonDetails
-                      name={info.name}
-                      biography={person.biography}
-                      birthDate={person.birthday}
-                      deathDay={person.deathday}
-                      popularity={person.popularity}
-                      placeOfBirth={person.place_of_birth}
-                      knownForDept={person.known_for_department}
-                    />
-                  ) : (
-                    <MediaDetails
-                      title={item.title ?? ""}
-                      genres={item.genres}
-                      rating={item.rating}
-                      releaseDate={item.releaseDate}
-                      overview={item.overview!}
-                      voteAverage={item.voteAverage ?? 0}
-                      paramsId={params.id}
-                      isVideo={
-                        item.videoPath !== undefined && item.videoPath !== ""
-                      }
-                    />
-                  )}
-                </div>
+                {personDetails ? (
+                  <PersonDetails
+                    name={info.name}
+                    biography={person.biography}
+                    birthDate={person.birthday}
+                    deathDay={person.deathday}
+                    popularity={person.popularity}
+                    placeOfBirth={person.place_of_birth}
+                    knownForDept={person.known_for_department}
+                  />
+                ) : (
+                  <MediaDetails
+                    title={item.title ?? ""}
+                    genres={item.genres}
+                    rating={item.rating}
+                    releaseDate={item.releaseDate}
+                    overview={item.overview!}
+                    voteAverage={item.voteAverage ?? 0}
+                    paramsId={params.id}
+                    isVideo={
+                      item.videoPath !== undefined && item.videoPath !== ""
+                    }
+                  />
+                )}
               </div>
             </div>
+            <h2 className="text-2xl font-bold pt-3">Details</h2>
+            <ul className="flex pt-1">
+              <li className="flex">
+                {data.media_type === "tv" ? (
+                  <>
+                    <span className="mr-32">Creators</span>
+                    <span>
+                      {data.created_by?.map((item, index) => (
+                        <Link
+                          href={`/person/${item.id}`}
+                          className="hover:underline"
+                        >
+                          {index === 0 ? "" : ", "}
+                          {item.name}
+                        </Link>
+                      ))}
+                    </span>
+                  </>
+                ) : data.media_type === "movie" ? (
+                  <>
+                    <span className="mr-32">Directors</span>
+                    <span>
+                      {data.credits.crew
+                        ?.filter((item) => item.job === "Director")
+                        .map((item, index) => (
+                          <Link
+                            href={`/person/${item.id}`}
+                            className="hover:underline"
+                          >
+                            {index === 0 ? "" : ", "}
+                            {item.name}
+                          </Link>
+                        ))}
+                    </span>
+                  </>
+                ) : data.media_type === "person" ? (
+                  <>
+                    <span className="mr-32"></span>
+                  </>
+                ) : (
+                  ""
+                )}
+              </li>
+            </ul>
             {item.credits?.cast && (
               <>
                 <h2 className={`text-2xl font-bold -mb-9 pt-3`}>Cast</h2>
