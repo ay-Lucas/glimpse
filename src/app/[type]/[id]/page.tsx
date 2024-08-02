@@ -89,8 +89,7 @@ export default async function ItemPage({
       };
       break;
     case "tv":
-      console.log(data?.credits?.crew);
-      console.log(data.created_by);
+      console.log(data);
       item = {
         title: data.name,
         posterPath: data.poster_path,
@@ -170,30 +169,14 @@ export default async function ItemPage({
               </div>
             </div>
             <h2 className="text-2xl font-bold pt-3">Details</h2>
-            <div className="grid w-full md:w-1/3 pt-1 bg-secondary/40 rounded-xl p-2 -ml-1">
-              {data.media_type === "tv" ? (
-                <>
-                  <span className="mr-32">Creators</span>
-                  <span>
-                    {data.created_by?.map((item, index) => (
-                      <Link
-                        href={`/person/${item.id}`}
-                        className="hover:underline"
-                      >
-                        {index === 0 ? "" : ", "}
-                        {item.name}
-                      </Link>
-                    ))}
-                  </span>
-                </>
-              ) : data.media_type === "movie" ? (
-                <ul className="space-y-1">
-                  <li className="grid grid-cols-2 border-b">
-                    <div>Directors</div>
-                    <div className="">
-                      {data.credits.crew
-                        ?.filter((item) => item.job === "Director")
-                        .map((item, index) => (
+            <div className="pt-3">
+              <ul className="grid md:w-1/3 bg-secondary/40 rounded-xl p-3 -ml-1 space-y-1">
+                {data.media_type === "tv" ? (
+                  <>
+                    <li className="grid grid-cols-2 border-b items-center">
+                      <div>Creators</div>
+                      <div>
+                        {data.created_by?.map((item, index) => (
                           <Link
                             href={`/person/${item.id}`}
                             className="hover:underline"
@@ -202,49 +185,99 @@ export default async function ItemPage({
                             {item.name}
                           </Link>
                         ))}
-                    </div>
-                  </li>
-                  {data.revenue !== null && data.revenue !== 0 && (
-                    <li className="grid grid-cols-2 border-b">
-                      <span>Revenue</span>
-                      <span>${data.revenue?.toLocaleString()}</span>
+                      </div>
                     </li>
-                  )}
-                  {data.budget !== null && data.budget !== 0 && (
                     <li className="grid grid-cols-2 border-b">
-                      <div>Budget</div>
-                      <span>${data.budget?.toLocaleString()}</span>
+                      <div>Networks</div>
+                      <div>
+                        {data.networks?.map((item, index) => (
+                          <span>
+                            {index === 0 ? "" : ", "}
+                            {item.name}
+                          </span>
+                        ))}
+                      </div>
                     </li>
-                  )}
-
-                  <li className="grid grid-cols-2 border-b">
-                    <div>Language</div>
-                    <div>{data.spoken_languages?.at(0)?.name}</div>
-                  </li>
-                  <li className="grid grid-cols-2 border-b">
-                    <div>Origin Country</div>
-                    <span>{data.origin_country}</span>
-                  </li>
-                  <li className="grid grid-cols-2 border-b">
-                    <div>Vote Average</div>
-                    <span>{data.vote_average.toFixed(1)}</span>
-                  </li>
-                  <li className="grid grid-cols-2 border-b">
-                    <div>Vote Count</div>
-                    <span>{data.vote_count}</span>
-                  </li>
-                  <li className="grid grid-cols-2">
-                    <div>Popularity</div>
-                    <span>{Math.round(data.popularity)}</span>
-                  </li>
-                </ul>
-              ) : data.media_type === "person" ? (
-                <>
-                  <span className="mr-32"></span>
-                </>
-              ) : (
-                ""
-              )}
+                    <li className="grid grid-cols-2 border-b">
+                      <div>Vote Average</div>
+                      <span>{data.vote_average!.toFixed(1)}</span>
+                    </li>
+                    <li className="grid grid-cols-2 border-b">
+                      <div>Vote Count</div>
+                      <span>{data.vote_count}</span>
+                    </li>
+                    <li className="grid grid-cols-2 border-b">
+                      <div>Popularity</div>
+                      <span>{Math.round(data.popularity!)}</span>
+                    </li>
+                    <li className="grid grid-cols-2 border-b">
+                      <div>Language</div>
+                      <div>{data.spoken_languages?.at(0)?.name}</div>
+                    </li>
+                    <li className="grid grid-cols-2">
+                      <div>Origin Country</div>
+                      <span>{data.origin_country}</span>
+                    </li>
+                  </>
+                ) : data.media_type === "movie" ? (
+                  <>
+                    <li className="grid grid-cols-2 border-b">
+                      <div className="items-center">Directors</div>
+                      <div>
+                        {data.credits.crew
+                          ?.filter((item) => item.job === "Director")
+                          .map((item, index) => (
+                            <Link
+                              href={`/person/${item.id}`}
+                              className="hover:underline"
+                            >
+                              {index === 0 ? "" : ", "}
+                              {item.name}
+                            </Link>
+                          ))}
+                      </div>
+                    </li>
+                    {data.revenue !== null && data.revenue !== 0 && (
+                      <li className="grid grid-cols-2 border-b">
+                        <span>Revenue</span>
+                        <span>${data.revenue?.toLocaleString()}</span>
+                      </li>
+                    )}
+                    {data.budget !== null && data.budget !== 0 && (
+                      <li className="grid grid-cols-2 border-b">
+                        <div>Budget</div>
+                        <span>${data.budget?.toLocaleString()}</span>
+                      </li>
+                    )}
+                    <li className="grid grid-cols-2 border-b">
+                      <div>Vote Average</div>
+                      <span>{data.vote_average.toFixed(1)}</span>
+                    </li>
+                    <li className="grid grid-cols-2 border-b">
+                      <div>Vote Count</div>
+                      <span>{data.vote_count}</span>
+                    </li>
+                    <li className="grid grid-cols-2 border-b">
+                      <div>Popularity</div>
+                      <span>{Math.round(data.popularity)}</span>
+                    </li>
+                    <li className="grid grid-cols-2 border-b">
+                      <div>Language</div>
+                      <div>{data.spoken_languages?.at(0)?.name}</div>
+                    </li>
+                    <li className="grid grid-cols-2">
+                      <div>Origin Country</div>
+                      <span>{data.origin_country}</span>
+                    </li>
+                  </>
+                ) : data.media_type === "person" ? (
+                  <>
+                    <span className="mr-32"></span>
+                  </>
+                ) : (
+                  ""
+                )}
+              </ul>
             </div>
             {item.credits?.cast && (
               <>
