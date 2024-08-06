@@ -654,6 +654,7 @@ export interface MovieResponseAppended extends MovieResponse {
     countries: Array<ReleaseDate>;
   };
   videos: VideosResponse;
+  "watch/providers"?: WatchProviderResponse;
   media_type: "movie"; // Not provided by api
   credits: CreditsResponse;
 }
@@ -935,6 +936,7 @@ export interface ShowResponseAppended extends ShowResponse {
   };
   videos: VideosResponse;
   credits?: CreditsResponse;
+  "watch/providers"?: WatchProviderResponse;
   media_type: "tv"; // Not provided by api
 }
 

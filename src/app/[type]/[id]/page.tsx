@@ -22,6 +22,8 @@ import { CastCard } from "@/components/cast-card";
 import { MediaDetails } from "@/components/media-details";
 import { Genre } from "@/types/types";
 import { PersonDetails } from "@/components/person-details";
+import Image from "next/image";
+import JustWatchLogo from "@/../public/justwatch-logo.svg";
 
 function getTrailer(videoArray: Array<Video>) {
   const trailer: Array<Video> = videoArray.filter(
@@ -89,7 +91,7 @@ export default async function ItemPage({
       };
       break;
     case "tv":
-      console.log(data);
+      console.log(data["watch/providers"]?.results?.US?.flatrate);
       item = {
         title: data.name,
         posterPath: data.poster_path,
@@ -136,7 +138,7 @@ export default async function ItemPage({
         <div className="relative px-3 md:container items-end pt-16">
           <div className="items-end pb-5 md:pt-0 px-0 lg:px-40">
             <div>
-              <div className="flex flex-col md:flex-row h-full md:h-3/4 z-10 md:items-center md:space-x-5">
+              <div className="flex md:flex-row h-full md:h-3/4 z-10 md:items-center md:space-x-5">
                 {item.posterPath && (
                   <Poster
                     src={`https://image.tmdb.org/t/p/original${item.posterPath}`}
@@ -168,116 +170,163 @@ export default async function ItemPage({
                 )}
               </div>
             </div>
-            <h2 className="text-2xl font-bold pt-3">Details</h2>
-            <div className="pt-3">
-              <ul className="grid md:w-1/3 bg-secondary/40 rounded-xl p-3 -ml-1 space-y-1">
-                {data.media_type === "tv" ? (
-                  <>
-                    <li className="grid grid-cols-2 border-b items-center">
-                      <div>Creators</div>
-                      <div>
-                        {data.created_by?.map((item, index) => (
-                          <Link
-                            href={`/person/${item.id}`}
-                            className="hover:underline"
-                          >
-                            {index === 0 ? "" : ", "}
-                            {item.name}
-                          </Link>
-                        ))}
-                      </div>
-                    </li>
-                    <li className="grid grid-cols-2 border-b">
-                      <div>Networks</div>
-                      <div>
-                        {data.networks?.map((item, index) => (
-                          <span>
-                            {index === 0 ? "" : ", "}
-                            {item.name}
-                          </span>
-                        ))}
-                      </div>
-                    </li>
-                    <li className="grid grid-cols-2 border-b">
-                      <div>Vote Average</div>
-                      <span>{data.vote_average!.toFixed(1)}</span>
-                    </li>
-                    <li className="grid grid-cols-2 border-b">
-                      <div>Vote Count</div>
-                      <span>{data.vote_count}</span>
-                    </li>
-                    <li className="grid grid-cols-2 border-b">
-                      <div>Popularity</div>
-                      <span>{Math.round(data.popularity!)}</span>
-                    </li>
-                    <li className="grid grid-cols-2 border-b">
-                      <div>Language</div>
-                      <div>{data.spoken_languages?.at(0)?.name}</div>
-                    </li>
-                    <li className="grid grid-cols-2">
-                      <div>Origin Country</div>
-                      <span>{data.origin_country}</span>
-                    </li>
-                  </>
-                ) : data.media_type === "movie" ? (
-                  <>
-                    <li className="grid grid-cols-2 border-b">
-                      <div className="items-center">Directors</div>
-                      <div>
-                        {data.credits.crew
-                          ?.filter((item) => item.job === "Director")
-                          .map((item, index) => (
+            <div className="pt-3 flex w-full">
+              <div className="w-full md:w-1/2">
+                <h2 className="text-2xl font-bold pb-3">Details</h2>
+                <ul className="grid bg-secondary/40 rounded-xl p-3 -ml-1 space-y-1">
+                  {data.media_type === "tv" ? (
+                    <>
+                      <li className="grid grid-cols-2 border-b items-center">
+                        <div>Creators</div>
+                        <div>
+                          {data.created_by?.map((item, index) => (
                             <Link
                               href={`/person/${item.id}`}
                               className="hover:underline"
+                              key={index}
                             >
                               {index === 0 ? "" : ", "}
                               {item.name}
                             </Link>
                           ))}
-                      </div>
-                    </li>
-                    {data.revenue !== null && data.revenue !== 0 && (
-                      <li className="grid grid-cols-2 border-b">
-                        <span>Revenue</span>
-                        <span>${data.revenue?.toLocaleString()}</span>
+                        </div>
                       </li>
-                    )}
-                    {data.budget !== null && data.budget !== 0 && (
                       <li className="grid grid-cols-2 border-b">
-                        <div>Budget</div>
-                        <span>${data.budget?.toLocaleString()}</span>
+                        <div>Networks</div>
+                        <div>
+                          {data.networks?.map((item, index) => (
+                            <span key={index}>
+                              {index === 0 ? "" : ", "}
+                              {item.name}
+                            </span>
+                          ))}
+                        </div>
                       </li>
-                    )}
-                    <li className="grid grid-cols-2 border-b">
-                      <div>Vote Average</div>
-                      <span>{data.vote_average.toFixed(1)}</span>
-                    </li>
-                    <li className="grid grid-cols-2 border-b">
-                      <div>Vote Count</div>
-                      <span>{data.vote_count}</span>
-                    </li>
-                    <li className="grid grid-cols-2 border-b">
-                      <div>Popularity</div>
-                      <span>{Math.round(data.popularity)}</span>
-                    </li>
-                    <li className="grid grid-cols-2 border-b">
-                      <div>Language</div>
-                      <div>{data.spoken_languages?.at(0)?.name}</div>
-                    </li>
-                    <li className="grid grid-cols-2">
-                      <div>Origin Country</div>
-                      <span>{data.origin_country}</span>
-                    </li>
-                  </>
-                ) : data.media_type === "person" ? (
-                  <>
-                    <span className="mr-32"></span>
-                  </>
-                ) : (
-                  ""
-                )}
-              </ul>
+                      <li className="grid grid-cols-2 border-b">
+                        <div>Vote Average</div>
+                        <span>{data.vote_average!.toFixed(1)}</span>
+                      </li>
+                      <li className="grid grid-cols-2 border-b">
+                        <div>Vote Count</div>
+                        <span>{data.vote_count}</span>
+                      </li>
+                      <li className="grid grid-cols-2 border-b">
+                        <div>Popularity</div>
+                        <span>{Math.round(data.popularity!)}</span>
+                      </li>
+                      <li className="grid grid-cols-2 border-b">
+                        <div>Language</div>
+                        <div>{data.spoken_languages?.at(0)?.name}</div>
+                      </li>
+                      <li className="grid grid-cols-2">
+                        <div>Origin Country</div>
+                        <span>{data.origin_country}</span>
+                      </li>
+                    </>
+                  ) : data.media_type === "movie" ? (
+                    <>
+                      <li className="grid grid-cols-2 border-b">
+                        <div className="items-center">Directors</div>
+                        <div>
+                          {data.credits.crew
+                            ?.filter((item) => item.job === "Director")
+                            .map((item, index) => (
+                              <Link
+                                href={`/person/${item.id}`}
+                                className="hover:underline"
+                              >
+                                {index === 0 ? "" : ", "}
+                                {item.name}
+                              </Link>
+                            ))}
+                        </div>
+                      </li>
+                      {data.revenue !== null && data.revenue !== 0 && (
+                        <li className="grid grid-cols-2 border-b">
+                          <span>Revenue</span>
+                          <span>${data.revenue?.toLocaleString()}</span>
+                        </li>
+                      )}
+                      {data.budget !== null && data.budget !== 0 && (
+                        <li className="grid grid-cols-2 border-b">
+                          <div>Budget</div>
+                          <span>${data.budget?.toLocaleString()}</span>
+                        </li>
+                      )}
+                      <li className="grid grid-cols-2 border-b">
+                        <div>Vote Average</div>
+                        <span>{data.vote_average.toFixed(1)}</span>
+                      </li>
+                      <li className="grid grid-cols-2 border-b">
+                        <div>Vote Count</div>
+                        <span>{data.vote_count}</span>
+                      </li>
+                      <li className="grid grid-cols-2 border-b">
+                        <div>Popularity</div>
+                        <span>{Math.round(data.popularity)}</span>
+                      </li>
+                      <li className="grid grid-cols-2 border-b">
+                        <div>Language</div>
+                        <div>{data.spoken_languages?.at(0)?.name}</div>
+                      </li>
+                      <li className="grid grid-cols-2">
+                        <div>Origin Country</div>
+                        <span>{data.origin_country}</span>
+                      </li>
+                    </>
+                  ) : data.media_type === "person" ? (
+                    <>
+                      <span className="mr-32"></span>
+                    </>
+                  ) : (
+                    ""
+                  )}
+                </ul>
+              </div>
+              {data.media_type === "movie" || data.media_type === "tv"
+                ? data["watch/providers"]?.results?.US?.flatrate &&
+                  data["watch/providers"]?.results?.US?.flatrate?.length >
+                    0 && (
+                    <div className="w-full md:w-1/2 pl-3">
+                      <h2 className="text-2xl font-bold pb-3">
+                        Streaming
+                        <span className="inline-flex items-center ml-4">
+                          <Link href="https://justwatch.com">
+                            <Image
+                              src={JustWatchLogo}
+                              alt={`JustWatch Logo`}
+                              width={100}
+                              height={70}
+                            />
+                          </Link>
+                        </span>
+                      </h2>
+                      <li className="grid grid-cols-2">
+                        <div className="flex space-x-2">
+                          {data["watch/providers"]?.results?.US?.flatrate?.map(
+                            (item, index) => (
+                              <div key={index}>
+                                <Link
+                                  href={
+                                    data["watch/providers"]?.results?.US?.link!
+                                  }
+                                >
+                                  <Image
+                                    src={`https://image.tmdb.org/t/p/original/${item.logo_path}`}
+                                    alt={`${item.provider_name} logo`}
+                                    width={55}
+                                    height={55}
+                                    className="rounded-lg object-cover"
+                                  />
+                                </Link>
+                              </div>
+                            ),
+                          )}
+                        </div>
+                      </li>
+                    </div>
+                  )
+                : ""}
             </div>
             {item.credits?.cast && (
               <>
