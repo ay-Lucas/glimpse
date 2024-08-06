@@ -234,6 +234,7 @@ export default async function ItemPage({
                               <Link
                                 href={`/person/${item.id}`}
                                 className="hover:underline"
+                                key={index}
                               >
                                 {index === 0 ? "" : ", "}
                                 {item.name}
