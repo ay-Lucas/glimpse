@@ -63,7 +63,7 @@ export default async function Discover() {
     upcomingMoviesRes,
   ] = await Promise.all([
     getTrendingPages(
-      { media_type: "tv", time_window: "week", page: 1 },
+      { media_type: "tv", time_window: "day", page: 1 },
       NUMBER_OF_PAGES,
     ),
     getTrendingPages(
