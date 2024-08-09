@@ -29,7 +29,7 @@ export function SeasonAccordion({
     <Accordion
       type="single"
       collapsible
-      className="bg-secondary/40 rounded-xl px-3"
+      className="bg-secondary/40 rounded-2xl px-3"
     >
       <AccordionItem value="item-1" className="text-lg">
         <AccordionTrigger>Season {number}</AccordionTrigger>
