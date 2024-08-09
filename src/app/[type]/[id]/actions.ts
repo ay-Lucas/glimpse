@@ -76,3 +76,11 @@ export async function getContentRating(type: "tv" | "movie", id: number) {
   );
   return res.json();
 }
+
+export async function getSeasonData(id: number, seasonNumber: number) {
+  const res = await fetch(
+    `${baseApiUrl}/tv/${id}/season/${seasonNumber}`,
+    options,
+  );
+  return res.json();
+}

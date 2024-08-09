@@ -1,5 +1,10 @@
 import "@/styles/globals.css";
-import { getData, getRecommendations, getReviews } from "./actions";
+import {
+  getData,
+  getRecommendations,
+  getReviews,
+  getSeasonData,
+} from "./actions";
 import { Reviews } from "../_components/reviews";
 import { Backdrop } from "../_components/backdrop";
 import { Poster } from "../_components/poster";
@@ -9,12 +14,15 @@ import { Recommended } from "../_components/recommended";
 import {
   Cast,
   CreditsResponse,
+  Episode,
+  EpisodeRequest,
   MovieResultsResponse,
   MovieReviewsResponse,
   Person,
   Review,
   TvResultsResponse,
   TvReviewsResponse,
+  TvSeasonResponse,
   Video,
 } from "@/types/request-types";
 import { ImageCarousel } from "@/components/image-carousel";
@@ -24,6 +32,7 @@ import { Genre } from "@/types/types";
 import { PersonDetails } from "@/components/person-details";
 import Image from "next/image";
 import JustWatchLogo from "@/../public/justwatch-logo.svg";
+import { SeasonAccordion } from "../_components/season-accordion";
 
 function getTrailer(videoArray: Array<Video>) {
   const trailer: Array<Video> = videoArray.filter(
@@ -67,11 +76,12 @@ export default async function ItemPage({
   let item: Item = {};
   let personDetails: boolean = false;
   let person: Person = { media_type: "person" };
+  const episodesData: Array<TvSeasonResponse> = [];
   data.media_type = params.type;
 
   switch (data.media_type) {
     case "movie":
-      console.log(data);
+      // console.log(data);
       item = {
         title: data.title,
         posterPath: data.poster_path,
@@ -91,7 +101,13 @@ export default async function ItemPage({
       };
       break;
     case "tv":
-      console.log(data["watch/providers"]?.results?.US?.flatrate);
+      // console.log(data);
+      for (let i = 0; i < data.number_of_seasons!; i++) {
+        const episodeData = await getSeasonData(params.id, i + 1);
+        episodesData.push(episodeData);
+        // console.log(episodeData);
+      }
+      // console.log(episodesData[0]);
       item = {
         title: data.name,
         posterPath: data.poster_path,
@@ -329,6 +345,19 @@ export default async function ItemPage({
                   )
                 : ""}
             </div>
+            {data.media_type === "tv" && (
+              <div>
+                <h2 className={`text-2xl font-bold pt-3`}>Seasons</h2>
+                <div>
+                  {episodesData.map((item) => (
+                    <SeasonAccordion
+                      episodesData={item?.episodes!}
+                      number={item.season_number!}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
             {item.credits?.cast && (
               <>
                 <h2 className={`text-2xl font-bold -mb-9 pt-3`}>Cast</h2>
