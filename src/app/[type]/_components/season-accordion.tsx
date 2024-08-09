@@ -33,7 +33,7 @@ export function SeasonAccordion({
           <ImageCarousel
             breakpoints="page"
             items={episodesData.map((item, index) => (
-              <div className="pr-2">
+              <div className="pr-2" key={index}>
                 <Image
                   width={300}
                   height={150}
