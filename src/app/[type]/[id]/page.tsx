@@ -186,7 +186,7 @@ export default async function ItemPage({
                 )}
               </div>
             </div>
-            <div className="pt-3 flex w-full">
+            <div className="pt-3 flex flex-col md:flex-row w-full">
               <div className="w-full md:w-1/2">
                 <h2 className="text-2xl font-bold pb-3">Details</h2>
                 <ul className="grid bg-secondary/40 rounded-xl p-3 -ml-1 space-y-1">
@@ -304,7 +304,7 @@ export default async function ItemPage({
                 ? data["watch/providers"]?.results?.US?.flatrate &&
                   data["watch/providers"]?.results?.US?.flatrate?.length >
                     0 && (
-                    <div className="w-full md:w-1/2 pl-3">
+                    <div className="w-full md:w-1/2 md:pl-3 pt-3 md:pt-0">
                       <h2 className="text-2xl font-bold pb-3">
                         Streaming
                         <span className="inline-flex items-center ml-4">
