@@ -31,7 +31,7 @@ export function SeasonAccordion({
       collapsible
       className="bg-secondary/40 rounded-xl px-3"
     >
-      <AccordionItem value="item-1">
+      <AccordionItem value="item-1" className="text-lg">
         <AccordionTrigger>Season {number}</AccordionTrigger>
         <AccordionContent>
           <ImageCarousel

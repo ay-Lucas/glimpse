@@ -350,7 +350,7 @@ export default async function ItemPage({
               episodesData[0].episodes &&
               episodesData[0].episodes[0]?.name !== "Episode 1" && (
                 <div className="pb-5">
-                  <h2 className={`text-2xl font-bold pb-2 pt-3`}>Seasons</h2>
+                  <h2 className={`text-2xl font-bold pb-4 pt-3`}>Seasons</h2>
                   <div>
                     {episodesData.map((item, index) => (
                       <SeasonAccordion
