@@ -152,7 +152,7 @@ export default async function ItemPage({
 
         <div className="h-[6vh] md:h-[25vh]"></div>
         <div className="relative px-3 md:container items-end pt-16">
-          <div className="items-end pb-5 md:pt-0 px-0 lg:px-40">
+          <div className="items-end pb-5 md:pt-0 px-0 lg:px-40 space-y-5">
             <div>
               <div className="flex md:flex-row h-full md:h-3/4 z-10 md:items-center md:space-x-5">
                 {item.posterPath && (
@@ -186,9 +186,9 @@ export default async function ItemPage({
                 )}
               </div>
             </div>
-            <div className="pt-3 flex flex-col md:flex-row w-full">
+            <div className="pt-3 flex flex-col md:flex-row w-full md:space-y-0 space-y-4">
               <div className="w-full md:w-1/2">
-                <h2 className="text-2xl font-bold pb-3">Details</h2>
+                <h2 className="text-2xl font-bold pb-4">Details</h2>
                 <ul className="grid bg-secondary/40 rounded-xl p-3 -ml-1 space-y-1">
                   {data.media_type === "tv" ? (
                     <>
@@ -304,8 +304,8 @@ export default async function ItemPage({
                 ? data["watch/providers"]?.results?.US?.flatrate &&
                   data["watch/providers"]?.results?.US?.flatrate?.length >
                     0 && (
-                    <div className="w-full md:w-1/2 md:pl-3 pt-3 md:pt-0">
-                      <h2 className="text-2xl font-bold pb-3">
+                    <div className="w-full md:w-1/2 md:pl-3 pt-3 md:pt-0 pb-3 md:pb-0">
+                      <h2 className="text-2xl font-bold pb-4">
                         Streaming
                         <span className="inline-flex items-center ml-4">
                           <Link href="https://justwatch.com">
@@ -349,8 +349,8 @@ export default async function ItemPage({
               episodesData[0] &&
               episodesData[0].episodes &&
               episodesData[0].episodes[0]?.name !== "Episode 1" && (
-                <div>
-                  <h2 className={`text-2xl font-bold pt-3`}>Seasons</h2>
+                <div className="pb-5">
+                  <h2 className={`text-2xl font-bold pb-2 pt-3`}>Seasons</h2>
                   <div>
                     {episodesData.map((item, index) => (
                       <SeasonAccordion
@@ -363,8 +363,8 @@ export default async function ItemPage({
                 </div>
               )}
             {item.credits?.cast && (
-              <>
-                <h2 className={`text-2xl font-bold -mb-9 pt-3`}>Cast</h2>
+              <div>
+                <h2 className={`text-2xl font-bold -mb-9`}>Cast</h2>
                 <div className="pt-2 pb-4 pl-8 md:pl-3 -ml-8 md:ml-0 md:w-full w-screen">
                   <ImageCarousel
                     items={item.credits.cast?.map(
@@ -384,11 +384,11 @@ export default async function ItemPage({
                     className="md:-ml-6"
                   />
                 </div>
-              </>
+              </div>
             )}
             {item.recommendations && item.recommendations.total_results > 0 && (
-              <>
-                <h2 className={`text-2xl font-bold -mb-9 pt-3`}>Recommended</h2>
+              <div>
+                <h2 className={`text-2xl font-bold -mb-9`}>Recommended</h2>
                 <div className="pt-2 pb-4 pl-8 md:pl-3 -ml-8 md:ml-0 md:w-full w-screen">
                   <Recommended
                     data={item.recommendations.results!}
@@ -396,7 +396,7 @@ export default async function ItemPage({
                     rating={item.rating!}
                   />
                 </div>
-              </>
+              </div>
             )}
           </div>
 

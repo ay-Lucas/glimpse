@@ -26,7 +26,11 @@ export function SeasonAccordion({
   console.log(episodesData[0]);
   const [isImageLoading, setImageLoading] = useState(true);
   return (
-    <Accordion type="single" collapsible>
+    <Accordion
+      type="single"
+      collapsible
+      className="bg-secondary/40 rounded-xl px-3"
+    >
       <AccordionItem value="item-1">
         <AccordionTrigger>Season {number}</AccordionTrigger>
         <AccordionContent>
