@@ -32,11 +32,11 @@ export function MediaDetails({
         {title}
       </h2>
       {genres && genres.length > 0 && (
-        <div className="flex flex-wrap justify-center space-x-2">
+        <div className="flex flex-wrap justify-center gap-x-1.5 gap-y-1">
           {genres?.map((genre, index: number) => (
             <ul
               key={index}
-              className="bg-gray-700/60 shadow-lg rounded-lg px-2 select-none"
+              className="bg-gray-700/60 shadow-lg rounded-lg px-2 py-1 select-none transition hover:bg-gray-700"
             >
               {genre.name}
             </ul>
