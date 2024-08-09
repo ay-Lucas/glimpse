@@ -150,7 +150,7 @@ export default async function ItemPage({
           )}
         </div>
 
-        <div className="h-[5vh] md:h-[25vh]"></div>
+        <div className="h-[6vh] md:h-[25vh]"></div>
         <div className="relative px-3 md:container items-end pt-16">
           <div className="items-end pb-5 md:pt-0 px-0 lg:px-40">
             <div>
@@ -345,19 +345,23 @@ export default async function ItemPage({
                   )
                 : ""}
             </div>
-            {data.media_type === "tv" && (
-              <div>
-                <h2 className={`text-2xl font-bold pt-3`}>Seasons</h2>
+            {data.media_type === "tv" &&
+              episodesData[0] &&
+              episodesData[0].episodes &&
+              episodesData[0].episodes[0]?.name !== "Episode 1" && (
                 <div>
-                  {episodesData.map((item) => (
-                    <SeasonAccordion
-                      episodesData={item?.episodes!}
-                      number={item.season_number!}
-                    />
-                  ))}
+                  <h2 className={`text-2xl font-bold pt-3`}>Seasons</h2>
+                  <div>
+                    {episodesData.map((item, index) => (
+                      <SeasonAccordion
+                        episodesData={item?.episodes!}
+                        number={item.season_number!}
+                        key={index}
+                      />
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
             {item.credits?.cast && (
               <>
                 <h2 className={`text-2xl font-bold -mb-9 pt-3`}>Cast</h2>

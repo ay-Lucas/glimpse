@@ -23,7 +23,7 @@ export function SeasonAccordion({
   number: number;
   episodesData: Array<Episode>;
 }) {
-  console.log(episodesData[0]?.id);
+  console.log(episodesData[0]);
   const [isImageLoading, setImageLoading] = useState(true);
   return (
     <Accordion type="single" collapsible>
