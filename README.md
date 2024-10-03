@@ -1,20 +1,15 @@
 # Glimpse
 
-Glimpse is a self hosted web app that will help users discover new tv shows and movies.
+A TV & Movie discovery web app built with Next.js and TypeScript
 
-## Planned Features:
+Features:
 
-- Media requests
-- Tailored suggestions
-- Integrate with Jellyfin, Radarr, and Sonarr
-- Trailors
-- Tv and Movie discovery
-
-**There is no telemetry or collection of user data.**
-
-## Inspirations:
-
-- Overseer, Jellyseer
+- Search
+- Streaming Services (only for TV shows)
+- Seasons and episode details
+- Reviews
+- Cast
+- Recommendations
 
 ## Attribution
 
