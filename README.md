@@ -11,6 +11,8 @@ Features:
 - Cast
 - Recommendations
 
+![Screenshot](./public/Screenshot.png)
+
 ## Attribution
 
 > The data is sourced from [TMDB API](https://developer.themoviedb.org).
