@@ -5,6 +5,8 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { TopNav } from "@/components/top-nav";
 import { Footer } from "@/components/footer";
 import { BottomNav } from "@/components/bottom-nav";
+import { Analytics } from "@vercel/analytics/react";
+
 const fontSans = FontSans({
   subsets: ["latin"],
   variable: "--font-sans",
@@ -36,6 +38,7 @@ export default function RootLayout({
         >
           <TopNav />
           {children}
+          <Analytics />
           <Footer />
           <BottomNav />
         </ThemeProvider>
