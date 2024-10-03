@@ -6,6 +6,7 @@ import { TopNav } from "@/components/top-nav";
 import { Footer } from "@/components/footer";
 import { BottomNav } from "@/components/bottom-nav";
 import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -39,6 +40,7 @@ export default function RootLayout({
           <TopNav />
           {children}
           <Analytics />
+          <SpeedInsights />
           <Footer />
           <BottomNav />
         </ThemeProvider>
