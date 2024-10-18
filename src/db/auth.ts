@@ -31,12 +31,7 @@ async function addUserToDb(username: string, saltedPassword: string) {
   return user.pop();
 }
 
-export const {
-  handlers: { GET, POST },
-  auth,
-  signIn,
-  signOut,
-} = NextAuth({
+export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: DrizzleAdapter(db),
   providers: [
     CredentialsProvider({
