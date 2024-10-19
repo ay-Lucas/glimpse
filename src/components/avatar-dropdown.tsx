@@ -30,8 +30,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
+import { signout } from "@/lib/actions";
 
-export function AvatarDropdown() {
+export async function AvatarDropdown() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -120,9 +121,19 @@ export function AvatarDropdown() {
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem>
-          <LogOut className="mr-2 h-4 w-4" />
-          <span>Sign Out</span>
-          <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+          <form
+            action={async () => {
+              "use server";
+              await signout();
+            }}
+            className="flex flex-row w-full"
+          >
+            <button type="submit" className="flex w-full">
+              <LogOut className="mr-2 h-4 w-4" />
+              Sign Out
+              <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+            </button>
+          </form>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

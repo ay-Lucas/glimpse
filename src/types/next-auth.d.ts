@@ -9,5 +9,6 @@ declare module "next-auth" {
       id: string;
       name: string;
     };
+    accessToken?: String;
   }
 }

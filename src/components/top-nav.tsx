@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { AvatarDropdown } from "./avatar-dropdown";
 import { Search } from "./search";
-import { auth } from "@/db/auth";
+import { auth } from "@/auth";
 
 export async function TopNav() {
   const session = await auth();

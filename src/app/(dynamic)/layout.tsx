@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import SessionProvider from "@/components/session-provider";
-import { auth } from "@/db/auth";
+import { auth } from "@/auth";
 import { Background } from "./signin/_components/background";
 import { getBackgrounds } from "./signin/_components/backdrops";
 
