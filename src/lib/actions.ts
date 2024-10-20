@@ -1,10 +1,8 @@
 "use server";
 
 import { AuthError } from "next-auth";
-import { users } from "@/db/schema";
 import {
   addUserToDb,
-  getUserFromDb,
   isExistingUser,
   passwordToSalt,
   signIn,
@@ -12,8 +10,6 @@ import {
 } from "@/auth";
 import { redirect } from "next/navigation";
 import { loginSchema } from "@/types/schema";
-import { db } from "@/db";
-import { eq } from "drizzle-orm";
 const defaultValues = {
   email: "",
   password: "",
@@ -23,8 +19,6 @@ export async function signin(prevState: any, formData: FormData) {
   try {
     const email = formData.get("email");
     const password = formData.get("password");
-    // await db.delete(users).where(eq(users.email, email?.toString()!));
-    // console.log("User deleted!");
 
     const validatedFields = loginSchema.safeParse({
       email: email,

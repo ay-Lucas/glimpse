@@ -54,7 +54,6 @@ export const {
           credentials.email as string,
           // credentials.password as string,
         );
-        const usersList = await db.select().from(users);
 
         return user ?? null;
       },

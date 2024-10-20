@@ -15,13 +15,15 @@ export default auth((req) => {
     nextUrl.pathname.startsWith("/movie") ||
     nextUrl.pathname.startsWith("/person");
 
+  // if (isPublicRoute && isAuthenticated)
+  // return Response.redirect(new URL(DEFAULT_REDIRECT, nextUrl));
+
   if (
     (isAuthenticated && nextUrl.pathname.startsWith("/signin")) ||
     (isAuthenticated && nextUrl.pathname.startsWith("/signup"))
   ) {
-    return Response.redirect(new URL(DEFAULT_REDIRECT, nextUrl));
+    return Response.redirect(new URL(ROOT, nextUrl));
   }
-
   if (!isAuthenticated && !isPublicRoute) {
     console.log(new URL(ROOT, nextUrl));
     return Response.redirect(new URL(ROOT, nextUrl));
