@@ -17,7 +17,7 @@ export default auth((req) => {
 
   if (
     (isAuthenticated && nextUrl.pathname.startsWith("/signin")) ||
-    nextUrl.pathname.startsWith("/signup")
+    (isAuthenticated && nextUrl.pathname.startsWith("/signup"))
   ) {
     return Response.redirect(new URL(DEFAULT_REDIRECT, nextUrl));
   }

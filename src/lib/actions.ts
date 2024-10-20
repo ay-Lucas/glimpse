@@ -11,6 +11,9 @@ import {
   signOut,
 } from "@/auth";
 import { redirect } from "next/navigation";
+import { loginSchema } from "@/types/schema";
+import { db } from "@/db";
+import { eq } from "drizzle-orm";
 const defaultValues = {
   email: "",
   password: "",
@@ -20,18 +23,20 @@ export async function signin(prevState: any, formData: FormData) {
   try {
     const email = formData.get("email");
     const password = formData.get("password");
+    // await db.delete(users).where(eq(users.email, email?.toString()!));
+    // console.log("User deleted!");
 
-    // const validatedFields = loginSchema.safeParse({
-    //  email: email,
-    //  password: password,
-    // });
+    const validatedFields = loginSchema.safeParse({
+      email: email,
+      password: password,
+    });
 
-    // if (!validatedFields.success) {
-    //  return {
-    //   message: 'validation error',
-    //   errors: validatedFields.error.flatten().fieldErrors,
-    //  };
-    // }
+    if (!validatedFields.success) {
+      return {
+        message: "validation error",
+        errors: validatedFields.error.flatten().fieldErrors,
+      };
+    }
 
     await signIn("credentials", formData);
 
@@ -72,7 +77,6 @@ export async function signup(prevState: any, formData: FormData) {
   try {
     const email = formData.get("email")?.toString();
     const password = formData.get("password")?.toString();
-    console.log(formData);
     if (!email || !password) {
       console.log("email and password can't be null");
       return null;
@@ -81,7 +85,6 @@ export async function signup(prevState: any, formData: FormData) {
     if (userExists) {
       redirect("/signin");
     }
-    console.log("here");
     const hashedPassword = passwordToSalt(password);
     await addUserToDb(email, hashedPassword);
     await signin("credentials", formData);

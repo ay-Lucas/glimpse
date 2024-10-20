@@ -7,9 +7,9 @@ export const authConfig = {
     strategy: "jwt",
   },
   pages: {
-    error: "/",
-    signIn: "/",
-    signOut: "/",
+    error: "/error",
+    signIn: "/signin",
+    signOut: "/discover",
   },
   callbacks: {
     authorized({ auth }) {
