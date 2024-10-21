@@ -10,6 +10,7 @@ import {
 } from "@/auth";
 import { redirect } from "next/navigation";
 import { loginSchema } from "@/types/schema";
+import { Console } from "console";
 const defaultValues = {
   email: "",
   password: "",
@@ -32,7 +33,12 @@ export async function signin(prevState: any, formData: FormData) {
       };
     }
 
-    await signIn("credentials", formData);
+    if (await isExistingUser(validatedFields.data.email))
+      await signIn("credentials", formData);
+    else {
+      console.log("User Does Not Exist");
+      return;
+    }
 
     return {
       message: "success",
@@ -81,7 +87,8 @@ export async function signup(prevState: any, formData: FormData) {
     }
     const hashedPassword = passwordToSalt(password);
     await addUserToDb(email, hashedPassword);
-    await signin("credentials", formData);
+    // await signin("credentials", formData);
+    await signIn("credentials", formData);
   } catch (error) {
     console.log("There was an error Signing up" + error);
   }
