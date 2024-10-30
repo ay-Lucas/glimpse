@@ -74,22 +74,20 @@ export async function signout() {
 }
 
 export async function signup(prevState: any, formData: FormData) {
-  try {
-    const email = formData.get("email")?.toString();
-    const password = formData.get("password")?.toString();
-    if (!email || !password) {
-      console.log("email and password can't be null");
-      return null;
-    }
-    const userExists = await isExistingUser(email);
-    if (userExists) {
-      redirect("/signin");
-    }
-    const hashedPassword = passwordToSalt(password);
-    await addUserToDb(email, hashedPassword);
-    // await signin("credentials", formData);
-    await signIn("credentials", formData);
-  } catch (error) {
-    console.log("There was an error Signing up" + error);
+  const email = formData.get("email")?.toString();
+  const password = formData.get("password")?.toString();
+  if (!email || !password) {
+    console.log("email and password can't be null");
+    return null;
   }
+  const userExists = await isExistingUser(email);
+  if (userExists) {
+    console.log("User already exists");
+    redirect("/signin");
+  }
+  const hashedPassword = passwordToSalt(password);
+  await addUserToDb(email, hashedPassword);
+  console.log('New user "' + email + '" registerd');
+  await signIn("credentials", formData);
+  console.log("Signing in..");
 }
