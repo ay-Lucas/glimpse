@@ -1,17 +1,32 @@
+"use client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { signin } from "@/lib/actions";
+import { useFormStatus } from "react-dom";
+import { usePathname } from "next/navigation";
 
-export async function SignInForm() {
+export function SignInButton() {
+  const { pending, data, method, action } = useFormStatus();
+  return (
+    <Button type="submit" variant="secondary">
+      {pending ? "Signing in..." : "Sign in"}
+    </Button>
+  );
+}
+
+export function SignInForm() {
+  const pathname = usePathname();
+  if (pathname == "/signin") console.log(pathname);
   return (
     <form
       action={async (formData) => {
-        "use server";
         await signin("credentials", formData);
       }}
       className="flex flex-col space-y-3"
     >
-      <span className="font-bold text-2xl">Sign in</span>
+      <span className="font-bold text-2xl">
+        {pathname === "/signin" ? "Sign in" : "Sign up"}
+      </span>
       <Input
         required
         name="email"
@@ -26,7 +41,7 @@ export async function SignInForm() {
         placeholder="Password"
         className="bg-gray-600 border-gray-500"
       />
-      <Button variant="secondary">Sign in</Button>
+      <SignInButton />
       <div className="border-b-gray-500 border-b" />
     </form>
   );

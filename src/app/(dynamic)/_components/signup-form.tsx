@@ -1,12 +1,22 @@
+"use client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { signin, signup } from "@/lib/actions";
+import { useFormStatus } from "react-dom";
+
+export function Submit() {
+  const { pending, data, method, action } = useFormStatus();
+  return (
+    <Button type="submit" variant="secondary">
+      {pending ? "Signing up..." : "Sign up"}
+    </Button>
+  );
+}
 
 export async function SignUpForm() {
   return (
     <form
       action={async (formData) => {
-        "use server";
         await signup("credentials", formData);
       }}
       className="flex flex-col space-y-3"
@@ -24,7 +34,7 @@ export async function SignUpForm() {
         placeholder="Password"
         className="bg-gray-600 border-gray-500"
       />
-      <Button variant="secondary">Sign up</Button>
+      <Submit />
       <div className="border-b-gray-500 border-b" />
     </form>
   );
