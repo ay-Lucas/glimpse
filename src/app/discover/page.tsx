@@ -9,10 +9,13 @@ import { MovieResult, PersonResult, TvResult } from "@/types/request-types";
 import { Card } from "@/components/card";
 import Link from "next/link";
 
-const MIN_TRENDING_POPULARITY = 100;
+const MIN_TRENDING_POPULARITY = 50;
 const VOTE_AVERAGE_GTE = 6;
 const NUMBER_OF_PAGES = 10;
 const TRENDING_YEARS_OLD = 3;
+const MIN_DATE = new Date().setFullYear(
+  new Date().getFullYear() - TRENDING_YEARS_OLD,
+);
 
 export function makeCarouselCards(
   data: Array<TvResult | MovieResult | PersonResult>,
@@ -74,21 +77,17 @@ export default async function Discover() {
     getPopular({ page: 1, "vote_average.gte": VOTE_AVERAGE_GTE }, "movie"),
     getUpcomingMovies({ page: 1 }),
   ]);
-  // const trendingTv = sortPopular(trendingTvRes, MIN_TRENDING_POPULARITY);
-  const minDate = new Date().setFullYear(
-    new Date().getFullYear() - TRENDING_YEARS_OLD,
-  );
   const trendingTv = trendingTvRes.filter(
     (item) =>
       item.original_language === "en" &&
       (item.popularity ?? 0) > MIN_TRENDING_POPULARITY &&
-      new Date((item as any).first_air_date).valueOf() > minDate,
+      new Date((item as any).first_air_date).valueOf() > MIN_DATE,
   );
   const trendingMovies = trendingMovieRes.filter(
     (item) =>
       item.original_language === "en" &&
       (item.popularity ?? 0) > MIN_TRENDING_POPULARITY &&
-      new Date((item as any).release_date).valueOf() > minDate,
+      new Date((item as any).release_date).valueOf() > MIN_DATE,
   );
   const trendingTvAndMovies = trendingTv.concat(trendingMovies);
   const filteredPopularTv = popularTvRes?.results?.filter(
