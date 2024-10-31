@@ -23,6 +23,6 @@ export async function getBackgrounds() {
       );
   }
 
-  shuffle(backdropUrls);
+  // shuffle(backdropUrls);
   return backdropUrls;
 }
