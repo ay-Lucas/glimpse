@@ -9,7 +9,7 @@ export function Background({ images }: { images: Array<String> }) {
       setIndex((prevIndex) => (prevIndex + 1) % images.length);
     }, 10000); // Switch image every 10 seconds
     return () => clearInterval(interval);
-  }, []);
+  }, [images]);
 
   return (
     <div className="absolute top-0 left-0 w-full h-full duration-300 ease-in overflow-hidden bg-gradient-to-t bg-blend-overlay from-gray-200 to-gray-950">

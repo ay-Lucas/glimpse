@@ -79,16 +79,12 @@ export function isUnique(
   let unique = false;
   array.forEach((trendingItem) => {
     if (
-      trendingItem.media_type === "tv" &&
-      trendingItem.name === (item as any)?.name
-    ) {
-      return (unique = true);
-    } else if (
-      trendingItem.media_type === "movie" &&
-      trendingItem.title === (item as any).title
-    ) {
-      return (unique = true);
-    }
+      (trendingItem.media_type === "tv" &&
+        trendingItem.name === (item as any)?.name) ||
+      (trendingItem.media_type === "movie" &&
+        trendingItem.title === (item as any)?.title)
+    )
+      unique = true;
   });
   return !unique;
   // return item

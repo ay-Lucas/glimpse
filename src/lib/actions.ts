@@ -74,19 +74,29 @@ export async function signout() {
 }
 
 export async function signup(prevState: any, formData: FormData) {
-  const email = formData.get("email")?.toString();
-  const password = formData.get("password")?.toString();
-  if (!email || !password) {
-    console.log("email and password can't be null");
-    return null;
+  const email = formData.get("email");
+  const password = formData.get("password");
+
+  const validatedFields = loginSchema.safeParse({
+    email: email,
+    password: password,
+  });
+
+  if (!validatedFields.success) {
+    // console.log(validatedFields.error.message);
+    return {
+      message: "validation error",
+      errors: validatedFields.error.flatten().fieldErrors,
+    };
   }
-  const userExists = await isExistingUser(email);
+
+  const userExists = await isExistingUser(validatedFields.data.email);
   if (userExists) {
     console.log("User already exists");
     redirect("/signin");
   }
-  const hashedPassword = passwordToSalt(password);
-  await addUserToDb(email, hashedPassword);
+  const hashedPassword = passwordToSalt(validatedFields.data.password);
+  await addUserToDb(validatedFields.data.email, hashedPassword);
   console.log('New user "' + email + '" registerd');
   await signIn("credentials", formData);
   console.log("Signing in..");

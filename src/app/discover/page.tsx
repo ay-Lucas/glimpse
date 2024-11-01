@@ -80,7 +80,6 @@ export default async function Discover() {
   const trendingTv = trendingTvRes.filter(
     (item) =>
       item.original_language === "en" &&
-      (item.popularity ?? 0) > MIN_TRENDING_POPULARITY &&
       new Date((item as any).first_air_date).valueOf() > MIN_DATE,
   );
   const trendingMovies = trendingMovieRes.filter(
@@ -95,10 +94,12 @@ export default async function Discover() {
   );
   // Discover api endpoint doesn't return media type
   filteredPopularTv?.forEach((item) => (item.media_type = "tv"));
-  const filteredPopularMovie = popularMoviesRes?.results?.filter(
-    (item: MovieResult | TvResult) => isUnique(item, trendingTvAndMovies),
+  // const filteredPopularMovie = popularMoviesRes?.results?.filter(
+  //   (item: MovieResult | TvResult) => isUnique(item, trendingTvAndMovies),
+  // );
+  const popularMovies = popularMoviesRes.results?.filter(
+    (item) => (item.media_type = "movie"),
   );
-  filteredPopularMovie?.forEach((item) => (item.media_type = "movie"));
   upcomingMoviesRes.results?.forEach((item) => (item.media_type = "movie"));
 
   return (
@@ -121,7 +122,7 @@ export default async function Discover() {
           title="Popular Series"
         />
         <ImageCarousel
-          items={makeCarouselCards(filteredPopularMovie!)}
+          items={makeCarouselCards(popularMovies!)}
           title="Popular Movies"
         />
       </div>

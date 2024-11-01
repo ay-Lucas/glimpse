@@ -2,15 +2,25 @@
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { signin, signup } from "@/lib/actions";
-import { useFormStatus } from "react-dom";
+import { useFormState, useFormStatus } from "react-dom";
 
 export function Submit() {
   const { pending, data, method, action } = useFormStatus();
+  console.log(pending);
   return (
     <Button type="submit" variant="secondary">
       {pending ? "Signing up..." : "Sign up"}
     </Button>
   );
+}
+
+export function ErrorMessage({ data }: { data: FormData }) {
+  // const { pending, data, method, action } = useFormStatus();
+  // console.log(data);
+  // console.log(action);
+  // return <div>{pending ? "Signing in..." : "Sign in"}</div>;
+  console.log();
+  return <div>{data.entries().toArray().toString()}</div>;
 }
 
 export async function SignUpForm() {
