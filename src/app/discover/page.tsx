@@ -80,8 +80,10 @@ export default async function Discover() {
   const trendingTv = trendingTvRes.filter(
     (item) =>
       item.original_language === "en" &&
+      item.backdrop_path &&
       new Date((item as any).first_air_date).valueOf() > MIN_DATE,
   );
+  console.log(trendingTv);
   const trendingMovies = trendingMovieRes.filter(
     (item) =>
       item.original_language === "en" &&
