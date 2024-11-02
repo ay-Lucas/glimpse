@@ -8,6 +8,7 @@ import {
   integer,
   serial,
   uuid,
+  unique,
 } from "drizzle-orm/pg-core";
 import type { AdapterAccountType } from "next-auth/adapters";
 
@@ -72,7 +73,7 @@ export const watchlistItems = pgTable("watchlistItems", {
   id: serial("id").primaryKey(),
   watchlistId: uuid("watchlistId").references(() => watchlist.id),
   itemId: uuid("itemId").default(sql`gen_random_uuid()`), // ID of the item being watched
-  tmdbId: integer("tmdbId").notNull(),
+  tmdbId: integer("tmdbId").unique().notNull(),
   title: text("title").notNull(),
   itemType: text({ enum: ["tv", "movie"] }).notNull(),
   genres: text("genres").array().notNull(),

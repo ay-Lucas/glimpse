@@ -142,6 +142,32 @@ async function createWatchlist(userId: string, name: string) {
   return result; // Returns the newly created watchlist entry
 }
 
+export async function deleteWatchlistItem(
+  watchlistId: string,
+  watchlistItemId: string,
+) {
+  const result = await db
+    .delete(watchlistItems)
+    .where(
+      and(
+        eq(watchlistItems.watchlistId, watchlistId),
+        eq(watchlistItems.itemId, watchlistItemId),
+      ),
+    )
+    .returning();
+  return result;
+}
+
+async function deleteAllWatchlistItems() {
+  try {
+    // Execute the delete command
+    await db.delete(watchlistItems);
+    console.log("All rows deleted successfully.");
+  } catch (error) {
+    console.error("Error deleting rows:", error);
+  }
+}
+
 export async function getDefaultWatchlist(userId: string) {
   const [defaultWatchlist] = await db
     .select()
@@ -162,18 +188,30 @@ export async function addToDefaultWatchlist(
   try {
     let defaultWatchlist;
     defaultWatchlist = await getDefaultWatchlist(userId);
-    console.log(await getUserWatchlist(userId));
+
     if (!defaultWatchlist) {
       setFirstWatchlistAsDefault(userId);
       defaultWatchlist = await getDefaultWatchlist(userId);
     }
-    let result = addToWatchlist(
+    const existingItem = await getWatchlistItem(
+      userId,
+      defaultWatchlist?.id!,
+      tmdbId,
+    );
+    if (existingItem.length > 0) {
+      console.log("Item already exists");
+      return null;
+    }
+    console.log(existingItem);
+    let result = await addToWatchlist(
       defaultWatchlist?.id!,
       tmdbId,
       title,
       itemType,
       genres,
     );
+    console.log("added" + result + " to Default watchlist");
+    console.log(await getWatchlistItems(userId, defaultWatchlist?.id!));
     return result;
   } catch (error) {
     console.log(error);
@@ -207,7 +245,7 @@ async function setFirstWatchlistAsDefault(userId: string): Promise<void> {
   }
 }
 
-async function getUserWatchlist(userId: string) {
+async function getWatchlistItems(userId: string, watchlistId: string) {
   const items = await db
     .select({
       id: watchlistItems.id,
@@ -219,8 +257,31 @@ async function getUserWatchlist(userId: string) {
       genres: watchlistItems.genres,
     })
     .from(watchlistItems)
-    .leftJoin(watchlist, eq(watchlistItems.watchlistId, watchlist.id)) // Corrected join syntax with eq
+    .leftJoin(watchlist, eq(watchlistItems.watchlistId, watchlistId)) // Corrected join syntax with eq
     .where(eq(watchlist.userId, userId)); // where expects a single condition argument
+
+  return items;
+}
+async function getWatchlistItem(
+  userId: string,
+  watchlistId: string,
+  tmdbId: number,
+) {
+  const items = await db
+    .select({
+      id: watchlistItems.id,
+      watchlistId: watchlistItems.watchlistId,
+      itemId: watchlistItems.itemId,
+      tmdbId: watchlistItems.tmdbId,
+      title: watchlistItems.title,
+      itemType: watchlistItems.itemType,
+      genres: watchlistItems.genres,
+    })
+    .from(watchlistItems)
+    .leftJoin(watchlist, eq(watchlistItems.watchlistId, watchlistId)) // Corrected join syntax with eq
+    .where(
+      and(eq(watchlist.userId, userId), eq(watchlistItems.tmdbId, tmdbId)),
+    ); // where expects a single condition argument
 
   return items;
 }
