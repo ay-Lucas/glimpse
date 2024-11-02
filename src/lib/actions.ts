@@ -304,7 +304,9 @@ async function getWatchlists(userId: string) {
   return items;
 }
 
-async function getWatchlistsAndItems(userId: string): Promise<Watchlist[]> {
+export async function getWatchlistsAndItems(
+  userId: string,
+): Promise<Watchlist[]> {
   // Get the user's watchlists
   const watchlistsRes = await getWatchlists(userId);
 
