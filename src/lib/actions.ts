@@ -14,6 +14,7 @@ import { loginSchema } from "@/types/schema";
 import { db } from "@/db/index";
 import { and, asc, eq } from "drizzle-orm";
 import { users, watchlist, watchlistItems } from "@/db/schema";
+import { Watchlist } from "@/types";
 const defaultValues = {
   email: "",
   password: "",
@@ -130,12 +131,12 @@ async function getUserIdByEmail(email: string): Promise<string | null> {
 
   return user ? user.id : null; // Returns the userId or null if not found
 }
-async function createWatchlist(userId: string, name: string) {
+async function createWatchlist(userId: string, watchlistName: string) {
   const result = await db
     .insert(watchlist)
     .values({
       userId,
-      name,
+      watchlistName,
     })
     .returning();
 
@@ -188,7 +189,8 @@ export async function addToDefaultWatchlist(
   try {
     let defaultWatchlist;
     defaultWatchlist = await getDefaultWatchlist(userId);
-
+    const all = await getWatchlistsAndItems(userId);
+    all.forEach((item) => console.log(item));
     if (!defaultWatchlist) {
       setFirstWatchlistAsDefault(userId);
       defaultWatchlist = await getDefaultWatchlist(userId);
@@ -210,8 +212,9 @@ export async function addToDefaultWatchlist(
       itemType,
       genres,
     );
-    console.log("added" + result + " to Default watchlist");
-    console.log(await getWatchlistItems(userId, defaultWatchlist?.id!));
+    console.log("added " + result.at(0)?.title + " to Default watchlist");
+    // console.log(await getWatchlistItems(userId, defaultWatchlist?.id!));
+    console.log(await getWatchlists(userId));
     return result;
   } catch (error) {
     console.log(error);
@@ -255,6 +258,7 @@ async function getWatchlistItems(userId: string, watchlistId: string) {
       title: watchlistItems.title,
       itemType: watchlistItems.itemType,
       genres: watchlistItems.genres,
+      watchlistName: watchlist.watchlistName,
     })
     .from(watchlistItems)
     .leftJoin(watchlist, eq(watchlistItems.watchlistId, watchlistId)) // Corrected join syntax with eq
@@ -284,4 +288,60 @@ async function getWatchlistItem(
     ); // where expects a single condition argument
 
   return items;
+}
+
+async function getWatchlists(userId: string) {
+  const items = await db
+    .select({
+      id: watchlist.id,
+      watchlistName: watchlist.watchlistName,
+      userid: watchlist.userId,
+      createdAt: watchlist.createdAt,
+      default: watchlist.default,
+    })
+    .from(watchlist)
+    .where(eq(watchlist.userId, userId));
+  return items;
+}
+
+async function getWatchlistsAndItems(userId: string): Promise<Watchlist[]> {
+  // Get the user's watchlists
+  const watchlistsRes = await getWatchlists(userId);
+
+  // Get all items associated with the user's watchlists
+  const items = await db
+    .select({
+      id: watchlistItems.id,
+      watchlistId: watchlistItems.watchlistId,
+      itemId: watchlistItems.itemId,
+      tmdbId: watchlistItems.tmdbId,
+      title: watchlistItems.title,
+      itemType: watchlistItems.itemType,
+      genres: watchlistItems.genres,
+    })
+    .from(watchlistItems)
+    .leftJoin(watchlist, eq(watchlist.id, watchlistItems.watchlistId))
+    .where(eq(watchlist.userId, userId));
+
+  // Organize watchlists and their items
+  const watchlists: Watchlist[] = watchlistsRes.map((watchlist) => {
+    const filteredItems = items
+      .filter((item) => item.watchlistId === watchlist.id)
+      .map((item) => ({
+        id: item.id,
+        watchlistId: item.watchlistId as string,
+        itemId: item.itemId as string,
+        tmdbId: item.tmdbId,
+        title: item.title,
+        itemType: item.itemType,
+        genres: item.genres,
+      }));
+
+    return {
+      ...watchlist,
+      items: filteredItems,
+    };
+  });
+
+  return watchlists;
 }

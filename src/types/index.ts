@@ -10,3 +10,21 @@ export interface CardTypes {
 export interface CardTypes1 {
   result?: MovieResult | TvResult | PersonResult | Cast;
 }
+
+export interface Watchlist {
+  id: string;
+  watchlistName: string;
+  createdAt: string;
+  default: boolean;
+  items: WatchlistItem[];
+}
+
+export interface WatchlistItem {
+  id: number;
+  watchlistId: string;
+  itemId: string;
+  tmdbId: number;
+  title: string;
+  itemType: "tv" | "movie";
+  genres: string[];
+}

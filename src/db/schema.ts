@@ -84,7 +84,7 @@ export const watchlist = pgTable("watchlist", {
     .default(sql`gen_random_uuid()`)
     .primaryKey(), // Auto-generate UUID
   userId: text("userId").references(() => users.id),
-  name: text("name").notNull(),
+  watchlistName: text("watchlistName").notNull(),
   createdAt: timestamp("createdAt", { mode: "string" })
     .notNull()
     .default(sql`now()`),
