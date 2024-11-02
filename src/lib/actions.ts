@@ -3,6 +3,7 @@
 import { AuthError } from "next-auth";
 import {
   addUserToDb,
+  auth,
   isExistingUser,
   passwordToSalt,
   signIn,
@@ -10,7 +11,9 @@ import {
 } from "@/auth";
 import { redirect } from "next/navigation";
 import { loginSchema } from "@/types/schema";
-import { Console } from "console";
+import { db } from "@/db/index";
+import { and, asc, eq } from "drizzle-orm";
+import { users, watchlist, watchlistItems } from "@/db/schema";
 const defaultValues = {
   email: "",
   password: "",
@@ -99,5 +102,125 @@ export async function signup(prevState: any, formData: FormData) {
   await addUserToDb(validatedFields.data.email, hashedPassword);
   console.log('New user "' + email + '" registerd');
   await signIn("credentials", formData);
+  const session = await auth();
+  createWatchlist(session?.user.id!, "Default");
+  setFirstWatchlistAsDefault(session?.user.id!);
   console.log("Signing in..");
+}
+
+export async function addToWatchlist(
+  watchlistId: string,
+  tmdbId: number,
+  title: string,
+  itemType: "tv" | "movie",
+  genres: string[],
+) {
+  const result = await db
+    .insert(watchlistItems)
+    .values({ watchlistId, tmdbId, title, itemType, genres })
+    .returning();
+  return result;
+}
+async function getUserIdByEmail(email: string): Promise<string | null> {
+  const [user] = await db
+    .select({ id: users.id })
+    .from(users)
+    .where(eq(users.email, email))
+    .limit(1);
+
+  return user ? user.id : null; // Returns the userId or null if not found
+}
+async function createWatchlist(userId: string, name: string) {
+  const result = await db
+    .insert(watchlist)
+    .values({
+      userId,
+      name,
+    })
+    .returning();
+
+  return result; // Returns the newly created watchlist entry
+}
+
+export async function getDefaultWatchlist(userId: string) {
+  const [defaultWatchlist] = await db
+    .select()
+    .from(watchlist)
+    .where(and(eq(watchlist.userId, userId), eq(watchlist.default, true)))
+    .limit(1); // Limit to 1 to ensure a single result
+
+  return defaultWatchlist || null; // Return the watchlist or null if not found
+}
+
+export async function addToDefaultWatchlist(
+  userId: string,
+  tmdbId: number,
+  title: string,
+  itemType: "tv" | "movie",
+  genres: string[],
+) {
+  try {
+    let defaultWatchlist;
+    defaultWatchlist = await getDefaultWatchlist(userId);
+    console.log(await getUserWatchlist(userId));
+    if (!defaultWatchlist) {
+      setFirstWatchlistAsDefault(userId);
+      defaultWatchlist = await getDefaultWatchlist(userId);
+    }
+    let result = addToWatchlist(
+      defaultWatchlist?.id!,
+      tmdbId,
+      title,
+      itemType,
+      genres,
+    );
+    return result;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+async function setFirstWatchlistAsDefault(userId: string): Promise<void> {
+  // Step 1: Check if the user already has a default watchlist
+  const [existingDefault] = await db
+    .select()
+    .from(watchlist)
+    .where(and(eq(watchlist.userId, userId), eq(watchlist.default, true)))
+    .limit(1);
+
+  // If a default watchlist exists, no action is needed
+  if (existingDefault) return;
+  // Step 2: Find the earliest created watchlist for the user
+  const [firstWatchlist] = await db
+    .select()
+    .from(watchlist)
+    .where(eq(watchlist.userId, userId))
+    .orderBy(asc(watchlist.createdAt))
+    .limit(1);
+
+  // Step 3: If a watchlist exists, set it as the default
+  if (firstWatchlist) {
+    await db
+      .update(watchlist)
+      .set({ default: true })
+      .where(eq(watchlist.id, firstWatchlist.id));
+  }
+}
+
+async function getUserWatchlist(userId: string) {
+  const items = await db
+    .select({
+      id: watchlistItems.id,
+      watchlistId: watchlistItems.watchlistId,
+      itemId: watchlistItems.itemId,
+      tmdbId: watchlistItems.tmdbId,
+      title: watchlistItems.title,
+      itemType: watchlistItems.itemType,
+      genres: watchlistItems.genres,
+    })
+    .from(watchlistItems)
+    .leftJoin(watchlist, eq(watchlistItems.watchlistId, watchlist.id)) // Corrected join syntax with eq
+    .where(eq(watchlist.userId, userId)); // where expects a single condition argument
+
+  return items;
 }

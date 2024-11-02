@@ -33,6 +33,10 @@ import { PersonDetails } from "@/components/person-details";
 import Image from "next/image";
 import JustWatchLogo from "@/../public/justwatch-logo.svg";
 import { SeasonAccordion } from "../_components/season-accordion";
+import { auth } from "@/auth";
+import { Button } from "@/components/ui/button";
+import { AddToWatchlistButton } from "@/components/add-to-watchlist-button";
+import { getDefaultWatchlist } from "@/lib/actions";
 
 function getTrailer(videoArray: Array<Video>) {
   const trailer: Array<Video> = videoArray.filter(
@@ -98,6 +102,7 @@ export default async function ItemPage({
           data.releases.countries.filter(
             (item) => item.iso_3166_1 === "US" && item.certification !== "",
           )[0]?.certification ?? "",
+        media_type: "movie",
       };
       break;
     case "tv":
@@ -124,16 +129,21 @@ export default async function ItemPage({
           data.content_ratings.results.filter(
             (item) => item.iso_3166_1 === "US" && item.rating !== "",
           )[0]?.rating ?? "",
+        media_type: "tv",
       };
       break;
     case "person":
       item = {
         posterPath: data.profile_path,
+        media_type: "person",
       };
       person = data;
       personDetails = true;
       break;
   }
+  const session = await auth();
+  // console.log(await getDefaultWatchlist(session?.user.id!));
+  // console.log(session);
   const info = data as any;
   return (
     <main>
@@ -171,20 +181,31 @@ export default async function ItemPage({
                     knownForDept={person.known_for_department}
                   />
                 ) : (
-                  <MediaDetails
-                    title={item.title ?? ""}
-                    genres={item.genres}
-                    rating={item.rating}
-                    releaseDate={item.releaseDate}
-                    overview={item.overview!}
-                    voteAverage={item.voteAverage ?? 0}
-                    paramsId={params.id}
-                    isVideo={
-                      item.videoPath !== undefined && item.videoPath !== ""
-                    }
-                  />
+                  <>
+                    <MediaDetails
+                      title={item.title ?? ""}
+                      genres={item.genres}
+                      rating={item.rating}
+                      releaseDate={item.releaseDate}
+                      overview={item.overview!}
+                      voteAverage={item.voteAverage ?? 0}
+                      paramsId={params.id}
+                      isVideo={
+                        item.videoPath !== undefined && item.videoPath !== ""
+                      }
+                    />
+                  </>
                 )}
               </div>
+              <AddToWatchlistButton
+                userId={session?.user.id}
+                title={item.title!}
+                itemType={item.media_type!}
+                watchlistName={"Default"}
+                isLoggedIn={session !== undefined}
+                tmdbId={params.id}
+                genres={item.genres?.map((item) => item.name ?? "none")!}
+              />
             </div>
             <div className="pt-3 flex flex-col md:flex-row w-full md:space-y-0 space-y-4">
               <div className="w-full md:w-1/2">

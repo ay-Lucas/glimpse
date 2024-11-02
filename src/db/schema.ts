@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import {
   boolean,
   timestamp,
@@ -5,6 +6,8 @@ import {
   text,
   primaryKey,
   integer,
+  serial,
+  uuid,
 } from "drizzle-orm/pg-core";
 import type { AdapterAccountType } from "next-auth/adapters";
 
@@ -64,6 +67,28 @@ export const verificationTokens = pgTable(
     }),
   }),
 );
+
+export const watchlistItems = pgTable("watchlistItems", {
+  id: serial("id").primaryKey(),
+  watchlistId: uuid("watchlistId").references(() => watchlist.id),
+  itemId: uuid("itemId").default(sql`gen_random_uuid()`), // ID of the item being watched
+  tmdbId: integer("tmdbId").notNull(),
+  title: text("title").notNull(),
+  itemType: text({ enum: ["tv", "movie"] }).notNull(),
+  genres: text("genres").array().notNull(),
+});
+
+export const watchlist = pgTable("watchlist", {
+  id: uuid("id")
+    .default(sql`gen_random_uuid()`)
+    .primaryKey(), // Auto-generate UUID
+  userId: text("userId").references(() => users.id),
+  name: text("name").notNull(),
+  createdAt: timestamp("createdAt", { mode: "string" })
+    .notNull()
+    .default(sql`now()`),
+  default: boolean("default").notNull().default(false), // Indicates if this is the default watchlist
+});
 
 // Causes Drizzle to crash when pushing with `npx drizzle-kit push` (Known Issue)
 
