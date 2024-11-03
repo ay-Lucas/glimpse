@@ -15,6 +15,7 @@ import { db } from "@/db/index";
 import { and, asc, eq } from "drizzle-orm";
 import { users, watchlist, watchlistItems } from "@/db/schema";
 import { WatchlistI } from "@/types";
+import { Item } from "@/app/[type]/[id]/page";
 const defaultValues = {
   email: "",
   password: "",
@@ -116,17 +117,30 @@ export async function signup(prevState: any, formData: FormData) {
   console.log("Signing in..");
 }
 
-export async function addToWatchlist(
-  watchlistId: string,
-  tmdbId: number,
-  title: string,
-  itemType: "tv" | "movie",
-  genres: string[],
-) {
+export async function addToWatchlist(watchlistId: string, item: Item) {
+  const itemType = item.media_type === "tv" ? "tv" : "movie";
   const result = await db
     .insert(watchlistItems)
-    .values({ watchlistId, tmdbId, title, itemType, genres })
+    .values({
+      tmdbId: item.tmdbId ?? "",
+      watchlistId: watchlistId, // Ensure watchlistId is a string (UUID format)
+      title: item.title ?? "", // Ensure title is a non-null string
+      itemType: itemType, // "tv" or "movie"
+      genres: item.genres?.map((genre) => genre.name || "none") ?? [], // Array of genre names (string[])
+      tmdbVoteAverage: item.voteAverage
+        ? parseFloat(item.voteAverage.toString())
+        : null, // Parse as float
+      rating: item.rating ?? null, // Rating is either string or null
+      popularity: Number(item.popularity.toFixed()) ?? null, // Popularity as integer or null
+      language: item.language || null, // Language as string or null
+      numberOfSeasons: item.numberOfSeasons ?? null, // Integer or null
+      numberOfEpisodes: item.numberOfEpisodes ?? null, // Integer or null
+      summary: item.overview ?? null, // Summary is string or null
+      posterPath: item.posterPath,
+      backdropPath: item.backdropPath,
+    })
     .returning();
+
   return result;
 }
 async function getUserIdByEmail(email: string): Promise<string | null> {
@@ -187,11 +201,8 @@ export async function getDefaultWatchlist(userId: string) {
 }
 
 export async function addToDefaultWatchlist(
+  watchlistItem: Item,
   userId: string,
-  tmdbId: number,
-  title: string,
-  itemType: "tv" | "movie",
-  genres: string[],
 ) {
   try {
     let defaultWatchlist;
@@ -203,19 +214,13 @@ export async function addToDefaultWatchlist(
     const existingItem = await getWatchlistItem(
       userId,
       defaultWatchlist?.id!,
-      tmdbId,
+      watchlistItem.tmdbId,
     );
     if (existingItem.length > 0) {
       console.log("Item already exists");
       return null;
     }
-    let result = await addToWatchlist(
-      defaultWatchlist?.id!,
-      tmdbId,
-      title,
-      itemType,
-      genres,
-    );
+    let result = await addToWatchlist(defaultWatchlist?.id!, watchlistItem);
     return result;
   } catch (error) {
     console.log(error);
@@ -260,6 +265,15 @@ async function getWatchlistItems(userId: string, watchlistId: string) {
       itemType: watchlistItems.itemType,
       genres: watchlistItems.genres,
       watchlistName: watchlist.watchlistName,
+      tmdbVoteAverage: watchlistItems.tmdbVoteAverage,
+      rating: watchlistItems.rating,
+      popularity: watchlistItems.popularity,
+      language: watchlistItems.language,
+      numberOfSeasons: watchlistItems.numberOfSeasons,
+      numberOfEpisodes: watchlistItems.numberOfEpisodes,
+      summary: watchlistItems.summary,
+      posterPath: watchlistItems.posterPath,
+      backdropPath: watchlistItems.backdropPath,
     })
     .from(watchlistItems)
     .leftJoin(watchlist, eq(watchlistItems.watchlistId, watchlistId)) // Corrected join syntax with eq
@@ -281,6 +295,15 @@ async function getWatchlistItem(
       title: watchlistItems.title,
       itemType: watchlistItems.itemType,
       genres: watchlistItems.genres,
+      tmdbVoteAverage: watchlistItems.tmdbVoteAverage,
+      rating: watchlistItems.rating,
+      popularity: watchlistItems.popularity,
+      language: watchlistItems.language,
+      numberOfSeasons: watchlistItems.numberOfSeasons,
+      numberOfEpisodes: watchlistItems.numberOfEpisodes,
+      summary: watchlistItems.summary,
+      posterPath: watchlistItems.posterPath,
+      backdropPath: watchlistItems.backdropPath,
     })
     .from(watchlistItems)
     .leftJoin(watchlist, eq(watchlistItems.watchlistId, watchlistId)) // Corrected join syntax with eq
@@ -321,12 +344,20 @@ export async function getWatchlistsAndItems(
       title: watchlistItems.title,
       itemType: watchlistItems.itemType,
       genres: watchlistItems.genres,
+      tmdbVoteAverage: watchlistItems.tmdbVoteAverage,
+      rating: watchlistItems.rating,
+      popularity: watchlistItems.popularity,
+      language: watchlistItems.language,
+      numberOfSeasons: watchlistItems.numberOfSeasons,
+      numberOfEpisodes: watchlistItems.numberOfEpisodes,
+      summary: watchlistItems.summary,
+      posterPath: watchlistItems.posterPath,
+      backdropPath: watchlistItems.backdropPath,
     })
     .from(watchlistItems)
     .leftJoin(watchlist, eq(watchlist.id, watchlistItems.watchlistId))
     .where(eq(watchlist.userId, userId));
 
-  // Organize watchlists and their items
   const watchlists: WatchlistI[] = watchlistsRes.map((watchlist) => {
     const filteredItems = items
       .filter((item) => item.watchlistId === watchlist.id)
@@ -336,8 +367,17 @@ export async function getWatchlistsAndItems(
         itemId: item.itemId as string,
         tmdbId: item.tmdbId,
         title: item.title,
-        itemType: item.itemType,
+        itemType: item.itemType as "tv" | "movie",
         genres: item.genres,
+        tmdbVoteAverage: Number(item.tmdbVoteAverage) || 0,
+        rating: item.rating ?? "",
+        popularity: item.popularity ?? 0,
+        language: item.language ?? "",
+        numberOfSeasons: item.numberOfSeasons ?? 0,
+        numberOfEpisodes: item.numberOfEpisodes ?? 0,
+        summary: item.summary ?? "",
+        posterPath: item.posterPath ?? null,
+        backdropPath: item.backdropPath ?? null,
       }));
 
     return {

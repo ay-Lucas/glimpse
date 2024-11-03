@@ -9,6 +9,8 @@ import {
   serial,
   uuid,
   unique,
+  numeric,
+  doublePrecision,
 } from "drizzle-orm/pg-core";
 import type { AdapterAccountType } from "next-auth/adapters";
 
@@ -77,6 +79,15 @@ export const watchlistItems = pgTable("watchlistItems", {
   title: text("title").notNull(),
   itemType: text({ enum: ["tv", "movie"] }).notNull(),
   genres: text("genres").array().notNull(),
+  tmdbVoteAverage: doublePrecision(),
+  rating: text("rating"),
+  popularity: integer("popularity"),
+  language: text("language"),
+  numberOfSeasons: integer("numberOfSeasons"),
+  numberOfEpisodes: integer("numberOfEpisodes"),
+  summary: text("summary"),
+  posterPath: text("posterPath"),
+  backdropPath: text("backdropPath"),
 });
 
 export const watchlist = pgTable("watchlist", {

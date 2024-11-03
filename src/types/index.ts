@@ -27,4 +27,13 @@ export interface WatchlistItemI {
   title: string;
   itemType: "tv" | "movie";
   genres: string[];
+  tmdbVoteAverage: number;
+  rating: string;
+  popularity: number;
+  language: string;
+  numberOfSeasons: number;
+  numberOfEpisodes: number;
+  posterPath: string | null;
+  backdropPath: string | null;
+  summary: string;
 }
