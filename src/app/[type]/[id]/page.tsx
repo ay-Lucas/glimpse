@@ -110,9 +110,7 @@ export default async function ItemPage({
       for (let i = 0; i < data.number_of_seasons!; i++) {
         const episodeData = await getSeasonData(params.id, i + 1);
         episodesData.push(episodeData);
-        // console.log(episodeData);
       }
-      // console.log(episodesData[0]);
       item = {
         title: data.name,
         posterPath: data.poster_path,

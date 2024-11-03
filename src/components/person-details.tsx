@@ -18,7 +18,6 @@ function Expandable({ content }: { content: string }) {
   };
   useEffect(() => {
     setExpandable((ref.current?.clientHeight ?? 0) > CLAMPED_CLIENT_HEIGHT);
-    console.log(ref.current?.clientHeight);
   }, []);
   return (
     <div className={`text-md text-start leading-6 select-text`}>

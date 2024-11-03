@@ -15,11 +15,6 @@ export function Submit() {
 }
 
 export function ErrorMessage({ data }: { data: FormData }) {
-  // const { pending, data, method, action } = useFormStatus();
-  // console.log(data);
-  // console.log(action);
-  // return <div>{pending ? "Signing in..." : "Sign in"}</div>;
-  console.log();
   return <div>{data.entries().toArray().toString()}</div>;
 }
 

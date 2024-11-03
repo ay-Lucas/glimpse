@@ -37,8 +37,6 @@ export default async function Movies() {
     (item: MovieResult | TvResult) => isUnique(item, trendingMovies),
   );
   filteredPopularMovie?.forEach((item) => (item.media_type = "movie"));
-  console.log(filteredPopularMovie);
-  console.log(filteredPopularMovie);
   upcomingMoviesRes.results?.forEach((item) => (item.media_type = "movie"));
 
   return (

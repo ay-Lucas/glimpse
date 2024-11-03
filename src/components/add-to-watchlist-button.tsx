@@ -20,9 +20,6 @@ export async function AddToWatchlistButton({
   tmdbId: number;
   genres: string[];
 }) {
-  // console.log(
-  //   `user ID: ${userId}\nitemName: ${title} \nitemType: ${itemType} \nwatchListName: ${watchlistName} \nisLoggedIn: ${isLoggedIn} \ntmdbId ${tmdbId}`,
-  // );
   return (
     <>
       {isLoggedIn &&

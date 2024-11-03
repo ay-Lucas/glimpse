@@ -196,8 +196,6 @@ export async function addToDefaultWatchlist(
   try {
     let defaultWatchlist;
     defaultWatchlist = await getDefaultWatchlist(userId);
-    const all = await getWatchlistsAndItems(userId);
-    all.forEach((item) => console.log(item));
     if (!defaultWatchlist) {
       setFirstWatchlistAsDefault(userId);
       defaultWatchlist = await getDefaultWatchlist(userId);
@@ -211,7 +209,6 @@ export async function addToDefaultWatchlist(
       console.log("Item already exists");
       return null;
     }
-    console.log(existingItem);
     let result = await addToWatchlist(
       defaultWatchlist?.id!,
       tmdbId,
@@ -219,9 +216,6 @@ export async function addToDefaultWatchlist(
       itemType,
       genres,
     );
-    console.log("added " + result.at(0)?.title + " to Default watchlist");
-    // console.log(await getWatchlistItems(userId, defaultWatchlist?.id!));
-    console.log(await getWatchlists(userId));
     return result;
   } catch (error) {
     console.log(error);

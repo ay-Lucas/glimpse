@@ -33,7 +33,6 @@ export const WatchlistProvider = ({ children }: { children: ReactNode }) => {
       session?.user.id!,
     );
     setWatchlists([...watchlist]);
-    console.log("updated watchlists: ", watchlist);
   };
   // Render on mount and on user signin / login
   useEffect(() => {
