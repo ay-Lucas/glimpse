@@ -36,18 +36,6 @@ export async function AvatarDropdown() {
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">
         <DropdownMenuItem>
-          <Link href="/settings" className="w-full h-full">
-            <button
-              type="submit"
-              className="flex px-2 py-1.5 w-full focus:bg-accent"
-            >
-              <Settings className="mr-2 h-4 w-4" />
-              Settings
-            </button>
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem>
           <Link href={"/watchlist"} className="w-full h-full">
             <button
               type="submit"
@@ -55,6 +43,18 @@ export async function AvatarDropdown() {
             >
               <LucideList className="mr-2 h-4 w-4" />
               Watchlist
+            </button>
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem disabled>
+          <Link href="/settings" className="w-full h-full">
+            <button
+              type="submit"
+              className="flex px-2 py-1.5 w-full focus:bg-accent"
+            >
+              <Settings className="mr-2 h-4 w-4" />
+              Settings
             </button>
           </Link>
         </DropdownMenuItem>
