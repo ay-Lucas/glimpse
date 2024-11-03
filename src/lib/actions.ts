@@ -14,7 +14,7 @@ import { loginSchema } from "@/types/schema";
 import { db } from "@/db/index";
 import { and, asc, eq } from "drizzle-orm";
 import { users, watchlist, watchlistItems } from "@/db/schema";
-import { Watchlist } from "@/types";
+import { WatchlistI } from "@/types";
 const defaultValues = {
   email: "",
   password: "",
@@ -75,6 +75,13 @@ export async function signin(prevState: any, formData: FormData) {
 
 export async function signout() {
   await signOut();
+}
+
+export async function deleteItemFromWatchlist(
+  watchlistId: string,
+  watchlistItemId: string,
+) {
+  await deleteWatchlistItem(watchlistId, watchlistItemId);
 }
 
 export async function signup(prevState: any, formData: FormData) {
@@ -306,7 +313,7 @@ async function getWatchlists(userId: string) {
 
 export async function getWatchlistsAndItems(
   userId: string,
-): Promise<Watchlist[]> {
+): Promise<WatchlistI[]> {
   // Get the user's watchlists
   const watchlistsRes = await getWatchlists(userId);
 
@@ -326,7 +333,7 @@ export async function getWatchlistsAndItems(
     .where(eq(watchlist.userId, userId));
 
   // Organize watchlists and their items
-  const watchlists: Watchlist[] = watchlistsRes.map((watchlist) => {
+  const watchlists: WatchlistI[] = watchlistsRes.map((watchlist) => {
     const filteredItems = items
       .filter((item) => item.watchlistId === watchlist.id)
       .map((item) => ({

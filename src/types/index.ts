@@ -11,15 +11,15 @@ export interface CardTypes1 {
   result?: MovieResult | TvResult | PersonResult | Cast;
 }
 
-export interface Watchlist {
+export interface WatchlistI {
   id: string;
   watchlistName: string;
   createdAt: string;
   default: boolean;
-  items: WatchlistItem[];
+  items: WatchlistItemI[];
 }
 
-export interface WatchlistItem {
+export interface WatchlistItemI {
   id: number;
   watchlistId: string;
   itemId: string;
