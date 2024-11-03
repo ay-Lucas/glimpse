@@ -52,7 +52,7 @@ function getTrailer(videoArray: Array<Video>) {
   }
 }
 
-interface Item {
+export interface Item {
   title?: string;
   credits?: CreditsResponse;
   videos?: Array<Video>;
@@ -69,6 +69,11 @@ interface Item {
   details?: React.ReactNode;
   voteAverage?: number;
   media_type?: "tv" | "movie" | "person";
+  tmdbId: number;
+  popularity: number;
+  numberOfSeasons?: number;
+  numberOfEpisodes?: number;
+  language?: string;
 }
 
 export default async function ItemPage({
@@ -77,12 +82,11 @@ export default async function ItemPage({
   params: { type: "movie" | "tv" | "person"; id: number };
 }) {
   const data = await getData({ id: params.id }, params.type);
-  let item: Item = {};
+  let item: Item;
   let personDetails: boolean = false;
   let person: Person = { media_type: "person" };
   const episodesData: Array<TvSeasonResponse> = [];
   data.media_type = params.type;
-
   switch (data.media_type) {
     case "movie":
       // console.log(data);
@@ -103,6 +107,9 @@ export default async function ItemPage({
             (item) => item.iso_3166_1 === "US" && item.certification !== "",
           )[0]?.certification ?? "",
         media_type: "movie",
+        tmdbId: params.id,
+        popularity: data.popularity,
+        language: data.original_language!,
       };
       break;
     case "tv":
@@ -128,12 +135,22 @@ export default async function ItemPage({
             (item) => item.iso_3166_1 === "US" && item.rating !== "",
           )[0]?.rating ?? "",
         media_type: "tv",
+        tmdbId: params.id,
+        popularity: data.popularity ?? 0,
+        numberOfSeasons: episodesData.length,
+        numberOfEpisodes: episodesData.reduce(
+          (total, season) => total + (season.episodes?.length ?? 0),
+          0,
+        ),
+        language: data.original_language!,
       };
       break;
     case "person":
       item = {
         posterPath: data.profile_path,
         media_type: "person",
+        tmdbId: params.id,
+        popularity: data.popularity ?? 0,
       };
       person = data;
       personDetails = true;
@@ -195,15 +212,18 @@ export default async function ItemPage({
                   </>
                 )}
               </div>
-              <AddToWatchlistButton
-                userId={session?.user.id}
-                title={item.title!}
-                itemType={item.media_type!}
-                watchlistName={"Default"}
-                isLoggedIn={session !== undefined}
-                tmdbId={params.id}
-                genres={item.genres?.map((item) => item.name ?? "none")!}
-              />
+              {item.media_type !== "person" && item.media_type && (
+                <AddToWatchlistButton
+                  userId={session?.user.id!}
+                  watchlistItem={item}
+                  // watchlistItem={{
+                  //   title: item.title!,
+                  //   genres: item.genres?.map((item) => item.name ?? "none")!,
+                  //   itemType: item.media_type,
+                  // }}
+                  isLoggedIn={session !== undefined}
+                />
+              )}
             </div>
             <div className="pt-3 flex flex-col md:flex-row w-full md:space-y-0 space-y-4">
               <div className="w-full md:w-1/2">
