@@ -19,6 +19,13 @@ export async function getUserFromDb(email: string) {
   return user;
 }
 
+export async function getUserFromDbUserId(userId: string) {
+  const user = await db.query.users.findFirst({
+    where: eq(users.email, userId),
+  });
+  return user;
+}
+
 export async function addUserToDb(email: string, saltedPassword: string) {
   const user = await db
     .insert(users)
