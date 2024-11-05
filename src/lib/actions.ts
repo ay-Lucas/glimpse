@@ -180,6 +180,26 @@ export async function deleteWatchlistItem(
   return result;
 }
 
+export async function deleteWatchlist(userId: string, watchlistId: string) {
+  try {
+    // Delete watchlist items referencing watchlistId
+    const itemRes = await db
+      .delete(watchlistItems)
+      .where(and(eq(watchlistItems.watchlistId, watchlistId)))
+      .returning();
+    // Delete watchlist
+    const watchlistRes = await db
+      .delete(watchlist)
+      .where(and(eq(watchlist.id, watchlistId), eq(watchlist.userId, userId)))
+      .returning();
+    console.log(watchlistRes);
+    console.log(itemRes);
+    return watchlistRes;
+  } catch (error) {
+    console.log("Failed to delete watchlist", error);
+  }
+}
+
 async function deleteAllWatchlistItems() {
   try {
     // Execute the delete command

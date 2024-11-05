@@ -1,6 +1,6 @@
 "use client";
 import { Watchlist } from "@/components/watchlist";
-import { useWatchlist, WatchlistProvider } from "@/context/watchlist";
+import { useWatchlist } from "@/context/watchlist";
 
 export default function WatchlistPage() {
   const { watchlists } = useWatchlist();

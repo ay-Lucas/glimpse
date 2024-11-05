@@ -4,10 +4,13 @@ import Link from "next/link";
 import { WatchlistDropdown } from "./watchlist-dropdown";
 import Image from "next/image";
 import { ChangeEvent, useEffect, useState } from "react";
-import { setWatchlistName } from "@/lib/actions";
+import { deleteWatchlist, setWatchlistName } from "@/lib/actions";
 import { useSession } from "next-auth/react";
 import { Session } from "next-auth";
 import { watchlistNameSchema } from "@/types/schema";
+import { Edit2, Edit2Icon, EditIcon, X } from "lucide-react";
+import { Input } from "./ui/input";
+import { Button } from "./ui/button";
 
 function EditableWatchlistTitle({
   initialTitle,
@@ -46,10 +49,12 @@ function EditableWatchlistTitle({
   };
 
   return (
-    <div className="text-xl text-center">
+    <div className="text-2xl items-center">
       {isEditing ? (
-        <input
+        <Input
           type="text"
+          size={10}
+          className="text-2xl text-center"
           value={title}
           onChange={handleTitleChange}
           onBlur={saveTitle}
@@ -57,25 +62,87 @@ function EditableWatchlistTitle({
           autoFocus
         />
       ) : (
-        <h2 onClick={() => setIsEditing(true)}>{title}</h2>
+        <div
+          onClick={() => setIsEditing(true)}
+          className="inline-flex items-center p-1.5"
+        >
+          <h2 className="mr-2">{title}</h2>
+          <Edit2Icon size={17} />
+        </div>
       )}
     </div>
   );
 }
 
+interface WatchlistDeleteConfirmationProps {
+  onConfirm: () => Promise<void> | void; // Accepts either a function that returns a Promise or a void
+}
+
+function WatchlistDeleteConfirmation({
+  onConfirm,
+}: WatchlistDeleteConfirmationProps) {
+  const [showModal, setShowModal] = useState<boolean>(false);
+
+  const handleDeleteClick = () => setShowModal(true);
+  const handleClose = () => setShowModal(false);
+
+  const confirmDelete = async () => {
+    await onConfirm();
+    setShowModal(false);
+  };
+
+  return (
+    <>
+      <button className="absolute">
+        <X
+          className="text-gray-400 hover:text-gray-100 transition-colors"
+          onClick={handleDeleteClick}
+          size={30}
+        />
+      </button>
+
+      {showModal && (
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-background rounded-lg p-6 max-w-md mx-auto shadow-lg text-center space-y-4 mb-40">
+            <h3 className="text-lg font-semibold">Delete Confirmation</h3>
+            <p>Are you sure you want to delete this watchlist?</p>
+            <div className="flex justify-center space-x-4">
+              <Button variant="destructive" onClick={confirmDelete}>
+                Yes, Delete
+              </Button>
+              <Button onClick={handleClose} variant="default">
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
 export function Watchlist({ watchlist }: { watchlist: WatchlistI }) {
   const { data: session } = useSession();
+  function onDeleteWatchlistConfirm() {
+    const res = deleteWatchlist(session!.user.id, watchlist.id);
+    console.log(res);
+  }
   return (
     <div className="p-3 bg-background border-secondary border rounded-2xl backdrop-blur-3xl">
       {watchlist ? (
         <>
           {watchlist.items.length > 0 ? (
-            <div className="w-full p-3">
-              <EditableWatchlistTitle
-                initialTitle={watchlist.watchlistName}
-                session={session!}
-                watchlistId={watchlist.id}
+            <div>
+              <WatchlistDeleteConfirmation
+                onConfirm={onDeleteWatchlistConfirm}
               />
+              <div className="flex justify-center p-3">
+                <EditableWatchlistTitle
+                  initialTitle={watchlist.watchlistName}
+                  session={session!}
+                  watchlistId={watchlist.id}
+                />
+              </div>
               <div className="grid space-y-2">
                 <div className="grid grid-cols-[1fr_75px_1fr_1fr_1fr_auto] gap-6 px-3 py-2 items-center">
                   <span className="text-gray-500">Title</span>
