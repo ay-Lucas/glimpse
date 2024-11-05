@@ -11,21 +11,21 @@ import { watchlistNameSchema } from "@/types/schema";
 
 function EditableWatchlistTitle({
   initialTitle,
-  onSave,
   session,
   watchlistId,
 }: {
   initialTitle: string;
-  onSave: (newTitle: string) => void;
   session: Session;
   watchlistId: string;
 }) {
   const [title, setTitle] = useState(initialTitle);
   const [originalTitle, setOriginalTitle] = useState(initialTitle);
   const [isEditing, setIsEditing] = useState(false);
+
   useEffect(() => {
     setOriginalTitle(title);
-  }, []);
+  }, [isEditing]);
+
   const handleTitleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setTitle(e.target.value);
   };
@@ -36,15 +36,12 @@ function EditableWatchlistTitle({
       setTitle(originalTitle);
       return;
     }
-    const res = await setWatchlistName(session.user.id, watchlistId, title);
-    onSave(title);
-    console.log(res);
+    await setWatchlistName(session.user.id, watchlistId, title);
   };
   const isInputValid = (string: string) => {
     const validatedFields = watchlistNameSchema.safeParse({
       name: string,
     });
-    console.log(validatedFields);
     return validatedFields.success;
   };
 
@@ -76,7 +73,6 @@ export function Watchlist({ watchlist }: { watchlist: WatchlistI }) {
             <div className="w-full p-3">
               <EditableWatchlistTitle
                 initialTitle={watchlist.watchlistName}
-                onSave={(newTitle) => console.log("Save new title:", newTitle)}
                 session={session!}
                 watchlistId={watchlist.id}
               />

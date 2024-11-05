@@ -18,5 +18,6 @@ export const watchlistNameSchema = z.object({
     .string()
     .trim()
     .min(1, { message: "Watchlist name must not be empty!" })
+    .regex(/^[A-Za-z0-9].*$/, "Title must start with a letter or number")
     .max(30, { message: "Wachlist name too long!" }),
 });
