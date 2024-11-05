@@ -10,7 +10,7 @@ import {
   signOut,
 } from "@/auth";
 import { redirect } from "next/navigation";
-import { loginSchema } from "@/types/schema";
+import { loginSchema, watchlistNameSchema } from "@/types/schema";
 import { db } from "@/db/index";
 import { and, asc, eq } from "drizzle-orm";
 import { users, watchlist, watchlistItems } from "@/db/schema";
@@ -227,6 +227,43 @@ export async function addToDefaultWatchlist(
   }
 }
 
+export async function setWatchlistName(
+  userId: string,
+  watchlistId: string,
+  newWatchlistName: string,
+) {
+  const validatedFields = watchlistNameSchema.safeParse({
+    name: newWatchlistName,
+  });
+
+  if (!validatedFields.success) {
+    return {
+      message: "validation error",
+      errors: validatedFields.error.flatten().fieldErrors,
+    };
+  }
+
+  try {
+    const [watchlistToChange] = await db
+      .update(watchlist)
+      .set({ watchlistName: validatedFields.data.name })
+      .where(and(eq(watchlist.userId, userId), eq(watchlist.id, watchlistId)))
+      .returning();
+
+    if (watchlistToChange?.watchlistName === newWatchlistName)
+      return watchlistToChange;
+  } catch (error) {
+    console.log("Failed to set watchlist name", error);
+  }
+}
+
+export async function getUserFromDbUUID(UUID: string) {
+  const user = await db.query.users.findFirst({
+    where: eq(users.email, UUID),
+  });
+  return user;
+}
+
 async function setFirstWatchlistAsDefault(userId: string): Promise<void> {
   // Step 1: Check if the user already has a default watchlist
   const [existingDefault] = await db
@@ -311,6 +348,20 @@ async function getWatchlistItem(
       and(eq(watchlist.userId, userId), eq(watchlistItems.tmdbId, tmdbId)),
     ); // where expects a single condition argument
 
+  return items;
+}
+
+async function getWatchlist(userId: string, watchlistId: string) {
+  const items = await db
+    .select({
+      id: watchlist.id,
+      watchlistName: watchlist.watchlistName,
+      userid: watchlist.userId,
+      createdAt: watchlist.createdAt,
+      default: watchlist.default,
+    })
+    .from(watchlist)
+    .where(eq(watchlist.userId, userId));
   return items;
 }
 

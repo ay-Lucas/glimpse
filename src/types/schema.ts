@@ -12,3 +12,11 @@ export const loginSchema = z.object({
     .min(1, { message: "Password required!" })
     .min(8, { message: "Password must have at least 8 characters!" }),
 });
+
+export const watchlistNameSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(1, { message: "Watchlist name must not be empty!" })
+    .max(30, { message: "Wachlist name too long!" }),
+});

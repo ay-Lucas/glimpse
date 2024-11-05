@@ -3,17 +3,83 @@ import { WatchlistI } from "@/types";
 import Link from "next/link";
 import { WatchlistDropdown } from "./watchlist-dropdown";
 import Image from "next/image";
+import { ChangeEvent, useEffect, useState } from "react";
+import { setWatchlistName } from "@/lib/actions";
+import { useSession } from "next-auth/react";
+import { Session } from "next-auth";
+import { watchlistNameSchema } from "@/types/schema";
+
+function EditableWatchlistTitle({
+  initialTitle,
+  onSave,
+  session,
+  watchlistId,
+}: {
+  initialTitle: string;
+  onSave: (newTitle: string) => void;
+  session: Session;
+  watchlistId: string;
+}) {
+  const [title, setTitle] = useState(initialTitle);
+  const [originalTitle, setOriginalTitle] = useState(initialTitle);
+  const [isEditing, setIsEditing] = useState(false);
+  useEffect(() => {
+    setOriginalTitle(title);
+  }, []);
+  const handleTitleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setTitle(e.target.value);
+  };
+
+  const saveTitle = async () => {
+    setIsEditing(false);
+    if (!isInputValid(title)) {
+      setTitle(originalTitle);
+      return;
+    }
+    const res = await setWatchlistName(session.user.id, watchlistId, title);
+    onSave(title);
+    console.log(res);
+  };
+  const isInputValid = (string: string) => {
+    const validatedFields = watchlistNameSchema.safeParse({
+      name: string,
+    });
+    console.log(validatedFields);
+    return validatedFields.success;
+  };
+
+  return (
+    <div className="text-xl text-center">
+      {isEditing ? (
+        <input
+          type="text"
+          value={title}
+          onChange={handleTitleChange}
+          onBlur={saveTitle}
+          onKeyDown={(e) => e.key === "Enter" && saveTitle()}
+          autoFocus
+        />
+      ) : (
+        <h2 onClick={() => setIsEditing(true)}>{title}</h2>
+      )}
+    </div>
+  );
+}
 
 export function Watchlist({ watchlist }: { watchlist: WatchlistI }) {
+  const { data: session } = useSession();
   return (
     <div className="p-3 bg-background border-secondary border rounded-2xl backdrop-blur-3xl">
       {watchlist ? (
         <>
           {watchlist.items.length > 0 ? (
             <div className="w-full p-3">
-              <h2 className="text-2xl text-center border-secondary">
-                {watchlist.watchlistName}
-              </h2>
+              <EditableWatchlistTitle
+                initialTitle={watchlist.watchlistName}
+                onSave={(newTitle) => console.log("Save new title:", newTitle)}
+                session={session!}
+                watchlistId={watchlist.id}
+              />
               <div className="grid space-y-2">
                 <div className="grid grid-cols-[1fr_75px_1fr_1fr_1fr_auto] gap-6 px-3 py-2 items-center">
                   <span className="text-gray-500">Title</span>
@@ -61,6 +127,7 @@ export function Watchlist({ watchlist }: { watchlist: WatchlistI }) {
                       <WatchlistDropdown
                         watchlistId={item.watchlistId}
                         watchlistItemId={item.itemId}
+                        session={session!}
                       />
                     </div>
                   </div>

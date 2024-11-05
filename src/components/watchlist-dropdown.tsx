@@ -5,26 +5,18 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
-import { deleteItemFromWatchlist } from "@/lib/actions";
 import { useWatchlist } from "@/context/watchlist";
-import { useSession } from "next-auth/react";
-import {
-  Ellipsis,
-  EllipsisVertical,
-  LucideOption,
-  MenuIcon,
-  Option,
-  OptionIcon,
-} from "lucide-react";
-import { IoOptions, IoOptionsOutline } from "react-icons/io5";
+import { EllipsisVertical } from "lucide-react";
+import { Session } from "next-auth";
 
 export function WatchlistDropdown({
   watchlistItemId,
   watchlistId,
+  session,
 }: {
   watchlistItemId: string;
   watchlistId: string;
+  session: Session;
 }) {
   return (
     <DropdownMenu>
@@ -38,6 +30,7 @@ export function WatchlistDropdown({
           <DeleteWatchlistItem
             watchlistId={watchlistId}
             watchlistItemId={watchlistItemId}
+            session={session}
           />
         </DropdownMenuItem>
       </DropdownMenuContent>
@@ -48,11 +41,12 @@ export function WatchlistDropdown({
 function DeleteWatchlistItem({
   watchlistItemId,
   watchlistId,
+  session,
 }: {
   watchlistItemId: string;
   watchlistId: string;
+  session: Session;
 }) {
-  const { data: session, status } = useSession();
   const { deleteItem } = useWatchlist();
 
   const handleDelete = async () => {
