@@ -21,14 +21,14 @@ export default function WatchlistPage() {
     <main>
       <div className="md:container pt-10">
         <div className="grid grid-cols-3 items-center">
-          <div className="col-start-3 col-end-4 justify-self-end">
-            <CreateWatchlistButton handleClick={addWatchlist} />
-          </div>
           <h1 className="text-2xl col-start-2 col-end-3 text-center">
             Watchlists
           </h1>
+          <div className="col-start-3 col-end-4 justify-self-end">
+            <CreateWatchlistButton handleClick={addWatchlist} />
+          </div>
         </div>
-        <div className="grid mx-auto gap-6 p-4 pt-10">
+        <div className="grid mx-auto gap-6 pt-10">
           {watchlists && watchlists.length > 0 ? (
             watchlists.map((watchlist, index) => (
               <Watchlist watchlist={watchlist} key={index} />
