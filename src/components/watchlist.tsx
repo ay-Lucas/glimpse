@@ -11,8 +11,9 @@ import { watchlistNameSchema } from "@/types/schema";
 import { Edit2, Edit2Icon, EditIcon, X } from "lucide-react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
+import { useWatchlist } from "@/context/watchlist";
 
-function EditableWatchlistTitle({
+export function EditableWatchlistTitle({
   initialTitle,
   session,
   watchlistId,
@@ -93,7 +94,7 @@ function WatchlistDeleteConfirmation({
 
   return (
     <>
-      <button className="absolute">
+      <button className="absolute top-4">
         <X
           className="text-gray-400 hover:text-gray-100 transition-colors"
           onClick={handleDeleteClick}
@@ -123,26 +124,23 @@ function WatchlistDeleteConfirmation({
 
 export function Watchlist({ watchlist }: { watchlist: WatchlistI }) {
   const { data: session } = useSession();
-  function onDeleteWatchlistConfirm() {
-    const res = deleteWatchlist(session!.user.id, watchlist.id);
-    console.log(res);
-  }
+  const { onDeleteWatchlist } = useWatchlist();
   return (
     <div className="p-3 bg-background border-secondary border rounded-2xl backdrop-blur-3xl">
       {watchlist ? (
         <>
+          <div className="flex justify-center p-3">
+            <EditableWatchlistTitle
+              initialTitle={watchlist.watchlistName}
+              session={session!}
+              watchlistId={watchlist.id}
+            />
+          </div>
+          <WatchlistDeleteConfirmation
+            onConfirm={() => onDeleteWatchlist(watchlist.id)}
+          />
           {watchlist.items.length > 0 ? (
             <div>
-              <WatchlistDeleteConfirmation
-                onConfirm={onDeleteWatchlistConfirm}
-              />
-              <div className="flex justify-center p-3">
-                <EditableWatchlistTitle
-                  initialTitle={watchlist.watchlistName}
-                  session={session!}
-                  watchlistId={watchlist.id}
-                />
-              </div>
               <div className="grid space-y-2">
                 <div className="grid grid-cols-[1fr_75px_1fr_1fr_1fr_auto] gap-6 px-3 py-2 items-center">
                   <span className="text-gray-500">Title</span>

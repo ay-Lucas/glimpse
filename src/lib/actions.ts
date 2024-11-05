@@ -152,7 +152,7 @@ async function getUserIdByEmail(email: string): Promise<string | null> {
 
   return user ? user.id : null; // Returns the userId or null if not found
 }
-async function createWatchlist(userId: string, watchlistName: string) {
+export async function createWatchlist(userId: string, watchlistName: string) {
   const result = await db
     .insert(watchlist)
     .values({
@@ -192,8 +192,6 @@ export async function deleteWatchlist(userId: string, watchlistId: string) {
       .delete(watchlist)
       .where(and(eq(watchlist.id, watchlistId), eq(watchlist.userId, userId)))
       .returning();
-    console.log(watchlistRes);
-    console.log(itemRes);
     return watchlistRes;
   } catch (error) {
     console.log("Failed to delete watchlist", error);

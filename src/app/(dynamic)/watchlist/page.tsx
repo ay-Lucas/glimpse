@@ -1,21 +1,40 @@
 "use client";
+import { Button } from "@/components/ui/button";
 import { Watchlist } from "@/components/watchlist";
 import { useWatchlist } from "@/context/watchlist";
+import { createWatchlist } from "@/lib/actions";
+import { useSession } from "next-auth/react";
+
+function CreateWatchlistButton({ handleClick }: { handleClick: () => void }) {
+  return (
+    <Button onClick={handleClick} variant="default">
+      Create Watchlist
+    </Button>
+  );
+}
 
 export default function WatchlistPage() {
-  const { watchlists } = useWatchlist();
+  const { data: session } = useSession();
+  const { watchlists, addWatchlist } = useWatchlist();
 
   return (
     <main>
       <div className="md:container pt-10">
-        <h1 className="text-2xl text-center w-full">Watchlists</h1>
+        <div className="grid grid-cols-3 items-center">
+          <div className="col-start-3 col-end-4 justify-self-end">
+            <CreateWatchlistButton handleClick={addWatchlist} />
+          </div>
+          <h1 className="text-2xl col-start-2 col-end-3 text-center">
+            Watchlists
+          </h1>
+        </div>
         <div className="grid mx-auto gap-6 p-4 pt-10">
           {watchlists && watchlists.length > 0 ? (
             watchlists.map((watchlist, index) => (
               <Watchlist watchlist={watchlist} key={index} />
             ))
           ) : (
-            <div>No Results</div>
+            <div className="text-center">You have 0 watchlists</div>
           )}
         </div>
       </div>
