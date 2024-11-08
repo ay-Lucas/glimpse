@@ -75,7 +75,7 @@ export const watchlistItems = pgTable("watchlistItems", {
   id: serial("id").primaryKey(),
   watchlistId: uuid("watchlistId").references(() => watchlist.id),
   itemId: uuid("itemId").default(sql`gen_random_uuid()`), // ID of the item being watched
-  tmdbId: integer("tmdbId").unique().notNull(),
+  tmdbId: integer("tmdbId").notNull(),
   title: text("title").notNull(),
   itemType: text({ enum: ["tv", "movie"] }).notNull(),
   genres: text("genres").array().notNull(),

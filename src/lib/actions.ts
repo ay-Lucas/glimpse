@@ -14,8 +14,8 @@ import { loginSchema, watchlistNameSchema } from "@/types/schema";
 import { db } from "@/db/index";
 import { and, asc, eq } from "drizzle-orm";
 import { users, watchlist, watchlistItems } from "@/db/schema";
-import { WatchlistI } from "@/types";
-import { Item } from "@/app/[type]/[id]/page";
+import { WatchlistI, WatchlistSchemaI } from "@/types";
+import { Item } from "@/types";
 const defaultValues = {
   email: "",
   password: "",
@@ -164,16 +164,37 @@ export async function createWatchlist(userId: string, watchlistName: string) {
   return result; // Returns the newly created watchlist entry
 }
 
+/** This function determines the type of the `watchlistItemId` parameter and uses the appropriate
+ * field (`itemId` or `tmdbId`) to locate and delete the item in the `watchlistItems` table.
+ */
 export async function deleteWatchlistItem(
   watchlistId: string,
-  watchlistItemId: string,
+  watchlistItemId: string | number,
 ) {
   const result = await db
     .delete(watchlistItems)
     .where(
       and(
         eq(watchlistItems.watchlistId, watchlistId),
-        eq(watchlistItems.itemId, watchlistItemId),
+        typeof watchlistItemId === "string"
+          ? eq(watchlistItems.itemId, watchlistItemId)
+          : eq(watchlistItems.tmdbId, watchlistItemId),
+      ),
+    )
+    .returning();
+  return result;
+}
+
+export async function deleteWatchlistItemTmdbId(
+  watchlistId: string,
+  tmdbId: number,
+) {
+  const result = await db
+    .delete(watchlistItems)
+    .where(
+      and(
+        eq(watchlistItems.watchlistId, watchlistId),
+        eq(watchlistItems.tmdbId, tmdbId),
       ),
     )
     .returning();
@@ -368,8 +389,10 @@ async function getWatchlistItem(
 
   return items;
 }
-
-async function getWatchlist(userId: string, watchlistId: string) {
+export async function getWatchlist(
+  userId: string,
+  watchlistId: string,
+): Promise<WatchlistSchemaI[]> {
   const items = await db
     .select({
       id: watchlist.id,
@@ -379,11 +402,12 @@ async function getWatchlist(userId: string, watchlistId: string) {
       default: watchlist.default,
     })
     .from(watchlist)
-    .where(eq(watchlist.userId, userId));
+    .where(and(eq(watchlist.userId, userId), eq(watchlist.id, watchlistId)))
+    .limit(1);
   return items;
 }
 
-async function getWatchlists(userId: string) {
+export async function getWatchlists(userId: string) {
   const items = await db
     .select({
       id: watchlist.id,

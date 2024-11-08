@@ -7,24 +7,29 @@ import {
   useEffect,
 } from "react";
 import {
+  addToWatchlist,
   createWatchlist,
   deleteWatchlist,
   deleteWatchlistItem,
   getWatchlistsAndItems,
 } from "@/lib/actions";
-import { WatchlistI, WatchlistItemI } from "@/types";
+import { Item, WatchlistI, WatchlistItemI } from "@/types";
 import { useSession } from "next-auth/react";
 
 interface WatchlistContextType {
   watchlists: WatchlistI[];
   deleteItem: (
     watchlistId: string,
-    watchlistItemId: string,
+    watchlistItemId: string | number,
     userId: string,
   ) => Promise<void>;
   fetchWatchlists: () => Promise<void>;
   addWatchlist: () => Promise<void>;
   onDeleteWatchlist: (watchlistId: string) => Promise<void>;
+  addItemToWatchlist: (
+    watchlistId: string,
+    watchlistItem: Item,
+  ) => Promise<boolean>;
 }
 
 const WatchlistContext = createContext<WatchlistContextType | undefined>(
@@ -46,7 +51,12 @@ export const WatchlistProvider = ({ children }: { children: ReactNode }) => {
     if (session?.user.id) fetchWatchlists();
   }, [session?.user.id]);
 
-  const deleteItem = async (watchlistId: string, watchlistItemId: string) => {
+  /** watchlistItemId is can be itemId or tmdbId
+   */
+  const deleteItem = async (
+    watchlistId: string,
+    watchlistItemId: string | number,
+  ) => {
     await deleteWatchlistItem(watchlistId, watchlistItemId);
     await fetchWatchlists();
   };
@@ -76,6 +86,15 @@ export const WatchlistProvider = ({ children }: { children: ReactNode }) => {
       setWatchlists(updatedWatchlists);
     }
   };
+  const addItemToWatchlist = async (
+    watchlistId: string,
+    watchlistItem: Item,
+  ) => {
+    const res = await addToWatchlist(watchlistId, watchlistItem);
+    // setWatchlists([...watchlists]);
+    fetchWatchlists();
+    return res !== undefined;
+  };
 
   return (
     <WatchlistContext.Provider
@@ -85,6 +104,7 @@ export const WatchlistProvider = ({ children }: { children: ReactNode }) => {
         fetchWatchlists,
         addWatchlist,
         onDeleteWatchlist,
+        addItemToWatchlist,
       }}
     >
       {children}

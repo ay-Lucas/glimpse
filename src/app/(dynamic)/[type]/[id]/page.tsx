@@ -36,7 +36,7 @@ import JustWatchLogo from "@/../public/justwatch-logo.svg";
 import { SeasonAccordion } from "../_components/season-accordion";
 import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";
-import { AddToWatchlistButton } from "@/components/add-to-watchlist-button";
+import { AddToWatchlistDropdown } from "@/components/add-to-watchlist-button";
 import { getDefaultWatchlist, getWatchlists } from "@/lib/actions";
 import { Item } from "@/types";
 import { useWatchlist } from "@/context/watchlist";
@@ -201,16 +201,18 @@ export default async function ItemPage({
                 )}
               </div>
               {item.media_type !== "person" &&
-                item.media_type &&
-                userWatchlists && (
-                  <AddToWatchlistButton
-                    userId={session?.user.id!}
-                    watchlistItem={item}
-                    watchlistsWithItem={watchlistsWithItem}
-                    isLoggedIn={session !== undefined}
-                    userWatchlists={userWatchlists}
-                  />
-                )}
+              item.media_type &&
+              userWatchlists &&
+              session ? (
+                <AddToWatchlistDropdown
+                  userId={session.user.id}
+                  watchlistItem={item}
+                />
+              ) : (
+                <Link href={"/signin"}>
+                  <Button variant="secondary">Add to Watchlist</Button>
+                </Link>
+              )}
             </div>
             <div className="pt-3 flex flex-col md:flex-row w-full md:space-y-0 space-y-4">
               <div className="w-full md:w-1/2">
