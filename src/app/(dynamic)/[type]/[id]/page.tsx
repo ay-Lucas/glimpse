@@ -4,6 +4,7 @@ import {
   getRecommendations,
   getReviews,
   getSeasonData,
+  getWatchlistsWithItem,
 } from "./actions";
 import { Reviews } from "../_components/reviews";
 import { Backdrop } from "../_components/backdrop";
@@ -36,7 +37,9 @@ import { SeasonAccordion } from "../_components/season-accordion";
 import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";
 import { AddToWatchlistButton } from "@/components/add-to-watchlist-button";
-import { getDefaultWatchlist } from "@/lib/actions";
+import { getDefaultWatchlist, getWatchlists } from "@/lib/actions";
+import { Item } from "@/types";
+import { useWatchlist } from "@/context/watchlist";
 
 function getTrailer(videoArray: Array<Video>) {
   const trailer: Array<Video> = videoArray.filter(
@@ -50,30 +53,6 @@ function getTrailer(videoArray: Array<Video>) {
     );
     return teaser[0];
   }
-}
-
-export interface Item {
-  title?: string;
-  credits?: CreditsResponse;
-  videos?: Array<Video>;
-  videoPath?: string;
-  backdropPath?: string;
-  posterPath?: string;
-  trailerPath?: string;
-  genres?: Array<Genre>;
-  recommendations?: MovieResultsResponse | TvResultsResponse;
-  reviews?: MovieReviewsResponse | TvReviewsResponse;
-  rating?: string;
-  overview?: string;
-  releaseDate?: string;
-  details?: React.ReactNode;
-  voteAverage?: number;
-  media_type?: "tv" | "movie" | "person";
-  tmdbId: number;
-  popularity: number;
-  numberOfSeasons?: number;
-  numberOfEpisodes?: number;
-  language?: string;
 }
 
 export default async function ItemPage({
@@ -107,7 +86,7 @@ export default async function ItemPage({
             (item) => item.iso_3166_1 === "US" && item.certification !== "",
           )[0]?.certification ?? "",
         media_type: "movie",
-        tmdbId: params.id,
+        tmdbId: Number(params.id),
         popularity: data.popularity,
         language: data.original_language!,
       };
@@ -135,7 +114,7 @@ export default async function ItemPage({
             (item) => item.iso_3166_1 === "US" && item.rating !== "",
           )[0]?.rating ?? "",
         media_type: "tv",
-        tmdbId: params.id,
+        tmdbId: Number(params.id),
         popularity: data.popularity ?? 0,
         numberOfSeasons: episodesData.length,
         numberOfEpisodes: episodesData.reduce(
@@ -149,7 +128,7 @@ export default async function ItemPage({
       item = {
         posterPath: data.profile_path,
         media_type: "person",
-        tmdbId: params.id,
+        tmdbId: Number(params.id),
         popularity: data.popularity ?? 0,
       };
       person = data;
@@ -157,6 +136,15 @@ export default async function ItemPage({
       break;
   }
   const session = await auth();
+  const watchlistsWithItem = await getWatchlistsWithItem(
+    item,
+    session?.user.id!,
+  );
+  let userWatchlists;
+  if (session) {
+    userWatchlists = await getWatchlists(session.user.id);
+  }
+  // console.log(watchlistsWithItem);
   // console.log(await getDefaultWatchlist(session?.user.id!));
   // console.log(session);
   const info = data as any;
@@ -179,7 +167,7 @@ export default async function ItemPage({
         <div className="relative px-3 md:container items-end pt-16">
           <div className="items-end pb-5 md:pt-0 px-0 lg:px-40 space-y-5">
             <div>
-              <div className="flex md:flex-row h-full md:h-3/4 z-10 md:items-center md:space-x-5">
+              <div className="flex md:flex-row h-full md:h-3/4 z-10 md:items-center md:space-x-5 pb-3">
                 {item.posterPath && (
                   <Poster
                     src={`https://image.tmdb.org/t/p/original${item.posterPath}`}
@@ -212,18 +200,17 @@ export default async function ItemPage({
                   </>
                 )}
               </div>
-              {item.media_type !== "person" && item.media_type && (
-                <AddToWatchlistButton
-                  userId={session?.user.id!}
-                  watchlistItem={item}
-                  // watchlistItem={{
-                  //   title: item.title!,
-                  //   genres: item.genres?.map((item) => item.name ?? "none")!,
-                  //   itemType: item.media_type,
-                  // }}
-                  isLoggedIn={session !== undefined}
-                />
-              )}
+              {item.media_type !== "person" &&
+                item.media_type &&
+                userWatchlists && (
+                  <AddToWatchlistButton
+                    userId={session?.user.id!}
+                    watchlistItem={item}
+                    watchlistsWithItem={watchlistsWithItem}
+                    isLoggedIn={session !== undefined}
+                    userWatchlists={userWatchlists}
+                  />
+                )}
             </div>
             <div className="pt-3 flex flex-col md:flex-row w-full md:space-y-0 space-y-4">
               <div className="w-full md:w-1/2">

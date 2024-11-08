@@ -1,5 +1,7 @@
 "server only";
+import { getWatchlistsAndItems } from "@/lib/actions";
 import { baseApiUrl, options } from "@/lib/constants";
+import { Item } from "@/types";
 import {
   FindRequest,
   IdAppendToResponseRequest,
@@ -11,6 +13,7 @@ import {
   TvResultsResponse,
   TvReviewsResponse,
 } from "@/types/request-types";
+import { Session } from "next-auth";
 
 export async function getData(
   request: FindRequest,
@@ -83,4 +86,21 @@ export async function getSeasonData(id: number, seasonNumber: number) {
     options,
   );
   return res.json();
+}
+
+export async function getWatchlistsWithItem(
+  watchlistItem: Item,
+  userId: string,
+) {
+  const watchlists = await getWatchlistsAndItems(userId);
+  // const watchlistsWithItem = watchlists.map((watchlist) => {
+  //   if (watchlist.items.some((item) => item.tmdbId === watchlistItem.tmdbId)) {
+  //     return watchlist;
+  //   }
+  // });
+  const watchlistsWithItem = watchlists.filter((watchlist) =>
+    watchlist.items.some((item) => item.tmdbId === watchlistItem.tmdbId),
+  );
+  if (watchlistsWithItem.length < 1) return undefined;
+  return watchlistsWithItem;
 }
