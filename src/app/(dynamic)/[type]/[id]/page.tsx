@@ -167,7 +167,7 @@ export default async function ItemPage({
         <div className="relative px-3 md:container items-end pt-16">
           <div className="items-end pb-5 md:pt-0 px-0 lg:px-40 space-y-5">
             <div>
-              <div className="flex md:flex-row h-full md:h-3/4 z-10 md:items-center md:space-x-5 pb-3">
+              <div className="flex flex-col md:flex-row h-full md:h-3/4 z-10 md:items-center md:space-x-5 pb-3">
                 {item.posterPath && (
                   <Poster
                     src={`https://image.tmdb.org/t/p/original${item.posterPath}`}

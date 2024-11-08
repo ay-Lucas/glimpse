@@ -10,9 +10,9 @@ export function Poster({ src }: { src: string }) {
       width={190}
       height={284}
       src={src}
-      sizes="(max-width: 768px) 50vw, (max-width: 1200px) 20vw"
+      sizes="(max-width: 768px) 40vw, (max-width: 1200px) 80vw"
       onLoad={() => setImageLoading(false)}
-      className={`object-cover rounded-xl mx-auto md:m-0 p-5 md:p-0 ${isImageLoading ? "blur-img" : "remove-blur"}`}
+      className={`object-cover rounded-xl mx-auto mb-4 md:m-0 ${isImageLoading ? "blur-img" : "remove-blur"}`}
       priority
       loading="eager"
       alt="poster image"
