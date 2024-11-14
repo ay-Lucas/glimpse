@@ -31,7 +31,7 @@ export function Card({
       <Image
         width={195}
         height={290}
-        src={`https://image.tmdb.org/t/p/original/${imagePath}`}
+        src={`https://image.tmdb.org/t/p/original${imagePath}`}
         alt={`Item image`}
         quality={75}
         // sizes="(max-width: 768px) 33vw, (max-width: 1080px) 23vw, (max-width: 1200px) 15vw"
