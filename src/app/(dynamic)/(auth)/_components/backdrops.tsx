@@ -31,6 +31,6 @@ export async function getBackgrounds() {
       backdropUrls.push(`${baseImageUrl}${item.backdrop_path}`);
   });
 
-  // shuffle(backdropUrls);
+  shuffle(backdropUrls);
   return backdropUrls;
 }
