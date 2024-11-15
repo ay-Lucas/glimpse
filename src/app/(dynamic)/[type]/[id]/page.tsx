@@ -376,23 +376,28 @@ export default async function ItemPage({
                   )
                 : ""}
             </div>
-            {data.media_type === "tv" &&
-              episodesData[0] &&
-              episodesData[0].episodes &&
-              episodesData[0].episodes[0]?.name !== "Episode 1" && (
-                <div className="pb-5">
-                  <h2 className={`text-2xl font-bold pb-4 pt-3`}>Seasons</h2>
-                  <div className="space-y-2">
-                    {episodesData.map((item, index) => (
-                      <SeasonAccordion
-                        episodesData={item?.episodes!}
-                        number={item.season_number!}
-                        key={index}
-                      />
-                    ))}
+
+            <Suspense
+              fallback={<Skeleton className="w-full h-[356px] rounded-xl" />}
+            >
+              {data.media_type === "tv" &&
+                episodesData[0] &&
+                episodesData[0].episodes &&
+                episodesData[0].episodes[0]?.name !== "Episode 1" && (
+                  <div className="pb-5">
+                    <h2 className={`text-2xl font-bold pb-4 pt-3`}>Seasons</h2>
+                    <div className="space-y-2">
+                      {episodesData.map((item, index) => (
+                        <SeasonAccordion
+                          episodesData={item?.episodes!}
+                          number={item.season_number!}
+                          key={index}
+                        />
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+            </Suspense>
             <Suspense
               fallback={<Skeleton className="w-full h-[52px] rounded-xl" />}
             >
