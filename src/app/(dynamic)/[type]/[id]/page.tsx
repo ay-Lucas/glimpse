@@ -393,32 +393,36 @@ export default async function ItemPage({
                   </div>
                 </div>
               )}
-            {item.credits?.cast && (
-              <div>
-                <h2 className={`text-2xl font-bold -mb-9`}>Cast</h2>
-                <div className="pt-2 pb-4 pl-8 md:pl-3 -ml-8 md:ml-0 md:w-full w-screen">
-                  <ImageCarousel
-                    items={item.credits.cast?.map(
-                      (item: Cast, index: number) => (
-                        <Link href={`/person/${item.id}`} key={index}>
-                          <CastCard
-                            name={item.name}
-                            character={item.character}
-                            imagePath={item.profile_path!}
-                            index={index}
-                            loading="lazy"
-                          />
-                        </Link>
-                      ),
-                    )}
-                    breakpoints="cast"
-                    className="md:-ml-6"
-                  />
-                </div>
-              </div>
-            )}
             <Suspense
-              fallback={<Skeleton className="w-full md:h-[356px] rounded-xl" />}
+              fallback={<Skeleton className="w-full h-[52px] rounded-xl" />}
+            >
+              {item.credits?.cast && (
+                <div>
+                  <h2 className={`text-2xl font-bold -mb-9`}>Cast</h2>
+                  <div className="pt-2 pb-4 pl-8 md:pl-3 -ml-8 md:ml-0 md:w-full w-screen">
+                    <ImageCarousel
+                      items={item.credits.cast?.map(
+                        (item: Cast, index: number) => (
+                          <Link href={`/person/${item.id}`} key={index}>
+                            <CastCard
+                              name={item.name}
+                              character={item.character}
+                              imagePath={item.profile_path!}
+                              index={index}
+                              loading="lazy"
+                            />
+                          </Link>
+                        ),
+                      )}
+                      breakpoints="cast"
+                      className="md:-ml-6"
+                    />
+                  </div>
+                </div>
+              )}
+            </Suspense>
+            <Suspense
+              fallback={<Skeleton className="w-full h-[356px] rounded-xl" />}
             >
               {item.recommendations &&
                 item.recommendations.total_results > 0 && (
