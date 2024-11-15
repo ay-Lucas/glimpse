@@ -40,6 +40,8 @@ import { AddToWatchlistDropdown } from "@/components/add-to-watchlist-button";
 import { getDefaultWatchlist, getWatchlists } from "@/lib/actions";
 import { Item } from "@/types";
 import { useWatchlist } from "@/context/watchlist";
+import { Suspense } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 function getTrailer(videoArray: Array<Video>) {
   const trailer: Array<Video> = videoArray.filter(
@@ -144,6 +146,7 @@ export default async function ItemPage({
   if (session) {
     userWatchlists = await getWatchlists(session.user.id);
   }
+
   // console.log(watchlistsWithItem);
   // console.log(await getDefaultWatchlist(session?.user.id!));
   // console.log(session);
@@ -414,18 +417,23 @@ export default async function ItemPage({
                 </div>
               </div>
             )}
-            {item.recommendations && item.recommendations.total_results > 0 && (
-              <div>
-                <h2 className={`text-2xl font-bold -mb-9`}>Recommended</h2>
-                <div className="pt-2 pb-4 pl-8 md:pl-3 -ml-8 md:ml-0 md:w-full w-screen">
-                  <Recommended
-                    data={item.recommendations.results!}
-                    type={(data as any).media_type}
-                    rating={item.rating!}
-                  />
-                </div>
-              </div>
-            )}
+            <Suspense
+              fallback={<Skeleton className="w-full md:h-[356px] rounded-xl" />}
+            >
+              {item.recommendations &&
+                item.recommendations.total_results > 0 && (
+                  <div>
+                    <h2 className={`text-2xl font-bold -mb-9`}>Recommended</h2>
+                    <div className="pt-2 pb-4 pl-8 md:pl-3 -ml-8 md:ml-0 md:w-full w-screen">
+                      <Recommended
+                        data={item.recommendations.results!}
+                        type={(data as any).media_type}
+                        rating={item.rating!}
+                      />
+                    </div>
+                  </div>
+                )}
+            </Suspense>
           </div>
 
           {(item.reviews?.results?.length ?? -1) > 0 && (
