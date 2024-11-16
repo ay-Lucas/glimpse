@@ -400,7 +400,7 @@ export default async function ItemPage({
             <Suspense
               fallback={<Skeleton className="w-full h-[52px] rounded-xl" />}
             >
-              {item.credits?.cast && (
+              {item.credits?.cast && item.credits.cast.length > 0 && (
                 <div>
                   <h2 className={`text-2xl font-bold -mb-9`}>Cast</h2>
                   <div className="pt-2 pb-4 pl-8 md:pl-3 -ml-8 md:ml-0 md:w-full w-screen">
