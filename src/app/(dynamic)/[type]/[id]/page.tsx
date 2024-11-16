@@ -34,6 +34,8 @@ import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getBlurData } from "@/lib/blur-data-generator";
 import { BASE_IMAGE_URL } from "@/lib/constants";
+import { Seasons } from "../_components/seasons";
+const SEASON_COMPONENT_HEIGHT = 52;
 
 function getTrailer(videoArray: Array<Video>) {
   const trailer: Array<Video> = videoArray.filter(
@@ -58,7 +60,6 @@ export default async function ItemPage({
   let item: Item;
   let personDetails: boolean = false;
   let person: Person = { media_type: "person" };
-  const episodesData: Array<TvSeasonResponse> = [];
   data.media_type = params.type;
   switch (data.media_type) {
     case "movie":
@@ -85,10 +86,6 @@ export default async function ItemPage({
       };
       break;
     case "tv":
-      for (let i = 0; i < data.number_of_seasons!; i++) {
-        const episodeData = await getSeasonData(params.id, i + 1);
-        episodesData.push(episodeData);
-      }
       item = {
         title: data.name,
         posterPath: data.poster_path,
@@ -108,11 +105,11 @@ export default async function ItemPage({
         media_type: "tv",
         tmdbId: Number(params.id),
         popularity: data.popularity ?? 0,
-        numberOfSeasons: episodesData.length,
-        numberOfEpisodes: episodesData.reduce(
-          (total, season) => total + (season.episodes?.length ?? 0),
-          0,
-        ),
+        numberOfSeasons: data.number_of_episodes,
+        // numberOfEpisodes: episodesData.reduce(
+        //   (total, season) => total + (season.episodes?.length ?? 0),
+        //   0,
+        // ),
         language: data.original_language!,
       };
       break;
@@ -372,35 +369,38 @@ export default async function ItemPage({
                   : ""}
               </Suspense>
             </div>
-            <Suspense
-              fallback={<Skeleton className="w-full h-[356px] rounded-xl" />}
-            >
-              {data.media_type === "tv" &&
-                episodesData[0]?.episodes &&
-                episodesData[0]?.episodes?.length > 0 &&
-                episodesData[0].episodes[0]?.name !== "Episode 1" && (
-                  <div className="pb-5">
+            {data.media_type === "tv" &&
+              data.number_of_seasons &&
+              data.number_of_seasons > 0 && (
+                <>
+                  <div className="pb-5 space-y-2">
                     <h2 className={`text-2xl font-bold pb-4 pt-3`}>Seasons</h2>
-                    <div className="space-y-2">
-                      {episodesData.map(
-                        (item, index) =>
-                          item.episodes &&
-                          item.episodes.length > 0 && (
-                            <SeasonAccordion
-                              episodesData={item?.episodes!}
-                              number={item.season_number!}
+                    <Suspense
+                      fallback={
+                        <div className="space-y-2">
+                          {Array.from({
+                            length: data.number_of_seasons ?? 1,
+                          }).map((_, index) => (
+                            <Skeleton
                               key={index}
+                              className={`w-full h-[${SEASON_COMPONENT_HEIGHT}px] rounded-xl`}
                             />
-                          ),
-                      )}
-                    </div>
+                          ))}
+                        </div>
+                      }
+                    >
+                      <Seasons
+                        id={params.id}
+                        numberOfSeasons={data.number_of_seasons}
+                      />
+                    </Suspense>
                   </div>
-                )}
-            </Suspense>
-            <Suspense
-              fallback={<Skeleton className="w-full h-[52px] rounded-xl" />}
-            >
-              {item.credits?.cast && item.credits.cast.length > 0 && (
+                </>
+              )}
+            {item.credits?.cast && item.credits.cast.length > 0 && (
+              <Suspense
+                fallback={<Skeleton className="w-full h-[356px] rounded-xl" />}
+              >
                 <div>
                   <h2 className={`text-2xl font-bold -mb-9`}>Cast</h2>
                   <div className="pt-2 pb-4 pl-8 md:pl-3 -ml-8 md:ml-0 md:w-full w-screen">
@@ -423,8 +423,8 @@ export default async function ItemPage({
                     />
                   </div>
                 </div>
-              )}
-            </Suspense>
+              </Suspense>
+            )}
             <Suspense
               fallback={<Skeleton className="w-full h-[356px] rounded-xl" />}
             >
