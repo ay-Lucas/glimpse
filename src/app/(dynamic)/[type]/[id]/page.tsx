@@ -192,81 +192,30 @@ export default async function ItemPage({
                   </>
                 )}
               </div>
-              {item.media_type !== "person" &&
-              item.media_type &&
-              userWatchlists &&
-              session ? (
+              {item.media_type !== "person" && userWatchlists && session ? (
                 <AddToWatchlistDropdown
                   userId={session.user.id}
                   watchlistItem={item}
                 />
               ) : (
-                <Link href={"/signin"}>
-                  <Button variant="secondary">Add to Watchlist</Button>
-                </Link>
+                item.media_type !== "person" && (
+                  <Link href={"/signin"}>
+                    <Button variant="secondary">Add to Watchlist</Button>
+                  </Link>
+                )
               )}
             </div>
-            <div className="pt-3 flex flex-col md:flex-row w-full md:space-y-0 space-y-4">
-              <div className="w-full md:w-1/2">
-                <h2 className="text-2xl font-bold pb-4">Details</h2>
-                <ul className="grid bg-secondary/40 rounded-xl p-3 -ml-1 space-y-1">
-                  {data.media_type === "tv" ? (
-                    <>
-                      <li className="grid grid-cols-2 border-b items-center">
-                        <div>Creators</div>
-                        <div>
-                          {data.created_by?.map((item, index) => (
-                            <Link
-                              href={`/person/${item.id}`}
-                              className="hover:underline"
-                              key={index}
-                            >
-                              {index === 0 ? "" : ", "}
-                              {item.name}
-                            </Link>
-                          ))}
-                        </div>
-                      </li>
-                      <li className="grid grid-cols-2 border-b">
-                        <div>Networks</div>
-                        <div>
-                          {data.networks?.map((item, index) => (
-                            <span key={index}>
-                              {index === 0 ? "" : ", "}
-                              {item.name}
-                            </span>
-                          ))}
-                        </div>
-                      </li>
-                      <li className="grid grid-cols-2 border-b">
-                        <div>Vote Average</div>
-                        <span>{data.vote_average!.toFixed(1)}</span>
-                      </li>
-                      <li className="grid grid-cols-2 border-b">
-                        <div>Vote Count</div>
-                        <span>{data.vote_count}</span>
-                      </li>
-                      <li className="grid grid-cols-2 border-b">
-                        <div>Popularity</div>
-                        <span>{Math.round(data.popularity!)}</span>
-                      </li>
-                      <li className="grid grid-cols-2 border-b">
-                        <div>Language</div>
-                        <div>{data.spoken_languages?.at(0)?.name}</div>
-                      </li>
-                      <li className="grid grid-cols-2">
-                        <div>Origin Country</div>
-                        <span>{data.origin_country}</span>
-                      </li>
-                    </>
-                  ) : data.media_type === "movie" ? (
-                    <>
-                      <li className="grid grid-cols-2 border-b">
-                        <div className="items-center">Directors</div>
-                        <div>
-                          {data.credits.crew
-                            ?.filter((item) => item.job === "Director")
-                            .map((item, index) => (
+            {data.media_type !== "person" && (
+              <div className="pt-3 flex flex-col md:flex-row w-full md:space-y-0 space-y-4">
+                <div className="w-full md:w-1/2">
+                  <h2 className="text-2xl font-bold pb-4">Details</h2>
+                  <ul className="grid bg-secondary/40 rounded-xl p-3 -ml-1 space-y-1">
+                    {data.media_type === "tv" ? (
+                      <>
+                        <li className="grid grid-cols-2 border-b items-center">
+                          <div>Creators</div>
+                          <div>
+                            {data.created_by?.map((item, index) => (
                               <Link
                                 href={`/person/${item.id}`}
                                 className="hover:underline"
@@ -276,99 +225,150 @@ export default async function ItemPage({
                                 {item.name}
                               </Link>
                             ))}
-                        </div>
-                      </li>
-                      {data.revenue !== null && data.revenue !== 0 && (
-                        <li className="grid grid-cols-2 border-b">
-                          <span>Revenue</span>
-                          <span>${data.revenue?.toLocaleString()}</span>
+                          </div>
                         </li>
-                      )}
-                      {data.budget !== null && data.budget !== 0 && (
                         <li className="grid grid-cols-2 border-b">
-                          <div>Budget</div>
-                          <span>${data.budget?.toLocaleString()}</span>
-                        </li>
-                      )}
-                      <li className="grid grid-cols-2 border-b">
-                        <div>Vote Average</div>
-                        <span>{data.vote_average.toFixed(1)}</span>
-                      </li>
-                      <li className="grid grid-cols-2 border-b">
-                        <div>Vote Count</div>
-                        <span>{data.vote_count}</span>
-                      </li>
-                      <li className="grid grid-cols-2 border-b">
-                        <div>Popularity</div>
-                        <span>{Math.round(data.popularity)}</span>
-                      </li>
-                      <li className="grid grid-cols-2 border-b">
-                        <div>Language</div>
-                        <div>{data.spoken_languages?.at(0)?.name}</div>
-                      </li>
-                      <li className="grid grid-cols-2">
-                        <div>Origin Country</div>
-                        <span>{data.origin_country}</span>
-                      </li>
-                    </>
-                  ) : data.media_type === "person" ? (
-                    <>
-                      <span className="mr-32"></span>
-                    </>
-                  ) : (
-                    ""
-                  )}
-                </ul>
-              </div>
-              <Suspense
-                fallback={<Skeleton className="w-full h-[356px] rounded-xl" />}
-              >
-                {data.media_type === "movie" || data.media_type === "tv"
-                  ? data["watch/providers"]?.results?.US?.flatrate &&
-                    data["watch/providers"]?.results?.US?.flatrate?.length >
-                      0 && (
-                      <div className="w-full md:w-1/2 md:pl-3 pt-3 md:pt-0 pb-3 md:pb-0">
-                        <h2 className="text-2xl font-bold pb-4">
-                          Streaming
-                          <span className="inline-flex items-center ml-4">
-                            <Link href="https://justwatch.com">
-                              <Image
-                                src={JustWatchLogo}
-                                alt={`JustWatch Logo`}
-                                width={100}
-                                height={70}
-                              />
-                            </Link>
-                          </span>
-                        </h2>
-                        <li className="grid grid-cols-2">
-                          <div className="flex space-x-2">
-                            {data[
-                              "watch/providers"
-                            ]?.results?.US?.flatrate?.map((item, index) => (
-                              <div key={index}>
-                                <Link
-                                  href={
-                                    data["watch/providers"]?.results?.US?.link!
-                                  }
-                                >
-                                  <Image
-                                    src={`https://image.tmdb.org/t/p/original/${item.logo_path}`}
-                                    alt={`${item.provider_name} logo`}
-                                    width={55}
-                                    height={55}
-                                    className="rounded-lg object-cover"
-                                  />
-                                </Link>
-                              </div>
+                          <div>Networks</div>
+                          <div>
+                            {data.networks?.map((item, index) => (
+                              <span key={index}>
+                                {index === 0 ? "" : ", "}
+                                {item.name}
+                              </span>
                             ))}
                           </div>
                         </li>
-                      </div>
-                    )
-                  : ""}
-              </Suspense>
-            </div>
+                        <li className="grid grid-cols-2 border-b">
+                          <div>Vote Average</div>
+                          <span>{data.vote_average!.toFixed(1)}</span>
+                        </li>
+                        <li className="grid grid-cols-2 border-b">
+                          <div>Vote Count</div>
+                          <span>{data.vote_count}</span>
+                        </li>
+                        <li className="grid grid-cols-2 border-b">
+                          <div>Popularity</div>
+                          <span>{Math.round(data.popularity!)}</span>
+                        </li>
+                        <li className="grid grid-cols-2 border-b">
+                          <div>Language</div>
+                          <div>{data.spoken_languages?.at(0)?.name}</div>
+                        </li>
+                        <li className="grid grid-cols-2">
+                          <div>Origin Country</div>
+                          <span>{data.origin_country}</span>
+                        </li>
+                      </>
+                    ) : data.media_type === "movie" ? (
+                      <>
+                        <li className="grid grid-cols-2 border-b">
+                          <div className="items-center">Directors</div>
+                          <div>
+                            {data.credits.crew
+                              ?.filter((item) => item.job === "Director")
+                              .map((item, index) => (
+                                <Link
+                                  href={`/person/${item.id}`}
+                                  className="hover:underline"
+                                  key={index}
+                                >
+                                  {index === 0 ? "" : ", "}
+                                  {item.name}
+                                </Link>
+                              ))}
+                          </div>
+                        </li>
+                        {data.revenue !== null && data.revenue !== 0 && (
+                          <li className="grid grid-cols-2 border-b">
+                            <span>Revenue</span>
+                            <span>${data.revenue?.toLocaleString()}</span>
+                          </li>
+                        )}
+                        {data.budget !== null && data.budget !== 0 && (
+                          <li className="grid grid-cols-2 border-b">
+                            <div>Budget</div>
+                            <span>${data.budget?.toLocaleString()}</span>
+                          </li>
+                        )}
+                        <li className="grid grid-cols-2 border-b">
+                          <div>Vote Average</div>
+                          <span>{data.vote_average.toFixed(1)}</span>
+                        </li>
+                        <li className="grid grid-cols-2 border-b">
+                          <div>Vote Count</div>
+                          <span>{data.vote_count}</span>
+                        </li>
+                        <li className="grid grid-cols-2 border-b">
+                          <div>Popularity</div>
+                          <span>{Math.round(data.popularity)}</span>
+                        </li>
+                        <li className="grid grid-cols-2 border-b">
+                          <div>Language</div>
+                          <div>{data.spoken_languages?.at(0)?.name}</div>
+                        </li>
+                        <li className="grid grid-cols-2">
+                          <div>Origin Country</div>
+                          <span>{data.origin_country}</span>
+                        </li>
+                      </>
+                    ) : (
+                      <span className="mr-32"></span>
+                    )}
+                  </ul>
+                </div>
+                <Suspense
+                  fallback={
+                    <Skeleton className="w-full h-[356px] rounded-xl" />
+                  }
+                >
+                  {data.media_type === "movie" || data.media_type === "tv"
+                    ? data["watch/providers"]?.results?.US?.flatrate &&
+                      data["watch/providers"]?.results?.US?.flatrate?.length >
+                        0 && (
+                        <div className="w-full md:w-1/2 md:pl-3 pt-3 md:pt-0 pb-3 md:pb-0">
+                          <h2 className="text-2xl font-bold pb-4">
+                            Streaming
+                            <span className="inline-flex items-center ml-4">
+                              <Link href="https://justwatch.com">
+                                <Image
+                                  src={JustWatchLogo}
+                                  alt={`JustWatch Logo`}
+                                  width={100}
+                                  height={70}
+                                />
+                              </Link>
+                            </span>
+                          </h2>
+                          <li className="grid grid-cols-2">
+                            <div className="flex space-x-2">
+                              {data[
+                                "watch/providers"
+                              ]?.results?.US?.flatrate?.map((item, index) => (
+                                <div key={index}>
+                                  <Link
+                                    href={
+                                      data["watch/providers"]?.results?.US
+                                        ?.link!
+                                    }
+                                  >
+                                    <Image
+                                      src={`https://image.tmdb.org/t/p/original/${item.logo_path}`}
+                                      alt={`${item.provider_name} logo`}
+                                      width={55}
+                                      height={55}
+                                      className="rounded-lg object-cover"
+                                    />
+                                  </Link>
+                                </div>
+                              ))}
+                            </div>
+                          </li>
+                        </div>
+                      )
+                    : ""}
+                </Suspense>
+              </div>
+            )}
             {data.media_type === "tv" &&
               data.number_of_seasons &&
               data.number_of_seasons > 0 && (
