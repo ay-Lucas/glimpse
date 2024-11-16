@@ -20,7 +20,7 @@ export function Background({ images }: { images: Array<String> }) {
             src={`${url}`}
             alt={`Background image ${i + 1}`}
             key={i}
-            quality={100}
+            quality={75}
             sizes="100vw"
             className={`object-cover transition from-background duration-1000 ${i === index ? "bg-gray-400 blur-0 opacity-100" : "opacity-0"}`}
           />

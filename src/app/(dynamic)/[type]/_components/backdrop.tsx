@@ -12,7 +12,7 @@ export function Backdrop({
     <Image
       fill
       src={src}
-      quality={100}
+      quality={75}
       alt="header image"
       priority
       className={`object-cover -z-10`}

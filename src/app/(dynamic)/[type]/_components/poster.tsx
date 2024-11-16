@@ -9,7 +9,7 @@ export function Poster({
 }) {
   return (
     <Image
-      quality={100}
+      quality={75}
       width={190}
       height={285}
       src={src}
