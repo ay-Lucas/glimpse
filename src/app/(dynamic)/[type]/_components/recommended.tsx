@@ -1,4 +1,4 @@
-import { getContentRating } from "../[id]/actions";
+import { getContentRating, getRecommendations } from "../[id]/actions";
 import { isUsRating } from "@/lib/utils";
 import { genres } from "@/lib/constants";
 import { MovieResult, RatingResponse, TvResult } from "@/types/request-types";
@@ -57,14 +57,18 @@ async function getValidRecommendations(
 export async function Recommended({
   rating,
   type,
-  data,
+  id,
 }: {
   rating: string;
   type: "tv" | "movie";
-  data: Array<MovieResult | TvResult>;
+  id: number;
 }) {
+  const data = await getRecommendations(id, type);
+
+  if (!data.results || data.results?.length < 1) return;
+
   const recommendations = await Promise.all(
-    data.map(async (item: MovieResult | TvResult) => {
+    data.results?.map(async (item: MovieResult | TvResult) => {
       // Make exception for undefined id
       if (item.id === undefined) return item;
       const itemRating = await getContentRating(item.media_type, item.id);

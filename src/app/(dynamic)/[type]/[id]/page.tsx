@@ -70,7 +70,6 @@ export default async function ItemPage({
         videoPath: getTrailer(data.videos.results!)?.key,
         credits: data.credits,
         reviews: await getReviews(data.media_type, params.id),
-        recommendations: await getRecommendations(params.id, data.media_type),
         releaseDate: data.release_date,
         genres: data.genres,
         overview: data.overview,
@@ -93,7 +92,6 @@ export default async function ItemPage({
         videoPath: getTrailer(data.videos.results!)?.key,
         credits: data.credits,
         reviews: await getReviews(data.media_type, params.id),
-        recommendations: await getRecommendations(params.id, data.media_type),
         releaseDate: data.first_air_date,
         genres: data.genres,
         overview: data.overview,
@@ -137,6 +135,8 @@ export default async function ItemPage({
     ? await getBlurData(`${BASE_IMAGE_URL}${item.backdropPath}`)
     : null;
 
+  const isReleased: boolean =
+    new Date(item.releaseDate ?? Date.now()).valueOf() < Date.now();
   const info = data as any;
   return (
     <main>
@@ -426,23 +426,22 @@ export default async function ItemPage({
                 </div>
               </Suspense>
             )}
-            <Suspense
-              fallback={<Skeleton className="w-full h-[356px] rounded-xl" />}
-            >
-              {item.recommendations &&
-                item.recommendations.total_results > 0 && (
-                  <div>
-                    <h2 className={`text-2xl font-bold -mb-9`}>Recommended</h2>
-                    <div className="pt-2 pb-4 pl-8 md:pl-3 -ml-8 md:ml-0 md:w-full w-screen">
-                      <Recommended
-                        data={item.recommendations.results!}
-                        type={(data as any).media_type}
-                        rating={item.rating!}
-                      />
-                    </div>
+            {data.media_type !== "person" && isReleased && (
+              <Suspense
+                fallback={<Skeleton className="w-full h-[356px] rounded-xl" />}
+              >
+                <div>
+                  <h2 className={`text-2xl font-bold -mb-9`}>Recommended</h2>
+                  <div className="pt-2 pb-4 pl-8 md:pl-3 -ml-8 md:ml-0 md:w-full w-screen">
+                    <Recommended
+                      type={data.media_type}
+                      rating={item.rating!}
+                      id={params.id}
+                    />
                   </div>
-                )}
-            </Suspense>
+                </div>
+              </Suspense>
+            )}
           </div>
 
           <Suspense
