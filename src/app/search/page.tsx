@@ -1,5 +1,5 @@
 import { SearchMultiRequest, SearchMultiResponse } from "@/types/request-types";
-import { baseApiUrl, options } from "@/lib/constants";
+import { BASE_API_URL, options } from "@/lib/constants";
 import { makeCarouselCards } from "../discover/page";
 
 const MAX_PAGES = 10;
@@ -8,7 +8,7 @@ async function getMultiSearch(
   request: SearchMultiRequest,
 ): Promise<SearchMultiResponse> {
   const res = await fetch(
-    `${baseApiUrl}/search/multi?query=${request.query}&include_adult=${request.include_adult}&language=${request.language}&page=${request.page}`,
+    `${BASE_API_URL}/search/multi?query=${request.query}&include_adult=${request.include_adult}&language=${request.language}&page=${request.page}`,
     options,
   );
   return res.json();

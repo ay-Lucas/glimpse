@@ -42,6 +42,8 @@ import { Item } from "@/types";
 import { useWatchlist } from "@/context/watchlist";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getBlurData } from "@/lib/blur-data-generator";
+import { BASE_IMAGE_URL } from "@/lib/constants";
 
 function getTrailer(videoArray: Array<Video>) {
   const trailer: Array<Video> = videoArray.filter(
@@ -147,9 +149,15 @@ export default async function ItemPage({
     userWatchlists = await getWatchlists(session.user.id);
   }
 
+  const posterBlurData = item.posterPath
+    ? await getBlurData(`${BASE_IMAGE_URL}${item.posterPath}`)
+    : null;
+  const backdropBlurData = item.backdropPath
+    ? await getBlurData(`${BASE_IMAGE_URL}${item.backdropPath}`)
+    : null;
   // console.log(watchlistsWithItem);
   // console.log(await getDefaultWatchlist(session?.user.id!));
-  // console.log(session);
+
   const info = data as any;
   return (
     <main>
@@ -158,7 +166,8 @@ export default async function ItemPage({
           {item.backdropPath ? (
             <div className="h-full w-full bg-gradient-to-t from-background from-30% via-background/95 via-40% to-transparent ">
               <Backdrop
-                src={`https://image.tmdb.org/t/p/original${item.backdropPath}`}
+                src={`${BASE_IMAGE_URL}${item.backdropPath}`}
+                blurDataUrl={backdropBlurData?.base64 ?? ""}
               />
             </div>
           ) : (
@@ -174,6 +183,7 @@ export default async function ItemPage({
                 {item.posterPath && (
                   <Poster
                     src={`https://image.tmdb.org/t/p/original${item.posterPath}`}
+                    blurDataUrl={posterBlurData?.base64 ?? ""}
                   />
                 )}
                 {personDetails ? (
@@ -331,28 +341,32 @@ export default async function ItemPage({
                   )}
                 </ul>
               </div>
-              {data.media_type === "movie" || data.media_type === "tv"
-                ? data["watch/providers"]?.results?.US?.flatrate &&
-                  data["watch/providers"]?.results?.US?.flatrate?.length >
-                    0 && (
-                    <div className="w-full md:w-1/2 md:pl-3 pt-3 md:pt-0 pb-3 md:pb-0">
-                      <h2 className="text-2xl font-bold pb-4">
-                        Streaming
-                        <span className="inline-flex items-center ml-4">
-                          <Link href="https://justwatch.com">
-                            <Image
-                              src={JustWatchLogo}
-                              alt={`JustWatch Logo`}
-                              width={100}
-                              height={70}
-                            />
-                          </Link>
-                        </span>
-                      </h2>
-                      <li className="grid grid-cols-2">
-                        <div className="flex space-x-2">
-                          {data["watch/providers"]?.results?.US?.flatrate?.map(
-                            (item, index) => (
+              <Suspense
+                fallback={<Skeleton className="w-full h-[356px] rounded-xl" />}
+              >
+                {data.media_type === "movie" || data.media_type === "tv"
+                  ? data["watch/providers"]?.results?.US?.flatrate &&
+                    data["watch/providers"]?.results?.US?.flatrate?.length >
+                      0 && (
+                      <div className="w-full md:w-1/2 md:pl-3 pt-3 md:pt-0 pb-3 md:pb-0">
+                        <h2 className="text-2xl font-bold pb-4">
+                          Streaming
+                          <span className="inline-flex items-center ml-4">
+                            <Link href="https://justwatch.com">
+                              <Image
+                                src={JustWatchLogo}
+                                alt={`JustWatch Logo`}
+                                width={100}
+                                height={70}
+                              />
+                            </Link>
+                          </span>
+                        </h2>
+                        <li className="grid grid-cols-2">
+                          <div className="flex space-x-2">
+                            {data[
+                              "watch/providers"
+                            ]?.results?.US?.flatrate?.map((item, index) => (
                               <div key={index}>
                                 <Link
                                   href={
@@ -368,32 +382,36 @@ export default async function ItemPage({
                                   />
                                 </Link>
                               </div>
-                            ),
-                          )}
-                        </div>
-                      </li>
-                    </div>
-                  )
-                : ""}
+                            ))}
+                          </div>
+                        </li>
+                      </div>
+                    )
+                  : ""}
+              </Suspense>
             </div>
-
             <Suspense
               fallback={<Skeleton className="w-full h-[356px] rounded-xl" />}
             >
               {data.media_type === "tv" &&
-                episodesData[0] &&
-                episodesData[0].episodes &&
+                episodesData[0]?.episodes &&
+                episodesData[0]?.episodes?.length > 0 &&
                 episodesData[0].episodes[0]?.name !== "Episode 1" && (
                   <div className="pb-5">
                     <h2 className={`text-2xl font-bold pb-4 pt-3`}>Seasons</h2>
                     <div className="space-y-2">
-                      {episodesData.map((item, index) => (
-                        <SeasonAccordion
-                          episodesData={item?.episodes!}
-                          number={item.season_number!}
-                          key={index}
-                        />
-                      ))}
+                      {episodesData.map(
+                        (item, index) =>
+                          item.episodes &&
+                          item.episodes.length > 0 && (
+                            <SeasonAccordion
+                              episodesData={item?.episodes!}
+                              number={item.season_number!}
+                              key={index}
+                              // blurData={seasonBlurData}
+                            />
+                          ),
+                      )}
                     </div>
                   </div>
                 )}
@@ -445,26 +463,32 @@ export default async function ItemPage({
             </Suspense>
           </div>
 
-          {(item.reviews?.results?.length ?? -1) > 0 && (
-            <div className="px-0 lg:px-40">
-              <h2 className="text-2xl font-semibold pb-5 pr-3 inline-flex">
-                Reviews
-              </h2>
-              <span className="text-2xl font-semibold">
-                ({item.reviews?.results?.length})
-              </span>
-              <div className="space-y-3">
-                {item.reviews?.results?.map(
-                  (reviews: Review, index: number) => (
-                    <Reviews data={reviews} key={index} />
-                  ),
-                )}
+          <Suspense
+            fallback={<Skeleton className="w-full h-[194px] rounded-xl" />}
+          >
+            {(item.reviews?.results?.length ?? -1) > 0 && (
+              <div className="px-0 lg:px-40">
+                <h2 className="text-2xl font-semibold pb-5 pr-3 inline-flex">
+                  Reviews
+                </h2>
+                <span className="text-2xl font-semibold">
+                  ({item.reviews?.results?.length})
+                </span>
+                <div className="space-y-3">
+                  {item.reviews?.results?.map(
+                    (reviews: Review, index: number) => (
+                      <Reviews data={reviews} key={index} />
+                    ),
+                  )}
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </Suspense>
         </div>
       </div>
-      <VideoPlayer youtubeId={item.videoPath!} id={params.id} />
+      <Suspense>
+        <VideoPlayer youtubeId={item.videoPath!} id={params.id} />
+      </Suspense>
     </main>
   );
 }

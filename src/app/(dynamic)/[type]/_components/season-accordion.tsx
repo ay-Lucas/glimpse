@@ -37,15 +37,19 @@ export function SeasonAccordion({
             breakpoints="page"
             items={episodesData.map((item, index) => (
               <div className="pr-2" key={index}>
-                <Image
-                  width={300}
-                  height={150}
-                  src={`https://image.tmdb.org/t/p/original/${item.still_path}`}
-                  alt={`Item image`}
-                  onLoad={() => setImageLoading(false)}
-                  quality={75}
-                  className={`object-cover pb-2 rounded-xl transition ${isImageLoading ? "blur-img" : "remove-blur"}`}
-                />
+                {item.still_path && (
+                  <Image
+                    width={300}
+                    height={150}
+                    src={`https://image.tmdb.org/t/p/original/${item.still_path}`}
+                    alt={`Item image`}
+                    onLoad={() => setImageLoading(false)}
+                    quality={75}
+                    className={`object-cover pb-2 rounded-xl transition ${isImageLoading ? "blur-img" : "remove-blur"}`}
+                    // blurDataURL={blurData}
+                    // placeholder="blur"
+                  />
+                )}
                 <div>
                   <span className="text-xl">{item.episode_number}. </span>
                   <span className="text-xl">{item.name}</span>

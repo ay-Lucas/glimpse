@@ -8,7 +8,7 @@ export default auth((req) => {
   const { nextUrl } = req;
 
   const isAuthenticated = !!req.auth;
-  console.log(nextUrl.pathname);
+  // console.log(nextUrl.pathname);
   const isPublicRoute =
     PUBLIC_ROUTES.includes(nextUrl.pathname) ||
     nextUrl.pathname.startsWith("/tv") ||

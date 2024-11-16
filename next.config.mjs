@@ -1,4 +1,5 @@
 /** @type {import('next').NextConfig} */
+import withPlaiceholder from "@plaiceholder/next";
 const nextConfig = {
   reactStrictMode: true,
   images: {
@@ -18,4 +19,4 @@ const nextConfig = {
   output: "standalone",
 };
 
-export default nextConfig;
+export default withPlaiceholder(nextConfig);

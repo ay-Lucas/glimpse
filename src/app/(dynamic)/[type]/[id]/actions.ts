@@ -1,6 +1,6 @@
 "server only";
 import { getWatchlistsAndItems } from "@/lib/actions";
-import { baseApiUrl, options } from "@/lib/constants";
+import { BASE_API_URL, options } from "@/lib/constants";
 import { Item } from "@/types";
 import {
   FindRequest,
@@ -20,7 +20,7 @@ export async function getData(
   type: "tv" | "movie" | "person",
 ): Promise<MovieResponseAppended | ShowResponseAppended | Person> {
   const res = await fetch(
-    `${baseApiUrl}/${type}/${request.id}?append_to_response=videos,releases,content_ratings,credits,aggregate_credits,episode_groups,watch/providers&language=en-US`,
+    `${BASE_API_URL}/${type}/${request.id}?append_to_response=videos,releases,content_ratings,credits,aggregate_credits,episode_groups,watch/providers&language=en-US`,
     options,
   );
   return res.json();
@@ -29,7 +29,7 @@ export async function getData(
 export async function getPersonData(
   request: IdAppendToResponseRequest,
 ): Promise<Person> {
-  const res = await fetch(`${baseApiUrl}/person/${request.id}`, options);
+  const res = await fetch(`${BASE_API_URL}/person/${request.id}`, options);
   return res.json();
 }
 
@@ -37,7 +37,7 @@ export async function getShowData(
   request: IdAppendToResponseRequest,
 ): Promise<ShowResponseAppended> {
   const res = await fetch(
-    `${baseApiUrl}/show/${request.id}?append_to_response=content_ratings,credits`,
+    `${BASE_API_URL}/show/${request.id}?append_to_response=content_ratings,credits`,
     options,
   );
   return res.json();
@@ -47,7 +47,7 @@ export async function getMovieData(
   request: IdAppendToResponseRequest,
 ): Promise<MovieResponseAppended> {
   const res = await fetch(
-    `${baseApiUrl}/movie/${request.id}?append_to_response=releases,credits`,
+    `${BASE_API_URL}/movie/${request.id}?append_to_response=releases,credits`,
     options,
   );
   return res.json();
@@ -57,7 +57,7 @@ export async function getReviews(
   type: "tv" | "movie",
   id: number,
 ): Promise<MovieReviewsResponse | TvReviewsResponse> {
-  const res = await fetch(`${baseApiUrl}/${type}/${id}/reviews`, options);
+  const res = await fetch(`${BASE_API_URL}/${type}/${id}/reviews`, options);
   return res.json();
 }
 
@@ -66,7 +66,7 @@ export async function getRecommendations(
   type: "tv" | "movie",
 ): Promise<MovieResultsResponse | TvResultsResponse> {
   const res = await fetch(
-    `${baseApiUrl}/${type}/${id}/recommendations`,
+    `${BASE_API_URL}/${type}/${id}/recommendations`,
     options,
   );
   return res.json();
@@ -74,7 +74,7 @@ export async function getRecommendations(
 
 export async function getContentRating(type: "tv" | "movie", id: number) {
   const res = await fetch(
-    `${baseApiUrl}/${type}/${id}/${type === "tv" ? "content_ratings" : "releases"}`,
+    `${BASE_API_URL}/${type}/${id}/${type === "tv" ? "content_ratings" : "releases"}`,
     options,
   );
   return res.json();
@@ -82,7 +82,7 @@ export async function getContentRating(type: "tv" | "movie", id: number) {
 
 export async function getSeasonData(id: number, seasonNumber: number) {
   const res = await fetch(
-    `${baseApiUrl}/tv/${id}/season/${seasonNumber}`,
+    `${BASE_API_URL}/tv/${id}/season/${seasonNumber}`,
     options,
   );
   return res.json();
