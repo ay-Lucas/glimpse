@@ -1,5 +1,4 @@
 "use client";
-import { useState } from "react";
 import Image from "next/image";
 export function Poster({
   src,
@@ -12,10 +11,10 @@ export function Poster({
     <Image
       quality={100}
       width={190}
-      height={284}
+      height={285}
       src={src}
-      sizes="(max-width: 768px) 80vw, (max-width: 1200px) 80vw"
-      className={`object-cover rounded-xl mx-auto w-[190px] h-[284px]`}
+      sizes="(max-width: 460px) 50vw, (max-width: 768px) 30vw, (max-width: 1200px) 20vw, 10vw"
+      className={`object-cover rounded-xl mx-auto w-[190px] h-[285px]`}
       priority
       placeholder="blur"
       blurDataURL={blurDataUrl}
