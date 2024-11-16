@@ -4,7 +4,6 @@ import {
   getRecommendations,
   getReviews,
   getSeasonData,
-  getWatchlistsWithItem,
 } from "./actions";
 import { Reviews } from "../_components/reviews";
 import { Backdrop } from "../_components/backdrop";
@@ -14,22 +13,14 @@ import Link from "next/link";
 import { Recommended } from "../_components/recommended";
 import {
   Cast,
-  CreditsResponse,
-  Episode,
-  EpisodeRequest,
-  MovieResultsResponse,
-  MovieReviewsResponse,
   Person,
   Review,
-  TvResultsResponse,
-  TvReviewsResponse,
   TvSeasonResponse,
   Video,
 } from "@/types/request-types";
 import { ImageCarousel } from "@/components/image-carousel";
 import { CastCard } from "@/components/cast-card";
 import { MediaDetails } from "@/components/media-details";
-import { Genre } from "@/types/types";
 import { PersonDetails } from "@/components/person-details";
 import Image from "next/image";
 import JustWatchLogo from "@/../public/justwatch-logo.svg";
@@ -37,9 +28,8 @@ import { SeasonAccordion } from "../_components/season-accordion";
 import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";
 import { AddToWatchlistDropdown } from "@/components/add-to-watchlist-button";
-import { getDefaultWatchlist, getWatchlists } from "@/lib/actions";
+import { getWatchlists } from "@/lib/actions";
 import { Item } from "@/types";
-import { useWatchlist } from "@/context/watchlist";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getBlurData } from "@/lib/blur-data-generator";
@@ -72,7 +62,6 @@ export default async function ItemPage({
   data.media_type = params.type;
   switch (data.media_type) {
     case "movie":
-      // console.log(data);
       item = {
         title: data.title,
         posterPath: data.poster_path,
@@ -96,7 +85,6 @@ export default async function ItemPage({
       };
       break;
     case "tv":
-      // console.log(data);
       for (let i = 0; i < data.number_of_seasons!; i++) {
         const episodeData = await getSeasonData(params.id, i + 1);
         episodesData.push(episodeData);
@@ -140,10 +128,6 @@ export default async function ItemPage({
       break;
   }
   const session = await auth();
-  const watchlistsWithItem = await getWatchlistsWithItem(
-    item,
-    session?.user.id!,
-  );
   let userWatchlists;
   if (session) {
     userWatchlists = await getWatchlists(session.user.id);
@@ -155,8 +139,6 @@ export default async function ItemPage({
   const backdropBlurData = item.backdropPath
     ? await getBlurData(`${BASE_IMAGE_URL}${item.backdropPath}`)
     : null;
-  // console.log(watchlistsWithItem);
-  // console.log(await getDefaultWatchlist(session?.user.id!));
 
   const info = data as any;
   return (
@@ -408,7 +390,6 @@ export default async function ItemPage({
                               episodesData={item?.episodes!}
                               number={item.season_number!}
                               key={index}
-                              // blurData={seasonBlurData}
                             />
                           ),
                       )}
