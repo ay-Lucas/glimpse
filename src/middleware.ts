@@ -12,7 +12,8 @@ export default auth((req) => {
     PUBLIC_ROUTES.includes(nextUrl.pathname) ||
     nextUrl.pathname.startsWith("/tv") ||
     nextUrl.pathname.startsWith("/movie") ||
-    nextUrl.pathname.startsWith("/person");
+    nextUrl.pathname.startsWith("/person") ||
+    nextUrl.pathname.startsWith("/search");
 
   if (
     (isAuthenticated && nextUrl.pathname.startsWith("/signin")) ||
