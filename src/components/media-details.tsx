@@ -32,7 +32,7 @@ export function MediaDetails({
         {title}
       </h2>
       {genres && genres.length > 0 && (
-        <div className="flex flex-wrap justify-center gap-x-1.5 gap-y-1">
+        <div className="flex flex-wrap justify-center gap-x-1.5 gap-y-1 pb-0.5">
           {genres?.map((genre, index: number) => (
             <ul
               key={index}
@@ -52,8 +52,9 @@ export function MediaDetails({
               </span>
               <Image
                 src={TmdbLogo}
-                className="w-[30px] h-[30px]"
                 priority
+                height={13}
+                width={30}
                 alt="tmdb logo"
               />
             </div>

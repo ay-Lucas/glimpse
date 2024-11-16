@@ -8,8 +8,6 @@ export function Backdrop({
   src: string;
   blurDataUrl: string;
 }) {
-  const [isImageLoading, setImageLoading] = useState(true);
-
   return (
     <Image
       fill
@@ -17,9 +15,7 @@ export function Backdrop({
       quality={100}
       alt="header image"
       priority
-      onLoad={() => setImageLoading(false)}
-      // className={`object-cover -z-10 ${isImageLoading ? "blur-img" : "blur-remove"}`}
-      className={`object-cover -z-10 fade-in-65 transition`}
+      className={`object-cover -z-10`}
       sizes="100vw"
       placeholder="blur"
       blurDataURL={blurDataUrl}

@@ -143,7 +143,7 @@ export default async function ItemPage({
       <div className="h-full w-full overflow-x-hidden">
         <div className="absolute top-0 left-0 mb-10 w-screen h-screen">
           {item.backdropPath ? (
-            <div className="h-full w-full bg-gradient-to-t from-background from-30% via-background/95 via-40% to-transparent ">
+            <div className="absolute h-full w-full bg-gradient-to-t from-background from-30% via-background/95 via-40% to-transparent">
               <Backdrop
                 src={`${BASE_IMAGE_URL}${item.backdropPath}`}
                 blurDataUrl={backdropBlurData?.base64 ?? ""}
@@ -334,7 +334,8 @@ export default async function ItemPage({
                                   src={JustWatchLogo}
                                   alt={`JustWatch Logo`}
                                   width={100}
-                                  height={70}
+                                  height={15}
+                                  className="flex"
                                 />
                               </Link>
                             </span>
