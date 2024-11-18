@@ -2,7 +2,13 @@
 import Image from "next/image";
 import { useState, useEffect } from "react";
 
-export function Background({ images }: { images: Array<String> }) {
+export function Background({
+  images,
+  firstBackdropBlurData,
+}: {
+  images: Array<String>;
+  firstBackdropBlurData: string;
+}) {
   const [index, setIndex] = useState(0);
   useEffect(() => {
     const interval = setInterval(() => {
@@ -23,6 +29,8 @@ export function Background({ images }: { images: Array<String> }) {
             quality={75}
             sizes="100vw"
             className={`object-cover transition from-background duration-1000 ${i === index ? "bg-gray-400 blur-0 opacity-100" : "opacity-0"}`}
+            placeholder="blur"
+            blurDataURL={firstBackdropBlurData}
           />
         ))}
       </div>
