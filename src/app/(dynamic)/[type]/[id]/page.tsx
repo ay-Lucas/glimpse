@@ -426,20 +426,32 @@ export default async function ItemPage({
                 </div>
               </Suspense>
             )}
-            {data.media_type !== "person" && isReleased && (
+            {isReleased && (
               <Suspense
                 fallback={<Skeleton className="w-full h-[356px] rounded-xl" />}
               >
-                <div>
-                  <h2 className={`text-2xl font-bold -mb-9`}>Recommended</h2>
-                  <div className="pt-2 pb-4 pl-8 md:pl-3 -ml-8 md:ml-0 md:w-full w-screen">
-                    <Recommended
-                      type={data.media_type}
-                      rating={item.rating!}
-                      id={params.id}
-                    />
-                  </div>
-                </div>
+                {(async () => {
+                  if (params.type === "person") return null;
+                  const recommendations = await getRecommendations(
+                    params.id,
+                    params.type,
+                  );
+                  if ((recommendations.results?.length ?? 0) === 0) return null;
+
+                  return (
+                    <div>
+                      <h2 className="text-2xl font-bold -mb-9">Recommended</h2>
+                      <div className="pt-2 pb-4 pl-8 md:pl-3 -ml-8 md:ml-0 md:w-full w-screen">
+                        <Recommended
+                          type={params.type}
+                          rating={item.rating!}
+                          data={recommendations}
+                          id={params.id}
+                        />
+                      </div>
+                    </div>
+                  );
+                })()}
               </Suspense>
             )}
           </div>

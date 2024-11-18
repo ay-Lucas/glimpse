@@ -79,16 +79,18 @@ export default async function Discover() {
   ]);
   const trendingTv = trendingTvRes.filter(
     (item) =>
+      item.media_type === "tv" &&
       item.original_language === "en" &&
       item.backdrop_path &&
-      new Date((item as any).first_air_date).valueOf() > MIN_DATE,
+      new Date(item.first_air_date ?? Date.now()).valueOf() > MIN_DATE,
   );
-  // console.log(trendingTv);
   const trendingMovies = trendingMovieRes.filter(
     (item) =>
+      item.media_type === "movie" &&
       item.original_language === "en" &&
       (item.popularity ?? 0) > MIN_TRENDING_POPULARITY &&
-      new Date((item as any).release_date).valueOf() > MIN_DATE,
+      new Date(item.release_date ?? Date.now()).valueOf() > MIN_DATE &&
+      new Date(item.release_date ?? Date.now()).valueOf() < Date.now(),
   );
   const trendingTvAndMovies = trendingTv.concat(trendingMovies);
   const filteredPopularTv = popularTvRes?.results?.filter(
@@ -103,7 +105,6 @@ export default async function Discover() {
     (item) => (item.media_type = "movie"),
   );
   upcomingMoviesRes.results?.forEach((item) => (item.media_type = "movie"));
-
   return (
     <main className="w-screen max-w-[1920px] mx-auto">
       <div className="px-0 lg:px-10 space-y-3 pt-5 overflow-hidden">

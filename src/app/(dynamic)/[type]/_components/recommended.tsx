@@ -1,7 +1,13 @@
 import { getContentRating, getRecommendations } from "../[id]/actions";
 import { isUsRating } from "@/lib/utils";
 import { genres } from "@/lib/constants";
-import { MovieResult, RatingResponse, TvResult } from "@/types/request-types";
+import {
+  MovieResult,
+  MovieResultsResponse,
+  RatingResponse,
+  TvResult,
+  TvResultsResponse,
+} from "@/types/request-types";
 import { ImageCarousel } from "@/components/image-carousel";
 import Link from "next/link";
 import { Card } from "@/components/card";
@@ -56,14 +62,16 @@ async function getValidRecommendations(
 
 export async function Recommended({
   rating,
+  data,
   type,
   id,
 }: {
   rating: string;
+  data: MovieResultsResponse | TvResultsResponse;
   type: "tv" | "movie";
   id: number;
 }) {
-  const data = await getRecommendations(id, type);
+  // const data = await getRecommendations(id, type);
 
   if (!data.results || data.results?.length < 1) return;
 
