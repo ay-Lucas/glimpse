@@ -35,6 +35,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { getBlurData } from "@/lib/blur-data-generator";
 import { BASE_IMAGE_URL } from "@/lib/constants";
 import { Seasons } from "../_components/seasons";
+import { RecommededSection } from "../_components/recommendedSection";
 const SEASON_COMPONENT_HEIGHT = 52;
 
 function getTrailer(videoArray: Array<Video>) {
@@ -426,34 +427,7 @@ export default async function ItemPage({
                 </div>
               </Suspense>
             )}
-            {isReleased && (
-              <Suspense
-                fallback={<Skeleton className="w-full h-[356px] rounded-xl" />}
-              >
-                {(async () => {
-                  if (params.type === "person") return null;
-                  const recommendations = await getRecommendations(
-                    params.id,
-                    params.type,
-                  );
-                  if ((recommendations.results?.length ?? 0) === 0) return null;
-
-                  return (
-                    <div>
-                      <h2 className="text-2xl font-bold -mb-9">Recommended</h2>
-                      <div className="pt-2 pb-4 pl-8 md:pl-3 -ml-8 md:ml-0 md:w-full w-screen">
-                        <Recommended
-                          type={params.type}
-                          rating={item.rating!}
-                          data={recommendations}
-                          id={params.id}
-                        />
-                      </div>
-                    </div>
-                  );
-                })()}
-              </Suspense>
-            )}
+            <RecommededSection isReleased={isReleased} item={item} />
           </div>
 
           <Suspense

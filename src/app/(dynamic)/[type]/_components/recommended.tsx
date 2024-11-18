@@ -71,8 +71,6 @@ export async function Recommended({
   type: "tv" | "movie";
   id: number;
 }) {
-  // const data = await getRecommendations(id, type);
-
   if (!data.results || data.results?.length < 1) return;
 
   const recommendations = await Promise.all(
