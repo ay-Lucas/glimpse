@@ -52,6 +52,7 @@ export interface MovieResult {
   };
   credits?: CreditsResponse;
   aggregate_credits?: AggregateCreditsResponse;
+  rating?: string;
 }
 
 export interface TvResult {
@@ -74,6 +75,7 @@ export interface TvResult {
   };
   credits: CreditsResponse;
   aggregate_credits?: AggregateCreditsResponse;
+  rating?: string;
 }
 
 export interface PersonResult {
@@ -971,9 +973,22 @@ export interface RatingResponse {
   rating?: string;
 }
 
+export interface MovieRatingResponse {
+  descriptors: Array<String>;
+  iso_3166_1?: string;
+  certification?: string;
+}
+
 export interface ShowContentRatingResponse extends Response {
   results?: Array<RatingResponse>;
   id?: number;
+  media_type: "tv";
+}
+
+export interface MovieContentRatingResponse extends Response {
+  countries?: Array<MovieRatingResponse>;
+  id?: number;
+  media_type: "movie";
 }
 
 export interface TvEpisodeGroupsResponse extends Response {

@@ -427,7 +427,11 @@ export default async function ItemPage({
                 </div>
               </Suspense>
             )}
-            <RecommededSection isReleased={isReleased} item={item} />
+            <Suspense
+              fallback={<Skeleton className="w-full h-[356px] rounded-xl" />}
+            >
+              <RecommededSection isReleased={isReleased} item={item} />
+            </Suspense>
           </div>
 
           <Suspense

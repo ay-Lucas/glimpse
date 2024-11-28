@@ -5,10 +5,12 @@ import { Item } from "@/types";
 import {
   FindRequest,
   IdAppendToResponseRequest,
+  MovieContentRatingResponse,
   MovieResponseAppended,
   MovieResultsResponse,
   MovieReviewsResponse,
   Person,
+  ShowContentRatingResponse,
   ShowResponseAppended,
   TvResultsResponse,
   TvReviewsResponse,
@@ -76,7 +78,10 @@ export async function getRecommendations(
   }
 }
 
-export async function getContentRating(type: "tv" | "movie", id: number) {
+export async function getContentRating(
+  type: "tv" | "movie",
+  id: number,
+): Promise<ShowContentRatingResponse | MovieContentRatingResponse | undefined> {
   try {
     const res = await fetch(
       `${BASE_API_URL}/${type}/${id}/${type === "tv" ? "content_ratings" : "releases"}`,
