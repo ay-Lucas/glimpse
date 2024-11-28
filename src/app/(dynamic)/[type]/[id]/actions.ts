@@ -64,20 +64,28 @@ export async function getReviews(
 export async function getRecommendations(
   id: number,
   type: "tv" | "movie",
-): Promise<MovieResultsResponse | TvResultsResponse> {
-  const res = await fetch(
-    `${BASE_API_URL}/${type}/${id}/recommendations`,
-    options,
-  );
-  return res.json();
+): Promise<MovieResultsResponse | TvResultsResponse | undefined> {
+  try {
+    const res = await fetch(
+      `${BASE_API_URL}/${type}/${id}/recommendations`,
+      options,
+    );
+    return res.json();
+  } catch (error) {
+    console.error(`Error fetching recommendations for ${type} with id: ${id}`);
+  }
 }
 
 export async function getContentRating(type: "tv" | "movie", id: number) {
-  const res = await fetch(
-    `${BASE_API_URL}/${type}/${id}/${type === "tv" ? "content_ratings" : "releases"}`,
-    options,
-  );
-  return res.json();
+  try {
+    const res = await fetch(
+      `${BASE_API_URL}/${type}/${id}/${type === "tv" ? "content_ratings" : "releases"}`,
+      options,
+    );
+    return res.json();
+  } catch (error) {
+    console.error("Error fetching content ratings");
+  }
 }
 
 export async function getSeasonData(id: number, seasonNumber: number) {
