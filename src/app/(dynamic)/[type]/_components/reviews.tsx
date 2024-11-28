@@ -5,9 +5,9 @@ import { Star } from "lucide-react";
 import { ChevronDown } from "lucide-react";
 import { useRef } from "react";
 import Link from "next/link";
-import { Review } from "@/types/request-types";
+import { ReviewI } from "@/types/request-types";
 
-export function Reviews({ data }: { data: Review }) {
+export function Review({ data }: { data: ReviewI }) {
   const ref = useRef<HTMLDivElement>(null);
   const CLAMPED_CLIENT_HEIGHT = 96;
   const [isOpen, setIsOpen] = useState(false);

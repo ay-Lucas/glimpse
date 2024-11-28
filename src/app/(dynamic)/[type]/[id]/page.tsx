@@ -1,30 +1,16 @@
 import "@/styles/globals.css";
-import {
-  getData,
-  getRecommendations,
-  getReviews,
-  getSeasonData,
-} from "./actions";
-import { Reviews } from "../_components/reviews";
+import { getData } from "./actions";
 import { Backdrop } from "../_components/backdrop";
 import { Poster } from "../_components/poster";
 import { VideoPlayer } from "../_components/video-player";
 import Link from "next/link";
-import { Recommended } from "../_components/recommended";
-import {
-  Cast,
-  Person,
-  Review,
-  TvSeasonResponse,
-  Video,
-} from "@/types/request-types";
+import { Cast, Person, Video } from "@/types/request-types";
 import { ImageCarousel } from "@/components/image-carousel";
 import { CastCard } from "@/components/cast-card";
 import { MediaDetails } from "@/components/media-details";
 import { PersonDetails } from "@/components/person-details";
 import Image from "next/image";
 import JustWatchLogo from "@/../public/justwatch-logo.svg";
-import { SeasonAccordion } from "../_components/season-accordion";
 import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";
 import { AddToWatchlistDropdown } from "@/components/add-to-watchlist-button";
@@ -36,6 +22,7 @@ import { getBlurData } from "@/lib/blur-data-generator";
 import { BASE_IMAGE_URL } from "@/lib/constants";
 import { Seasons } from "../_components/seasons";
 import { RecommededSection } from "../_components/recommendedSection";
+import ReviewSection from "../_components/ReviewSection";
 const SEASON_COMPONENT_HEIGHT = 52;
 
 function getTrailer(videoArray: Array<Video>) {
@@ -70,7 +57,6 @@ export default async function ItemPage({
         backdropPath: data.backdrop_path,
         videoPath: getTrailer(data.videos.results!)?.key,
         credits: data.credits,
-        reviews: await getReviews(data.media_type, params.id),
         releaseDate: data.release_date,
         genres: data.genres,
         overview: data.overview,
@@ -92,7 +78,6 @@ export default async function ItemPage({
         backdropPath: data.backdrop_path,
         videoPath: getTrailer(data.videos.results!)?.key,
         credits: data.credits,
-        reviews: await getReviews(data.media_type, params.id),
         releaseDate: data.first_air_date,
         genres: data.genres,
         overview: data.overview,
@@ -105,10 +90,6 @@ export default async function ItemPage({
         tmdbId: Number(params.id),
         popularity: data.popularity ?? 0,
         numberOfSeasons: data.number_of_episodes,
-        // numberOfEpisodes: episodesData.reduce(
-        //   (total, season) => total + (season.episodes?.length ?? 0),
-        //   0,
-        // ),
         language: data.original_language!,
       };
       break;
@@ -434,27 +415,13 @@ export default async function ItemPage({
             </Suspense>
           </div>
 
-          <Suspense
-            fallback={<Skeleton className="w-full h-[194px] rounded-xl" />}
-          >
-            {(item.reviews?.results?.length ?? -1) > 0 && (
-              <div className="px-0 lg:px-40">
-                <h2 className="text-2xl font-semibold pb-5 pr-3 inline-flex">
-                  Reviews
-                </h2>
-                <span className="text-2xl font-semibold">
-                  ({item.reviews?.results?.length})
-                </span>
-                <div className="space-y-3">
-                  {item.reviews?.results?.map(
-                    (reviews: Review, index: number) => (
-                      <Reviews data={reviews} key={index} />
-                    ),
-                  )}
-                </div>
-              </div>
-            )}
-          </Suspense>
+          {item.media_type !== "person" && (
+            <Suspense
+              fallback={<Skeleton className="w-full h-[194px] rounded-xl" />}
+            >
+              <ReviewSection id={item.tmdbId} type={item.media_type!} />
+            </Suspense>
+          )}
         </div>
       </div>
       <Suspense>

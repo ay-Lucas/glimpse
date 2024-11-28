@@ -52,7 +52,7 @@ export interface MovieResult {
   };
   credits?: CreditsResponse;
   aggregate_credits?: AggregateCreditsResponse;
-  rating?: string;
+  rating?: string; // Not provided by TMDB
 }
 
 export interface TvResult {
@@ -845,7 +845,7 @@ export interface SimilarMovieResponse extends MovieRecommendationsResponse {}
 export interface MovieReviewsRequest extends MovieRecommendationsRequest {}
 
 export interface MovieReviewsResponse extends PaginatedResponse {
-  results?: Array<Review>;
+  results?: Array<ReviewI>;
 }
 
 export interface MovieListsRequest extends MovieRecommendationsRequest {}
@@ -1031,7 +1031,7 @@ export interface TvResultsResponse extends PaginatedResponse {
 }
 
 export interface TvReviewsResponse extends PaginatedResponse {
-  results?: Array<Review>;
+  results?: Array<ReviewI>;
 }
 
 export interface TvScreenTheatricallyResponse extends Response {
@@ -1571,7 +1571,7 @@ export interface NetworkResponse extends Response {
   origin_country?: string;
 }
 
-export interface Review {
+export interface ReviewI {
   id?: string;
   author?: string;
   author_details?: {
