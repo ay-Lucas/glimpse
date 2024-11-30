@@ -31,6 +31,7 @@ export async function Recommended({
                           title={item.title}
                           overview={item.overview}
                           imagePath={item.poster_path}
+                          isOptimized={false}
                         />
                       );
                       break;
@@ -40,6 +41,7 @@ export async function Recommended({
                           title={item.name}
                           overview={item.overview}
                           imagePath={item.poster_path}
+                          isOptimized={false}
                         />
                       );
                       break;

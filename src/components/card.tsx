@@ -7,6 +7,7 @@ interface CardProps {
   imagePath?: string;
   className?: string;
   loading?: "lazy" | "eager";
+  isOptimized?: boolean;
 }
 
 export function Card({
@@ -15,6 +16,7 @@ export function Card({
   imagePath,
   className,
   loading,
+  isOptimized = true,
 }: CardProps) {
   const [isImageLoading, setImageLoading] = useState(true);
   return (
@@ -34,6 +36,7 @@ export function Card({
         src={`https://image.tmdb.org/t/p/original${imagePath}`}
         alt={`Item image`}
         quality={75}
+        unoptimized={!isOptimized}
         // sizes="(max-width: 768px) 33vw, (max-width: 1080px) 23vw, (max-width: 1200px) 15vw"
         onLoad={() => setImageLoading(false)}
         className={`object-cover transition ${isImageLoading ? "blur-img" : "remove-blur"}`}
