@@ -23,6 +23,10 @@ import { BASE_IMAGE_URL } from "@/lib/constants";
 import { Seasons } from "../_components/seasons";
 import { RecommededSection } from "../_components/recommendedSection";
 import ReviewSection from "../_components/ReviewSection";
+import { checkRateLimit } from "@/lib/actions";
+import { notFound } from "next/navigation";
+import { headers } from "next/headers";
+
 const SEASON_COMPONENT_HEIGHT = 52;
 
 function getTrailer(videoArray: Array<Video>) {
@@ -44,11 +48,20 @@ export default async function ItemPage({
 }: {
   params: { type: "movie" | "tv" | "person"; id: number };
 }) {
+  const ip = headers().get("x-forwarded-for") || "unknown";
+  const allowed = await checkRateLimit(ip, "/browse"); // group [type] (/tv, /movie) routes together
+
+  if (!allowed) {
+    console.log(`${ip} has been rate limited`);
+    return notFound();
+  }
+
   const data = await getData({ id: params.id }, params.type);
   let item: Item;
   let personDetails: boolean = false;
   let person: Person = { media_type: "person" };
   data.media_type = params.type;
+
   switch (data.media_type) {
     case "movie":
       item = {
