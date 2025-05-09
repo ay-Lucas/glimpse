@@ -109,6 +109,12 @@ export const rateLimitLog = pgTable("rate_limit_log", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export const rateLimitViolation = pgTable("rate_limit_violation", {
+  ip: text("ip").primaryKey().notNull(),
+  count: integer("count").default(1).notNull(),
+  lastViolation: timestamp("last_violation").defaultNow().notNull(),
+});
+
 // Causes Drizzle to crash when pushing with `npx drizzle-kit push` (Known Issue)
 
 //
