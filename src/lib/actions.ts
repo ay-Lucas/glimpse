@@ -51,24 +51,22 @@ export async function signin(prevState: any, formData: FormData) {
     };
   } catch (error) {
     if (error instanceof AuthError) {
-      switch (error.type) {
-        case "CredentialsSignin":
-          return {
-            message: "credentials error",
-            errors: {
-              ...defaultValues,
-              credentials: "incorrect email or password",
-            },
-          };
-        default:
-          return {
-            message: "unknown error",
-            errors: {
-              ...defaultValues,
-              unknown: "unknown error",
-            },
-          };
+      if (error.message.includes("CredentialsSignin")) {
+        return {
+          message: "credentials error",
+          errors: {
+            ...defaultValues,
+            credentials: "incorrect email or password",
+          },
+        };
       }
+      return {
+        message: "unknown error",
+        errors: {
+          ...defaultValues,
+          unknown: error.message,
+        },
+      };
     }
     throw error;
   }
