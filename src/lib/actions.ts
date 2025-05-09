@@ -12,14 +12,19 @@ import {
 import { redirect } from "next/navigation";
 import { loginSchema, watchlistNameSchema } from "@/types/schema";
 import { db } from "@/db/index";
-import { and, asc, eq, gt } from "drizzle-orm";
-import { users, watchlist, watchlistItems } from "@/db/schema";
+import { and, asc, eq, gt, sql } from "drizzle-orm";
+import {
+  rateLimitViolation,
+  users,
+  watchlist,
+  watchlistItems,
+} from "@/db/schema";
 import { WatchlistI, WatchlistSchemaI } from "@/types";
 import { Item } from "@/types";
 import { rateLimitLog } from "@/db/schema";
 import { nanoid } from "nanoid";
 
-const LIMIT = 20;
+const LIMIT = 10;
 const WINDOW = 60_000;
 const defaultValues = {
   email: "",
@@ -486,8 +491,27 @@ export async function getWatchlistsAndItems(
 }
 
 export async function checkRateLimit(ip: string, route: string) {
-  const cutoff = new Date(Date.now() - WINDOW);
+  const now = Date.now();
+  const cutoff = new Date(now - WINDOW);
 
+  // Escalating lockout check
+  const violation = await db.query.rateLimitViolation.findFirst({
+    where: eq(rateLimitViolation.ip, ip),
+  });
+
+  if (violation) {
+    const last = new Date(violation.lastViolation).getTime();
+    const lockoutTime = Math.min(violation.count * 30_000, 10 * 60_000); // max 10 minutes
+
+    if (now - last < lockoutTime) {
+      console.warn(
+        `[RateLimit] IP ${ip} is currently locked out for ${lockoutTime / 1000}s (violation count: ${violation.count})`,
+      );
+      return false; // still locked out
+    }
+  }
+
+  // Check request frequency
   const recentRequests = await db.query.rateLimitLog.findMany({
     where: and(
       eq(rateLimitLog.ip, ip),
@@ -495,12 +519,34 @@ export async function checkRateLimit(ip: string, route: string) {
       gt(rateLimitLog.createdAt, cutoff),
     ),
   });
-  console.log(`ip: ${ip} route: ${route}`);
 
-  if (recentRequests.length >= LIMIT) return false;
+  if (recentRequests.length >= LIMIT) {
+    console.warn(
+      `[RateLimit] IP ${ip} exceeded limit (${LIMIT} reqs in ${WINDOW / 1000}s) on route ${route}`,
+    );
 
+    // Log or escalate violation
+    await db
+      .insert(rateLimitViolation)
+      .values({
+        ip,
+        count: 1,
+        lastViolation: new Date(),
+      })
+      .onConflictDoUpdate({
+        target: rateLimitViolation.ip,
+        set: {
+          count: sql`${rateLimitViolation.count} + 1`,
+          lastViolation: new Date(),
+        },
+      });
+
+    return false;
+  }
+
+  // Allowed request — log it
   await db.insert(rateLimitLog).values({
-    id: `${ip}-${Date.now()}-${nanoid(4)}`,
+    id: `${ip}-${Date.now()}-${nanoid(6)}`,
     ip,
     route,
   });
