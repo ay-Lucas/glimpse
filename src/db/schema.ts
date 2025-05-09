@@ -102,6 +102,13 @@ export const watchlist = pgTable("watchlist", {
   default: boolean("default").notNull().default(false), // Indicates if this is the default watchlist
 });
 
+export const rateLimitLog = pgTable("rate_limit_log", {
+  id: text("id").primaryKey(), // use nanoid or similar
+  ip: text("ip").notNull(),
+  route: text("route").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // Causes Drizzle to crash when pushing with `npx drizzle-kit push` (Known Issue)
 
 //
