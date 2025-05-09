@@ -12,10 +12,15 @@ import {
 import { redirect } from "next/navigation";
 import { loginSchema, watchlistNameSchema } from "@/types/schema";
 import { db } from "@/db/index";
-import { and, asc, eq } from "drizzle-orm";
+import { and, asc, eq, gt } from "drizzle-orm";
 import { users, watchlist, watchlistItems } from "@/db/schema";
 import { WatchlistI, WatchlistSchemaI } from "@/types";
 import { Item } from "@/types";
+import { rateLimitLog } from "@/db/schema";
+import { nanoid } from "nanoid";
+
+const LIMIT = 20;
+const WINDOW = 60_000;
 const defaultValues = {
   email: "",
   password: "",
@@ -478,4 +483,27 @@ export async function getWatchlistsAndItems(
   });
 
   return watchlists;
+}
+
+export async function checkRateLimit(ip: string, route: string) {
+  const cutoff = new Date(Date.now() - WINDOW);
+
+  const recentRequests = await db.query.rateLimitLog.findMany({
+    where: and(
+      eq(rateLimitLog.ip, ip),
+      eq(rateLimitLog.route, route),
+      gt(rateLimitLog.createdAt, cutoff),
+    ),
+  });
+  console.log(`ip: ${ip} route: ${route}`);
+
+  if (recentRequests.length >= LIMIT) return false;
+
+  await db.insert(rateLimitLog).values({
+    id: `${ip}-${Date.now()}-${nanoid(4)}`,
+    ip,
+    route,
+  });
+
+  return true;
 }
