@@ -1,39 +1,4 @@
-"use client";
-import { Genre } from "@/types/types";
-import Image from "next/image";
-import TmdbLogo from "@/../public/tmdb-logo.svg";
-import Link from "next/link";
-import { Button } from "./ui/button";
-import { ChevronDown, Play } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-
-function Expandable({ content }: { content: string }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const CLAMPED_CLIENT_HEIGHT = 144;
-  const [isOpen, setIsOpen] = useState(false);
-  const [isExpandable, setExpandable] = useState(false);
-
-  const handleIsOpen = () => {
-    setIsOpen(!isOpen);
-  };
-  useEffect(() => {
-    setExpandable((ref.current?.clientHeight ?? 0) > CLAMPED_CLIENT_HEIGHT);
-  }, []);
-  return (
-    <div className={`text-md text-start leading-6 select-text`}>
-      <div ref={ref} className={`${isOpen ? "" : "line-clamp-6"} `}>
-        {content}
-      </div>
-      <div className="flex w-full justify-end">
-        <button onClick={handleIsOpen} disabled={!isExpandable}>
-          <ChevronDown
-            className={`dark:brightness-50  ease-in-out transition-transform duration-300 ${isOpen ? "rotate-180" : ""} ${ref.current && ref.current.clientHeight >= CLAMPED_CLIENT_HEIGHT ? "opacity-100" : "opacity-0"}`}
-          />
-        </button>
-      </div>
-    </div>
-  );
-}
+import PersonBio from "./person-bio";
 
 export function PersonDetails({
   name,
@@ -103,8 +68,8 @@ export function PersonDetails({
         </div>
       </div>
       <br />
-      <div className="text-md md:text-lg font-medium">
-        {<Expandable content={biography!} />}
+      <div className="">
+        <PersonBio bio={biography ?? ""} />
       </div>
     </div>
   );
