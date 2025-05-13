@@ -1,25 +1,8 @@
-"use client";
-import * as React from "react";
-import { useEffect, useState } from "react";
 import { Star } from "lucide-react";
-import { ChevronDown } from "lucide-react";
-import { useRef } from "react";
 import Link from "next/link";
 import { ReviewI } from "@/types/request-types";
 
 export function Review({ data }: { data: ReviewI }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const CLAMPED_CLIENT_HEIGHT = 96;
-  const [isOpen, setIsOpen] = useState(false);
-  const [isExpandable, setExpandable] = useState(false);
-
-  const handleIsOpen = () => {
-    setIsOpen(!isOpen);
-  };
-  useEffect(() => {
-    setExpandable((ref.current?.clientHeight ?? 0) >= CLAMPED_CLIENT_HEIGHT);
-  }, []);
-
   return (
     <div className="rounded-md border px-4 pt-2 pb-1 text-md backdrop-blur">
       <div className="pb-1">
@@ -39,21 +22,25 @@ export function Review({ data }: { data: ReviewI }) {
           </span>
         )}
       </div>
-      <div
-        className={`text-md text-start leading-6 line-clamp-4 select-text ${isOpen ? "line-clamp-none" : ""}`}
-        ref={ref}
-      >
-        {data.content}
-      </div>
-      <div className="flex w-full justify-end">
-        {/* {isExpandable && ( */}
-        <button onClick={handleIsOpen} disabled={!isExpandable}>
-          <ChevronDown
-            className={`dark:brightness-50  ease-in-out transition-transform duration-300 ${isOpen ? "rotate-180" : ""} ${ref.current && ref.current.clientHeight >= CLAMPED_CLIENT_HEIGHT ? "opacity-100" : "opacity-0"}`}
-            // className={`absolute dark:brightness-50 right-2 bottom-1 ease-in-out transition-transform duration-300 ${isOpen ? "rotate-180" : ""} ${ref.current && ref.current.clientHeight >= CLAMPED_CLIENT_HEIGHT ? "visible" : "hidden"}`}
-          />
-        </button>
-        {/* )} */}
+      <div className="relative">
+        <input id="bio-toggle" type="checkbox" className="peer sr-only" />
+        <p className="overflow-hidden max-h-[4.5rem] peer-checked:max-h-[1000px] transition-all duration-300 ease-in-out">
+          {data.content}
+        </p>
+        <label
+          htmlFor="bio-toggle"
+          className="py-1 text-blue-600 cursor-pointer select-none hover:underline block peer-checked:hidden peer-checked:aria-expanded:false"
+          aria-expanded="true"
+        >
+          Read more
+        </label>
+        <label
+          htmlFor="bio-toggle"
+          className="py-1 mt-2 text-blue-600 cursor-pointer select-none hover:underline hidden peer-checked:block peer-checked:aria-expanded=true"
+          aria-expanded="false"
+        >
+          Show less
+        </label>
       </div>
     </div>
   );
