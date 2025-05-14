@@ -1,5 +1,5 @@
 import { TvSeasonResponse } from "@/types/request-types";
-import { getSeasonData } from "../[id]/actions";
+import { getSeasonData } from "@/app/(media)/actions";
 import { SeasonAccordion } from "./season-accordion";
 
 export async function Seasons({

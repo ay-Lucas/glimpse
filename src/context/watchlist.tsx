@@ -7,14 +7,19 @@ import {
   useEffect,
 } from "react";
 import {
-  addToWatchlist,
+  addTvToWatchlist,
+  addMovieToWatchlist,
   createWatchlist,
   deleteWatchlist,
   deleteWatchlistItem,
   getWatchlistsAndItems,
 } from "@/lib/actions";
-import { Item, WatchlistI, WatchlistItemI } from "@/types";
+import { WatchlistI, WatchlistItemI } from "@/types";
 import { useSession } from "next-auth/react";
+import {
+  MovieResponseAppended,
+  ShowResponseAppended,
+} from "@/types/request-types";
 
 interface WatchlistContextType {
   watchlists: WatchlistI[];
@@ -28,7 +33,8 @@ interface WatchlistContextType {
   onDeleteWatchlist: (watchlistId: string) => Promise<void>;
   addItemToWatchlist: (
     watchlistId: string,
-    watchlistItem: Item,
+    watchlistItem: ShowResponseAppended | MovieResponseAppended,
+    rating: string,
   ) => Promise<boolean>;
 }
 
@@ -88,9 +94,15 @@ export const WatchlistProvider = ({ children }: { children: ReactNode }) => {
   };
   const addItemToWatchlist = async (
     watchlistId: string,
-    watchlistItem: Item,
+    watchlistItem: MovieResponseAppended | ShowResponseAppended,
+    rating: string,
   ) => {
-    const res = await addToWatchlist(watchlistId, watchlistItem);
+    let res;
+    if (watchlistItem.media_type == "tv")
+      res = await addTvToWatchlist(watchlistId, watchlistItem, rating);
+    else if (watchlistItem.media_type == "movie")
+      res = await addMovieToWatchlist(watchlistId, watchlistItem, rating);
+    console.log(res);
     // setWatchlists([...watchlists]);
     fetchWatchlists();
     return res !== undefined;

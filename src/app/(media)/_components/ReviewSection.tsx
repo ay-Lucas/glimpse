@@ -3,7 +3,7 @@ import {
   ReviewI,
   TvReviewsResponse,
 } from "@/types/request-types";
-import { getReviews } from "../[id]/actions";
+import { getReviews } from "@/app/(media)/actions";
 import { Review } from "./reviews";
 
 export default async function ReviewSection({

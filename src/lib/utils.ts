@@ -1,5 +1,10 @@
 import { type ClassValue, clsx } from "clsx";
-import { MovieResult, RatingResponse, TvResult } from "@/types/request-types";
+import {
+  MovieResult,
+  RatingResponse,
+  TvResult,
+  Video,
+} from "@/types/request-types";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -92,4 +97,18 @@ export function isUnique(
 
 export function isUsRating(item: RatingResponse) {
   return item.iso_3166_1 === "US" && item !== undefined;
+}
+
+export function getTrailer(videoArray: Array<Video>) {
+  const trailer: Array<Video> = videoArray.filter(
+    (video) => video.type === "Trailer",
+  );
+  if (trailer?.length !== 0) {
+    return trailer[0];
+  } else {
+    const teaser: Array<Video> = videoArray.filter(
+      (video) => video.type === "Teaser",
+    );
+    return teaser[0];
+  }
 }

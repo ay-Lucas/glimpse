@@ -1,7 +1,6 @@
 "server only";
 import { getWatchlistsAndItems } from "@/lib/actions";
 import { BASE_API_URL, options } from "@/lib/constants";
-import { Item } from "@/types";
 import {
   FindRequest,
   IdAppendToResponseRequest,
@@ -34,11 +33,11 @@ export async function getPersonData(
   return res.json();
 }
 
-export async function getShowData(
+export async function getTvData(
   request: IdAppendToResponseRequest,
 ): Promise<ShowResponseAppended> {
   const res = await fetch(
-    `${BASE_API_URL}/show/${request.id}?append_to_response=content_ratings,credits`,
+    `${BASE_API_URL}/tv/${request.id}?append_to_response=content_ratings,credits`,
     options,
   );
   return res.json();
@@ -101,7 +100,7 @@ export async function getSeasonData(id: number, seasonNumber: number) {
 }
 
 export async function getWatchlistsWithItem(
-  watchlistItem: Item,
+  watchlistItem: ShowResponseAppended | MovieResponseAppended,
   userId: string,
 ) {
   const watchlists = await getWatchlistsAndItems(userId);
@@ -111,7 +110,7 @@ export async function getWatchlistsWithItem(
   //   }
   // });
   const watchlistsWithItem = watchlists.filter((watchlist) =>
-    watchlist.items.some((item) => item.tmdbId === watchlistItem.tmdbId),
+    watchlist.items.some((item) => item.tmdbId === watchlistItem.id),
   );
   if (watchlistsWithItem.length < 1) return undefined;
   return watchlistsWithItem;

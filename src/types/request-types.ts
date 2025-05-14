@@ -905,7 +905,7 @@ export interface ShowResponse extends Response {
   first_air_date?: string;
   genres?: Array<Genre>;
   homepage?: string;
-  id?: number;
+  id: number;
   in_production?: boolean;
   languages?: string[];
   last_air_date?: string;

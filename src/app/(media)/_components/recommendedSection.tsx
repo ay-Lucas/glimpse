@@ -1,6 +1,5 @@
-import { Item } from "@/types";
 import { Recommended } from "./recommended";
-import { getContentRating, getRecommendations } from "../[id]/actions";
+import { getContentRating, getRecommendations } from "@/app/(media)/actions";
 import { isUsRating } from "@/lib/utils";
 import { genres } from "@/lib/constants";
 import { MovieResult, TvResult } from "@/types/request-types";
@@ -46,7 +45,7 @@ async function getValidRecommendations(
   const result = [];
   for (let i = 0; i < itemArray.length; i++) {
     const item = itemArray[i] as any;
-    if (validateRecommended(type, item.rating, rating, item)) {
+    if (validateRecommended(type, rating, rating, item)) {
       result.push(item);
     }
   }
@@ -55,16 +54,17 @@ async function getValidRecommendations(
 
 export async function RecommededSection({
   isReleased,
-  item,
+  tmdbId: tmdbId,
+  mediaType,
+  rating,
 }: {
   isReleased: boolean;
-  item: Item;
+  tmdbId: number;
+  mediaType: "movie" | "tv";
+  rating: string;
 }) {
-  if (!isReleased || item.media_type === "person") return;
-  const recommendationsRes = await getRecommendations(
-    item.tmdbId,
-    item.media_type!,
-  );
+  if (!isReleased) return;
+  const recommendationsRes = await getRecommendations(tmdbId, mediaType);
   if (!recommendationsRes?.results || recommendationsRes.results?.length < 1)
     return;
 
@@ -105,8 +105,8 @@ export async function RecommededSection({
 
   if (!recommendations || recommendations.length < 1) return;
   const filteredRecommendations = await getValidRecommendations(
-    item.media_type!,
-    item.rating!,
+    mediaType,
+    rating,
     recommendations,
   );
   return (

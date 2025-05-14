@@ -20,9 +20,15 @@ import {
   watchlistItems,
 } from "@/db/schema";
 import { WatchlistI, WatchlistSchemaI } from "@/types";
-import { Item } from "@/types";
 import { rateLimitLog } from "@/db/schema";
 import { nanoid } from "nanoid";
+import {
+  MovieResponse,
+  MovieResponseAppended,
+  MovieResultsResponse,
+  ShowResponseAppended,
+  TvResultsResponse,
+} from "@/types/request-types";
 
 const LIMIT = 10;
 const WINDOW = 60_000;
@@ -125,32 +131,64 @@ export async function signup(prevState: any, formData: FormData) {
   console.log("Signing in..");
 }
 
-export async function addToWatchlist(watchlistId: string, item: Item) {
-  const itemType = item.media_type === "tv" ? "tv" : "movie";
+export async function addMovieToWatchlist(
+  watchlistId: string,
+  data: MovieResponseAppended,
+  rating: string,
+) {
   const result = await db
     .insert(watchlistItems)
     .values({
-      tmdbId: item.tmdbId ?? "",
-      watchlistId: watchlistId, // Ensure watchlistId is a string (UUID format)
-      title: item.title ?? "", // Ensure title is a non-null string
-      itemType: itemType, // "tv" or "movie"
-      genres: item.genres?.map((genre) => genre.name || "none") ?? [], // Array of genre names (string[])
-      tmdbVoteAverage: item.voteAverage
-        ? parseFloat(item.voteAverage.toString())
-        : null, // Parse as float
-      rating: item.rating ?? null, // Rating is either string or null
-      popularity: Number(item.popularity.toFixed()) ?? null, // Popularity as integer or null
-      language: item.language || null, // Language as string or null
-      numberOfSeasons: item.numberOfSeasons ?? null, // Integer or null
-      numberOfEpisodes: item.numberOfEpisodes ?? null, // Integer or null
-      summary: item.overview ?? null, // Summary is string or null
-      posterPath: item.posterPath,
-      backdropPath: item.backdropPath,
+      tmdbId: data.id,
+      watchlistId: watchlistId,
+      title: data.title ?? "",
+      itemType: "movie",
+      genres: data.genres?.map((genre) => genre.name || "none") ?? [], // Array of genre names (string[])
+      tmdbVoteAverage: data.vote_average
+        ? parseFloat(data.vote_average.toString())
+        : null,
+      rating: rating,
+      popularity: Number(data.popularity.toFixed()), // Popularity as integer or null
+      language: data.original_language,
+      summary: data.overview,
+      posterPath: data.poster_path,
+      backdropPath: data.backdrop_path,
     })
     .returning();
 
   return result;
 }
+
+export async function addTvToWatchlist(
+  watchlistId: string,
+  data: ShowResponseAppended,
+  rating: string,
+) {
+  const result = await db
+    .insert(watchlistItems)
+    .values({
+      tmdbId: data.id,
+      watchlistId: watchlistId,
+      title: data.name ?? "",
+      itemType: "tv",
+      genres: data.genres?.map((genre) => genre.name || "none") ?? [], // Array of genre names (string[])
+      tmdbVoteAverage: data.vote_average
+        ? parseFloat(data.vote_average.toString())
+        : null, // Parse as float
+      rating: rating ?? null, // Rating is either string or null
+      popularity: Number(data.popularity?.toFixed()) ?? null, // Popularity as integer or null
+      language: data.original_language || null, // Language as string or null
+      numberOfSeasons: data.number_of_seasons ?? null, // Integer or null
+      numberOfEpisodes: data.number_of_episodes ?? null, // Integer or null
+      summary: data.overview ?? null, // Summary is string or null
+      posterPath: data.poster_path,
+      backdropPath: data.backdrop_path,
+    })
+    .returning();
+
+  return result;
+}
+
 async function getUserIdByEmail(email: string): Promise<string | null> {
   const [user] = await db
     .select({ id: users.id })
@@ -246,10 +284,10 @@ export async function getDefaultWatchlist(userId: string) {
 
   return defaultWatchlist || null; // Return the watchlist or null if not found
 }
-
 export async function addToDefaultWatchlist(
-  watchlistItem: Item,
   userId: string,
+  data: ShowResponseAppended | MovieResponseAppended,
+  rating: string,
 ) {
   try {
     let defaultWatchlist;
@@ -261,13 +299,17 @@ export async function addToDefaultWatchlist(
     const existingItem = await getWatchlistItem(
       userId,
       defaultWatchlist?.id!,
-      watchlistItem.tmdbId,
+      data.id,
     );
     if (existingItem.length > 0) {
       console.log("Item already exists");
       return null;
     }
-    let result = await addToWatchlist(defaultWatchlist?.id!, watchlistItem);
+    let result;
+    if (data.media_type == "tv")
+      result = await addTvToWatchlist(defaultWatchlist?.id!, data, rating);
+    else if (data.media_type == "movie")
+      result = await addMovieToWatchlist(defaultWatchlist?.id!, data, rating);
     return result;
   } catch (error) {
     console.log(error);

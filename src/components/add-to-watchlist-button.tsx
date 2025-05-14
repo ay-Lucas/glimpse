@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "./ui/button";
-import { Item, WatchlistI } from "@/types";
+import { WatchlistI } from "@/types";
 import { useWatchlist } from "@/context/watchlist";
 import {
   DropdownMenu,
@@ -11,13 +11,19 @@ import { Checkbox } from "./ui/checkbox";
 import { useEffect, useState } from "react";
 import { CheckedState } from "@radix-ui/react-checkbox";
 import { LucideListPlus } from "lucide-react";
+import {
+  MovieResponseAppended,
+  ShowResponseAppended,
+} from "@/types/request-types";
 
 export default function AddToWatchlistDropdown({
   userId,
-  watchlistItem,
+  item,
+  rating,
 }: {
-  watchlistItem: Item;
   userId: string;
+  item: ShowResponseAppended | MovieResponseAppended;
+  rating: string;
 }) {
   const { addItemToWatchlist, deleteItem, watchlists } = useWatchlist();
   const [open, setOpen] = useState(false);
@@ -30,6 +36,7 @@ export default function AddToWatchlistDropdown({
     watchlists.forEach((watchlist) => {
       initialStates[watchlist.id] = isItemOnWatchlist(watchlist);
     });
+    console.log(initialStates);
     return initialStates;
   });
 
@@ -42,19 +49,19 @@ export default function AddToWatchlistDropdown({
       ...prevStates,
       [watchlistId]: checked,
     }));
-
     if (checked) {
-      addItemToWatchlist(watchlistId, watchlistItem);
+      addItemToWatchlist(watchlistId, item, rating);
     } else {
-      deleteItem(watchlistId, watchlistItem.tmdbId, userId);
+      deleteItem(watchlistId, item.id, userId);
     }
   };
 
   function isItemOnWatchlist(watchlist: WatchlistI) {
     // watchlists?.some((item) => item.id === watchlist.id) || false
     const found = watchlist.items.find(
-      (item) => item.tmdbId === watchlistItem.tmdbId,
+      (watchlistItem) => watchlistItem.tmdbId === item.id,
     );
+    console.log("found: " + found);
     return found !== undefined;
   }
   // Sync checkbox states with watchlistsWithItem and userWatchlists whenever they change
