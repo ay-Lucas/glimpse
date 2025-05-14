@@ -1,6 +1,6 @@
 import NextAuth from "next-auth";
 import { authConfig } from "@/auth.config";
-import { DEFAULT_REDIRECT, PUBLIC_ROUTES, ROOT } from "@/lib/routes";
+import { PUBLIC_ROUTES, ROOT } from "@/lib/routes";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { isRateLimitedEdge } from "./lib/rateLimit";
@@ -21,22 +21,27 @@ export const config = {
 };
 
 export async function middleware(request: NextRequest) {
-  const ua = request.headers.get("user-agent") || "";
+  if (process.env.NODE_ENV !== "production") {
+    return NextResponse.next();
+  }
 
+  const ua = request.headers.get("user-agent") || "";
   const ip = request.ip || "unknown";
   const pathname = request.nextUrl.pathname;
   const route = pathname.split("/")[1] ?? "/";
+
   // Block known abusive bots
   if (blockedUserAgents.some((bot) => ua.includes(bot))) {
     console.warn(`Blocked bot: ${ua} from ${ip}`);
     return new NextResponse("Blocked bot", { status: 403 });
   }
+
   if (await isRateLimitedEdge(ip, route)) {
     const url = request.nextUrl.clone();
     url.pathname = "/429";
-    console.log(url);
     return NextResponse.rewrite(url, { status: 429 });
   }
+
   return NextResponse.next();
 }
 
