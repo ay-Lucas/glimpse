@@ -341,30 +341,27 @@ export default async function ItemPage({
                               </Link>
                             </span>
                           </h2>
-                          <li className="grid grid-cols-2">
-                            <div className="flex space-x-2">
-                              {data[
-                                "watch/providers"
-                              ]?.results?.US?.flatrate?.map((item, index) => (
-                                <div key={index}>
-                                  <Link
-                                    href={
-                                      data["watch/providers"]?.results?.US
-                                        ?.link!
-                                    }
-                                  >
-                                    <Image
-                                      src={`https://image.tmdb.org/t/p/original/${item.logo_path}`}
-                                      alt={`${item.provider_name} logo`}
-                                      width={55}
-                                      height={55}
-                                      className="rounded-lg object-cover"
-                                    />
-                                  </Link>
-                                </div>
-                              ))}
-                            </div>
-                          </li>
+                          <div className="flex flex-wrap gap-2">
+                            {data[
+                              "watch/providers"
+                            ]?.results?.US?.flatrate?.map((item, index) => (
+                              <a
+                                href={
+                                  data["watch/providers"]?.results?.US?.link!
+                                }
+                                key={index}
+                                className="w-[55px] h-[55px] flex-shrink-0 transform transition-transform  duration-200  hover:scale-105  hover:shadow-xl"
+                              >
+                                <Image
+                                  src={`https://image.tmdb.org/t/p/original/${item.logo_path}`}
+                                  alt={`${item.provider_name} logo`}
+                                  width={55}
+                                  height={55}
+                                  className="rounded-lg object-cover"
+                                />
+                              </a>
+                            ))}
+                          </div>
                         </div>
                       )
                     : ""}
