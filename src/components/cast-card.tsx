@@ -12,7 +12,7 @@ interface CardProps {
   className?: string;
 }
 
-export function CastCard({
+export default function CastCard({
   name,
   character,
   imagePath,

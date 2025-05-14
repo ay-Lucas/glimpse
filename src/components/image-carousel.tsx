@@ -97,7 +97,7 @@ const carouselBreakpoints = {
   },
 };
 
-export function ImageCarousel({
+export default function ImageCarousel({
   title,
   userAgent,
   className,

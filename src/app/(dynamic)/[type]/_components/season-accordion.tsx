@@ -1,5 +1,5 @@
 "use client";
-import { ImageCarousel } from "@/components/image-carousel";
+import ImageCarousel from "@/components/image-carousel";
 import {
   Accordion,
   AccordionContent,

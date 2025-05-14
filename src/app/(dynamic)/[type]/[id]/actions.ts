@@ -15,7 +15,6 @@ import {
   TvResultsResponse,
   TvReviewsResponse,
 } from "@/types/request-types";
-import { Session } from "next-auth";
 
 export async function getData(
   request: FindRequest,

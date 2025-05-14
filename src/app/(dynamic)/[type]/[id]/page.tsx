@@ -1,19 +1,16 @@
+import dynamic from "next/dynamic";
 import "@/styles/globals.css";
 import { getData } from "./actions";
 import { Backdrop } from "../_components/backdrop";
 import { Poster } from "../_components/poster";
-import { VideoPlayer } from "../_components/video-player";
 import Link from "next/link";
 import { Cast, Person, Video } from "@/types/request-types";
-import { ImageCarousel } from "@/components/image-carousel";
-import { CastCard } from "@/components/cast-card";
 import { MediaDetails } from "@/components/media-details";
 import { PersonDetails } from "@/components/person-details";
 import Image from "next/image";
 import JustWatchLogo from "@/../public/justwatch-logo.svg";
 import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";
-import { AddToWatchlistDropdown } from "@/components/add-to-watchlist-button";
 import { getWatchlists } from "@/lib/actions";
 import { Item } from "@/types";
 import { Suspense } from "react";
@@ -23,10 +20,28 @@ import { BASE_IMAGE_URL } from "@/lib/constants";
 import { Seasons } from "../_components/seasons";
 import { RecommededSection } from "../_components/recommendedSection";
 import ReviewSection from "../_components/ReviewSection";
-import { checkRateLimit } from "@/lib/actions";
-import { notFound } from "next/navigation";
-import { headers } from "next/headers";
 
+const VideoPlayerClient = dynamic(() => import("../_components/video-player"), {
+  ssr: false,
+  loading: () => <Skeleton className="w-full h-[194px] rounded-xl" />,
+});
+
+const ImageCarouselClient = dynamic(
+  () => import("@/components/image-carousel"),
+  {
+    ssr: false,
+    loading: () => <Skeleton className="w-full h-[356px] rounded-xl" />,
+  },
+);
+
+const CastCardClient = dynamic(() => import("@/components/cast-card"), {
+  ssr: false,
+});
+
+const AddToWatchlistDropdownClient = dynamic(
+  () => import("@/components/add-to-watchlist-button"),
+  { ssr: false },
+);
 const SEASON_COMPONENT_HEIGHT = 52;
 
 function getTrailer(videoArray: Array<Video>) {
@@ -180,7 +195,7 @@ export default async function ItemPage({
                 )}
               </div>
               {item.media_type !== "person" && userWatchlists && session ? (
-                <AddToWatchlistDropdown
+                <AddToWatchlistDropdownClient
                   userId={session.user.id}
                   watchlistItem={item}
                 />
@@ -392,11 +407,11 @@ export default async function ItemPage({
                 <div>
                   <h2 className={`text-2xl font-bold -mb-9`}>Cast</h2>
                   <div className="pt-2 pb-4 pl-8 md:pl-3 -ml-8 md:ml-0 md:w-full w-screen">
-                    <ImageCarousel
+                    <ImageCarouselClient
                       items={item.credits.cast?.map(
                         (item: Cast, index: number) => (
                           <Link href={`/person/${item.id}`} key={index}>
-                            <CastCard
+                            <CastCardClient
                               name={item.name}
                               character={item.character}
                               imagePath={item.profile_path!}
@@ -430,7 +445,7 @@ export default async function ItemPage({
         </div>
       </div>
       <Suspense>
-        <VideoPlayer youtubeId={item.videoPath!} id={params.id} />
+        <VideoPlayerClient youtubeId={item.videoPath!} id={params.id} />
       </Suspense>
     </main>
   );

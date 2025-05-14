@@ -5,7 +5,7 @@ import {
   TvResult,
   TvResultsResponse,
 } from "@/types/request-types";
-import { ImageCarousel } from "@/components/image-carousel";
+import ImageCarousel from "@/components/image-carousel";
 import Link from "next/link";
 import { Card } from "@/components/card";
 

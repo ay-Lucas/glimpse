@@ -1,4 +1,4 @@
-import { ImageCarousel } from "@/components/image-carousel";
+import ImageCarousel from "@/components/image-carousel";
 import { isUnique } from "@/lib/utils";
 import {
   getUpcomingMovies,

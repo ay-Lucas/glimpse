@@ -1,13 +1,10 @@
 "use client";
-import { addToDefaultWatchlist } from "@/lib/actions";
 import { Button } from "./ui/button";
-import Link from "next/link";
-import { Item, WatchlistI, WatchlistItemI, WatchlistSchemaI } from "@/types";
+import { Item, WatchlistI } from "@/types";
 import { useWatchlist } from "@/context/watchlist";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuSeparator,
 } from "@radix-ui/react-dropdown-menu";
 import { DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { Checkbox } from "./ui/checkbox";
@@ -15,7 +12,7 @@ import { useEffect, useState } from "react";
 import { CheckedState } from "@radix-ui/react-checkbox";
 import { LucideListPlus } from "lucide-react";
 
-export function AddToWatchlistDropdown({
+export default function AddToWatchlistDropdown({
   userId,
   watchlistItem,
 }: {
