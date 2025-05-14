@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 import withPlaiceholder from "@plaiceholder/next";
+import withBundleAnalyzer from "@next/bundle-analyzer";
 const nextConfig = {
   reactStrictMode: true,
   images: {
@@ -19,4 +20,8 @@ const nextConfig = {
   output: "standalone",
 };
 
-export default withPlaiceholder(nextConfig);
+const withAnalyzer = withBundleAnalyzer({
+  enabled: process.env.ANALYZE === "true",
+});
+
+export default withAnalyzer(withPlaiceholder(nextConfig));
