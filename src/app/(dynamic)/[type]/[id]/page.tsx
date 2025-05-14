@@ -8,7 +8,6 @@ import { Cast, Person, Video } from "@/types/request-types";
 import { MediaDetails } from "@/components/media-details";
 import { PersonDetails } from "@/components/person-details";
 import Image from "next/image";
-import JustWatchLogo from "@/../public/justwatch-logo.svg";
 import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";
 import { getWatchlists } from "@/lib/actions";
@@ -333,7 +332,7 @@ export default async function ItemPage({
                             <span className="inline-flex items-center ml-4">
                               <Link href="https://justwatch.com">
                                 <Image
-                                  src={JustWatchLogo}
+                                  src={"/justwatch-logo.svg"}
                                   alt={`JustWatch Logo`}
                                   width={100}
                                   height={15}
