@@ -490,7 +490,7 @@ export async function getWatchlistsAndItems(
   return watchlists;
 }
 
-export async function checkRateLimit(ip: string, route: string) {
+export async function isRateLimited(ip: string, route: string) {
   const now = Date.now();
   const cutoff = new Date(now - WINDOW);
 

@@ -48,14 +48,6 @@ export default async function ItemPage({
 }: {
   params: { type: "movie" | "tv" | "person"; id: number };
 }) {
-  const ip = headers().get("x-forwarded-for") || "unknown";
-  const allowed = await checkRateLimit(ip, "/browse"); // group [type] (/tv, /movie) routes together
-
-  if (!allowed) {
-    console.log(`${ip} has been rate limited`);
-    return notFound();
-  }
-
   const data = await getData({ id: params.id }, params.type);
   let item: Item;
   let personDetails: boolean = false;
