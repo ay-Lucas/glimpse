@@ -107,7 +107,7 @@ export default async function Discover() {
   upcomingMoviesRes.results?.forEach((item) => (item.media_type = "movie"));
   return (
     <main className="w-screen max-w-[1920px] mx-auto">
-      <div className="px-0 lg:px-10 space-y-3 pt-5 overflow-hidden">
+      <div className="px-0 lg:px-10 space-y-3 py-6 overflow-hidden">
         <ImageCarousel
           items={makeCarouselCards(trendingTv)}
           title="Trending Series"

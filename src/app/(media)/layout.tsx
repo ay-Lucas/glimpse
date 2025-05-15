@@ -22,7 +22,9 @@ export default async function Layout({ children }: { children: ReactNode }) {
 
   return (
     <SessionProviderClient session={session}>
-      <WatchlistProviderClient>{children}</WatchlistProviderClient>
+      <WatchlistProviderClient>
+        <div className="min-h-screen">{children}</div>
+      </WatchlistProviderClient>
     </SessionProviderClient>
   );
 }

@@ -20,13 +20,15 @@ export default async function Layout({ children }: { children: ReactNode }) {
   return (
     <SessionProvider session={session}>
       <WatchlistProvider>
-        <main className="absolute flex left-0 top-0 h-full w-full items-center">
-          <Background
-            images={backdrops}
-            firstBackdropBlurData={firstBackdropBlurData?.base64 ?? ""}
-          />
-          <div className="container items-center">
-            <div>{children}</div>
+        <main className="min-h-screen">
+          <div className="absolute flex left-0 top-0 h-full w-full items-center">
+            <Background
+              images={backdrops}
+              firstBackdropBlurData={firstBackdropBlurData?.base64 ?? ""}
+            />
+            <div className="container items-center">
+              <div>{children}</div>
+            </div>
           </div>
         </main>
       </WatchlistProvider>
