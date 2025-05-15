@@ -1,14 +1,28 @@
 import { ReactNode } from "react";
-import SessionProvider from "@/components/session-provider";
 import { auth } from "@/auth";
-import { WatchlistProvider } from "@/context/watchlist";
+import dynamic from "next/dynamic";
+
+const WatchlistProviderClient = dynamic(
+  () =>
+    import("@/context/watchlist").then((module) => module.WatchlistProvider),
+  {
+    ssr: false,
+  },
+);
+
+const SessionProviderClient = dynamic(
+  () => import("@/components/session-provider"),
+  {
+    ssr: false,
+  },
+);
 
 export default async function Layout({ children }: { children: ReactNode }) {
   const session = await auth();
 
   return (
-    <SessionProvider session={session}>
-      <WatchlistProvider>{children}</WatchlistProvider>
-    </SessionProvider>
+    <SessionProviderClient session={session}>
+      <WatchlistProviderClient>{children}</WatchlistProviderClient>
+    </SessionProviderClient>
   );
 }

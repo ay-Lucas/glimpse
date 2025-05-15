@@ -14,7 +14,7 @@ import {
   deleteWatchlistItem,
   getWatchlistsAndItems,
 } from "@/lib/actions";
-import { WatchlistI, WatchlistItemI } from "@/types";
+import { WatchlistI } from "@/types";
 import { useSession } from "next-auth/react";
 import {
   MovieResponseAppended,
@@ -85,7 +85,6 @@ export const WatchlistProvider = ({ children }: { children: ReactNode }) => {
   const onDeleteWatchlist = async (watchlistId: string) => {
     const res = await deleteWatchlist(session!.user.id, watchlistId);
     if (res) {
-      console.log(res);
       const updatedWatchlists = watchlists.filter(
         (item) => item.id !== watchlistId,
       );
@@ -102,8 +101,6 @@ export const WatchlistProvider = ({ children }: { children: ReactNode }) => {
       res = await addTvToWatchlist(watchlistId, watchlistItem, rating);
     else if (watchlistItem.media_type == "movie")
       res = await addMovieToWatchlist(watchlistId, watchlistItem, rating);
-    console.log(res);
-    // setWatchlists([...watchlists]);
     fetchWatchlists();
     return res !== undefined;
   };
@@ -131,3 +128,4 @@ export const useWatchlist = () => {
   }
   return context;
 };
+// export default WatchlistProvider;
