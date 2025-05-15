@@ -124,11 +124,15 @@ export async function signup(prevState: any, formData: FormData) {
   const hashedPassword = passwordToSalt(validatedFields.data.password);
   await addUserToDb(validatedFields.data.email, hashedPassword);
   console.log('New user "' + email + '" registerd');
-  await signIn("credentials", formData);
-  const session = await auth();
-  createWatchlist(session?.user.id!, "Default");
-  setFirstWatchlistAsDefault(session?.user.id!);
-  console.log("Signing in..");
+  const userId = await getUserIdByEmail(String(email));
+  const watchlist = await createWatchlist(userId!, "Default");
+  if (watchlist.length > 0) {
+    setFirstWatchlistAsDefault(String(userId));
+    console.log("Default watchlist created");
+  } else {
+    console.log("There was an error creating first watchlist");
+  }
+  await signIn("credentials", formData); // Function ends ends here
 }
 
 export async function addMovieToWatchlist(
