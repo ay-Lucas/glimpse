@@ -44,7 +44,8 @@ export default auth(async (req) => {
     pathname.startsWith("/search");
   if (
     (isAuthenticated && pathname.startsWith("/signin")) ||
-    (isAuthenticated && pathname.startsWith("/signup"))
+    (isAuthenticated && pathname.startsWith("/signup")) ||
+    (isAuthenticated && pathname === "/")
   ) {
     return NextResponse.redirect(new URL(ROOT, nextUrl));
   }
