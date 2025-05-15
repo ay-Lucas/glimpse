@@ -49,9 +49,8 @@ export function MediaDetails({
               <span className="mr-2">
                 {((voteAverage ?? 0) * 10).toFixed(0)}%
               </span>
-              <Image
+              <img
                 src={"/tmdb-logo.svg"}
-                priority
                 height={13}
                 width={30}
                 alt="tmdb logo"

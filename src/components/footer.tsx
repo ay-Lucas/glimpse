@@ -43,7 +43,7 @@ export function Footer() {
             rel="noopener noreferrer"
             className="underline"
           >
-            <Image
+            <img
               src="/tmdb-logo.svg"
               alt="TMDB Logo"
               width={50}

@@ -242,7 +242,7 @@ export default async function ItemPage({ params }: { params: { id: number } }) {
                         Streaming
                         <span className="inline-flex items-center ml-4">
                           <Link href="https://justwatch.com">
-                            <Image
+                            <img
                               src={"/justwatch-logo.svg"}
                               alt={`JustWatch Logo`}
                               width={100}
