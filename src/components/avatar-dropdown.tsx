@@ -1,16 +1,8 @@
-import {
-  Github,
-  LogOut,
-  LucideList,
-  LucideListOrdered,
-  Settings,
-  WatchIcon,
-} from "lucide-react";
+import { Github, LogOut, LucideList, Settings } from "lucide-react";
 
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
@@ -18,9 +10,10 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import { signout } from "@/lib/actions";
 import Link from "next/link";
-import { IoWatchOutline } from "react-icons/io5";
+import { auth } from "@/auth";
 
 export async function AvatarDropdown() {
+  const session = await auth();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -35,6 +28,14 @@ export async function AvatarDropdown() {
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">
+        {session?.user && (
+          <>
+            <DropdownMenuItem>
+              <p className="w-full h-full px-2 py-1.5">{session.user.email}</p>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+          </>
+        )}
         <DropdownMenuItem>
           <Link href={"/watchlist"} className="w-full h-full">
             <button
