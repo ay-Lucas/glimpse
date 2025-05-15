@@ -1,30 +1,34 @@
 "use client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { signin, signup } from "@/lib/actions";
-import { useFormState, useFormStatus } from "react-dom";
-
-export function Submit() {
-  const { pending, data, method, action } = useFormStatus();
-  return (
-    <Button type="submit" variant="secondary">
-      {pending ? "Signing up..." : "Sign up"}
-    </Button>
-  );
-}
+import { signup } from "@/lib/actions";
+import { useState } from "react";
+import { redirect } from "next/navigation";
 
 export function ErrorMessage({ data }: { data: FormData }) {
   return <div>{data.entries().toArray().toString()}</div>;
 }
 
-export async function SignUpForm() {
+interface FieldErrors {
+  email?: string[] | undefined;
+  password?: string[] | undefined;
+}
+export function SignUpForm() {
+  const [errorMessage, setErrorMessage] = useState<String[]>();
+  async function signUpAndRedirect(formData: FormData) {
+    const res = await signup("credentials", formData); // Calls signin if successful
+    if (!res?.errors) {
+      redirect("/discover");
+    } else {
+      setErrorMessage([
+        res.errors.email?.toString() ?? "",
+        res.errors.password?.toString() ?? "",
+      ]);
+    }
+  }
+
   return (
-    <form
-      action={async (formData) => {
-        await signup("credentials", formData);
-      }}
-      className="flex flex-col space-y-3"
-    >
+    <form action={signUpAndRedirect} className="flex flex-col space-y-3">
       <span className="font-bold text-2xl">Sign Up</span>
       <Input
         name="email"
@@ -38,7 +42,16 @@ export async function SignUpForm() {
         placeholder="Password"
         className="bg-gray-600 border-gray-500"
       />
-      <Submit />
+      {errorMessage && (
+        <div className="text-red-400 text-sm">
+          {errorMessage.map((item, index) => (
+            <p key={index}>{item}</p>
+          ))}
+        </div>
+      )}
+      <Button type="submit" variant="secondary">
+        Sign Up
+      </Button>
       <div className="border-b-gray-500 border-b" />
     </form>
   );

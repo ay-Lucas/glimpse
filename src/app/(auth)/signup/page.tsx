@@ -7,7 +7,10 @@ export default async function SignIn() {
       <div className="flex flex-col space-y-3">
         <SignUpForm />
         <span className="font-bold text-lg text-center">or</span>
-        <Link href="/signin" className="text-center">
+        <Link
+          href="/signin"
+          className="text-center hover:text-white text-gray-300"
+        >
           Sign in
         </Link>
       </div>

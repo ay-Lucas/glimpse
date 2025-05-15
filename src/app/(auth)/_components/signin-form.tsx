@@ -2,28 +2,24 @@
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { signin } from "@/lib/actions";
-import { useFormStatus } from "react-dom";
-import { usePathname } from "next/navigation";
-
-export function SignInButton() {
-  const { pending, data, method, action } = useFormStatus();
-  return (
-    <Button type="submit" variant="secondary">
-      {pending ? "Signing in..." : "Sign in"}
-    </Button>
-  );
-}
+import { redirect, usePathname } from "next/navigation";
+import { useState } from "react";
 
 export function SignInForm() {
+  const [error, setError] = useState(false);
   const pathname = usePathname();
-  if (pathname == "/signin") console.log(pathname);
+
+  async function signInAndRedirect(formData: FormData) {
+    const res = await signin("credentials", formData);
+    if (!res?.errors) {
+      redirect("/discover");
+    } else {
+      setError(true);
+    }
+  }
+
   return (
-    <form
-      action={async (formData) => {
-        await signin("credentials", formData);
-      }}
-      className="flex flex-col space-y-3"
-    >
+    <form action={signInAndRedirect} className="flex flex-col space-y-3">
       <span className="font-bold text-2xl">
         {pathname === "/signin" ? "Sign in" : "Sign up"}
       </span>
@@ -41,7 +37,14 @@ export function SignInForm() {
         placeholder="Password"
         className="bg-gray-600 border-gray-500"
       />
-      <SignInButton />
+      {error && (
+        <p className="text-red-400 text-sm">
+          The email and/or password you specified are not correct.
+        </p>
+      )}
+      <Button type="submit" variant="secondary">
+        Sign In
+      </Button>
       <div className="border-b-gray-500 border-b" />
     </form>
   );

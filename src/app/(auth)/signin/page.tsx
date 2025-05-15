@@ -8,7 +8,10 @@ export default async function SignIn() {
         <div className="flex flex-col space-y-3">
           <SignInForm />
           <span className="font-bold text-lg text-center">or</span>
-          <Link href="/signup" className="mx-auto">
+          <Link
+            href="/signup"
+            className="mx-auto hover:text-white text-gray-300"
+          >
             Create an Account
           </Link>
         </div>
