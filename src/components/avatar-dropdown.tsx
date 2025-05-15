@@ -61,7 +61,10 @@ export async function AvatarDropdown() {
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem>
-          <Link href={"https://github.com/ay-lucas"} className="w-full h-full">
+          <Link
+            href={"https://github.com/ay-lucas/glimpse"}
+            className="w-full h-full"
+          >
             <button
               type="submit"
               className="flex px-2 py-1.5 w-full focus:bg-accent"
