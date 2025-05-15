@@ -37,7 +37,7 @@ export async function getTvData(
   request: IdAppendToResponseRequest,
 ): Promise<ShowResponseAppended> {
   const res = await fetch(
-    `${BASE_API_URL}/tv/${request.id}?append_to_response=content_ratings,credits`,
+    `${BASE_API_URL}/tv/${request.id}?append_to_response=videos,releases,content_ratings,credits,aggregate_credits,episode_groups,watch/providers&language=en-US`,
     options,
   );
   return res.json();
@@ -47,7 +47,7 @@ export async function getMovieData(
   request: IdAppendToResponseRequest,
 ): Promise<MovieResponseAppended> {
   const res = await fetch(
-    `${BASE_API_URL}/movie/${request.id}?append_to_response=releases,credits`,
+    `${BASE_API_URL}/movie/${request.id}?append_to_response=videos,releases,content_ratings,credits,aggregate_credits,episode_groups,watch/providers&language=en-US`,
     options,
   );
   return res.json();
