@@ -21,14 +21,23 @@ export const config = {
 };
 
 export async function middleware(request: NextRequest) {
-  if (process.env.NODE_ENV !== "production") {
+  const { hostname, pathname } = request.nextUrl;
+
+  // Bypass non-prod environments
+  if (
+    process.env.NODE_ENV !== "production" ||
+    hostname === "localhost" ||
+    hostname === "127.0.0.1"
+  ) {
     return NextResponse.next();
   }
 
+  const forwarded = request.headers.get("x-forwarded-for") ?? "";
+  const ip =
+    forwarded.split(",")[0]?.trim() ||
+    request.headers.get("x-real-ip") ||
+    "unknown";
   const ua = request.headers.get("user-agent") || "";
-  const ip = request.ip || "unknown";
-  const pathname = request.nextUrl.pathname;
-  const route = pathname.split("/")[1] ?? "/";
 
   // Block known abusive bots
   if (blockedUserAgents.some((bot) => ua.includes(bot))) {
@@ -36,6 +45,9 @@ export async function middleware(request: NextRequest) {
     return new NextResponse("Blocked bot", { status: 403 });
   }
 
+  const route = pathname.split("/")[1] ?? "/";
+
+  // Check if client is rate limited
   if (await isRateLimitedEdge(ip, route)) {
     const url = request.nextUrl.clone();
     url.pathname = "/429";
