@@ -4,7 +4,7 @@ export const PUBLIC_ROUTES = [
   "/discover",
   "/signin",
   "/signup",
-  "/discover/movies",
-  "/discover/series",
+  "/movie",
+  "/tv",
 ];
 export const DEFAULT_REDIRECT = "/protected";
