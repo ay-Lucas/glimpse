@@ -36,7 +36,6 @@ export default function AddToWatchlistDropdown({
     watchlists.forEach((watchlist) => {
       initialStates[watchlist.id] = isItemOnWatchlist(watchlist);
     });
-    console.log(initialStates);
     return initialStates;
   });
 
@@ -61,7 +60,6 @@ export default function AddToWatchlistDropdown({
     const found = watchlist.items.find(
       (watchlistItem) => watchlistItem.tmdbId === item.id,
     );
-    console.log("found: " + found);
     return found !== undefined;
   }
   // Sync checkbox states with watchlistsWithItem and userWatchlists whenever they change

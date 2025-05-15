@@ -6,7 +6,6 @@ import { useFormState, useFormStatus } from "react-dom";
 
 export function Submit() {
   const { pending, data, method, action } = useFormStatus();
-  console.log(pending);
   return (
     <Button type="submit" variant="secondary">
       {pending ? "Signing up..." : "Sign up"}

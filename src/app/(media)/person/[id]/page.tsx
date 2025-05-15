@@ -1,4 +1,3 @@
-import "@/styles/globals.css";
 import { getPersonData } from "@/app/(media)/actions";
 import { Poster } from "../../_components/poster";
 import { auth } from "@/auth";
@@ -12,7 +11,6 @@ export default async function PersonPage({
 }: {
   params: { type: "person"; id: number };
 }) {
-  console.log("person");
   const data = await getPersonData({ id: params.id });
 
   const session = await auth();

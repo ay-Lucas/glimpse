@@ -1,5 +1,4 @@
 import dynamic from "next/dynamic";
-import "@/styles/globals.css";
 import { Backdrop } from "@/app/(media)/_components/backdrop";
 import { Poster } from "../../_components/poster";
 import Link from "next/link";
@@ -50,7 +49,6 @@ export default async function MoviePage({
 }) {
   const data = await getMovieData({ id: params.id });
   data.media_type = "movie";
-  console.log("video results: " + data.videos);
   const tmdbId = Number(params.id);
   let videoPath;
   if (data.videos !== undefined && data.videos.results)

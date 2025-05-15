@@ -1,5 +1,4 @@
 import dynamic from "next/dynamic";
-import "@/styles/globals.css";
 import { getTvData } from "@/app/(media)/actions";
 import { Backdrop } from "@/app/(media)/_components/backdrop";
 import { Poster } from "../../_components/poster";
@@ -61,7 +60,6 @@ function getTrailer(videoArray: Array<Video>) {
 export default async function ItemPage({ params }: { params: { id: number } }) {
   const data = await getTvData({ id: params.id });
   data.media_type = "tv";
-  console.log(data);
   const tmdbId = Number(params.id);
   let videoPath;
   if (data.videos !== undefined && data.videos.results)
