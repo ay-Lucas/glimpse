@@ -17,6 +17,7 @@ import { Seasons } from "@/app/(media)/_components/seasons";
 import { RecommededSection } from "@/app/(media)/_components/recommendedSection";
 import ReviewSection from "@/app/(media)/_components/ReviewSection";
 import JustWatchLogo from "@/assets/justwatch-logo.svg";
+import CastCard from "@/components/cast-card";
 
 const VideoPlayerClient = dynamic(
   () => import("@/app/(media)/_components/video-player"),
@@ -33,10 +34,6 @@ const ImageCarouselClient = dynamic(
     loading: () => <Skeleton className="w-full h-[356px] rounded-xl" />,
   },
 );
-
-const CastCardClient = dynamic(() => import("@/components/cast-card"), {
-  ssr: false,
-});
 
 const AddToWatchlistDropdownClient = dynamic(
   () => import("@/components/add-to-watchlist-button"),
@@ -312,12 +309,11 @@ export default async function ItemPage({ params }: { params: { id: number } }) {
                       items={data.credits.cast?.map(
                         (item: Cast, index: number) => (
                           <Link href={`/person/${item.id}`} key={index}>
-                            <CastCardClient
+                            <CastCard
                               name={item.name}
                               character={item.character}
                               imagePath={item.profile_path!}
                               index={index}
-                              loading="lazy"
                             />
                           </Link>
                         ),

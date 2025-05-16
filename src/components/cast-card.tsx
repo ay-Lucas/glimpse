@@ -1,14 +1,11 @@
-"use client";
-
 import { BASE_IMAGE_URL } from "@/lib/constants";
 import Image from "next/image";
-import { useState } from "react";
-interface CardProps {
+
+interface CastCardProps {
   name?: string;
   character?: string;
   imagePath?: string;
   index: number;
-  loading?: "lazy" | "eager";
   className?: string;
 }
 
@@ -17,34 +14,35 @@ export default function CastCard({
   character,
   imagePath,
   index,
-  loading,
-  className,
-}: CardProps) {
-  const [isImageLoading, setImageLoading] = useState(true);
-
+  className = "",
+}: CastCardProps) {
   return (
     <div
-      className={`${className ?? ""} text-xl md:group-hover:scale-110 transform-gpu transition duration-150 overflow-hidden shadow-2xl h-full mx-auto z-50 select-none rounded-lg justify-center w-fit`}
+      className={`${className} 
+                  select-none rounded-full shadow-xl 
+                  transition-transform duration-150 group-hover:scale-110 justify-center w-fit`}
     >
       {imagePath ? (
         <Image
+          src={`${BASE_IMAGE_URL}${imagePath}`}
+          alt={`${name} as ${character}`}
+          key={index}
           width={150}
           height={150}
-          src={`${BASE_IMAGE_URL}${imagePath}`}
-          alt={`Background image ${index + 1}`}
-          key={index}
-          quality={75}
-          sizes="(max-width: 300px), 40vw, (max-width: 768px) 33vw, (max-width: 1080px) 23vw, (max-width: 1200px) 20vw"
-          onLoad={() => setImageLoading(false)}
-          className={`object-cover transition ${isImageLoading ? "blur-img" : "remove-blur"} w-[150px] h-[150px] rounded-[50%] mx-auto`}
-          loading={loading}
+          loading="lazy"
+          quality={60}
+          placeholder="blur"
+          blurDataURL="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=="
+          sizes="150px"
+          className="rounded-[50%] object-cover w-[150px] h-[150px]"
         />
       ) : (
-        <div className="w-[150px] h-[150px]"></div>
+        <div className="w-[150px] h-[150px] rounded-[50%] bg-gray-200" />
       )}
-      <div className="flex flex-col items-center text-center pt-1">
-        <div className="font-bold text-md md:text-lg">{name}</div>
-        <div className="text-sm">{character}</div>
+
+      <div className="mt-2 text-center">
+        <p className="font-semibold text-sm line-clamp-1">{name}</p>
+        <p className="text-sm text-gray-500 line-clamp-1">{character}</p>
       </div>
     </div>
   );
