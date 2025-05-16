@@ -1,8 +1,8 @@
 import { Genre } from "@/types/types";
-import Image from "next/image";
 import Link from "next/link";
 import { Button } from "./ui/button";
 import { Play } from "lucide-react";
+import TmdbLogo from "@/assets/tmdb-logo.svg";
 
 export function MediaDetails({
   title,
@@ -49,13 +49,9 @@ export function MediaDetails({
               <span className="mr-2">
                 {((voteAverage ?? 0) * 10).toFixed(0)}%
               </span>
-              <img
-                src={"/tmdb-logo.svg"}
-                height={13}
-                width={30}
-                alt="tmdb logo"
-              />
+              <TmdbLogo height={13} width={30} alt="tmdb logo" />
             </div>
+
             <span>•</span>
           </>
         )}

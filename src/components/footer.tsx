@@ -1,6 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
 import React from "react";
+import TmdbLogo from "@/assets/tmdb-logo.svg";
 
 export function Footer() {
   return (
@@ -43,8 +43,7 @@ export function Footer() {
             rel="noopener noreferrer"
             className="underline"
           >
-            <img
-              src="/tmdb-logo.svg"
+            <TmdbLogo
               alt="TMDB Logo"
               width={50}
               height={20}

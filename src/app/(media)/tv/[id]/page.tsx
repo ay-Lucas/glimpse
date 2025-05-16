@@ -16,6 +16,7 @@ import { BASE_IMAGE_URL } from "@/lib/constants";
 import { Seasons } from "@/app/(media)/_components/seasons";
 import { RecommededSection } from "@/app/(media)/_components/recommendedSection";
 import ReviewSection from "@/app/(media)/_components/ReviewSection";
+import JustWatchLogo from "@/assets/justwatch-logo.svg";
 
 const VideoPlayerClient = dynamic(
   () => import("@/app/(media)/_components/video-player"),
@@ -242,8 +243,7 @@ export default async function ItemPage({ params }: { params: { id: number } }) {
                         Streaming
                         <span className="inline-flex items-center ml-4">
                           <Link href="https://justwatch.com">
-                            <img
-                              src={"/justwatch-logo.svg"}
+                            <JustWatchLogo
                               alt={`JustWatch Logo`}
                               width={100}
                               height={15}

@@ -16,6 +16,7 @@ import { RecommededSection } from "@/app/(media)/_components/recommendedSection"
 import ReviewSection from "@/app/(media)/_components/ReviewSection";
 import { getMovieData } from "../../actions";
 import { getTrailer } from "@/lib/utils";
+import JustWatchLogo from "@/assets/justwatch-logo.svg";
 
 const VideoPlayerClient = dynamic(
   () => import("@/app/(media)/_components/video-player"),
@@ -190,8 +191,7 @@ export default async function MoviePage({
                           Streaming
                           <span className="inline-flex items-center ml-4">
                             <Link href="https://justwatch.com">
-                              <Image
-                                src={"/justwatch-logo.svg"}
+                              <JustWatchLogo
                                 alt={`JustWatch Logo`}
                                 width={100}
                                 height={15}
