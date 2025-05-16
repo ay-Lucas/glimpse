@@ -1,5 +1,9 @@
 import { shuffle } from "@/lib/utils";
-import { BASE_API_URL, BASE_IMAGE_URL, options } from "@/lib/constants";
+import {
+  BASE_API_URL,
+  BASE_ORIGINAL_IMAGE_URL,
+  options,
+} from "@/lib/constants";
 import {
   MovieResult,
   MovieResultsResponse,
@@ -23,12 +27,12 @@ export async function getBackgrounds() {
 
   res1.results?.forEach((item) => {
     if (item.popularity! > MIN_POPULARITY)
-      backdropUrls.push(`${BASE_IMAGE_URL}${item.backdrop_path}`);
+      backdropUrls.push(`${BASE_ORIGINAL_IMAGE_URL}${item.backdrop_path}`);
   });
 
   res2.results?.forEach((item) => {
     if (item.popularity! > MIN_POPULARITY)
-      backdropUrls.push(`${BASE_IMAGE_URL}${item.backdrop_path}`);
+      backdropUrls.push(`${BASE_ORIGINAL_IMAGE_URL}${item.backdrop_path}`);
   });
 
   shuffle(backdropUrls);

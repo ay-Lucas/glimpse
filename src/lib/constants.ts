@@ -13,7 +13,10 @@ export const dateOptions: Intl.DateTimeFormatOptions = {
 
 export const BASE_API_URL = "https://api.themoviedb.org/3";
 
-export const BASE_IMAGE_URL = "https://image.tmdb.org/t/p/original";
+export const BASE_ORIGINAL_IMAGE_URL = "https://image.tmdb.org/t/p/original";
+export const BASE_POSTER_IMAGE_URL = "https://image.tmdb.org/t/p/w500";
+export const BASE_BLUR_IMAGE_URL = "https://image.tmdb.org/t/p/w92";
+export const BASE_CAST_IMAGE_URL = "https://image.tmdb.org/t/p/w185";
 
 export const options: RequestInit = {
   method: "GET",

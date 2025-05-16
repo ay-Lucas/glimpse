@@ -5,7 +5,7 @@ import { Background } from "./_components/background";
 import { getBackgrounds } from "./_components/backdrops";
 import { WatchlistProvider } from "@/context/watchlist";
 import { getBlurData } from "@/lib/blur-data-generator";
-import { BASE_IMAGE_URL } from "@/lib/constants";
+import { BASE_ORIGINAL_IMAGE_URL } from "@/lib/constants";
 
 export default async function Layout({ children }: { children: ReactNode }) {
   const backdrops = await getBackgrounds();
@@ -14,7 +14,7 @@ export default async function Layout({ children }: { children: ReactNode }) {
 
   if (backdrops.at(0))
     firstBackdropBlurData = await getBlurData(
-      `${BASE_IMAGE_URL}${backdrops.at(0)}`,
+      `${BASE_ORIGINAL_IMAGE_URL}${backdrops.at(0)}`,
     );
 
   return (

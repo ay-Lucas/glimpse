@@ -11,7 +11,7 @@ import { getWatchlists } from "@/lib/actions";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getBlurData } from "@/lib/blur-data-generator";
-import { BASE_IMAGE_URL } from "@/lib/constants";
+import { BASE_BLUR_IMAGE_URL, BASE_ORIGINAL_IMAGE_URL } from "@/lib/constants";
 import { RecommededSection } from "@/app/(media)/_components/recommendedSection";
 import ReviewSection from "@/app/(media)/_components/ReviewSection";
 import { getMovieData } from "../../actions";
@@ -62,11 +62,30 @@ export default async function MoviePage({
   }
 
   const posterBlurData = data.poster_path
-    ? await getBlurData(`${BASE_IMAGE_URL}${data.poster_path}`)
+    ? await getBlurData(`${BASE_BLUR_IMAGE_URL}${data.poster_path}`)
     : null;
   const backdropBlurData = data.backdrop_path
-    ? await getBlurData(`${BASE_IMAGE_URL}${data.backdrop_path}`)
+    ? await getBlurData(`${BASE_BLUR_IMAGE_URL}${data.backdrop_path}`)
     : null;
+
+  const castWithPlaceholder = await Promise.all(
+    (data.credits?.cast ?? []).map(async (item) => {
+      let blurDataURL;
+      if (item.profile_path) {
+        let blurData = await getBlurData(
+          `${BASE_BLUR_IMAGE_URL}${item.profile_path}`,
+        );
+        blurDataURL = blurData.base64;
+      } else {
+        blurDataURL =
+          "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
+      }
+      return {
+        ...item,
+        blurDataURL: blurDataURL,
+      };
+    }),
+  );
 
   const isReleased: boolean =
     new Date(data.release_date ?? Date.now()).valueOf() < Date.now();
@@ -77,7 +96,7 @@ export default async function MoviePage({
           {data.backdrop_path ? (
             <div className="absolute h-full w-full bg-gradient-to-t from-background from-30% via-background/95 via-40% to-transparent">
               <Backdrop
-                src={`${BASE_IMAGE_URL}${data.backdrop_path}`}
+                src={`${BASE_ORIGINAL_IMAGE_URL}${data.backdrop_path}`}
                 blurDataUrl={backdropBlurData?.base64 ?? ""}
               />
             </div>
@@ -231,7 +250,7 @@ export default async function MoviePage({
                   <h2 className={`text-2xl font-bold -mb-9`}>Cast</h2>
                   <div className="pt-2 pb-4 pl-8 md:pl-3 -ml-8 md:ml-0 md:w-full w-screen">
                     <ImageCarouselClient
-                      items={data.credits.cast?.map(
+                      items={castWithPlaceholder.map(
                         (item: Cast, index: number) => (
                           <Link href={`/person/${item.id}`} key={index}>
                             <CastCard
@@ -239,6 +258,7 @@ export default async function MoviePage({
                               character={item.character}
                               imagePath={item.profile_path!}
                               index={index}
+                              blurDataURL={(item as any).blurDataURL}
                             />
                           </Link>
                         ),

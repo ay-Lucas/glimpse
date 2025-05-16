@@ -3,7 +3,7 @@ import { Poster } from "../../_components/poster";
 import { auth } from "@/auth";
 import { getWatchlists } from "@/lib/actions";
 import { getBlurData } from "@/lib/blur-data-generator";
-import { BASE_IMAGE_URL } from "@/lib/constants";
+import { BASE_ORIGINAL_IMAGE_URL } from "@/lib/constants";
 import { PersonDetails } from "@/components/person-details";
 
 export default async function PersonPage({
@@ -20,7 +20,7 @@ export default async function PersonPage({
   }
 
   const posterBlurData = data.profile_path
-    ? await getBlurData(`${BASE_IMAGE_URL}${data.profile_path}`)
+    ? await getBlurData(`${BASE_ORIGINAL_IMAGE_URL}${data.profile_path}`)
     : null;
 
   const info = data as any;

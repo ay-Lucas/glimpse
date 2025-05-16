@@ -8,6 +8,8 @@ import {
 import { MovieResult, PersonResult, TvResult } from "@/types/request-types";
 import { Card } from "@/components/card";
 import Link from "next/link";
+import { BASE_BLUR_IMAGE_URL, BASE_POSTER_IMAGE_URL } from "@/lib/constants";
+import { getBlurData } from "@/lib/blur-data-generator";
 
 const MIN_TRENDING_POPULARITY = 50;
 const VOTE_AVERAGE_GTE = 6;
@@ -17,10 +19,19 @@ const MIN_DATE = new Date().setFullYear(
   new Date().getFullYear() - TRENDING_YEARS_OLD,
 );
 
-export function makeCarouselCards(
-  data: Array<TvResult | MovieResult | PersonResult>,
-) {
-  return data.map(
+export async function makeCarouselCards(data: Array<TvResult | MovieResult>) {
+  const itemsWithPlaceholder = await Promise.all(
+    data.map(async (item) => {
+      const { base64 } = await getBlurData(
+        `${BASE_BLUR_IMAGE_URL}${item.poster_path}`,
+      );
+      return {
+        ...item,
+        blurDataURL: base64,
+      };
+    }),
+  );
+  return itemsWithPlaceholder.map(
     (item: MovieResult | TvResult | PersonResult, index: number) => {
       let card: React.ReactNode;
       switch (item.media_type) {
@@ -29,7 +40,8 @@ export function makeCarouselCards(
             <Card
               title={item.name}
               overview={item.overview}
-              imagePath={item.poster_path}
+              imagePath={`${BASE_POSTER_IMAGE_URL}${item.poster_path}`}
+              blurDataURL={(item as any).blurDataURL}
             />
           );
           break;
@@ -38,13 +50,18 @@ export function makeCarouselCards(
             <Card
               title={item.title}
               overview={item.overview}
-              imagePath={item.poster_path}
+              imagePath={`${BASE_POSTER_IMAGE_URL}${item.poster_path}`}
+              blurDataURL={(item as any).blurDataURL}
             />
           );
           break;
         case "person":
           card = (
-            <Card title={item.name} overview="" imagePath={item.profile_path} />
+            <Card
+              title={item.name}
+              overview=""
+              imagePath={item.profile_path ?? ""}
+            />
           );
           break;
       }
@@ -109,23 +126,23 @@ export default async function Discover() {
     <main className="w-screen max-w-[1920px] mx-auto">
       <div className="px-0 lg:px-10 space-y-3 py-6 overflow-hidden">
         <ImageCarousel
-          items={makeCarouselCards(trendingTv)}
+          items={await makeCarouselCards(trendingTv)}
           title="Trending Series"
         />
         <ImageCarousel
-          items={makeCarouselCards(trendingMovies)}
+          items={await makeCarouselCards(trendingMovies)}
           title="Trending Movies"
         />
         <ImageCarousel
-          items={makeCarouselCards(upcomingMoviesRes.results!)}
+          items={await makeCarouselCards(upcomingMoviesRes.results!)}
           title="Upcoming Movies"
         />
         <ImageCarousel
-          items={makeCarouselCards(filteredPopularTv!)}
+          items={await makeCarouselCards(filteredPopularTv!)}
           title="Popular Series"
         />
         <ImageCarousel
-          items={makeCarouselCards(popularMovies!)}
+          items={await makeCarouselCards(popularMovies!)}
           title="Popular Movies"
         />
       </div>

@@ -1,4 +1,3 @@
-"use client";
 import ImageCarousel from "@/components/image-carousel";
 import {
   Accordion,
@@ -6,24 +5,20 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import {
-  Episode,
-  EpisodeGroupResponse,
-  EpisodeRequest,
-  EpisodeResult,
-  EpisodeResultsResponse,
-} from "@/types/request-types";
+import { BASE_CAST_IMAGE_URL, BASE_POSTER_IMAGE_URL } from "@/lib/constants";
+import { Episode } from "@/types/request-types";
 import Image from "next/image";
-import { useState } from "react";
 
+interface EpisodeWithBlur extends Episode {
+  blurDataURL: string;
+}
 export function SeasonAccordion({
   number,
   episodesData,
 }: {
   number: number;
-  episodesData: Array<Episode>;
+  episodesData: Array<EpisodeWithBlur>;
 }) {
-  const [isImageLoading, setImageLoading] = useState(true);
   return (
     <Accordion
       type="single"
@@ -41,20 +36,20 @@ export function SeasonAccordion({
                   <Image
                     width={300}
                     height={150}
-                    src={`https://image.tmdb.org/t/p/original/${item.still_path}`}
+                    src={`${BASE_POSTER_IMAGE_URL}${item.still_path}`}
                     alt={`Item image`}
-                    onLoad={() => setImageLoading(false)}
                     quality={75}
-                    className={`object-cover pb-2 rounded-xl transition ${isImageLoading ? "blur-img" : "remove-blur"}`}
-                    // blurDataURL={blurData}
-                    // placeholder="blur"
+                    className={`object-cover pb-2 rounded-xl`}
+                    blurDataURL={(item as any).blurDataURL}
+                    loading="lazy"
+                    placeholder="blur"
                   />
                 )}
                 <div>
                   <span className="text-xl">{item.episode_number}. </span>
                   <span className="text-xl">{item.name}</span>
                 </div>
-                <div className="text-base">{item.overview}</div>
+                <div className="text-base text-gray-400">{item.overview}</div>
               </div>
             ))}
           />

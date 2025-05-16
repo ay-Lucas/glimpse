@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { Background } from "./(auth)/_components/background";
 import { getBackgrounds } from "./(auth)/_components/backdrops";
-import { BASE_IMAGE_URL } from "@/lib/constants";
+import { BASE_ORIGINAL_IMAGE_URL } from "@/lib/constants";
 import { getBlurData } from "@/lib/blur-data-generator";
 import { Button } from "@/components/ui/button";
 import { Suspense } from "react";
@@ -13,7 +13,7 @@ export default async function HomePage() {
 
   if (backdrops.at(0))
     firstBackdropBlurData = await getBlurData(
-      `${BASE_IMAGE_URL}${backdrops.at(0)}`,
+      `${BASE_ORIGINAL_IMAGE_URL}${backdrops.at(0)}`,
     );
 
   return (

@@ -12,7 +12,12 @@ import { getWatchlists } from "@/lib/actions";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getBlurData } from "@/lib/blur-data-generator";
-import { BASE_IMAGE_URL } from "@/lib/constants";
+import {
+  BASE_BLUR_IMAGE_URL,
+  BASE_CAST_IMAGE_URL,
+  BASE_ORIGINAL_IMAGE_URL,
+  BASE_POSTER_IMAGE_URL,
+} from "@/lib/constants";
 import { Seasons } from "@/app/(media)/_components/seasons";
 import { RecommededSection } from "@/app/(media)/_components/recommendedSection";
 import ReviewSection from "@/app/(media)/_components/ReviewSection";
@@ -73,11 +78,30 @@ export default async function ItemPage({ params }: { params: { id: number } }) {
   }
 
   const posterBlurData = data.poster_path
-    ? await getBlurData(`${BASE_IMAGE_URL}${data.poster_path}`)
+    ? await getBlurData(`${BASE_BLUR_IMAGE_URL}${data.poster_path}`)
     : null;
   const backdropBlurData = data.backdrop_path
-    ? await getBlurData(`${BASE_IMAGE_URL}${data.backdrop_path}`)
+    ? await getBlurData(`${BASE_POSTER_IMAGE_URL}${data.backdrop_path}`)
     : null;
+
+  const castWithPlaceholder = await Promise.all(
+    (data.credits?.cast ?? []).map(async (item) => {
+      let blurDataURL;
+      if (item.profile_path) {
+        let blurData = await getBlurData(
+          `${BASE_BLUR_IMAGE_URL}${item.profile_path}`,
+        );
+        blurDataURL = blurData.base64;
+      } else {
+        blurDataURL =
+          "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
+      }
+      return {
+        ...item,
+        blurDataURL: blurDataURL,
+      };
+    }),
+  );
 
   const isReleased: boolean =
     new Date(data.first_air_date ?? Date.now()).valueOf() < Date.now();
@@ -88,7 +112,7 @@ export default async function ItemPage({ params }: { params: { id: number } }) {
           {data.backdrop_path ? (
             <div className="absolute h-full w-full bg-gradient-to-t from-background from-30% via-background/95 via-40% to-transparent">
               <Backdrop
-                src={`${BASE_IMAGE_URL}${data.backdrop_path}`}
+                src={`${BASE_ORIGINAL_IMAGE_URL}${data.backdrop_path}`}
                 blurDataUrl={backdropBlurData?.base64 ?? ""}
               />
             </div>
@@ -104,7 +128,7 @@ export default async function ItemPage({ params }: { params: { id: number } }) {
               <div className="flex flex-col md:flex-row h-full md:h-3/4 z-10 md:items-center md:space-x-5 pb-3">
                 {data.poster_path && (
                   <Poster
-                    src={`https://image.tmdb.org/t/p/original${data.poster_path}`}
+                    src={`${BASE_POSTER_IMAGE_URL}${data.poster_path}`}
                     blurDataUrl={posterBlurData?.base64 ?? ""}
                   />
                 )}
@@ -306,14 +330,15 @@ export default async function ItemPage({ params }: { params: { id: number } }) {
                   <h2 className={`text-2xl font-bold -mb-9`}>Cast</h2>
                   <div className="pt-2 pb-4 pl-8 md:pl-3 -ml-8 md:ml-0 md:w-full w-screen">
                     <ImageCarouselClient
-                      items={data.credits.cast?.map(
+                      items={castWithPlaceholder?.map(
                         (item: Cast, index: number) => (
                           <Link href={`/person/${item.id}`} key={index}>
                             <CastCard
                               name={item.name}
                               character={item.character}
-                              imagePath={item.profile_path!}
+                              imagePath={`${BASE_CAST_IMAGE_URL}${item.profile_path}`}
                               index={index}
+                              blurDataURL={(item as any).blurDataURL}
                             />
                           </Link>
                         ),

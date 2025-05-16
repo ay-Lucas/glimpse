@@ -109,9 +109,10 @@ export async function RecommededSection({
     rating,
     recommendations,
   );
+
   return (
     <div>
-      <Recommended recommendations={filteredRecommendations} />
+      <Recommended recommendations={filteredRecommendations} />{" "}
     </div>
   );
 }

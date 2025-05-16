@@ -1,4 +1,4 @@
-import { BASE_IMAGE_URL } from "@/lib/constants";
+import { BASE_CAST_IMAGE_URL } from "@/lib/constants";
 import Image from "next/image";
 
 interface CastCardProps {
@@ -7,6 +7,7 @@ interface CastCardProps {
   imagePath?: string;
   index: number;
   className?: string;
+  blurDataURL: string;
 }
 
 export default function CastCard({
@@ -15,6 +16,7 @@ export default function CastCard({
   imagePath,
   index,
   className = "",
+  blurDataURL,
 }: CastCardProps) {
   return (
     <div
@@ -24,7 +26,7 @@ export default function CastCard({
     >
       {imagePath ? (
         <Image
-          src={`${BASE_IMAGE_URL}${imagePath}`}
+          src={`${BASE_CAST_IMAGE_URL}${imagePath}`}
           alt={`${name} as ${character}`}
           key={index}
           width={150}
@@ -32,7 +34,8 @@ export default function CastCard({
           loading="lazy"
           quality={60}
           placeholder="blur"
-          blurDataURL="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=="
+          // blurDataURL="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=="
+          blurDataURL={blurDataURL}
           sizes="150px"
           className="rounded-[50%] object-cover w-[150px] h-[150px]"
         />
