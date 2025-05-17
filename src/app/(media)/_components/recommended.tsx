@@ -26,6 +26,7 @@ export async function Recommended({
             <ImageCarousel
               items={items.map(
                 (item: MovieResult | TvResult, index: number) => {
+                  if (!item.poster_path) return;
                   let card: React.ReactNode;
                   switch (item.media_type) {
                     case "movie":
