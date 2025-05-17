@@ -3,7 +3,7 @@ import { getTvData } from "@/app/(media)/actions";
 import { Backdrop } from "@/app/(media)/_components/backdrop";
 import { Poster } from "../../_components/poster";
 import Link from "next/link";
-import { Cast, Person, Video } from "@/types/request-types";
+import { Cast, Video } from "@/types/request-types";
 import { MediaDetails } from "@/components/media-details";
 import Image from "next/image";
 import { auth } from "@/auth";
@@ -11,12 +11,16 @@ import { Button } from "@/components/ui/button";
 import { getWatchlists } from "@/lib/actions";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getBlurData } from "@/lib/blur-data-generator";
+import {
+  appendBlurDataToMediaArray,
+  getBlurData,
+} from "@/lib/blur-data-generator";
 import {
   BASE_BLUR_IMAGE_URL,
   BASE_CAST_IMAGE_URL,
   BASE_ORIGINAL_IMAGE_URL,
   BASE_POSTER_IMAGE_URL,
+  BaseImageUrl,
 } from "@/lib/constants";
 import { Seasons } from "@/app/(media)/_components/seasons";
 import { RecommededSection } from "@/app/(media)/_components/recommendedSection";
@@ -84,25 +88,15 @@ export default async function ItemPage({ params }: { params: { id: number } }) {
     ? await getBlurData(`${BASE_POSTER_IMAGE_URL}${data.backdrop_path}`)
     : null;
 
-  const castWithPlaceholder = await Promise.all(
-    (data.credits?.cast ?? []).map(async (item) => {
-      let blurDataURL;
-      if (item.profile_path) {
-        let blurData = await getBlurData(
-          `${BASE_BLUR_IMAGE_URL}${item.profile_path}`,
-        );
-        blurDataURL = blurData.base64;
-      } else {
-        blurDataURL =
-          "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
-      }
-      return {
-        ...item,
-        blurDataURL: blurDataURL,
-      };
-    }),
-  );
-
+  let castWithBlur;
+  if (data.credits?.cast && data.credits?.cast.length > 0) {
+    const posterPaths = data.credits?.cast?.map((item) => item.profile_path);
+    castWithBlur = (await appendBlurDataToMediaArray(
+      data.credits?.cast,
+      BaseImageUrl.BLUR,
+      posterPaths,
+    )) as Array<Cast>;
+  }
   const isReleased: boolean =
     new Date(data.first_air_date ?? Date.now()).valueOf() < Date.now();
   return (
@@ -322,7 +316,7 @@ export default async function ItemPage({ params }: { params: { id: number } }) {
                 </div>
               </>
             )}
-            {data.credits?.cast && data.credits.cast.length > 0 && (
+            {castWithBlur && (
               <Suspense
                 fallback={<Skeleton className="w-full h-[356px] rounded-xl" />}
               >
@@ -330,19 +324,17 @@ export default async function ItemPage({ params }: { params: { id: number } }) {
                   <h2 className={`text-2xl font-bold -mb-9`}>Cast</h2>
                   <div className="pt-2 pb-4 pl-8 md:pl-3 -ml-8 md:ml-0 md:w-full w-screen">
                     <ImageCarouselClient
-                      items={castWithPlaceholder?.map(
-                        (item: Cast, index: number) => (
-                          <Link href={`/person/${item.id}`} key={index}>
-                            <CastCard
-                              name={item.name}
-                              character={item.character}
-                              imagePath={`${BASE_CAST_IMAGE_URL}${item.profile_path}`}
-                              index={index}
-                              blurDataURL={(item as any).blurDataURL}
-                            />
-                          </Link>
-                        ),
-                      )}
+                      items={castWithBlur?.map((item: Cast, index: number) => (
+                        <Link href={`/person/${item.id}`} key={index}>
+                          <CastCard
+                            name={item.name}
+                            character={item.character}
+                            imagePath={`${BASE_CAST_IMAGE_URL}${item.profile_path}`}
+                            index={index}
+                            blurDataURL={(item as any).blurDataURL}
+                          />
+                        </Link>
+                      ))}
                       breakpoints="cast"
                       className="md:-ml-6"
                     />

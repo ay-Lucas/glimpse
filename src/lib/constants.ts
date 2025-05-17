@@ -18,6 +18,16 @@ export const BASE_POSTER_IMAGE_URL = "https://image.tmdb.org/t/p/w500";
 export const BASE_BLUR_IMAGE_URL = "https://image.tmdb.org/t/p/w92";
 export const BASE_CAST_IMAGE_URL = "https://image.tmdb.org/t/p/w185";
 
+export enum BaseImageUrl {
+  ORIGINAL = BASE_ORIGINAL_IMAGE_URL,
+  BLUR = BASE_BLUR_IMAGE_URL,
+  CAST = BASE_CAST_IMAGE_URL,
+  POSTER = BASE_POSTER_IMAGE_URL,
+}
+
+export const DEFAULT_BLUR_DATA_URL =
+  "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
+
 export const options: RequestInit = {
   method: "GET",
   headers: {

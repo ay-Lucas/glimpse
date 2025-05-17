@@ -56,14 +56,13 @@ export function MediaDetails({
           </>
         )}
         <div className="">
-          {isReleased
-            ? `${new Intl.DateTimeFormat("us", {
-                timeZone: "UTC",
-                month: "short",
-                year: "numeric",
-                day: "numeric",
-              }).format(new Date(releaseDate!))}`
-            : "Date Unavailable"}
+          {!isReleased && <div>Unreleased</div>}
+          {new Intl.DateTimeFormat("us", {
+            timeZone: "UTC",
+            month: "short",
+            year: "numeric",
+            day: "numeric",
+          }).format(new Date(releaseDate!))}
         </div>
       </div>
       {rating ? (
@@ -71,7 +70,7 @@ export function MediaDetails({
           Rated <span className="font-semibold">{rating}</span>
         </div>
       ) : (
-        <div>Rating Unavailable</div>
+        <div></div>
       )}
 
       {isVideo && (

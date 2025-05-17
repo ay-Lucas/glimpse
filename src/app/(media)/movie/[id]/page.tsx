@@ -10,8 +10,15 @@ import { Button } from "@/components/ui/button";
 import { getWatchlists } from "@/lib/actions";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getBlurData } from "@/lib/blur-data-generator";
-import { BASE_BLUR_IMAGE_URL, BASE_ORIGINAL_IMAGE_URL } from "@/lib/constants";
+import {
+  appendBlurDataToMediaArray,
+  getBlurData,
+} from "@/lib/blur-data-generator";
+import {
+  BASE_BLUR_IMAGE_URL,
+  BASE_ORIGINAL_IMAGE_URL,
+  BaseImageUrl,
+} from "@/lib/constants";
 import { RecommededSection } from "@/app/(media)/_components/recommendedSection";
 import ReviewSection from "@/app/(media)/_components/ReviewSection";
 import { getMovieData } from "../../actions";
@@ -68,24 +75,15 @@ export default async function MoviePage({
     ? await getBlurData(`${BASE_BLUR_IMAGE_URL}${data.backdrop_path}`)
     : null;
 
-  const castWithPlaceholder = await Promise.all(
-    (data.credits?.cast ?? []).map(async (item) => {
-      let blurDataURL;
-      if (item.profile_path) {
-        let blurData = await getBlurData(
-          `${BASE_BLUR_IMAGE_URL}${item.profile_path}`,
-        );
-        blurDataURL = blurData.base64;
-      } else {
-        blurDataURL =
-          "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
-      }
-      return {
-        ...item,
-        blurDataURL: blurDataURL,
-      };
-    }),
-  );
+  let castWithBlur;
+  if (data.credits?.cast && data.credits?.cast.length > 0) {
+    const posterPaths = data.credits?.cast?.map((item) => item.profile_path);
+    castWithBlur = (await appendBlurDataToMediaArray(
+      data.credits?.cast,
+      BaseImageUrl.BLUR,
+      posterPaths,
+    )) as Array<Cast>;
+  }
 
   const isReleased: boolean =
     new Date(data.release_date ?? Date.now()).valueOf() < Date.now();
@@ -246,12 +244,12 @@ export default async function MoviePage({
               <Suspense
                 fallback={<Skeleton className="w-full h-[356px] rounded-xl" />}
               >
-                <div>
-                  <h2 className={`text-2xl font-bold -mb-9`}>Cast</h2>
-                  <div className="pt-2 pb-4 pl-8 md:pl-3 -ml-8 md:ml-0 md:w-full w-screen">
-                    <ImageCarouselClient
-                      items={castWithPlaceholder.map(
-                        (item: Cast, index: number) => (
+                {castWithBlur && (
+                  <div>
+                    <h2 className={`text-2xl font-bold -mb-9`}>Cast</h2>
+                    <div className="pt-2 pb-4 pl-8 md:pl-3 -ml-8 md:ml-0 md:w-full w-screen">
+                      <ImageCarouselClient
+                        items={castWithBlur.map((item: Cast, index: number) => (
                           <Link href={`/person/${item.id}`} key={index}>
                             <CastCard
                               name={item.name}
@@ -261,13 +259,13 @@ export default async function MoviePage({
                               blurDataURL={(item as any).blurDataURL}
                             />
                           </Link>
-                        ),
-                      )}
-                      breakpoints="cast"
-                      className="md:-ml-6"
-                    />
+                        ))}
+                        breakpoints="cast"
+                        className="md:-ml-6"
+                      />
+                    </div>
                   </div>
-                </div>
+                )}
               </Suspense>
             )}
             <Suspense

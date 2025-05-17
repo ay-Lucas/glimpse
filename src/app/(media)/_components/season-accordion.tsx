@@ -5,13 +5,14 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { BASE_CAST_IMAGE_URL, BASE_POSTER_IMAGE_URL } from "@/lib/constants";
+import { BASE_POSTER_IMAGE_URL } from "@/lib/constants";
 import { Episode } from "@/types/request-types";
 import Image from "next/image";
 
-interface EpisodeWithBlur extends Episode {
+export interface EpisodeWithBlur extends Episode {
   blurDataURL: string;
 }
+
 export function SeasonAccordion({
   number,
   episodesData,
