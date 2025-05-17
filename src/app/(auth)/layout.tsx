@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import SessionProvider from "@/components/session-provider";
 import { auth } from "@/auth";
-import { Background } from "./_components/background";
+import Background from "./_components/background";
 import { getBackgrounds } from "./_components/backdrops";
 import { WatchlistProvider } from "@/context/watchlist";
 import { getBlurData } from "@/lib/blur-data-generator";

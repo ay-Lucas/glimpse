@@ -2,7 +2,7 @@
 import Image from "next/image";
 import { useState, useEffect } from "react";
 
-export function Background({
+export default function Background({
   images,
   firstBackdropBlurData,
 }: {

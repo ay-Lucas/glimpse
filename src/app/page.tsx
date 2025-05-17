@@ -1,11 +1,20 @@
 // app/page.tsx
 import Link from "next/link";
-import { Background } from "./(auth)/_components/background";
 import { getBackgrounds } from "./(auth)/_components/backdrops";
 import { BASE_ORIGINAL_IMAGE_URL } from "@/lib/constants";
 import { getBlurData } from "@/lib/blur-data-generator";
 import { Button } from "@/components/ui/button";
 import { Suspense } from "react";
+import dynamic from "next/dynamic";
+import { Skeleton } from "@/components/ui/skeleton";
+
+const BackgroundClient = dynamic(
+  () => import("./(auth)/_components/background"),
+  {
+    ssr: false,
+    loading: () => <Skeleton className="w-full h-full" />,
+  },
+);
 
 export default async function HomePage() {
   const backdrops = await getBackgrounds();
@@ -20,7 +29,7 @@ export default async function HomePage() {
     <main>
       <div className="-z-40 absolute flex left-0 top-0 h-full w-full items-center">
         <Suspense>
-          <Background
+          <BackgroundClient
             images={backdrops}
             firstBackdropBlurData={firstBackdropBlurData?.base64 ?? ""}
           />
