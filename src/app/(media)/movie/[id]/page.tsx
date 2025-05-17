@@ -26,6 +26,7 @@ import { getTrailer } from "@/lib/utils";
 import JustWatchLogo from "@/assets/justwatch-logo.svg";
 import CastCard from "@/components/cast-card";
 
+export const revalidate = 3600;
 const VideoPlayerClient = dynamic(
   () => import("@/app/(media)/_components/video-player"),
   {

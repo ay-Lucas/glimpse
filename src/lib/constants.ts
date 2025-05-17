@@ -34,7 +34,8 @@ export const options: RequestInit = {
     accept: "application/json",
     Authorization: `Bearer ${process.env.TMDB_ACCESS_TOKEN}`,
   },
-  cache: "force-cache",
+  // cache: "force-cache",
+  // next: { revalidate: 60 },
 };
 
 // export const genres = new Map([

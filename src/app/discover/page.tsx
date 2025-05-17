@@ -8,8 +8,12 @@ import {
 import { MovieResult, PersonResult, TvResult } from "@/types/request-types";
 import { Card } from "@/components/card";
 import Link from "next/link";
-import { BASE_BLUR_IMAGE_URL, BASE_POSTER_IMAGE_URL } from "@/lib/constants";
-import { getBlurData } from "@/lib/blur-data-generator";
+import { BASE_POSTER_IMAGE_URL, BaseImageUrl } from "@/lib/constants";
+import { appendBlurDataToMediaArray } from "@/lib/blur-data-generator";
+import dynamic from "next/dynamic";
+import { Skeleton } from "@/components/ui/skeleton";
+
+export const revalidate = 600;
 
 const MIN_TRENDING_POPULARITY = 50;
 const VOTE_AVERAGE_GTE = 6;

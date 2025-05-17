@@ -6,6 +6,7 @@ import { getBlurData } from "@/lib/blur-data-generator";
 import { BASE_ORIGINAL_IMAGE_URL } from "@/lib/constants";
 import { PersonDetails } from "@/components/person-details";
 
+export const revalidate = 3600;
 export default async function PersonPage({
   params,
 }: {
