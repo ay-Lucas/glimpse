@@ -25,7 +25,7 @@ const MIN_DATE = new Date().setFullYear(
 const ImageCarouselClient = dynamic(
   () => import("@/components/image-carousel"),
   {
-    ssr: false,
+    ssr: true,
     loading: () => <Skeleton className="w-full h-[336px] rounded-xl" />,
   },
 );
@@ -49,6 +49,7 @@ export async function makeCarouselCards(data: Array<TvResult | MovieResult>) {
               overview={item.overview}
               imagePath={`${BASE_POSTER_IMAGE_URL}${item.poster_path}`}
               blurDataURL={(item as any).blurDataURL}
+              loading="lazy"
             />
           );
           break;
@@ -59,6 +60,7 @@ export async function makeCarouselCards(data: Array<TvResult | MovieResult>) {
               overview={item.overview}
               imagePath={`${BASE_POSTER_IMAGE_URL}${item.poster_path}`}
               blurDataURL={(item as any).blurDataURL}
+              loading="lazy"
             />
           );
           break;
@@ -67,7 +69,8 @@ export async function makeCarouselCards(data: Array<TvResult | MovieResult>) {
             <Card
               title={item.name}
               overview=""
-              imagePath={item.profile_path ?? ""}
+              imagePath={`${BaseImageUrl.CAST}${item.profile_path}`}
+              loading="lazy"
             />
           );
           break;
@@ -129,29 +132,35 @@ export default async function Discover() {
     (item) => (item.media_type = "movie"),
   );
   upcomingMoviesRes.results?.forEach((item) => (item.media_type = "movie"));
+
+  const [
+    trendingTvCards,
+    trendingMovieCards,
+    upcomingMovieCards,
+    popularTvCards,
+    popularMovieCards,
+  ] = await Promise.all([
+    makeCarouselCards(trendingTv),
+    makeCarouselCards(trendingMovies),
+    makeCarouselCards(upcomingMoviesRes.results!),
+    makeCarouselCards(filteredPopularTv!),
+    makeCarouselCards(popularMovies!),
+  ]);
+
   return (
     <main className="w-screen max-w-[1920px] mx-auto">
       <div className="px-0 lg:px-10 space-y-3 py-6 overflow-hidden">
+        <ImageCarouselClient items={trendingTvCards} title="Trending Series" />
         <ImageCarouselClient
-          items={await makeCarouselCards(trendingTv)}
-          title="Trending Series"
-        />
-        <ImageCarouselClient
-          items={await makeCarouselCards(trendingMovies)}
+          items={trendingMovieCards}
           title="Trending Movies"
         />
         <ImageCarouselClient
-          items={await makeCarouselCards(upcomingMoviesRes.results!)}
+          items={upcomingMovieCards}
           title="Upcoming Movies"
         />
-        <ImageCarouselClient
-          items={await makeCarouselCards(filteredPopularTv!)}
-          title="Popular Series"
-        />
-        <ImageCarouselClient
-          items={await makeCarouselCards(popularMovies!)}
-          title="Popular Movies"
-        />
+        <ImageCarouselClient items={popularTvCards} title="Popular Series" />
+        <ImageCarouselClient items={popularMovieCards} title="Popular Movies" />
       </div>
     </main>
   );
