@@ -67,9 +67,37 @@ function getTrailer(videoArray: Array<Video>) {
 }
 
 export default async function ItemPage({ params }: { params: { id: number } }) {
-  const data = await getTvData({ id: params.id });
-  data.media_type = "tv";
   const tmdbId = Number(params.id);
+
+  const [data, session] = await Promise.all([
+    getTvData({ id: params.id }),
+    auth(),
+  ]);
+
+  data.media_type = "tv";
+
+  const watchlistPromise = session
+    ? getWatchlists(session.user.id)
+    : Promise.resolve(null);
+
+  const [userWatchlists, posterBlurData, backdropBlurData, castWithBlur] =
+    await Promise.all([
+      watchlistPromise,
+      data.poster_path
+        ? getBlurData(`${BASE_BLUR_IMAGE_URL}${data.poster_path}`)
+        : Promise.resolve(null),
+      data.backdrop_path
+        ? getBlurData(`${BASE_BLUR_IMAGE_URL}${data.backdrop_path}`)
+        : Promise.resolve(null),
+      data.credits?.cast?.length
+        ? appendBlurDataToMediaArray(
+            data.credits.cast,
+            BaseImageUrl.BLUR,
+            data.credits.cast.map((c) => c.profile_path),
+          )
+        : Promise.resolve([]),
+    ]);
+
   let videoPath;
   if (data.videos !== undefined && data.videos.results)
     videoPath = getTrailer(data.videos.results)?.key;
@@ -77,30 +105,10 @@ export default async function ItemPage({ params }: { params: { id: number } }) {
     data.content_ratings.results.filter(
       (item) => item.iso_3166_1 === "US" && item.rating !== "",
     )[0]?.rating ?? "";
-  const session = await auth();
-  let userWatchlists;
-  if (session) {
-    userWatchlists = await getWatchlists(session.user.id);
-  }
 
-  const posterBlurData = data.poster_path
-    ? await getBlurData(`${BASE_BLUR_IMAGE_URL}${data.poster_path}`)
-    : null;
-  const backdropBlurData = data.backdrop_path
-    ? await getBlurData(`${BASE_POSTER_IMAGE_URL}${data.backdrop_path}`)
-    : null;
-
-  let castWithBlur;
-  if (data.credits?.cast && data.credits?.cast.length > 0) {
-    const posterPaths = data.credits?.cast?.map((item) => item.profile_path);
-    castWithBlur = (await appendBlurDataToMediaArray(
-      data.credits?.cast,
-      BaseImageUrl.BLUR,
-      posterPaths,
-    )) as Array<Cast>;
-  }
   const isReleased: boolean =
     new Date(data.first_air_date ?? Date.now()).valueOf() < Date.now();
+
   return (
     <main>
       <div className="h-full w-full overflow-x-hidden">
