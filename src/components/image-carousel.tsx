@@ -2,12 +2,10 @@
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Swiper as SwiperCore, SwiperOptions } from "swiper/types";
 import { ReactNode, useEffect, useRef, useState } from "react";
-import { FreeMode, Navigation } from "swiper/modules";
+import { FreeMode, Navigation, Virtual } from "swiper/modules";
 import "swiper/css";
-import "swiper/css/navigation";
 import { Button } from "./ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import "@/styles/globals.css";
 
 export interface ImageCarouselProps {
   title?: string;
@@ -144,8 +142,8 @@ export default function ImageCarousel({
   return (
     <>
       <div className={`${className ?? ""}`}>
-        <div className="space-x-2 flex justify-between pb-2">
-          <h2 className={`text-2xl font-bold pb-3 ml-6 md:ml-7`}>
+        <div className="space-x-2 flex justify-between">
+          <h2 className={`text-2xl font-bold ml-6 md:ml-1`}>
             {title && title}
           </h2>
           <div className="whitespace-nowrap opacity-0 lg:opacity-100">
@@ -168,7 +166,6 @@ export default function ImageCarousel({
           </div>
         </div>
         <Swiper
-          slidesPerView={1}
           speed={750}
           spaceBetween={10}
           freeMode={{
@@ -185,12 +182,16 @@ export default function ImageCarousel({
           }}
           breakpoints={breakpointsOption}
           lazyPreloadPrevNext={3}
-          modules={[Navigation, FreeMode]}
+          modules={[Navigation, FreeMode, Virtual]}
           className="mySwiper"
-          style={{ overflow: "visible" }}
+          watchSlidesProgress={true}
         >
           {items.map((item: ReactNode, i: number) => (
-            <SwiperSlide key={i} className="group">
+            <SwiperSlide
+              key={i}
+              className={`group py-2 px-0 ${i === 0 ? "ml-2" : " "}`}
+              virtualIndex={i}
+            >
               {item}
             </SwiperSlide>
           ))}
