@@ -3,7 +3,10 @@ import { Poster } from "../../_components/poster";
 import { auth } from "@/auth";
 import { getWatchlists } from "@/lib/actions";
 import { getBlurData } from "@/lib/blur-data-generator";
-import { BASE_ORIGINAL_IMAGE_URL } from "@/lib/constants";
+import {
+  BASE_ORIGINAL_IMAGE_URL,
+  DEFAULT_BLUR_DATA_URL,
+} from "@/lib/constants";
 import { PersonDetails } from "@/components/person-details";
 
 export const revalidate = 3600;
@@ -40,7 +43,7 @@ export default async function PersonPage({
                 {data.profile_path && (
                   <Poster
                     src={`https://image.tmdb.org/t/p/original${data.profile_path}`}
-                    blurDataUrl={posterBlurData?.base64 ?? ""}
+                    blurDataUrl={posterBlurData ?? DEFAULT_BLUR_DATA_URL}
                   />
                 )}
                 <PersonDetails

@@ -18,6 +18,7 @@ import {
   BASE_BLUR_IMAGE_URL,
   BASE_ORIGINAL_IMAGE_URL,
   BaseImageUrl,
+  DEFAULT_BLUR_DATA_URL,
 } from "@/lib/constants";
 import { RecommededSection } from "@/app/(media)/_components/recommendedSection";
 import ReviewSection from "@/app/(media)/_components/ReviewSection";
@@ -99,7 +100,7 @@ export default async function MoviePage({
             <div className="absolute h-full w-full bg-gradient-to-t from-background from-30% via-background/95 via-40% to-transparent">
               <Backdrop
                 src={`${BASE_ORIGINAL_IMAGE_URL}${data.backdrop_path}`}
-                blurDataUrl={backdropBlurData?.base64 ?? ""}
+                blurDataUrl={backdropBlurData ?? DEFAULT_BLUR_DATA_URL}
               />
             </div>
           ) : (
@@ -115,7 +116,7 @@ export default async function MoviePage({
                 {data.poster_path && (
                   <Poster
                     src={`https://image.tmdb.org/t/p/original${data.poster_path}`}
-                    blurDataUrl={posterBlurData?.base64 ?? ""}
+                    blurDataUrl={posterBlurData ?? DEFAULT_BLUR_DATA_URL}
                   />
                 )}
                 <MediaDetails

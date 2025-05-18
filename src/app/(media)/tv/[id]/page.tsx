@@ -21,6 +21,7 @@ import {
   BASE_ORIGINAL_IMAGE_URL,
   BASE_POSTER_IMAGE_URL,
   BaseImageUrl,
+  DEFAULT_BLUR_DATA_URL,
 } from "@/lib/constants";
 import { Seasons } from "@/app/(media)/_components/seasons";
 import { RecommededSection } from "@/app/(media)/_components/recommendedSection";
@@ -117,7 +118,7 @@ export default async function ItemPage({ params }: { params: { id: number } }) {
             <div className="absolute h-full w-full bg-gradient-to-t from-background from-30% via-background/95 via-40% to-transparent">
               <Backdrop
                 src={`${BASE_ORIGINAL_IMAGE_URL}${data.backdrop_path}`}
-                blurDataUrl={backdropBlurData?.base64 ?? ""}
+                blurDataUrl={backdropBlurData ?? DEFAULT_BLUR_DATA_URL}
               />
             </div>
           ) : (
@@ -133,7 +134,7 @@ export default async function ItemPage({ params }: { params: { id: number } }) {
                 {data.poster_path && (
                   <Poster
                     src={`${BASE_POSTER_IMAGE_URL}${data.poster_path}`}
-                    blurDataUrl={posterBlurData?.base64 ?? ""}
+                    blurDataUrl={posterBlurData ?? DEFAULT_BLUR_DATA_URL}
                   />
                 )}
                 <MediaDetails
