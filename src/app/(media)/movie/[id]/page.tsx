@@ -53,41 +53,44 @@ export default async function MoviePage({
 }: {
   params: { id: number };
 }) {
-  const data = await getMovieData({ id: params.id });
-  data.media_type = "movie";
   const tmdbId = Number(params.id);
-  let videoPath;
-  if (data.videos !== undefined && data.videos.results)
-    videoPath = getTrailer(data.videos.results)?.key;
+
+  const [data, session] = await Promise.all([
+    getMovieData({ id: params.id }),
+    auth(),
+  ]);
+
+  data.media_type = "movie";
+
+  const watchlistPromise = session
+    ? getWatchlists(session.user.id)
+    : Promise.resolve(null);
+
+  const [userWatchlists, posterBlurData, backdropBlurData, castWithBlur] =
+    await Promise.all([
+      watchlistPromise,
+      data.poster_path
+        ? getBlurData(`${BASE_BLUR_IMAGE_URL}${data.poster_path}`)
+        : Promise.resolve(null),
+      data.backdrop_path
+        ? getBlurData(`${BASE_BLUR_IMAGE_URL}${data.backdrop_path}`)
+        : Promise.resolve(null),
+      data.credits?.cast?.length
+        ? appendBlurDataToMediaArray(
+            data.credits.cast,
+            BaseImageUrl.BLUR,
+            data.credits.cast.map((c) => c.profile_path),
+          )
+        : Promise.resolve([]),
+    ]);
+
+  const videoPath = getTrailer(data.videos?.results || [])?.key;
   const rating =
-    data.releases.countries.filter(
-      (item) => item.iso_3166_1 === "US" && item.certification !== "",
-    )[0]?.certification ?? "";
-  const session = await auth();
-  let userWatchlists;
-  if (session) {
-    userWatchlists = await getWatchlists(session.user.id);
-  }
-
-  const posterBlurData = data.poster_path
-    ? await getBlurData(`${BASE_BLUR_IMAGE_URL}${data.poster_path}`)
-    : null;
-  const backdropBlurData = data.backdrop_path
-    ? await getBlurData(`${BASE_BLUR_IMAGE_URL}${data.backdrop_path}`)
-    : null;
-
-  let castWithBlur;
-  if (data.credits?.cast && data.credits?.cast.length > 0) {
-    const posterPaths = data.credits?.cast?.map((item) => item.profile_path);
-    castWithBlur = (await appendBlurDataToMediaArray(
-      data.credits?.cast,
-      BaseImageUrl.BLUR,
-      posterPaths,
-    )) as Array<Cast>;
-  }
-
-  const isReleased: boolean =
-    new Date(data.release_date ?? Date.now()).valueOf() < Date.now();
+    data.releases.countries.find(
+      (c) => c.iso_3166_1 === "US" && c.certification,
+    )?.certification ?? "";
+  const isReleased =
+    new Date(data.release_date || Date.now()).getTime() < Date.now();
   return (
     <main>
       <div className="h-full w-full overflow-x-hidden">
@@ -226,7 +229,7 @@ export default async function MoviePage({
                                 className="w-[55px] h-[55px] flex-shrink-0 transform transition-transform  duration-200  hover:scale-105  hover:shadow-xl"
                               >
                                 <Image
-                                  src={`https://image.tmdb.org/t/p/original/${item.logo_path}`}
+                                  src={`${BASE_ORIGINAL_IMAGE_URL}{item.logo_path}`}
                                   alt={`${item.provider_name} logo`}
                                   width={55}
                                   height={55}
