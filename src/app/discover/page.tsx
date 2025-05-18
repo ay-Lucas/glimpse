@@ -47,7 +47,7 @@ export async function makeCarouselCards(data: Array<TvResult | MovieResult>) {
             <Card
               title={item.name}
               overview={item.overview}
-              imagePath={`${BASE_POSTER_IMAGE_URL}${item.poster_path}`}
+              imagePath={`${BaseImageUrl.POSTER}${item.poster_path}`}
               blurDataURL={(item as any).blurDataURL}
               loading="lazy"
             />
@@ -58,7 +58,7 @@ export async function makeCarouselCards(data: Array<TvResult | MovieResult>) {
             <Card
               title={item.title}
               overview={item.overview}
-              imagePath={`${BASE_POSTER_IMAGE_URL}${item.poster_path}`}
+              imagePath={`${BaseImageUrl.POSTER}${item.poster_path}`}
               blurDataURL={(item as any).blurDataURL}
               loading="lazy"
             />
