@@ -1,42 +1,44 @@
 import Image from "next/image";
-interface CardProps {
-  title?: string;
-  overview?: string;
-  imagePath: string;
-  className?: string;
-  blurDataURL?: string;
-}
 
-export async function Card({
+export function Card({
   title,
   overview,
   imagePath,
-  className,
   blurDataURL,
-}: CardProps) {
+  loading = "lazy",
+  className = "",
+}: {
+  title?: string;
+  overview?: string;
+  imagePath: string;
+  blurDataURL?: string;
+  loading?: "lazy" | "eager";
+  className?: string;
+}) {
   return (
     <div
-      className={`${className ?? ""} relative text-xl md:group-hover:scale-110 transform-gpu transition duration-150 rounded-lg overflow-hidden shadow-2xl w-[142.5px] h-[213px] md:w-[190px] md:h-[284px] flex mx-auto z-50 select-none`}
+      className={`w-[238px] h-[357px] group relative overflow-hidden rounded-2xl shadow-lg transform transition-transform duration-200 ease-out group-hover:scale-105 will-change-transform ${className}`}
     >
-      <div className="absolute z-10 h-full w-full bg-gradient-to-t from-background from-30% to-gray-300/20 opacity-0 md:group-hover:opacity-95 transition-opacity transform-gpu duration-300" />
-      <div className="absolute z-20 flex h-full w-full items-end opacity-0 md:group-hover:opacity-100 transition transform-gpu duration-300">
-        <div className="p-2">
-          <span className="font-bold">{title}</span>
-          <div className="text-sm line-clamp-6">{overview}</div>
-        </div>
+      <div className="relative w-full h-0 pb-[150%]">
+        <Image
+          src={imagePath}
+          alt={title ?? "untitled"}
+          fill
+          className="object-cover"
+          placeholder={blurDataURL ? "blur" : undefined}
+          blurDataURL={blurDataURL}
+          loading={loading}
+          sizes="(max-width: 768px) 100vw, 200px"
+        />
+        <div className="absolute inset-0 opacity-0 transition-opacity duration-200 ease-out group-hover:opacity-100 bg-[linear-gradient(to_top,rgba(0,0,0,0.9)_35%,transparent)] pointer-events-none" />
       </div>
-      <Image
-        width={195}
-        height={290}
-        src={imagePath}
-        alt={`Poster image of ${title}`}
-        quality={60}
-        placeholder="blur"
-        blurDataURL={blurDataURL}
-        sizes="100px"
-        className="object-cover"
-        loading="lazy"
-      />
+
+      <div className="absolute bottom-0 left-0 right-0 p-4 opacity-0 translate-y-4 transition-all duration-200 ease-out group-hover:opacity-100 group-hover:translate-y-0 will-change-opacity will-change-transform bg-[linear-gradient(to_top,rgba(0,0,0,0.95)_20%,transparent)]">
+        <h3 className="text-white text-xl font-semibold truncate">{title}</h3>
+        {overview && (
+          <p className="text-gray-200 text-sm mt-1 line-clamp-5">{overview}</p>
+        )}
+      </div>
     </div>
   );
 }
