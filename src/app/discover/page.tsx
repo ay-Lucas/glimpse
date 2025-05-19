@@ -32,13 +32,13 @@ const ImageCarouselClient = dynamic(
 export async function makeCarouselCards(data: Array<TvResult | MovieResult>) {
   const posterPaths = data.map((item) => item.poster_path);
 
-  const recsWithBlur = (await appendBlurDataToMediaArray(
-    data,
-    BaseImageUrl.BLUR,
-    posterPaths,
-  )) as Array<TvResult | MovieResult>;
+  // const recsWithBlur = (await appendBlurDataToMediaArray(
+  //   data,
+  //   BaseImageUrl.BLUR,
+  //   posterPaths,
+  // )) as Array<TvResult | MovieResult>;
 
-  return recsWithBlur.map(
+  return data.map(
     (item: MovieResult | TvResult | PersonResult, index: number) => {
       let card: React.ReactNode;
       switch (item.media_type) {
@@ -48,7 +48,7 @@ export async function makeCarouselCards(data: Array<TvResult | MovieResult>) {
               title={item.name}
               overview={item.overview}
               imagePath={`${BaseImageUrl.POSTER}${item.poster_path}`}
-              blurDataURL={(item as any).blurDataURL}
+              // blurDataURL={(item as any).blurDataURL}
               loading="lazy"
             />
           );
@@ -59,7 +59,7 @@ export async function makeCarouselCards(data: Array<TvResult | MovieResult>) {
               title={item.title}
               overview={item.overview}
               imagePath={`${BaseImageUrl.POSTER}${item.poster_path}`}
-              blurDataURL={(item as any).blurDataURL}
+              // blurDataURL={(item as any).blurDataURL}
               loading="lazy"
             />
           );

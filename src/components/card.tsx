@@ -1,3 +1,4 @@
+import { DEFAULT_BLUR_DATA_URL } from "@/lib/constants";
 import Image from "next/image";
 
 export function Card({
@@ -26,7 +27,7 @@ export function Card({
           fill
           className="object-cover"
           placeholder={blurDataURL ? "blur" : undefined}
-          blurDataURL={blurDataURL}
+          blurDataURL={blurDataURL ?? DEFAULT_BLUR_DATA_URL}
           loading={loading}
           sizes="(max-width: 768px) 100vw, 200px"
         />
