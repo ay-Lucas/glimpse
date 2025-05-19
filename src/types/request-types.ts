@@ -68,7 +68,7 @@ export interface TvResult {
   genre_ids?: Array<number>;
   original_language?: string;
   vote_count?: number;
-  name?: string;
+  name: string;
   original_name?: string;
   videos?: {
     results: Array<Video>;

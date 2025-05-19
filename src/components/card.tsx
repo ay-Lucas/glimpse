@@ -35,7 +35,7 @@ export function Card({
       </div>
 
       <div className="absolute bottom-0 left-0 right-0 p-4 opacity-0 translate-y-4 transition-all duration-200 ease-out group-hover:opacity-100 group-hover:translate-y-0 will-change-opacity will-change-transform bg-[linear-gradient(to_top,rgba(0,0,0,0.95)_20%,transparent)]">
-        <h3 className="text-white text-xl font-semibold truncate">{title}</h3>
+        <h3 className="text-white text-xl font-semibold">{title}</h3>
         {overview && (
           <p className="text-gray-200 text-sm mt-1 line-clamp-5">{overview}</p>
         )}

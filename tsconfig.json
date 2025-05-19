@@ -5,24 +5,16 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "paths": {
-      "@/*": [
-        "./src/*"
-      ]
+      "@/*": ["./src/*"]
     },
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "es6",
-      "es5",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "es6", "es5", "esnext"],
     "target": "esnext",
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "checkJs": true,
-    
+
     "noEmit": true,
     "incremental": true,
     "module": "esnext",
@@ -32,7 +24,8 @@
         "name": "next"
       }
     ],
-    "jsx": "preserve"
+    "jsx": "preserve",
+    "allowImportingTsExtensions": true
   },
   "include": [
     ".eslintrc.cjs",
@@ -41,9 +34,7 @@
     "**/*.ts",
     "**/*.tsx",
     "**/*.cjs",
-    "**/*.js",
+    "**/*.js"
   ],
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules"]
 }

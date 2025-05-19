@@ -38,6 +38,7 @@ export const options: RequestInit = {
   // next: { revalidate: 60 },
 };
 
+export const DISCOVER_LIMIT = 20 as const;
 // export const genres = new Map([
 //   [28, "Action"],
 //   [12, "Adventure"],
