@@ -8,9 +8,11 @@ import {
   integer,
   serial,
   uuid,
-  unique,
-  numeric,
   doublePrecision,
+  numeric,
+  date,
+  jsonb,
+  unique,
 } from "drizzle-orm/pg-core";
 import type { AdapterAccountType } from "next-auth/adapters";
 
@@ -114,6 +116,108 @@ export const rateLimitViolation = pgTable("rate_limit_violation", {
   count: integer("count").default(1).notNull(),
   lastViolation: timestamp("last_violation").defaultNow().notNull(),
 });
+
+export const movieSummaries = pgTable("movie_summaries", {
+  id: serial("id").primaryKey(),
+  tmdbId: integer("tmdb_id").notNull().unique(),
+  title: text("title").notNull(),
+  overview: text("overview").notNull(),
+  posterPath: text("poster_path"),
+  backdropPath: text("backdrop_path"),
+  popularity: doublePrecision("popularity"),
+  voteAverage: doublePrecision("vote_average"),
+  voteCount: integer("vote_count"),
+  releaseDate: date("release_date"),
+  blurDataUrl: text("blur_data_url"),
+});
+
+export const movieDetails = pgTable("movie_details", {
+  summaryId: integer("summary_id")
+    .primaryKey()
+    .references(() => movieSummaries.id, { onDelete: "cascade" }),
+  overview: text("overview").notNull(),
+  budget: integer("budget"),
+  revenue: integer("revenue"),
+  runtime: integer("runtime"),
+  status: text("status"),
+  tagline: text("tagline"),
+  homepage: text("homepage"),
+  genres: jsonb("genres").notNull(),
+  productionCompanies: jsonb("production_companies"),
+  spokenLanguages: jsonb("spoken_languages"),
+  videos: jsonb("videos"),
+  credits: jsonb("credits"),
+  aggregateCredits: jsonb("aggregate_credits"),
+});
+
+export const tvSummaries = pgTable("tv_summaries", {
+  id: serial("id").primaryKey(),
+  tmdbId: integer("tmdb_id").notNull().unique(),
+  name: text("name").notNull(),
+  overview: text("overview").notNull(),
+  posterPath: text("poster_path"),
+  backdropPath: text("backdrop_path"),
+  popularity: doublePrecision("popularity"),
+  voteAverage: doublePrecision("vote_average"),
+  voteCount: integer("vote_count"),
+  firstAirDate: date("first_air_date"),
+  blurDataUrl: text("blur_data_url"),
+});
+
+export const tvDetails = pgTable("tv_details", {
+  summaryId: integer("summary_id")
+    .primaryKey()
+    .references(() => tvSummaries.id, { onDelete: "cascade" }),
+  overview: text("overview").notNull(),
+  numberOfSeasons: integer("number_of_seasons"),
+  numberOfEpisodes: integer("number_of_episodes"),
+  genres: jsonb("genres").notNull(),
+  seasons: jsonb("seasons"),
+  networks: jsonb("networks"),
+  videos: jsonb("videos"),
+  credits: jsonb("credits"),
+  aggregateCredits: jsonb("aggregate_credits"),
+  watchProviders: jsonb("watch_providers"),
+});
+
+export const personSummaries = pgTable("person_summaries", {
+  id: serial("id").primaryKey(),
+  tmdbId: integer("tmdb_id").notNull().unique(),
+  name: text("name").notNull(),
+  profilePath: text("profile_path"),
+  blurDataUrl: text("blur_data_url"),
+});
+
+export const personDetails = pgTable("person_details", {
+  summaryId: integer("summary_id")
+    .primaryKey()
+    .references(() => personSummaries.id, { onDelete: "cascade" }),
+  biography: text("biography"),
+  birthday: date("birthday"),
+  placeOfBirth: text("place_of_birth"),
+  combinedCredits: jsonb("combined_credits"),
+});
+
+export const listEntries = pgTable(
+  "list_entries",
+  {
+    listName: text("list_name").notNull(), // e.g. "trending_series"
+    tmdbId: integer("tmdb_id").notNull(),
+    mediaType: text("media_type").notNull(), // "tv" or "movie"
+    position: integer("position").notNull(),
+    fetchedAt: timestamp("fetched_at", { mode: "string" })
+      .notNull()
+      .default(sql`now()`),
+  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.listName, t.tmdbId] }),
+    // and if you still want to unique‐enforce (list_name, position):
+    listPositionUnique: unique("list_entries_position_unique").on(
+      t.listName,
+      t.position,
+    ),
+  }),
+);
 
 // Causes Drizzle to crash when pushing with `npx drizzle-kit push` (Known Issue)
 
