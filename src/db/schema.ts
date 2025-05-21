@@ -135,19 +135,41 @@ export const movieDetails = pgTable("movie_details", {
   summaryId: integer("summary_id")
     .primaryKey()
     .references(() => movieSummaries.id, { onDelete: "cascade" }),
-  overview: text("overview").notNull(),
+
+  // Basic flags & paths
+  adult: boolean("adult").notNull().default(true),
+  video: boolean("video").notNull().default(true),
+
+  // Collection info
+  belongsToCollection: text("belongs_to_collection"),
+
+  // Identifiers & titles
+  imdbId: text("imdb_id"),
+  originalLanguage: text("original_language"),
+  originalTitle: text("original_title"),
+
+  // Dates & stats
   budget: integer("budget"),
   revenue: integer("revenue"),
   runtime: integer("runtime"),
+  popularity: doublePrecision("popularity"),
+  voteAverage: doublePrecision("vote_average"),
+  voteCount: integer("vote_count"),
+
+  // Text content
   status: text("status"),
   tagline: text("tagline"),
   homepage: text("homepage"),
+
+  // JSON payloads
   genres: jsonb("genres").notNull(),
   productionCompanies: jsonb("production_companies"),
+  productionCountries: jsonb("production_countries"),
   spokenLanguages: jsonb("spoken_languages"),
+
   videos: jsonb("videos"),
   credits: jsonb("credits"),
-  aggregateCredits: jsonb("aggregate_credits"),
+  releases: jsonb("releases"),
 });
 
 export const tvSummaries = pgTable("tv_summaries", {
@@ -164,21 +186,76 @@ export const tvSummaries = pgTable("tv_summaries", {
   blurDataUrl: text("blur_data_url"),
 });
 
-export const tvDetails = pgTable("tv_details", {
-  summaryId: integer("summary_id")
-    .primaryKey()
-    .references(() => tvSummaries.id, { onDelete: "cascade" }),
-  overview: text("overview").notNull(),
-  numberOfSeasons: integer("number_of_seasons"),
-  numberOfEpisodes: integer("number_of_episodes"),
-  genres: jsonb("genres").notNull(),
-  seasons: jsonb("seasons"),
-  networks: jsonb("networks"),
-  videos: jsonb("videos"),
-  credits: jsonb("credits"),
-  aggregateCredits: jsonb("aggregate_credits"),
-  watchProviders: jsonb("watch_providers"),
-});
+export const tvDetails = pgTable(
+  "tv_details",
+  {
+    summaryId: integer("summary_id")
+      .primaryKey()
+      .unique()
+      .references(() => tvSummaries.id, { onDelete: "cascade" }),
+    // basic flags & identifiers
+    adult: boolean("adult").notNull().default(true),
+    originalLanguage: text("original_language"),
+    originalName: text("original_name"),
+    homepage: text("homepage"),
+    status: text("status"),
+    tagline: text("tagline"),
+    type: text("type"),
+
+    // dates & counts
+    lastAirDate: date("last_air_date"),
+    numberOfSeasons: integer("number_of_seasons"),
+    numberOfEpisodes: integer("number_of_episodes"),
+
+    // nested blobs
+    genres: jsonb("genres").notNull(),
+    createdBy: jsonb("created_by"), // array of creators
+    episodeRunTime: jsonb("episode_run_time"), // array of ints
+    languages: jsonb("languages"), // array of iso_ codes
+    networks: jsonb("networks"),
+    seasons: jsonb("seasons"),
+    videos: jsonb("videos"),
+    credits: jsonb("credits"),
+    aggregateCredits: jsonb("aggregate_credits"),
+    watchProviders: jsonb("watch_providers"),
+    contentRatings: jsonb("content_ratings"),
+  },
+  (t) => ({
+    // unique constraint to ensure one details row per summary
+    summaryUk: unique("tv_details_summary_uk").on(t.summaryId),
+  }),
+);
+
+export const episodeDetails = pgTable(
+  "episode_details",
+  {
+    summaryId: integer("summary_id")
+      .notNull()
+      .references(() => tvSummaries.id, { onDelete: "cascade" }),
+    seasonNumber: integer("season_number").notNull(),
+    episodeNumber: integer("episode_number").notNull(),
+
+    airDate: date("air_date"),
+    name: text("name"),
+    overview: text("overview"),
+    productionCode: text("production_code"),
+    runtime: integer("runtime"),
+    stillPath: text("still_path"),
+
+    voteAverage: doublePrecision("vote_average"),
+    voteCount: integer("vote_count"),
+
+    // arrays of objects
+    crew: jsonb("crew"), // array of { department, job, credit_id, crew_member… }
+    guestStars: jsonb("guest_stars"), // array of { character, credit_id, order, person… }
+  },
+  (t) => ({
+    // composite PK: one row per show/season/episode
+    pk: primaryKey({
+      columns: [t.summaryId, t.seasonNumber, t.episodeNumber],
+    }),
+  }),
+);
 
 export const personSummaries = pgTable("person_summaries", {
   id: serial("id").primaryKey(),
@@ -218,7 +295,6 @@ export const listEntries = pgTable(
     ),
   }),
 );
-
 // Causes Drizzle to crash when pushing with `npx drizzle-kit push` (Known Issue)
 
 //
