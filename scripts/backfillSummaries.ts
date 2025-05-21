@@ -76,6 +76,7 @@ async function backfillSummaries() {
       ? await getBlurData(`${BaseImageUrl.BLUR}${m.poster_path}`)
       : null;
 
+    const releaseDate = m.release_date?.trim() || undefined;
     await db
       .insert(movieSummaries)
       .values({
@@ -87,7 +88,7 @@ async function backfillSummaries() {
         popularity: m.popularity,
         voteAverage: m.vote_average,
         voteCount: m.vote_count,
-        releaseDate: m.release_date,
+        releaseDate: releaseDate,
         blurDataUrl: blur,
       })
       .onConflictDoUpdate({
@@ -99,7 +100,7 @@ async function backfillSummaries() {
           popularity: m.popularity,
           voteAverage: m.vote_average,
           voteCount: m.vote_count,
-          releaseDate: m.release_date,
+          releaseDate: releaseDate,
           blurDataUrl: blur,
         },
       });
@@ -110,6 +111,9 @@ async function backfillSummaries() {
     const blur = t.poster_path
       ? await getBlurData(`${BaseImageUrl.BLUR}${t.poster_path}`)
       : null;
+    console.log(t);
+
+    const firstAirDate = t.first_air_date?.trim() || undefined;
 
     await db
       .insert(tvSummaries)
@@ -122,7 +126,7 @@ async function backfillSummaries() {
         popularity: t.popularity,
         voteAverage: t.vote_average,
         voteCount: t.vote_count,
-        firstAirDate: t.first_air_date,
+        firstAirDate: firstAirDate,
         blurDataUrl: blur,
       })
       .onConflictDoUpdate({
@@ -134,12 +138,13 @@ async function backfillSummaries() {
           popularity: t.popularity,
           voteAverage: t.vote_average,
           voteCount: t.vote_count,
-          firstAirDate: t.first_air_date,
+          firstAirDate: firstAirDate,
           blurDataUrl: blur,
         },
       });
   }
 
+  console.log(`Backfilling Trending TV shows positions...`);
   await db.transaction(async (tx) => {
     // clear old entries for this list
     await tx
@@ -162,6 +167,7 @@ async function backfillSummaries() {
     );
   });
 
+  console.log(`Backfilling Trending Movies positions...`);
   await db.transaction(async (tx) => {
     // clear old entries for this list
     await tx
@@ -176,7 +182,7 @@ async function backfillSummaries() {
           .values({
             listName: "trending_movies",
             tmdbId: item.id,
-            mediaType: "tv",
+            mediaType: "movie",
             position: idx,
           })
           .onConflictDoNothing(),
