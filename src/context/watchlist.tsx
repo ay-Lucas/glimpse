@@ -14,12 +14,8 @@ import {
   deleteWatchlistItem,
   getWatchlistsAndItems,
 } from "@/lib/actions";
-import { WatchlistI } from "@/types";
+import { FullMovie, FullTv, WatchlistI } from "@/types/camel-index";
 import { useSession } from "next-auth/react";
-import {
-  MovieResponseAppended,
-  ShowResponseAppended,
-} from "@/types/request-types";
 
 interface WatchlistContextType {
   watchlists: WatchlistI[];
@@ -33,8 +29,9 @@ interface WatchlistContextType {
   onDeleteWatchlist: (watchlistId: string) => Promise<void>;
   addItemToWatchlist: (
     watchlistId: string,
-    watchlistItem: ShowResponseAppended | MovieResponseAppended,
+    watchlistItem: FullTv | FullMovie,
     rating: string,
+    mediaType: "tv" | "movie",
   ) => Promise<boolean>;
 }
 
@@ -93,14 +90,23 @@ export const WatchlistProvider = ({ children }: { children: ReactNode }) => {
   };
   const addItemToWatchlist = async (
     watchlistId: string,
-    watchlistItem: MovieResponseAppended | ShowResponseAppended,
+    watchlistItem: FullMovie | FullTv,
     rating: string,
+    mediaType: "tv" | "movie",
   ) => {
     let res;
-    if (watchlistItem.media_type == "tv")
-      res = await addTvToWatchlist(watchlistId, watchlistItem, rating);
-    else if (watchlistItem.media_type == "movie")
-      res = await addMovieToWatchlist(watchlistId, watchlistItem, rating);
+    if (mediaType == "tv")
+      res = await addTvToWatchlist(
+        watchlistId,
+        watchlistItem as FullTv,
+        rating,
+      );
+    else if (mediaType == "movie")
+      res = await addMovieToWatchlist(
+        watchlistId,
+        watchlistItem as FullMovie,
+        rating,
+      );
     fetchWatchlists();
     return res !== undefined;
   };

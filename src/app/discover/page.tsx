@@ -156,6 +156,7 @@ export default async function Discover() {
     getPopularSeries(DISCOVER_LIMIT),
     getPopularMovies(DISCOVER_LIMIT),
   ]);
+  // console.log(trendingTvItems);
 
   const mkCards = (items: DiscoverItem[], mediaType: "tv" | "movie") =>
     items.map((item) => (
@@ -163,7 +164,7 @@ export default async function Discover() {
         <Card
           title={item.title}
           overview={item.overview}
-          blurDataURL={item.blurDataUrl}
+          blurDataURL={item.posterBlurDataUrl}
           imagePath={`${BaseImageUrl.POSTER}${item.posterPath}`}
           loading="lazy"
         />

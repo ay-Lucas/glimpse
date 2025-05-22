@@ -98,7 +98,7 @@ export type DiscoverItem = {
   title: string;
   posterPath?: string;
   backdropPath?: string;
-  blurDataUrl?: string;
+  posterBlurDataUrl?: string;
   overview?: string;
 };
 
@@ -111,7 +111,7 @@ export async function getTrendingSeries(limit = 10): Promise<DiscoverItem[]> {
       overview: tvSummaries.overview,
       posterPath: tvSummaries.posterPath,
       backdropPath: tvSummaries.backdropPath,
-      blurDataUrl: tvSummaries.blurDataUrl,
+      posterBlurDataUrl: tvSummaries.posterBlurDataUrl,
       releaseDate: tvSummaries.firstAirDate,
     })
     .from(tvSummaries)
@@ -132,7 +132,7 @@ export async function getTrendingSeries(limit = 10): Promise<DiscoverItem[]> {
     overview: r.overview ?? undefined,
     posterPath: r.posterPath ?? undefined,
     backdropPath: r.backdropPath ?? undefined,
-    blurDataUrl: r.blurDataUrl ?? undefined,
+    posterBlurDataUrl: r.posterBlurDataUrl ?? undefined,
     releaseDate: r.releaseDate ?? undefined,
   }));
 }
@@ -145,7 +145,7 @@ export async function getTrendingMovies(limit = 10): Promise<DiscoverItem[]> {
       overview: movieSummaries.overview,
       posterPath: movieSummaries.posterPath,
       backdropPath: movieSummaries.backdropPath,
-      blurDataUrl: movieSummaries.blurDataUrl,
+      posterBlurDataUrl: movieSummaries.posterBlurDataUrl,
       releaseDate: movieSummaries.releaseDate,
     })
     .from(movieSummaries)
@@ -166,7 +166,7 @@ export async function getTrendingMovies(limit = 10): Promise<DiscoverItem[]> {
     overview: r.overview ?? undefined,
     posterPath: r.posterPath ?? undefined,
     backdropPath: r.backdropPath ?? undefined,
-    blurDataUrl: r.blurDataUrl ?? undefined,
+    posterBlurDataUrl: r.posterBlurDataUrl ?? undefined,
     releaseDate: r.releaseDate ?? undefined,
   }));
 }
@@ -181,7 +181,7 @@ export async function getUpcomingMovieSummaries(
       title: movieSummaries.title,
       posterPath: movieSummaries.posterPath,
       backdropPath: movieSummaries.backdropPath,
-      blurDataUrl: movieSummaries.blurDataUrl,
+      posterBlurUrl: movieSummaries.posterBlurDataUrl,
       overview: movieSummaries.overview,
     })
     .from(movieSummaries)
@@ -194,7 +194,7 @@ export async function getUpcomingMovieSummaries(
     title: r.title,
     posterPath: r.posterPath ?? undefined,
     backdropPath: r.backdropPath ?? undefined,
-    blurDataUrl: r.blurDataUrl ?? undefined,
+    posterBlurUrl: r.posterBlurUrl,
     overview: r.overview,
   }));
 }
@@ -207,7 +207,7 @@ export async function getPopularSeries(limit = 10): Promise<DiscoverItem[]> {
       overview: tvSummaries.overview,
       posterPath: tvSummaries.posterPath,
       backdropPath: tvSummaries.backdropPath,
-      blurDataUrl: tvSummaries.blurDataUrl,
+      posterBlurUrl: tvSummaries.posterBlurDataUrl,
       popularity: tvSummaries.popularity,
       voteAverage: tvSummaries.voteAverage,
       voteCount: tvSummaries.voteCount,
@@ -222,7 +222,7 @@ export async function getPopularSeries(limit = 10): Promise<DiscoverItem[]> {
     overview: r.overview ?? undefined,
     posterPath: r.posterPath ?? undefined,
     backdropPath: r.backdropPath ?? undefined,
-    blurDataUrl: r.blurDataUrl ?? undefined,
+    posterBlurUrl: r.posterBlurUrl,
     popularity: r.popularity ?? undefined,
     voteAverage: r.voteAverage ?? undefined,
     voteCount: r.voteCount ?? undefined,
@@ -240,7 +240,7 @@ export async function getPopularMovies(limit = 10): Promise<DiscoverItem[]> {
       overview: movieSummaries.overview,
       posterPath: movieSummaries.posterPath,
       backdropPath: movieSummaries.backdropPath,
-      blurDataUrl: movieSummaries.blurDataUrl,
+      posterBlurUrl: movieSummaries.posterBlurDataUrl,
       popularity: movieSummaries.popularity,
       voteAverage: movieSummaries.voteAverage,
       voteCount: movieSummaries.voteCount,
@@ -255,7 +255,7 @@ export async function getPopularMovies(limit = 10): Promise<DiscoverItem[]> {
     overview: r.overview ?? undefined,
     posterPath: r.posterPath ?? undefined,
     backdropPath: r.backdropPath ?? undefined,
-    blurDataUrl: r.blurDataUrl ?? undefined,
+    posterBlurUrl: r.posterBlurUrl ?? undefined,
     popularity: r.popularity ?? undefined,
     voteAverage: r.voteAverage ?? undefined,
     voteCount: r.voteCount ?? undefined,

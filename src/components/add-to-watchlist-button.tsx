@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "./ui/button";
-import { WatchlistI } from "@/types";
+import { FullMovie, FullTv, WatchlistI } from "@/types/camel-index";
 import { useWatchlist } from "@/context/watchlist";
 import {
   DropdownMenu,
@@ -11,18 +11,16 @@ import { Checkbox } from "./ui/checkbox";
 import { useEffect, useState } from "react";
 import { CheckedState } from "@radix-ui/react-checkbox";
 import { LucideListPlus } from "lucide-react";
-import {
-  MovieResponseAppended,
-  ShowResponseAppended,
-} from "@/types/request-types";
 
 export default function AddToWatchlistDropdown({
   userId,
   item,
   rating,
+  mediaType,
 }: {
   userId: string;
-  item: ShowResponseAppended | MovieResponseAppended;
+  item: FullTv | FullMovie;
+  mediaType: "tv" | "movie";
   rating: string;
 }) {
   const { addItemToWatchlist, deleteItem, watchlists } = useWatchlist();
@@ -43,13 +41,24 @@ export default function AddToWatchlistDropdown({
     setOpen(isOpen);
   };
 
-  const handleCheckboxChange = (checked: CheckedState, watchlistId: string) => {
+  const handleCheckboxChange = (
+    checked: CheckedState,
+    watchlistId: string,
+    mediaType: "movie" | "tv",
+  ) => {
     setCheckboxStates((prevStates) => ({
       ...prevStates,
       [watchlistId]: checked,
     }));
     if (checked) {
-      addItemToWatchlist(watchlistId, item, rating);
+      switch (mediaType) {
+        case "movie":
+          addItemToWatchlist(watchlistId, item, rating, "movie");
+          break;
+        case "tv":
+          addItemToWatchlist(watchlistId, item, rating, "tv");
+          break;
+      }
     } else {
       deleteItem(watchlistId, item.id, userId);
     }
@@ -89,7 +98,7 @@ export default function AddToWatchlistDropdown({
               <Checkbox
                 checked={checkboxStates[watchlist.id]}
                 onCheckedChange={(checked) =>
-                  handleCheckboxChange(checked, watchlist.id)
+                  handleCheckboxChange(checked, watchlist.id, mediaType)
                 }
                 onClick={(e) => e.stopPropagation()} // Prevent dropdown from closing
               />

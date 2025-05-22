@@ -6,6 +6,7 @@ import {
   Video,
 } from "@/types/request-types";
 import { twMerge } from "tailwind-merge";
+import camelcaseKeys from "camelcase-keys";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -111,4 +112,28 @@ export function getTrailer(videoArray: Array<Video>) {
     );
     return teaser[0];
   }
+}
+
+type AnyObject = Record<string, any>;
+
+/**
+ * 1) Pull off any TMDB‐special keys that camelcase‐keys won't touch (e.g. "watch/providers")
+ * 2) deep‐convert the rest
+ * 3) stick those special keys back in under camelCase
+ * 4) assert the result as T
+ */
+export function tmdbToCamel<T extends AnyObject>(raw: AnyObject): T {
+  // 1) Extract TMDB’s oddball fields
+  const { "watch/providers": watchProviders, ...rest } = raw;
+
+  // 2) Deep‐convert every other key
+  const camel = camelcaseKeys(rest, { deep: true }) as AnyObject;
+
+  // 3) Re‐attach the oddball under a proper camelCase name
+  if (watchProviders !== undefined) {
+    camel.watchProviders = watchProviders;
+  }
+
+  // 4) Assert to your API‐boundary type
+  return camel as T;
 }

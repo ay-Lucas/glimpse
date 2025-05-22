@@ -1,14 +1,14 @@
 "use client";
-import { WatchlistI } from "@/types";
+import { WatchlistI } from "@/types/camel-index";
 import Link from "next/link";
 import { WatchlistDropdown } from "./watchlist-dropdown";
 import Image from "next/image";
 import { ChangeEvent, useEffect, useState } from "react";
-import { deleteWatchlist, setWatchlistName } from "@/lib/actions";
+import { setWatchlistName } from "@/lib/actions";
 import { useSession } from "next-auth/react";
 import { Session } from "next-auth";
 import { watchlistNameSchema } from "@/types/schema";
-import { Edit2, Edit2Icon, EditIcon, X } from "lucide-react";
+import { Edit2Icon, X } from "lucide-react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { useWatchlist } from "@/context/watchlist";

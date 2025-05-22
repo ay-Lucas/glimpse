@@ -51,7 +51,6 @@ export interface MovieResult {
     results: Array<Video>;
   };
   credits?: CreditsResponse;
-  aggregate_credits?: AggregateCreditsResponse;
   rating?: string; // Not provided by TMDB
 }
 
@@ -619,13 +618,13 @@ export interface TrendingResponse extends PaginatedResponse {
 export interface MovieResponse extends Response {
   adult?: boolean;
   backdrop_path: string;
-  belongs_to_collection?: object;
+  belongs_to_collection?: string;
   budget?: number;
   genres: Array<Genre>;
   homepage?: string;
   id: number;
   imdb_id?: string;
-  origin_country?: string;
+  origin_country?: string[];
   original_language?: string;
   original_title?: string;
   overview: string;
@@ -930,6 +929,7 @@ export interface ShowResponse extends Response {
   type?: string;
   vote_average?: number;
   vote_count?: number;
+  adult: boolean;
 }
 
 export interface ShowResponseAppended extends ShowResponse {
@@ -940,6 +940,7 @@ export interface ShowResponseAppended extends ShowResponse {
   credits?: CreditsResponse;
   "watch/providers"?: WatchProviderResponse;
   media_type: "tv"; // Not provided by api
+  aggregate_credits?: AggregateCreditsResponse;
 }
 
 export interface ShowAccountStatesResponse extends Response {

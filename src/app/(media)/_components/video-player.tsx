@@ -53,7 +53,6 @@ export default function VideoPlayer({
               className="w-full h-full pt-5"
               src={trailer}
               allowFullScreen
-              allowTransparency
             ></iframe>
           </div>
           <Link
