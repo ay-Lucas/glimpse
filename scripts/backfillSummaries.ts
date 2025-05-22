@@ -7,15 +7,27 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 import { BaseImageUrl, DISCOVER_LIMIT } from "../src/lib/constants.ts";
 import { getBlurData } from "../src/lib/blur-data-generator.ts";
-import { MovieResult, TvResult } from "../src/types/request-types.ts";
+import {
+  MovieResult,
+  TvResult,
+  MovieResponseAppended,
+  ShowResponseAppended,
+} from "../src/types/request-types.ts";
 import { db } from "../src/db/index.ts";
-import { listEntries, movieSummaries, tvSummaries } from "../src/db/schema.ts";
+import {
+  listEntries,
+  movieDetails,
+  movieSummaries,
+  tvDetails,
+  tvSummaries,
+} from "../src/db/schema.ts";
 import {
   getTrendingPages,
   getPopular,
   getUpcomingMovies,
 } from "../src/app/discover/actions.ts";
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
+import { getMovieDetails, getTvDetails } from "@/app/(media)/actions.ts";
 
 // now load your .env.local
 dotenv.config({ path: join(__dirname, "../.env.local") });
@@ -71,11 +83,13 @@ async function backfillSummaries() {
   ]) as TvResult[];
 
   console.log(`Backfilling ${movies.length} movies...`);
+
   for (const m of movies) {
-    const blur = m.poster_path
+    const posterBlurUrl = m.poster_path
       ? await getBlurData(`${BaseImageUrl.BLUR}${m.poster_path}`)
       : null;
 
+    // Movie Summaries
     const releaseDate = m.release_date?.trim() || undefined;
     await db
       .insert(movieSummaries)
@@ -89,7 +103,7 @@ async function backfillSummaries() {
         voteAverage: m.vote_average,
         voteCount: m.vote_count,
         releaseDate: releaseDate,
-        blurDataUrl: blur,
+        posterBlurDataUrl: posterBlurUrl,
       })
       .onConflictDoUpdate({
         target: movieSummaries.tmdbId,
@@ -101,17 +115,16 @@ async function backfillSummaries() {
           voteAverage: m.vote_average,
           voteCount: m.vote_count,
           releaseDate: releaseDate,
-          blurDataUrl: blur,
+          posterBlurDataUrl: posterBlurUrl,
         },
       });
   }
 
   console.log(`Backfilling ${tvShows.length} TV shows...`);
   for (const t of tvShows) {
-    const blur = t.poster_path
+    const posterBlurUrl = t.poster_path
       ? await getBlurData(`${BaseImageUrl.BLUR}${t.poster_path}`)
       : null;
-    console.log(t);
 
     const firstAirDate = t.first_air_date?.trim() || undefined;
 
@@ -127,7 +140,7 @@ async function backfillSummaries() {
         voteAverage: t.vote_average,
         voteCount: t.vote_count,
         firstAirDate: firstAirDate,
-        blurDataUrl: blur,
+        posterBlurDataUrl: posterBlurUrl,
       })
       .onConflictDoUpdate({
         target: tvSummaries.tmdbId,
@@ -139,10 +152,12 @@ async function backfillSummaries() {
           voteAverage: t.vote_average,
           voteCount: t.vote_count,
           firstAirDate: firstAirDate,
-          blurDataUrl: blur,
+          posterBlurDataUrl: posterBlurUrl,
         },
       });
   }
+
+  await backfillDetails(movies, tvShows);
 
   console.log(`Backfilling Trending TV shows positions...`);
   await db.transaction(async (tx) => {
@@ -197,3 +212,181 @@ backfillSummaries().catch((err) => {
   console.error(err);
   process.exit(1);
 });
+
+async function backfillDetails(movies: MovieResult[], tvShows: TvResult[]) {
+  const movieIdMap = new Map<number, number>();
+  await db
+    .select({ tmdbId: movieSummaries.tmdbId, id: movieSummaries.id })
+    .from(movieSummaries)
+    .where(
+      inArray(
+        movieSummaries.tmdbId,
+        movies.map((m) => m.id),
+      ),
+    )
+    .then((rows) => rows.forEach((r) => movieIdMap.set(r.tmdbId, r.id)));
+
+  const tvIdMap = new Map<number, number>();
+  await db
+    .select({ tmdbId: tvSummaries.tmdbId, id: tvSummaries.id })
+    .from(tvSummaries)
+    .where(
+      inArray(
+        tvSummaries.tmdbId,
+        tvShows.map((t) => t.id),
+      ),
+    )
+    .then((rows) => rows.forEach((r) => tvIdMap.set(r.tmdbId, r.id)));
+
+  // 3) Backfill movie_details
+  console.log(`Backfilling Movie Details...`);
+
+  for (const m of movies) {
+    const summaryId = movieIdMap.get(m.id);
+
+    if (!summaryId) continue;
+
+    const backdropBlurUrl = m.backdrop_path
+      ? await getBlurData(`${BaseImageUrl.BLUR}${m.backdrop_path}`)
+      : null;
+    const details = await getMovieDetails({ id: m.id }, options);
+    await db
+      .insert(movieDetails)
+      .values({
+        summaryId: summaryId,
+        genres: details.genres,
+        budget: details.budget,
+        credits: details.credits,
+        runtime: details.runtime,
+        revenue: details.revenue,
+        spokenLanguages: details.spokenLanguages,
+        status: details.status,
+        videos: details.videos,
+        tagline: details.tagline,
+        homepage: details.homepage,
+        adult: details.adult,
+        belongsToCollection: details.belongsToCollection,
+        imdbId: details.imdbId,
+        originalLanguage: details.originalLanguage,
+        originalTitle: details.originalTitle,
+        originCountry: details.originCountry,
+        popularity: details.popularity,
+        productionCountries: details.productionCountries,
+        productionCompanies: details.productionCompanies,
+        releases: details.releases,
+        video: details.video,
+        voteAverage: details.voteAverage,
+        voteCount: details.voteCount,
+        backdropBlurDataUrl: backdropBlurUrl,
+        watchProviders: details.watchProviders,
+      })
+      .onConflictDoUpdate({
+        target: movieDetails.summaryId,
+        set: {
+          genres: details.genres,
+          budget: details.budget,
+          credits: details.credits,
+          runtime: details.runtime,
+          revenue: details.revenue,
+          spokenLanguages: details.spokenLanguages,
+          status: details.status,
+          videos: details.videos,
+          tagline: details.tagline,
+          homepage: details.homepage,
+          adult: details.adult,
+          belongsToCollection: details.belongsToCollection,
+          imdbId: details.imdbId,
+          originalLanguage: details.originalLanguage,
+          originalTitle: details.originalTitle,
+          originCountry: details.originCountry,
+          popularity: details.popularity,
+          productionCountries: details.productionCountries,
+          productionCompanies: details.productionCompanies,
+          releases: details.releases,
+          video: details.video,
+          voteAverage: details.voteAverage,
+          voteCount: details.voteCount,
+          backdropBlurDataUrl: backdropBlurUrl,
+          watchProviders: details.watchProviders,
+        },
+      });
+  }
+
+  // 4) Backfill tv_details
+  console.log(`Backfilling TV Details...`);
+  for (const t of tvShows) {
+    const summaryId = tvIdMap.get(t.id);
+    if (!summaryId) continue;
+
+    const backdropBlurUrl = t.backdrop_path
+      ? await getBlurData(`${BaseImageUrl.BLUR}${t.backdrop_path}`)
+      : null;
+
+    const details = await getTvDetails({ id: t.id }, options);
+
+    await db
+      .insert(tvDetails)
+      .values({
+        summaryId: summaryId,
+        adult: details.adult,
+        originalLanguage: details.originalLanguage,
+        originalName: details.originalName,
+        originCountry: details.originCountry,
+        homepage: details.homepage,
+        status: details.status,
+        tagline: details.tagline,
+        type: details.type,
+        lastAirDate: details.lastAirDate
+          ? details.lastAirDate.toString()
+          : null,
+        numberOfSeasons: details.numberOfSeasons,
+        numberOfEpisodes: details.numberOfEpisodes,
+        genres: details.genres,
+        createdBy: details.createdBy,
+        episodeRunTime: details.episodeRunTime,
+        languages: details.languages,
+        networks: details.networks,
+        seasons: details.seasons,
+        videos: details.videos,
+        credits: details.credits,
+        aggregateCredits: details.aggregateCredits,
+        watchProviders: details.watchProviders,
+        contentRatings: details.contentRatings,
+        backdropBlurDataUrl: backdropBlurUrl,
+        productionCompanies: details.productionCompanies,
+        productionCountries: details.productionCountries,
+      })
+      .onConflictDoUpdate({
+        target: tvDetails.summaryId,
+        set: {
+          adult: details.adult,
+          originalLanguage: details.originalLanguage,
+          originalName: details.originalName,
+          originCountry: details.originCountry,
+          homepage: details.homepage,
+          status: details.status,
+          tagline: details.tagline,
+          type: details.type,
+          lastAirDate: details.lastAirDate
+            ? details.lastAirDate.toString()
+            : null,
+          numberOfSeasons: details.numberOfSeasons,
+          numberOfEpisodes: details.numberOfEpisodes,
+          genres: details.genres,
+          createdBy: details.createdBy,
+          episodeRunTime: details.episodeRunTime,
+          languages: details.languages,
+          networks: details.networks,
+          seasons: details.seasons,
+          videos: details.videos,
+          credits: details.credits,
+          aggregateCredits: details.aggregateCredits,
+          watchProviders: details.watchProviders,
+          contentRatings: details.contentRatings,
+          backdropBlurDataUrl: backdropBlurUrl,
+          productionCompanies: details.productionCompanies,
+          productionCountries: details.productionCountries,
+        },
+      });
+  }
+}

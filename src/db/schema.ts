@@ -128,7 +128,7 @@ export const movieSummaries = pgTable("movie_summaries", {
   voteAverage: doublePrecision("vote_average"),
   voteCount: integer("vote_count"),
   releaseDate: date("release_date"),
-  blurDataUrl: text("blur_data_url"),
+  posterBlurDataUrl: text("poster_blur_data_url"),
 });
 
 export const movieDetails = pgTable("movie_details", {
@@ -139,15 +139,15 @@ export const movieDetails = pgTable("movie_details", {
   // Basic flags & paths
   adult: boolean("adult").notNull().default(true),
   video: boolean("video").notNull().default(true),
+  backdropBlurDataUrl: text("backdrop_blur_data_url"),
 
   // Collection info
   belongsToCollection: text("belongs_to_collection"),
-
   // Identifiers & titles
   imdbId: text("imdb_id"),
   originalLanguage: text("original_language"),
   originalTitle: text("original_title"),
-
+  originCountry: text("origin_country").array(),
   // Dates & stats
   budget: integer("budget"),
   revenue: integer("revenue"),
@@ -166,6 +166,7 @@ export const movieDetails = pgTable("movie_details", {
   productionCompanies: jsonb("production_companies"),
   productionCountries: jsonb("production_countries"),
   spokenLanguages: jsonb("spoken_languages"),
+  watchProviders: jsonb("watch_providers"),
 
   videos: jsonb("videos"),
   credits: jsonb("credits"),
@@ -183,7 +184,7 @@ export const tvSummaries = pgTable("tv_summaries", {
   voteAverage: doublePrecision("vote_average"),
   voteCount: integer("vote_count"),
   firstAirDate: date("first_air_date"),
-  blurDataUrl: text("blur_data_url"),
+  posterBlurDataUrl: text("poster_blur_data_url"),
 });
 
 export const tvDetails = pgTable(
@@ -197,10 +198,12 @@ export const tvDetails = pgTable(
     adult: boolean("adult").notNull().default(true),
     originalLanguage: text("original_language"),
     originalName: text("original_name"),
+    originCountry: text("origin_country").array(),
     homepage: text("homepage"),
     status: text("status"),
     tagline: text("tagline"),
     type: text("type"),
+    backdropBlurDataUrl: text("backdrop_blur_data_url"),
 
     // dates & counts
     lastAirDate: date("last_air_date"),
@@ -219,6 +222,9 @@ export const tvDetails = pgTable(
     aggregateCredits: jsonb("aggregate_credits"),
     watchProviders: jsonb("watch_providers"),
     contentRatings: jsonb("content_ratings"),
+    productionCompanies: jsonb("production_companies"),
+    productionCountries: jsonb("production_countries"),
+    spokenLanguages: jsonb("spoken_languages"),
   },
   (t) => ({
     // unique constraint to ensure one details row per summary
