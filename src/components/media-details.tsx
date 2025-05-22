@@ -3,8 +3,10 @@ import Link from "next/link";
 import { Button } from "./ui/button";
 import { Play } from "lucide-react";
 import TmdbLogo from "@/assets/tmdb-logo.svg";
+import { getWatchlists } from "@/lib/actions";
+import { auth } from "@/auth";
 
-export function MediaDetails({
+export async function MediaDetails({
   title,
   overview,
   genres,
@@ -13,18 +15,21 @@ export function MediaDetails({
   rating,
   isVideo,
   paramsId,
+  isReleased,
 }: {
   title: string;
   overview: string;
   genres?: Array<Genre>;
   voteAverage?: number;
-  releaseDate?: string;
+  releaseDate?: Date;
   rating?: string;
   isVideo?: boolean;
   paramsId?: number;
+  isReleased: boolean;
 }) {
-  const isReleased: boolean = new Date(releaseDate!).valueOf() < Date.now();
-
+  console.log("release date: " + releaseDate);
+  const session = await auth();
+  const userWatchlists = session ? await getWatchlists(session.user.id) : null;
   return (
     <div className="flex flex-col justify-between space-y-1 items-center md:items-start">
       <h2 className="text-3xl md:text-5xl font-medium text-center md:text-start pb-2">
@@ -42,37 +47,32 @@ export function MediaDetails({
           ))}
         </div>
       )}
-      <div className="flex flex-row space-x-2 items-center justify-center md:justify-start">
+      <div>
         {isReleased && (
           <>
             <div className="inline-flex items-center">
-              <span className="mr-2">
+              <span className="pr-2">
                 {((voteAverage ?? 0) * 10).toFixed(0)}%
               </span>
               <TmdbLogo height={13} width={30} alt="tmdb logo" />
             </div>
-
-            <span>•</span>
+            <span className="px-2">•</span>
           </>
         )}
-        <div className="">
-          {!isReleased && <div>Unreleased</div>}
-          {new Intl.DateTimeFormat("us", {
+        {!isReleased && <div>Unreleased</div>}
+        {releaseDate &&
+          new Intl.DateTimeFormat("us", {
             timeZone: "UTC",
             month: "short",
             year: "numeric",
             day: "numeric",
-          }).format(new Date(releaseDate!))}
-        </div>
+          }).format(new Date(releaseDate))}
+        {rating && (
+          <div>
+            Rated <span className="font-semibold">{rating}</span>
+          </div>
+        )}
       </div>
-      {rating ? (
-        <div className="">
-          Rated <span className="font-semibold">{rating}</span>
-        </div>
-      ) : (
-        <div></div>
-      )}
-
       {isVideo && (
         <Link className="text-md z-10" href={`${paramsId}/?show=true`}>
           <Button className="p-2 mt-1" variant="outline">

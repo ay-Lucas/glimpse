@@ -1,13 +1,14 @@
-import { getPersonData } from "@/app/(media)/actions";
-import { Poster } from "../../_components/poster";
+import { getPersonDetails } from "@/app/(media)/actions";
 import { auth } from "@/auth";
 import { getWatchlists } from "@/lib/actions";
 import { getBlurData } from "@/lib/blur-data-generator";
 import {
   BASE_ORIGINAL_IMAGE_URL,
+  BASE_POSTER_IMAGE_URL,
   DEFAULT_BLUR_DATA_URL,
 } from "@/lib/constants";
 import { PersonDetails } from "@/components/person-details";
+import Image from "next/image";
 
 export const revalidate = 3600;
 export default async function PersonPage({
@@ -15,7 +16,7 @@ export default async function PersonPage({
 }: {
   params: { type: "person"; id: number };
 }) {
-  const data = await getPersonData({ id: params.id });
+  const person = await getPersonDetails({ id: params.id });
 
   const session = await auth();
   let userWatchlists;
@@ -23,11 +24,10 @@ export default async function PersonPage({
     userWatchlists = await getWatchlists(session.user.id);
   }
 
-  const posterBlurData = data.profile_path
-    ? await getBlurData(`${BASE_ORIGINAL_IMAGE_URL}${data.profile_path}`)
+  const posterBlurData = person.profile_path
+    ? await getBlurData(`${BASE_ORIGINAL_IMAGE_URL}${person.profile_path}`)
     : null;
 
-  const info = data as any;
   return (
     <main>
       <div className="h-full w-full overflow-x-hidden">
@@ -40,20 +40,28 @@ export default async function PersonPage({
           <div className="items-end pb-5 md:pt-0 px-0 lg:px-40 space-y-5">
             <div>
               <div className="flex flex-col md:flex-row h-full md:h-3/4 z-10 md:items-center md:space-x-5 pb-3">
-                {data.profile_path && (
-                  <Poster
-                    src={`https://image.tmdb.org/t/p/original${data.profile_path}`}
-                    blurDataUrl={posterBlurData ?? DEFAULT_BLUR_DATA_URL}
+                {person.profile_path && (
+                  <Image
+                    quality={60}
+                    width={190}
+                    height={285}
+                    src={`${BASE_POSTER_IMAGE_URL}${person.profile_path}`}
+                    className={`object-cover rounded-xl md:rounded-l-xl mx-auto w-[238px] h-[357px]`}
+                    priority
+                    placeholder="blur"
+                    blurDataURL={posterBlurData ?? DEFAULT_BLUR_DATA_URL}
+                    loading="eager"
+                    alt="poster image"
                   />
                 )}
                 <PersonDetails
-                  name={info.name}
-                  biography={data.biography}
-                  birthDate={data.birthday}
-                  deathDay={data.deathday}
-                  popularity={data.popularity}
-                  placeOfBirth={data.place_of_birth}
-                  knownForDept={data.known_for_department}
+                  name={person.name}
+                  biography={person.biography}
+                  birthDate={person.birthday}
+                  deathDay={person.deathday}
+                  popularity={person.popularity}
+                  placeOfBirth={person.place_of_birth}
+                  knownForDept={person.known_for_department}
                 />
               </div>
             </div>

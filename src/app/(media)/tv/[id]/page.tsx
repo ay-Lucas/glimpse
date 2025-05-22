@@ -1,7 +1,5 @@
 import dynamic from "next/dynamic";
-import { getTvData } from "@/app/(media)/actions";
-import { Backdrop } from "@/app/(media)/_components/backdrop";
-import { Poster } from "../../_components/poster";
+import { getFullTv, getTvDetails } from "@/app/(media)/actions";
 import Link from "next/link";
 import { Cast, Video } from "@/types/request-types";
 import { MediaDetails } from "@/components/media-details";
@@ -12,15 +10,9 @@ import { getWatchlists } from "@/lib/actions";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
-  appendBlurDataToMediaArray,
-  getBlurData,
-} from "@/lib/blur-data-generator";
-import {
-  BASE_BLUR_IMAGE_URL,
   BASE_CAST_IMAGE_URL,
   BASE_ORIGINAL_IMAGE_URL,
   BASE_POSTER_IMAGE_URL,
-  BaseImageUrl,
   DEFAULT_BLUR_DATA_URL,
 } from "@/lib/constants";
 import { Seasons } from "@/app/(media)/_components/seasons";
@@ -67,58 +59,65 @@ function getTrailer(videoArray: Array<Video>) {
   }
 }
 
-export default async function ItemPage({ params }: { params: { id: number } }) {
+export default async function TvPage({ params }: { params: { id: number } }) {
   const tmdbId = Number(params.id);
 
-  const [data, session] = await Promise.all([
-    getTvData({ id: params.id }),
-    auth(),
-  ]);
+  let res = await getFullTv(params.id);
+  const dataPromise = res ? res : getTvDetails({ id: params.id });
+  const [data, session] = await Promise.all([dataPromise, auth()]);
 
-  data.media_type = "tv";
-
-  const watchlistPromise = session
-    ? getWatchlists(session.user.id)
-    : Promise.resolve(null);
-
-  const [userWatchlists, posterBlurData, backdropBlurData, castWithBlur] =
-    await Promise.all([
-      watchlistPromise,
-      data.poster_path
-        ? getBlurData(`${BASE_BLUR_IMAGE_URL}${data.poster_path}`)
-        : Promise.resolve(null),
-      data.backdrop_path
-        ? getBlurData(`${BASE_BLUR_IMAGE_URL}${data.backdrop_path}`)
-        : Promise.resolve(null),
-      data.credits?.cast?.length
-        ? appendBlurDataToMediaArray(
-            data.credits.cast,
-            BaseImageUrl.BLUR,
-            data.credits.cast.map((c) => c.profile_path),
-          )
-        : Promise.resolve([]),
-    ]);
+  // const watchlistPromise = session
+  //   ? getWatchlists(session.user.id)
+  //   : Promise.resolve(null);
+  //
+  // const [userWatchlists, posterBlurData, backdropBlurData, castWithBlur] =
+  //   await Promise.all([
+  //     watchlistPromise,
+  //     data.posterPath
+  //       ? getBlurData(`${BASE_BLUR_IMAGE_URL}${data.posterPath}`)
+  //       : Promise.resolve(null),
+  //     data.backdropPath
+  //       ? getBlurData(`${BASE_BLUR_IMAGE_URL}${data.backdropPath}`)
+  //       : Promise.resolve(null),
+  //     data.credits?.cast?.length
+  //       ? appendBlurDataToMediaArray(
+  //           data.credits.cast,
+  //           BaseImageUrl.BLUR,
+  //           data.credits.cast.map((c) => c.profilePath),
+  //         )
+  //       : Promise.resolve([]),
+  //   ]);
+  const userWatchlists = session ? await getWatchlists(session.user.id) : null;
+  console.log(data);
+  if (!data) return;
 
   let videoPath;
   if (data.videos !== undefined && data.videos.results)
     videoPath = getTrailer(data.videos.results)?.key;
   const rating =
-    data.content_ratings.results.filter(
+    data.contentRatings?.results.filter(
       (item) => item.iso_3166_1 === "US" && item.rating !== "",
     )[0]?.rating ?? "";
 
   const isReleased: boolean =
-    new Date(data.first_air_date ?? Date.now()).valueOf() < Date.now();
-
+    data.firstAirDate !== undefined &&
+    data.firstAirDate !== null &&
+    new Date(data.firstAirDate).valueOf() < Date.now();
   return (
     <main>
       <div className="h-full w-full overflow-x-hidden">
         <div className="absolute top-0 left-0 mb-10 w-screen h-screen">
-          {data.backdrop_path ? (
+          {data.backdropPath ? (
             <div className="absolute h-full w-full bg-gradient-to-t from-background from-30% via-background/95 via-40% to-transparent">
-              <Backdrop
-                src={`${BASE_ORIGINAL_IMAGE_URL}${data.backdrop_path}`}
-                blurDataUrl={backdropBlurData ?? DEFAULT_BLUR_DATA_URL}
+              <Image
+                fill
+                src={`${BASE_ORIGINAL_IMAGE_URL}${data.backdropPath}`}
+                quality={70}
+                alt={`Backdrop image of ${data.name}`}
+                className={`object-cover -z-10`}
+                sizes="100vw"
+                placeholder="blur"
+                blurDataURL={data.backdropBlurData ?? DEFAULT_BLUR_DATA_URL}
               />
             </div>
           ) : (
@@ -131,27 +130,37 @@ export default async function ItemPage({ params }: { params: { id: number } }) {
           <div className="items-end pb-5 md:pt-0 px-0 lg:px-40 space-y-5">
             <div>
               <div className="flex flex-col md:flex-row h-full md:h-3/4 z-10 md:items-center md:space-x-5 pb-3">
-                {data.poster_path && (
-                  <Poster
-                    src={`${BASE_POSTER_IMAGE_URL}${data.poster_path}`}
-                    blurDataUrl={posterBlurData ?? DEFAULT_BLUR_DATA_URL}
+                {data.posterPath && (
+                  <Image
+                    quality={60}
+                    width={190}
+                    height={285}
+                    src={`${BASE_POSTER_IMAGE_URL}${data.posterPath}`}
+                    className={`object-cover rounded-xl md:rounded-l-xl mx-auto w-[238px] h-[357px]`}
+                    priority
+                    placeholder="blur"
+                    blurDataURL={DEFAULT_BLUR_DATA_URL}
+                    loading="eager"
+                    alt="poster image"
                   />
                 )}
                 <MediaDetails
                   title={data.name ?? ""}
                   genres={data.genres}
                   rating={rating}
-                  releaseDate={data.first_air_date!}
+                  releaseDate={data.firstAirDate ?? undefined}
                   overview={data.overview!}
-                  voteAverage={data.vote_average ?? 0}
+                  voteAverage={data.voteAverage ?? 0}
                   paramsId={params.id}
                   isVideo={videoPath !== undefined && videoPath !== ""}
+                  isReleased={isReleased}
                 />
               </div>
               {userWatchlists && session ? (
                 <AddToWatchlistDropdownClient
                   userId={session.user.id}
                   item={data}
+                  mediaType="tv"
                   rating={rating}
                 />
               ) : (
@@ -164,106 +173,59 @@ export default async function ItemPage({ params }: { params: { id: number } }) {
               <div className="w-full md:w-1/2">
                 <h2 className="text-2xl font-bold pb-4">Details</h2>
                 <ul className="grid bg-secondary/40 rounded-xl p-3 -ml-1 space-y-1">
-                  {data.media_type === "tv" ? (
-                    <>
-                      <li className="grid grid-cols-2 border-b items-center">
-                        <div>Creators</div>
-                        <div>
-                          {data.created_by?.map((item, index) => (
-                            <Link
-                              href={`/person/${item.id}`}
-                              className="hover:underline"
-                              key={index}
-                            >
-                              {index === 0 ? "" : ", "}
-                              {item.name}
-                            </Link>
-                          ))}
-                        </div>
-                      </li>
-                      <li className="grid grid-cols-2 border-b">
-                        <div>Networks</div>
-                        <div>
-                          {data.networks?.map((item, index) => (
-                            <span key={index}>
-                              {index === 0 ? "" : ", "}
-                              {item.name}
-                            </span>
-                          ))}
-                        </div>
-                      </li>
-                      <li className="grid grid-cols-2 border-b">
-                        <div>Vote Average</div>
-                        <span>{data.vote_average!.toFixed(1)}</span>
-                      </li>
-                      <li className="grid grid-cols-2 border-b">
-                        <div>Vote Count</div>
-                        <span>{data.vote_count}</span>
-                      </li>
-                      <li className="grid grid-cols-2 border-b">
-                        <div>Popularity</div>
-                        <span>{Math.round(data.popularity!)}</span>
-                      </li>
-                      <li className="grid grid-cols-2 border-b">
-                        <div>Language</div>
-                        <div>{data.spoken_languages?.at(0)?.name}</div>
-                      </li>
-                      <li className="grid grid-cols-2">
-                        <div>Origin Country</div>
-                        <span>{data.origin_country}</span>
-                      </li>
-                    </>
-                  ) : data.media_type === "movie" ? (
-                    <>
-                      <li className="grid grid-cols-2 border-b">
-                        <div className="items-center">Directors</div>
-                        <div>
-                          {data.credits?.crew
-                            ?.filter((item) => item.job === "Director")
-                            .map((item, index) => (
-                              <Link
-                                href={`/person/${item.id}`}
-                                className="hover:underline"
-                                key={index}
-                              >
-                                {index === 0 ? "" : ", "}
-                                {item.name}
-                              </Link>
-                            ))}
-                        </div>
-                      </li>
-                      <li className="grid grid-cols-2 border-b">
-                        <div>Vote Average</div>
-                        <span>{data.vote_average?.toFixed(1)}</span>
-                      </li>
-                      <li className="grid grid-cols-2 border-b">
-                        <div>Vote Count</div>
-                        <span>{data.vote_count}</span>
-                      </li>
-                      <li className="grid grid-cols-2 border-b">
-                        <div>Popularity</div>
-                        <span>{Math.round(data.popularity ?? 0)}</span>
-                      </li>
-                      <li className="grid grid-cols-2 border-b">
-                        <div>Language</div>
-                        <div>{data.spoken_languages?.at(0)?.name}</div>
-                      </li>
-                      <li className="grid grid-cols-2">
-                        <div>Origin Country</div>
-                        <span>{data.origin_country}</span>
-                      </li>
-                    </>
-                  ) : (
-                    <span className="mr-32"></span>
-                  )}
+                  <li className="grid grid-cols-2 border-b items-center">
+                    <div>Creators</div>
+                    <div>
+                      {data.createdBy?.map((item, index) => (
+                        <Link
+                          href={`/person/${item.id}`}
+                          className="hover:underline"
+                          key={index}
+                        >
+                          {index === 0 ? "" : ", "}
+                          {item.name}
+                        </Link>
+                      ))}
+                    </div>
+                  </li>
+                  <li className="grid grid-cols-2 border-b">
+                    <div>Networks</div>
+                    <div>
+                      {data.networks?.map((item, index) => (
+                        <span key={index}>
+                          {index === 0 ? "" : ", "}
+                          {item.name}
+                        </span>
+                      ))}
+                    </div>
+                  </li>
+                  <li className="grid grid-cols-2 border-b">
+                    <div>Vote Average</div>
+                    <span>{data.voteAverage!.toFixed(1)}</span>
+                  </li>
+                  <li className="grid grid-cols-2 border-b">
+                    <div>Vote Count</div>
+                    <span>{data.voteCount}</span>
+                  </li>
+                  <li className="grid grid-cols-2 border-b">
+                    <div>Popularity</div>
+                    <span>{Math.round(data.popularity!)}</span>
+                  </li>
+                  <li className="grid grid-cols-2 border-b">
+                    <div>Language</div>
+                    <div>{data.spokenLanguages?.at(0)?.name}</div>
+                  </li>
+                  <li className="grid grid-cols-2">
+                    <div>Origin Country</div>
+                    <span>{data.originCountry}</span>
+                  </li>
                 </ul>
               </div>
               <Suspense
                 fallback={<Skeleton className="w-full h-[356px] rounded-xl" />}
               >
-                {data["watch/providers"]?.results?.US?.flatrate &&
-                  data["watch/providers"]?.results?.US?.flatrate?.length >
-                    0 && (
+                {data.watchProviders?.results?.US?.flatrate &&
+                  data.watchProviders?.results?.US?.flatrate?.length > 0 && (
                     <div className="w-full md:w-1/2 md:pl-3 pt-3 md:pt-0 pb-3 md:pb-0">
                       <h2 className="text-2xl font-bold pb-4">
                         Streaming
@@ -279,16 +241,16 @@ export default async function ItemPage({ params }: { params: { id: number } }) {
                         </span>
                       </h2>
                       <div className="flex flex-wrap gap-2">
-                        {data["watch/providers"]?.results?.US?.flatrate?.map(
+                        {data.watchProviders?.results?.US?.flatrate?.map(
                           (item, index) => (
                             <a
-                              href={data["watch/providers"]?.results?.US?.link!}
+                              href={data.watchProviders?.results?.US?.link!}
                               key={index}
                               className="w-[55px] h-[55px] flex-shrink-0 transform transition-transform  duration-200  hover:scale-105  hover:shadow-xl"
                             >
                               <Image
-                                src={`https://image.tmdb.org/t/p/original/${item.logo_path}`}
-                                alt={`${item.provider_name} logo`}
+                                src={`https://image.tmdb.org/t/p/original/${item.logoPath}`}
+                                alt={`${item.providerName} logo`}
                                 width={55}
                                 height={55}
                                 className="rounded-lg object-cover"
@@ -301,7 +263,7 @@ export default async function ItemPage({ params }: { params: { id: number } }) {
                   )}
               </Suspense>
             </div>
-            {data.number_of_seasons && data.number_of_seasons > 0 && (
+            {data.numberOfSeasons && data.numberOfSeasons > 0 && (
               <>
                 <div className="pb-5 space-y-2">
                   <h2 className={`text-2xl font-bold pb-4 pt-3`}>Seasons</h2>
@@ -309,7 +271,7 @@ export default async function ItemPage({ params }: { params: { id: number } }) {
                     fallback={
                       <div className="space-y-2">
                         {Array.from({
-                          length: data.number_of_seasons ?? 1,
+                          length: data.numberOfSeasons ?? 1,
                         }).map((_, index) => (
                           <Skeleton
                             key={index}
@@ -321,13 +283,13 @@ export default async function ItemPage({ params }: { params: { id: number } }) {
                   >
                     <Seasons
                       id={params.id}
-                      numberOfSeasons={data.number_of_seasons}
+                      numberOfSeasons={data.numberOfSeasons}
                     />
                   </Suspense>
                 </div>
               </>
             )}
-            {castWithBlur && (
+            {data.credits?.cast && (
               <Suspense
                 fallback={<Skeleton className="w-full h-[356px] rounded-xl" />}
               >
@@ -335,14 +297,14 @@ export default async function ItemPage({ params }: { params: { id: number } }) {
                   <h2 className={`text-2xl font-bold -mb-9`}>Cast</h2>
                   <div className="pt-2 pb-4 pl-8 md:pl-3 -ml-8 md:ml-0 md:w-full w-screen">
                     <ImageCarouselClient
-                      items={castWithBlur?.map((item: Cast, index: number) => (
+                      items={data.credits?.cast?.map((item, index: number) => (
                         <Link href={`/person/${item.id}`} key={index}>
                           <CastCard
                             name={item.name}
                             character={item.character}
-                            imagePath={`${BASE_CAST_IMAGE_URL}${item.profile_path}`}
+                            imagePath={`${BASE_CAST_IMAGE_URL}${item.profilePath}`}
                             index={index}
-                            blurDataURL={(item as any).blurDataURL}
+                            blurDataURL={DEFAULT_BLUR_DATA_URL}
                           />
                         </Link>
                       ))}
