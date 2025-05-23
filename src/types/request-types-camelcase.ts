@@ -1,11 +1,13 @@
 import { Response } from "./types";
 
+/* ────────────────────  Search / Movie / TV Results ──────────────────── */
+
 export interface MovieResult {
   posterPath?: string;
   adult?: boolean;
   overview?: string;
   releaseDate?: string;
-  genreIds?: Array<number>;
+  genreIds?: number[];
   id: number;
   mediaType: "movie";
   originalTitle?: string;
@@ -16,9 +18,7 @@ export interface MovieResult {
   voteCount?: number;
   video?: boolean;
   voteAverage?: number;
-  videos?: {
-    results: Array<Video>;
-  };
+  videos?: { results: Video[] };
   credits?: CreditsResponse;
   rating?: string; // Not provided by TMDB
 }
@@ -32,15 +32,13 @@ export interface TvResult {
   voteAverage?: number;
   mediaType: "tv";
   firstAirDate?: string;
-  originCountry?: Array<string>;
-  genreIds?: Array<number>;
+  originCountry?: string[];
+  genreIds?: number[];
   originalLanguage?: string;
   voteCount?: number;
   name: string;
   originalName?: string;
-  videos?: {
-    results: Array<Video>;
-  };
+  videos?: { results: Video[] };
   credits: CreditsResponse;
   aggregateCredits?: AggregateCreditsResponse;
   rating?: string;
@@ -51,7 +49,7 @@ export interface PersonResult {
   adult?: boolean;
   id?: number;
   name?: string;
-  mediaType: "person"; // Not provided by api
+  mediaType: "person"; // Not provided by API
   popularity?: number;
   knownFor?: Array<MovieResult | TvResult>;
 }
@@ -61,10 +59,12 @@ export interface EpisodeResult extends SimpleEpisode {
   runtime?: string;
 }
 
+/* ─────────────────────────────  People  ────────────────────────────── */
+
 export interface Person {
   birthday?: string | null;
   knownForDepartment?: string;
-  deathday?: null | string;
+  deathday?: string | null;
   id?: number;
   name?: string;
   alsoKnownAs?: string[];
@@ -75,18 +75,20 @@ export interface Person {
   profilePath?: string;
   adult?: boolean;
   imdbId?: string;
-  homepage?: null | string;
-  mediaType: "person"; // Not provided by api
+  homepage?: string | null;
+  mediaType: "person"; // Not provided by API
 }
+
+/* ─────────────────────────────  Images  ────────────────────────────── */
 
 export interface Image {
   baseUrl?: string;
   secureBaseUrl?: string;
-  backdropSizes?: Array<string>;
-  logoSizes?: Array<string>;
-  posterSizes?: Array<string>;
-  profileSizes?: Array<string>;
-  stillSizes?: Array<string>;
+  backdropSizes?: string[];
+  logoSizes?: string[];
+  posterSizes?: string[];
+  profileSizes?: string[];
+  stillSizes?: string[];
 }
 
 interface BaseImage {
@@ -104,20 +106,22 @@ export interface Logo extends BaseImage {
 }
 
 export interface Backdrop extends BaseImage {
-  iso_639_1?: string;
+  iso6391?: string;
 }
 
 export interface Profile extends BaseImage {
-  iso_639_1?: string;
+  iso6391?: string;
 }
 
 export interface Poster extends BaseImage {
-  iso_639_1?: string;
+  iso6391?: string;
 }
 
 export interface TitleLogo extends BaseImage {
-  iso_639_1?: string;
+  iso6391?: string;
 }
+
+/* ─────────────────────────  Keywords / Dates  ───────────────────────── */
 
 export interface Keyword {
   id?: number;
@@ -127,22 +131,24 @@ export interface Keyword {
 export interface ReleaseDate {
   certification?: string;
   descriptors?: string;
-  iso_3166_1?: string;
+  iso31661?: string;
   primary?: boolean;
   releaseDate?: string;
 }
 
+/* ─────────────────────────────  Videos  ────────────────────────────── */
+
 export interface Video {
   id?: string;
-  iso_639_1?: string;
-  iso_3166_1?: string;
+  iso6391?: string;
+  iso31661?: string;
   key?: string;
   name?: string;
   official?: boolean;
   publishedAt?: string;
   site?: string;
   size?: 360 | 480 | 720 | 1080;
-  type?:
+  type:
     | "Trailer"
     | "Teaser"
     | "Clip"
@@ -151,10 +157,12 @@ export interface Video {
     | "Bloopers";
 }
 
+/* ─────────────────────────────  Credits  ───────────────────────────── */
+
 export interface CreditsResponse extends Response {
   id?: number;
-  cast?: Array<Cast>;
-  crew?: Array<Crew>;
+  cast?: Cast[];
+  crew?: Crew[];
 }
 
 export interface Cast {
@@ -186,19 +194,21 @@ export interface Crew {
   profilePath?: string | null;
 }
 
+/* ───────────────────────  Configuration Lists  ─────────────────────── */
+
 export interface Country {
-  iso_3166_1?: string;
+  iso31661?: string;
   englishName?: string;
 }
 
 export interface Language {
-  iso_639_1?: string;
+  iso6391?: string;
   englishName?: string;
   name?: string;
 }
 
 export interface Timezone {
-  iso_3166_1?: string;
+  iso31661?: string;
   zones?: string[];
 }
 
@@ -207,9 +217,11 @@ export interface Job {
   jobs?: string[];
 }
 
+/* ─────────────────────────────  Episodes  ──────────────────────────── */
+
 export interface Episode {
   airDate?: string;
-  crew?: Array<Crew>;
+  crew?: Crew[];
   episodeNumber?: number;
   guestStars?: GuestStar[];
   name?: string;
@@ -223,11 +235,14 @@ export interface Episode {
   voteCount?: number;
 }
 
+/* ────────────────────────  Aggregate Credits  ──────────────────────── */
+
 export interface AggregateCreditsResponse extends Response {
-  cast?: Array<AggregateCast>;
-  crew?: Array<AggregateCrew>;
+  cast?: AggregateCast[];
+  crew?: AggregateCrew[];
   id?: number;
 }
+
 export interface GuestStar {
   id?: number;
   name?: string;
@@ -271,6 +286,8 @@ export interface AggregateCrew {
   totalEpisodeCount?: number;
 }
 
+/* ─────────────────────────  Simple Episode  ────────────────────────── */
+
 export interface SimpleEpisode {
   airDate?: string;
   episodeNumber?: number;
@@ -293,12 +310,14 @@ export interface Role {
   episodeCount?: number;
 }
 
+/* ─────────────────────────  Movie Response  ────────────────────────── */
+
 export interface MovieResponse extends Response {
   adult?: boolean;
   backdropPath: string;
   belongsToCollection?: string;
   budget?: number;
-  genres: Array<Genre>;
+  genres: Genre[];
   homepage?: string;
   id: number;
   imdbId?: string;
@@ -308,13 +327,13 @@ export interface MovieResponse extends Response {
   overview: string;
   popularity: number;
   posterPath: string;
-  productionCompanies?: Array<ProductionCompany>;
-  productionCountries?: Array<ProductionCountry>;
+  productionCompanies?: ProductionCompany[];
+  productionCountries?: ProductionCountry[];
   releaseDate?: string;
   revenue?: number;
   runtime?: number;
-  spokenLanguages?: Array<SpokenLanguage>;
-  status?:
+  spokenLanguages?: SpokenLanguage[];
+  status:
     | "Rumored"
     | "Planned"
     | "In Production"
@@ -329,21 +348,21 @@ export interface MovieResponse extends Response {
 }
 
 export interface MovieResponseAppended extends MovieResponse {
-  releases: {
-    countries: Array<ReleaseDate>;
-  };
+  releases: { countries: ReleaseDate[] };
   videos: VideosResponse;
   "watch/providers"?: WatchProviderResponse;
-  mediaType: "movie"; // Not provided by api
+  mediaType: "movie"; // Not provided by API
   credits: CreditsResponse;
 }
 
+/* ───────────────────────────  Show Response  ───────────────────────── */
+
 export interface ShowResponse extends Response {
   backdropPath?: string;
-  createdBy?: Array<SimplePerson>;
+  createdBy?: SimplePerson[];
   episodeRunTime?: number[];
   firstAirDate?: string;
-  genres?: Array<Genre>;
+  genres?: Genre[];
   homepage?: string;
   id: number;
   inProduction?: boolean;
@@ -352,7 +371,7 @@ export interface ShowResponse extends Response {
   lastEpisodeToAir?: SimpleEpisode;
   name?: string;
   nextEpisodeToAir?: SimpleEpisode;
-  networks?: Array<Network>;
+  networks?: Network[];
   numberOfEpisodes?: number;
   numberOfSeasons?: number;
   originCountry?: string[];
@@ -361,10 +380,10 @@ export interface ShowResponse extends Response {
   overview?: string;
   popularity?: number;
   posterPath?: string;
-  productionCompanies?: Array<ProductionCompany>;
-  productionCountries?: Array<ProductionCountry>;
-  seasons?: Array<SimpleSeason>;
-  spokenLanguages?: Array<SpokenLanguage>;
+  productionCompanies?: ProductionCompany[];
+  productionCountries?: ProductionCountry[];
+  seasons?: SimpleSeason[];
+  spokenLanguages?: SpokenLanguage[];
   status?: string;
   tagline?: string;
   type?: string;
@@ -374,20 +393,22 @@ export interface ShowResponse extends Response {
 }
 
 export interface ShowResponseAppended extends ShowResponse {
-  contentRatings: {
-    results: Array<RatingResponse>;
-  };
+  contentRatings: { results: RatingResponse[] };
   videos: VideosResponse;
   credits?: CreditsResponse;
   "watch/providers"?: WatchProviderResponse;
-  mediaType: "tv"; // Not provided by api
+  mediaType: "tv"; // Not provided by API
   aggregateCredits?: AggregateCreditsResponse;
 }
 
+/* ───────────────────────────  Video Lists  ─────────────────────────── */
+
 export interface VideosResponse extends Response {
   id?: number;
-  results?: Array<Video>;
+  results?: Video[];
 }
+
+/* ────────────────────────  Watch Providers  ────────────────────────── */
 
 export interface WatchProviderResponse {
   id?: number;
@@ -443,11 +464,11 @@ export interface WatchProviderResponse {
 
 export interface WatchProviderCountry {
   link?: string;
-  rent?: Array<WatchProvider>;
-  buy?: Array<WatchProvider>;
-  flatrate?: Array<WatchProvider>;
-  ads?: Array<WatchProvider>;
-  free?: Array<WatchProvider>;
+  rent?: WatchProvider[];
+  buy?: WatchProvider[];
+  flatrate?: WatchProvider[];
+  ads?: WatchProvider[];
+  free?: WatchProvider[];
 }
 
 export interface WatchProvider {
@@ -458,8 +479,10 @@ export interface WatchProvider {
 }
 
 export interface WatchProviderListResponse {
-  results?: Array<WatchProvider>;
+  results?: WatchProvider[];
 }
+
+/* ───────────────────────────  Misc Models  ─────────────────────────── */
 
 export interface SimpleSeason {
   airDate?: string;
@@ -493,16 +516,17 @@ export interface ProductionCompany {
 
 export interface ProductionCountry {
   name?: string;
-  iso_3166_1?: string;
+  iso31661?: string;
 }
 
 export interface SpokenLanguage {
-  iso_639_1?: string;
+  iso6391?: string;
   name?: string;
 }
+
 export interface RatingResponse {
-  descriptors: Array<String>;
-  iso_3166_1?: string;
+  descriptors: string[];
+  iso31661?: string;
   rating?: string;
 }
 

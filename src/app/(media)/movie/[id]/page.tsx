@@ -82,14 +82,14 @@ export default async function MoviePage({
   // console.log(movie?.credits?.cast);
   const rating =
     movie?.releases?.countries?.find(
-      (c) => c.iso_3166_1 === "US" && c.certification,
+      (c) => c.iso31661 === "US" && c.certification,
     )?.certification ?? "";
+  console.log(movie.releases.countries.find((c) => c.iso31661));
   const isReleased: boolean =
     (movie?.releaseDate &&
       new Date(movie?.releaseDate!).valueOf() < Date.now()) ||
     false;
-  if (movie.credits?.cast) console.log(movie?.credits?.cast[0]);
-  console.log(movie);
+  // console.log(movie);
   // console.log(movie.releaseDate);
   return (
     <main>

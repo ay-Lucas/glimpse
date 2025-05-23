@@ -96,7 +96,7 @@ export default async function TvPage({ params }: { params: { id: number } }) {
     videoPath = getTrailer(data.videos.results)?.key;
   const rating =
     data.contentRatings?.results.filter(
-      (item) => item.iso_3166_1 === "US" && item.rating !== "",
+      (item) => item.iso31661 === "US" && item.rating !== "",
     )[0]?.rating ?? "";
 
   const isReleased: boolean =
