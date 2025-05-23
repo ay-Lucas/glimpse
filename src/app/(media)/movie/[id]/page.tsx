@@ -24,6 +24,7 @@ import JustWatchLogo from "@/assets/justwatch-logo.svg";
 import CastCard from "@/components/cast-card";
 import { MovieDetails } from "../../_components/movie-details";
 import MediaActions from "../../_components/media-actions";
+import { ScoreCircle } from "../../_components/score-circle";
 
 export const revalidate = 3600;
 const VideoPlayerClient = dynamic(
@@ -142,25 +143,34 @@ export default async function MoviePage({
                       <h1 className="text-3xl md:text-5xl font-bold text-center md:text-left">
                         {movie.title}
                       </h1>
-                      {movie?.genres && movie.genres.length > 0 && (
-                        <div className="flex flex-wrap gap-3 justify-center md:justify-start">
-                          {movie.genres.map((g) => (
-                            <span
-                              key={g.id}
-                              className="text-sm bg-gray-700/60 px-2 py-0.5 rounded-full hover:bg-gray-700 transition ring-1 ring-gray-400"
-                            >
-                              {g.name}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-
+                      <div className="flex flex-wrap items-center gap-4 mb-4">
+                        {isReleased && movie.voteAverage != null && (
+                          <div className="flex flex-col items-center">
+                            <ScoreCircle
+                              size={54}
+                              strokeWidth={3}
+                              percentage={Math.round(movie.voteAverage * 10)}
+                            />
+                            <span className="sr-only">{movie.voteAverage}</span>
+                          </div>
+                        )}
+                        {movie.genres && movie.genres.length > 0 && (
+                          <>
+                            {movie.genres.map((g) => (
+                              <span
+                                key={g.id}
+                                className="text-sm bg-gray-700/60 px-2 py-0.5 rounded-full hover:bg-gray-700 transition ring-1 ring-gray-400"
+                              >
+                                {g.name}
+                              </span>
+                            ))}
+                          </>
+                        )}
+                      </div>
                       <MovieDetails
                         rating={rating}
                         releaseDate={movie.releaseDate?.toString()}
                         overview={movie.overview!}
-                        voteAverage={movie.voteAverage ?? 0}
-                        isReleased={isReleased}
                         status={movie.status}
                       />
                       <MediaActions

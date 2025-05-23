@@ -1,12 +1,10 @@
 import TmdbLogo from "@/assets/tmdb-logo.svg";
+import { ScoreCircle } from "./score-circle";
 
 interface MovieDetailsProps {
   overview: string;
-  voteAverage?: number;
   releaseDate?: string;
   rating?: string;
-  isVideo?: boolean;
-  isReleased: boolean;
   status?:
     | "Rumored"
     | "Planned"
@@ -18,11 +16,8 @@ interface MovieDetailsProps {
 
 export async function MovieDetails({
   overview,
-  voteAverage,
   releaseDate,
   rating,
-  isVideo,
-  isReleased,
   status,
 }: MovieDetailsProps) {
   const formattedDate = releaseDate
@@ -51,18 +46,6 @@ export async function MovieDetails({
           </div>
           <div className="mt-1">{status ?? "Unreleased"}</div>
         </div>
-        {isReleased && voteAverage != null && (
-          <div>
-            <div className="text-xs font-medium text-gray-400 uppercase">
-              Score
-            </div>
-            <div className="mt-1 flex items-center justify-center md:justify-start space-x-1">
-              <span className="font-medium">{voteAverage.toFixed(1)}</span>
-              <span className="text-gray-400">/10</span>
-              <TmdbLogo className="h-3 w-auto" alt="TMDB logo" />
-            </div>
-          </div>
-        )}
         {rating && (
           <div>
             <div className="text-xs font-medium text-gray-400 uppercase">
@@ -73,7 +56,6 @@ export async function MovieDetails({
             </div>
           </div>
         )}
-
         <div>
           <div className="text-xs font-medium text-gray-400 uppercase">
             Type
