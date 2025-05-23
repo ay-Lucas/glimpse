@@ -23,6 +23,7 @@ import { getTrailer } from "@/lib/utils";
 import JustWatchLogo from "@/assets/justwatch-logo.svg";
 import CastCard from "@/components/cast-card";
 import { MovieDetails } from "../../_components/movie-details";
+import MediaActions from "../../_components/media-actions";
 
 export const revalidate = 3600;
 const VideoPlayerClient = dynamic(
@@ -76,21 +77,16 @@ export default async function MoviePage({
   const movie =
     (await getFullMovie(tmdbId)) ?? (await getMovieDetails({ id: params.id }));
   const session = await auth();
-  const userWatchlists = session ? await getWatchlists(session.user.id) : null;
 
   const videoPath = getTrailer(movie?.videos?.results || [])?.key;
-  // console.log(movie?.credits?.cast);
   const rating =
     movie?.releases?.countries?.find(
       (c) => c.iso31661 === "US" && c.certification,
     )?.certification ?? "";
-  console.log(movie.releases.countries.find((c) => c.iso31661));
   const isReleased: boolean =
     (movie?.releaseDate &&
       new Date(movie?.releaseDate!).valueOf() < Date.now()) ||
     false;
-  // console.log(movie);
-  // console.log(movie.releaseDate);
   return (
     <main>
       {movie && (
@@ -121,42 +117,62 @@ export default async function MoviePage({
             <div className="h-[6vh] md:h-[10vh]"></div>
             <div className="relative px-3 md:container items-end pt-16">
               <div className="items-end pb-5 md:pt-0 px-0 lg:px-40 space-y-5 ">
-                {/* <div> */}
-                <div className="md:bg-background/20 md:backdrop-blur-sm rounded-lg pr-2">
-                  <div className="flex flex-col md:flex-row h-full md:h-3/4 z-10 md:items-center md:space-x-5 space-y-5 md:space-y-0">
+                <section className="bg-background/20 backdrop-blur-sm rounded-lg p-4 md:p-6">
+                  <div className="grid grid-cols-1 md:grid-cols-[238px,1fr] gap-5 items-start">
                     {movie?.posterPath && (
-                      <Image
-                        quality={60}
-                        width={190}
-                        height={285}
-                        src={`${BASE_POSTER_IMAGE_URL}${movie.posterPath}`}
-                        className={`object-cover rounded-xl md:rounded-l-xl mx-auto w-[238px] h-[357px]`}
-                        priority
-                        placeholder="blur"
-                        blurDataURL={
-                          movie?.posterBlurData ?? DEFAULT_BLUR_DATA_URL
-                        }
-                        loading="eager"
-                        alt="poster image"
-                      />
+                      <figure className="w-full">
+                        <Image
+                          quality={60}
+                          width={238}
+                          height={357}
+                          src={`${BASE_POSTER_IMAGE_URL}${movie.posterPath}`}
+                          className="object-cover rounded-lg w-full h-full"
+                          priority
+                          placeholder="blur"
+                          blurDataURL={
+                            movie?.posterBlurData ?? DEFAULT_BLUR_DATA_URL
+                          }
+                          alt={`${movie.title} poster`}
+                          loading="eager"
+                        />
+                      </figure>
                     )}
-                    <MovieDetails
-                      title={movie?.title ?? ""}
-                      genres={movie.genres}
-                      rating={rating}
-                      releaseDate={movie?.releaseDate?.toString()}
-                      overview={movie?.overview}
-                      voteAverage={movie?.voteAverage ?? 0}
-                      paramsId={params.id}
-                      isVideo={videoPath !== undefined && videoPath !== ""}
-                      isReleased={isReleased}
-                      status={movie?.status}
-                      data={movie}
-                      userWatchlists={userWatchlists ?? undefined}
-                      session={session ?? undefined}
-                    />
+
+                    <div className="space-y-6">
+                      <h1 className="text-3xl md:text-5xl font-bold text-center md:text-left">
+                        {movie.title}
+                      </h1>
+                      {movie?.genres && movie.genres.length > 0 && (
+                        <div className="flex flex-wrap gap-3 justify-center md:justify-start">
+                          {movie.genres.map((g) => (
+                            <span
+                              key={g.id}
+                              className="text-sm bg-gray-700/60 px-2 py-0.5 rounded-full hover:bg-gray-700 transition ring-1 ring-gray-400"
+                            >
+                              {g.name}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+
+                      <MovieDetails
+                        rating={rating}
+                        releaseDate={movie.releaseDate?.toString()}
+                        overview={movie.overview!}
+                        voteAverage={movie.voteAverage ?? 0}
+                        isReleased={isReleased}
+                        status={movie.status}
+                      />
+                      <MediaActions
+                        data={movie}
+                        videoPath={videoPath}
+                        tmdbId={params.id}
+                        rating={rating}
+                        session={session ?? undefined}
+                      />
+                    </div>
                   </div>
-                </div>
+                </section>
                 <div className="pt-3 flex flex-col md:flex-row w-full md:space-y-0 space-y-4 backdrop-blur-sm bg-background/20 rounded-lg p-2">
                   <div className="w-full md:w-1/2">
                     <h2 className="text-2xl font-bold pb-4">Details</h2>
