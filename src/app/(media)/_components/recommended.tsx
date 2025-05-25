@@ -1,4 +1,4 @@
-import { MovieResult, TvResult } from "@/types/request-types";
+import { MovieResult, TvResult } from "@/types/request-types-snakecase";
 import ImageCarousel from "@/components/image-carousel";
 import Link from "next/link";
 import { Card } from "@/components/card";

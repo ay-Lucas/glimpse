@@ -17,7 +17,7 @@ export interface AppendToResponseRequest {
 
 export interface IdAppendToResponseRequest
   extends IdRequestParams,
-    AppendToResponseRequest {}
+  AppendToResponseRequest { }
 
 export interface PagedRequestParams extends RequestParams {
   page?: number;
@@ -174,12 +174,12 @@ export interface Video {
   site?: string;
   size?: 360 | 480 | 720 | 1080;
   type?:
-    | "Trailer"
-    | "Teaser"
-    | "Clip"
-    | "Featurette"
-    | "Behind the Scenes"
-    | "Bloopers";
+  | "Trailer"
+  | "Teaser"
+  | "Clip"
+  | "Featurette"
+  | "Behind the Scenes"
+  | "Bloopers";
 }
 
 export interface Translation {
@@ -520,20 +520,20 @@ export interface CollectionTranslationsResponse extends Response {
 export interface DiscoverMovieRequest extends RequestParams {
   region?: string;
   sort_by?:
-    | "popularity.asc"
-    | "popularity.desc"
-    | "release_date.asc"
-    | "release_date.desc"
-    | "revenue.asc"
-    | "revenue.desc"
-    | "primary_release_date.asc"
-    | "primary_release_date.desc"
-    | "original_title.asc"
-    | "original_title.desc"
-    | "vote_average.asc"
-    | "vote_average.desc"
-    | "vote_count.asc"
-    | "vote_count.desc";
+  | "popularity.asc"
+  | "popularity.desc"
+  | "release_date.asc"
+  | "release_date.desc"
+  | "revenue.asc"
+  | "revenue.desc"
+  | "primary_release_date.asc"
+  | "primary_release_date.desc"
+  | "original_title.asc"
+  | "original_title.desc"
+  | "vote_average.asc"
+  | "vote_average.desc"
+  | "vote_count.asc"
+  | "vote_count.desc";
   certification_country?: string;
   certification?: string;
   "certification.lte"?: string;
@@ -637,12 +637,12 @@ export interface MovieResponse extends Response {
   runtime?: number;
   spoken_languages?: Array<SpokenLanguage>;
   status?:
-    | "Rumored"
-    | "Planned"
-    | "In Production"
-    | "Post Production"
-    | "Released"
-    | "Canceled";
+  | "Rumored"
+  | "Planned"
+  | "In Production"
+  | "Post Production"
+  | "Released"
+  | "Canceled";
   tagline?: string;
   title: string;
   video?: boolean;
@@ -829,7 +829,7 @@ export interface VideosResponse extends Response {
 }
 
 export interface MovieTranslationsResponse
-  extends CollectionTranslationsResponse {}
+  extends CollectionTranslationsResponse { }
 
 export interface MovieRecommendationsRequest extends IdRequestParams {
   page?: string;
@@ -839,15 +839,15 @@ export interface MovieRecommendationsResponse extends PaginatedResponse {
   results?: Array<MovieResult>;
 }
 
-export interface SimilarMovieResponse extends MovieRecommendationsResponse {}
+export interface SimilarMovieResponse extends MovieRecommendationsResponse { }
 
-export interface MovieReviewsRequest extends MovieRecommendationsRequest {}
+export interface MovieReviewsRequest extends MovieRecommendationsRequest { }
 
 export interface MovieReviewsResponse extends PaginatedResponse {
   results?: Array<ReviewI>;
 }
 
-export interface MovieListsRequest extends MovieRecommendationsRequest {}
+export interface MovieListsRequest extends MovieRecommendationsRequest { }
 
 export interface MovieListsResponse extends PaginatedResponse {
   results?: Array<MovieList>;
@@ -876,13 +876,13 @@ export interface MovieNowPlayingResponse extends PaginatedResponse {
   };
 }
 
-export interface PopularMoviesRequest extends MovieNowPlayingRequest {}
+export interface PopularMoviesRequest extends MovieNowPlayingRequest { }
 
-export interface PopularMoviesResponse extends DiscoverMovieResponse {}
+export interface PopularMoviesResponse extends DiscoverMovieResponse { }
 
-export interface TopRatedMoviesRequest extends MovieNowPlayingRequest {}
+export interface TopRatedMoviesRequest extends MovieNowPlayingRequest { }
 
-export interface TopRatedMoviesResponse extends DiscoverMovieResponse {}
+export interface TopRatedMoviesResponse extends DiscoverMovieResponse { }
 
 export interface UpcomingMoviesRequest extends MovieNowPlayingRequest {
   page?: number;
@@ -1082,11 +1082,11 @@ export interface TvSeasonChangesResponse extends Response {
       action?: string;
       time?: string;
       value?:
-        | string
-        | {
-            episode_id?: number;
-            episode_number?: number;
-          };
+      | string
+      | {
+        episode_id?: number;
+        episode_number?: number;
+      };
       iso_639_1?: string;
       original_value?: string;
     }>;
@@ -1099,10 +1099,10 @@ export interface TvSeasonAccountStatesResponse extends Response {
     id?: number;
     episode_number?: number;
     rated?:
-      | boolean
-      | {
-          value?: number;
-        };
+    | boolean
+    | {
+      value?: number;
+    };
   }>;
 }
 
@@ -1192,14 +1192,14 @@ export interface EpisodeVideosResponse extends Response {
     site?: string;
     size?: 360 | 480 | 720 | 1080;
     type?:
-      | "Trailer"
-      | "Teaser"
-      | "Clip"
-      | "Featurette"
-      | "Opening Credits"
-      | "Behind the Scenes"
-      | "Bloopers"
-      | "Recap";
+    | "Trailer"
+    | "Teaser"
+    | "Clip"
+    | "Featurette"
+    | "Opening Credits"
+    | "Behind the Scenes"
+    | "Bloopers"
+    | "Recap";
   }>;
 }
 

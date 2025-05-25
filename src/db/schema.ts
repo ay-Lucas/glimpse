@@ -13,6 +13,7 @@ import {
   date,
   jsonb,
   unique,
+  bigint,
 } from "drizzle-orm/pg-core";
 import type { AdapterAccountType } from "next-auth/adapters";
 
@@ -149,8 +150,8 @@ export const movieDetails = pgTable("movie_details", {
   originalTitle: text("original_title"),
   originCountry: text("origin_country").array(),
   // Dates & stats
-  budget: integer("budget"),
-  revenue: integer("revenue"),
+  budget: bigint("budget", { mode: "number" }),
+  revenue: bigint("revenue", { mode: "number" }),
   runtime: integer("runtime"),
   popularity: doublePrecision("popularity"),
   voteAverage: doublePrecision("vote_average"),

@@ -2,7 +2,7 @@ import {
   MovieReviewsRequest,
   ReviewI,
   TvReviewsResponse,
-} from "@/types/request-types";
+} from "@/types/request-types-snakecase";
 import { getReviews } from "@/app/(media)/actions";
 import { Review } from "./reviews";
 

@@ -4,7 +4,7 @@ import {
   RatingResponse,
   TvResult,
   Video,
-} from "@/types/request-types";
+} from "@/types/request-types-snakecase";
 import { twMerge } from "tailwind-merge";
 import camelcaseKeys from "camelcase-keys";
 

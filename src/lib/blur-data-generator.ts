@@ -1,4 +1,4 @@
-import { MovieResult, TvResult, Cast, Episode } from "@/types/request-types";
+import { MovieResult, TvResult, Cast, Episode } from "@/types/request-types-snakecase";
 import { getPlaiceholder } from "plaiceholder";
 import { BaseImageUrl, DEFAULT_BLUR_DATA_URL, options } from "./constants";
 

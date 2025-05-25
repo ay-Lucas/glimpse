@@ -2,7 +2,7 @@ import { Recommended } from "./recommended";
 import { getContentRating, getRecommendations } from "@/app/(media)/actions";
 import { isUsRating } from "@/lib/utils";
 import { genres } from "@/lib/constants";
-import { MovieResult, TvResult } from "@/types/request-types";
+import { MovieResult, TvResult } from "@/types/request-types-snakecase";
 
 function validateRecommended(
   type: "movie" | "tv",

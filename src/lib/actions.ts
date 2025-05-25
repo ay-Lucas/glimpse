@@ -33,7 +33,7 @@ import {
   MovieResultsResponse,
   ShowResponseAppended,
   TvResultsResponse,
-} from "@/types/request-types";
+} from "@/types/request-types-snakecase";
 import { Genre } from "@/types/types";
 
 const LIMIT = 10;

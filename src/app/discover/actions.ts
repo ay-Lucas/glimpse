@@ -10,12 +10,12 @@ import {
   TrendingResponse,
   UpcomingMoviesRequest,
   UpcomingMoviesResponse,
-} from "@/types/request-types";
+} from "@/types/request-types-snakecase";
 
 import { db } from "@/db";
-import { listEntries, movieSummaries } from "@/db/schema";
+import { listEntries, movieDetails, movieSummaries, tvDetails } from "@/db/schema";
 import { tvSummaries } from "@/db/schema";
-import { and, asc, desc, eq, gte } from "drizzle-orm";
+import { and, asc, desc, eq, gte, inArray, isNotNull, lte, not, or } from "drizzle-orm";
 
 export async function getTrending(
   request: TrendingRequest,
@@ -115,11 +115,16 @@ export async function getTrendingSeries(limit = 10): Promise<DiscoverItem[]> {
       releaseDate: tvSummaries.firstAirDate,
     })
     .from(tvSummaries)
+    .leftJoin(
+      tvDetails,
+      eq(tvDetails.summaryId, tvSummaries.id),
+    )
     .innerJoin(
       listEntries,
       and(
         eq(listEntries.tmdbId, tvSummaries.tmdbId),
-        eq(listEntries.listName, "trending_series"),
+        eq(listEntries.listName, "trending_tv"),
+        or(eq(tvDetails.originalLanguage, "en"), eq(tvDetails.originalLanguage, "ja"))
       ),
     )
     .orderBy(asc(listEntries.position))
@@ -138,6 +143,7 @@ export async function getTrendingSeries(limit = 10): Promise<DiscoverItem[]> {
 }
 
 export async function getTrendingMovies(limit = 10): Promise<DiscoverItem[]> {
+  const today = new Date().toISOString().split('T')[0];
   const rows = await db
     .select({
       tmdbId: movieSummaries.tmdbId,
@@ -149,12 +155,27 @@ export async function getTrendingMovies(limit = 10): Promise<DiscoverItem[]> {
       releaseDate: movieSummaries.releaseDate,
     })
     .from(movieSummaries)
+    .leftJoin(
+      movieDetails,
+      eq(movieDetails.summaryId, movieSummaries.id),
+    )
     .innerJoin(
       listEntries,
       and(
         eq(listEntries.tmdbId, movieSummaries.tmdbId),
         eq(listEntries.listName, "trending_movies"),
       ),
+    )
+    .where(
+      and(
+        isNotNull(movieSummaries.releaseDate),
+        // <= today
+        lte(movieSummaries.releaseDate, today!), // no unreleased movies
+        eq(movieDetails.originalLanguage, "en")
+        // other filters…
+        // gt(movieSummaries.popularity, MIN_POPULARITY),
+        // movieSummaries.voteAverage.gte(MIN_RATING),
+      )
     )
     .orderBy(asc(listEntries.position))
     .limit(limit);
@@ -200,6 +221,12 @@ export async function getUpcomingMovieSummaries(
 }
 
 export async function getPopularSeries(limit = 10): Promise<DiscoverItem[]> {
+  // build a sub-query of all the trending IDs
+  const trendingIdsQ = db
+    .select({ id: listEntries.tmdbId })
+    .from(listEntries)
+    .where(eq(listEntries.listName, "trending_tv"));
+
   const rows = await db
     .select({
       tmdbId: tvSummaries.tmdbId,
@@ -213,7 +240,16 @@ export async function getPopularSeries(limit = 10): Promise<DiscoverItem[]> {
       voteCount: tvSummaries.voteCount,
     })
     .from(tvSummaries)
-    .orderBy(desc(tvSummaries.voteCount), desc(tvSummaries.popularity))
+    .innerJoin(
+      listEntries,
+      and(
+        eq(listEntries.listName, "popular_tv"),
+        eq(listEntries.tmdbId, tvSummaries.tmdbId),
+      ),
+    )
+    .where(not(inArray(tvSummaries.tmdbId, trendingIdsQ))) // prevent duplicates from trending series
+    // .orderBy(asc(listEntries.position))
+    // .orderBy()
     .limit(limit);
 
   return rows.map((r) => ({
@@ -229,10 +265,13 @@ export async function getPopularSeries(limit = 10): Promise<DiscoverItem[]> {
   }));
 }
 
-/**
- * Top N movies by vote count (then fallback to popularity)
- */
 export async function getPopularMovies(limit = 10): Promise<DiscoverItem[]> {
+  // build a sub-query of all the trending IDs
+  const trendingIdsQ = db
+    .select({ id: listEntries.tmdbId })
+    .from(listEntries)
+    .where(eq(listEntries.listName, "trending_movies"));
+
   const rows = await db
     .select({
       tmdbId: movieSummaries.tmdbId,
@@ -246,7 +285,15 @@ export async function getPopularMovies(limit = 10): Promise<DiscoverItem[]> {
       voteCount: movieSummaries.voteCount,
     })
     .from(movieSummaries)
-    .orderBy(desc(movieSummaries.voteCount), desc(movieSummaries.popularity))
+    .innerJoin(
+      listEntries,
+      and(
+        eq(listEntries.listName, "popular_movies"),
+        eq(listEntries.tmdbId, movieSummaries.tmdbId),
+      ),
+    )
+    .where(not(inArray(movieSummaries.tmdbId, trendingIdsQ))) // prevent dupliactes from trending series
+    .orderBy(asc(listEntries.position))
     .limit(limit);
 
   return rows.map((r) => ({

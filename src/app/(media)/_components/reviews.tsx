@@ -1,6 +1,6 @@
 import { Star } from "lucide-react";
 import Link from "next/link";
-import { ReviewI } from "@/types/request-types";
+import { ReviewI } from "@/types/request-types-snakecase";
 
 export function Review({ data }: { data: ReviewI }) {
   return (

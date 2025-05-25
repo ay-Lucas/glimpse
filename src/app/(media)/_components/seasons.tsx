@@ -1,4 +1,4 @@
-import { TvSeasonResponse } from "@/types/request-types";
+import { TvSeasonResponse } from "@/types/request-types-snakecase";
 import { getSeasonData } from "@/app/(media)/actions";
 import { EpisodeWithBlur, SeasonAccordion } from "./season-accordion";
 import { BaseImageUrl } from "@/lib/constants";

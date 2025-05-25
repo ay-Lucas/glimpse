@@ -1,7 +1,7 @@
 import dynamic from "next/dynamic";
 import { getFullTv, getTvDetails } from "@/app/(media)/actions";
 import Link from "next/link";
-import { Cast, Video } from "@/types/request-types";
+import { Cast, Video } from "@/types/request-types-snakecase";
 import { MediaDetails } from "@/components/media-details";
 import Image from "next/image";
 import { auth } from "@/auth";

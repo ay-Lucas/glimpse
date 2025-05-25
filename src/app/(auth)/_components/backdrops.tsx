@@ -10,7 +10,7 @@ import {
   TrendingResponse,
   TvResult,
   TvResultsResponse,
-} from "@/types/request-types";
+} from "@/types/request-types-snakecase";
 
 const trendingTvUrl = `${BASE_API_URL}/trending/tv/day?language=en-US`;
 const trendingMoviesUrl = `${BASE_API_URL}/trending/movie/day?language=en-US`;

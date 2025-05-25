@@ -1,4 +1,4 @@
-import { SearchMultiRequest, SearchMultiResponse } from "@/types/request-types";
+import { SearchMultiRequest, SearchMultiResponse } from "@/types/request-types-snakecase";
 import { BASE_API_URL, options } from "@/lib/constants";
 import { makeCarouselCards } from "../discover/page";
 

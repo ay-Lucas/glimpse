@@ -6,7 +6,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { BASE_POSTER_IMAGE_URL } from "@/lib/constants";
-import { Episode } from "@/types/request-types";
+import { Episode } from "@/types/request-types-snakecase";
 import Image from "next/image";
 
 export interface EpisodeWithBlur extends Episode {

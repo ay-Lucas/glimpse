@@ -10,7 +10,7 @@ import {
   getUpcomingMovieSummaries,
   DiscoverItem,
 } from "@/app/discover/actions";
-import { MovieResult, PersonResult, TvResult } from "@/types/request-types";
+import { MovieResult, PersonResult, TvResult } from "@/types/request-types-snakecase";
 import { Card } from "@/components/card";
 import Link from "next/link";
 import {
@@ -143,6 +143,9 @@ export default async function Discover() {
   // upcomingMoviesRes.results?.forEach((item) => (item.media_type = "movie"));
   //
   //
+  trendingTvRes.map(item => {
+    console.log(`${(item as any).name} : ${item.original_language}`)
+  })
   const [
     trendingTvItems,
     trendingMovieItems,
@@ -156,6 +159,13 @@ export default async function Discover() {
     getPopularSeries(DISCOVER_LIMIT),
     getPopularMovies(DISCOVER_LIMIT),
   ]);
+  // const trendingTv = trendingTvItems.filter(
+  //   (item) =>
+  //     item.media_type === "tv" &&
+  //     item.original_language === "en" &&
+  //     item.backdrop_path &&
+  //     new Date(item.first_air_date ?? Date.now()).valueOf() > MIN_DATE,
+  // );
   // console.log(trendingTvItems);
 
   const mkCards = (items: DiscoverItem[], mediaType: "tv" | "movie") =>
