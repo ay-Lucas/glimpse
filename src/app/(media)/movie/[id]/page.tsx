@@ -91,10 +91,10 @@ export default async function MoviePage({
     false;
   // console.log(movie.watchProviders?.results?.US?.flatrate)
   // console.log(movie.watchProviders?.results)
-  // const details = await getMovieDetails({ id: params.id }, options);
-  // details;
-  console.log(movie.watchProviders)
-  console.log(movie.watchProviders?.results?.US?.flatrate)
+  const details = await getMovieDetails({ id: params.id }, options);
+  details;
+  if (movie.originCountry)
+    console.log(movie.originCountry[0])
   // TODO: Add all watch providers
   return (
     <main>
@@ -242,7 +242,7 @@ export default async function MoviePage({
                       </li>
                       <li className="grid grid-cols-2">
                         <div>Origin Country</div>
-                        <span>{movie.originCountry}</span>
+                        <span>{movie.originCountry?.join(", ")}</span>
                       </li>
                       <span className="mr-32"></span>
                     </ul>

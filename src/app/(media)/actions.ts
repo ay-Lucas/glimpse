@@ -89,7 +89,6 @@ export async function getMovieDetails(
     exclude: [/^[A-Z]{2}$/]
   }) as FullMovie;
 
-
   // fix up dates, etc…
   if (camel.releaseDate) camel.releaseDate = new Date(camel.releaseDate);
   // console.log(camel.watchProviders?.results?.US?.flatrate)
@@ -206,6 +205,7 @@ export async function getFullMovie(tmdbId: number): Promise<FullMovie | null> {
       releases: movieDetails.releases,
       watchProviders: movieDetails.watchProviders,
       // if you need separate vote stats from details
+      originCountry: movieDetails.originCountry,
       voteAverageDetail: movieDetails.voteAverage,
       voteCountDetail: movieDetails.voteCount,
     })
@@ -239,6 +239,7 @@ export async function getFullMovie(tmdbId: number): Promise<FullMovie | null> {
       | "Canceled"
       | undefined,
     watchProviders: row.watchProviders as WatchProviderResponse,
+    originCountry: row.originCountry as string[],
   };
 }
 
