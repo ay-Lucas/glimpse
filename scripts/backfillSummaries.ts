@@ -8,11 +8,10 @@ const __dirname = dirname(__filename);
 import { BaseImageUrl, DISCOVER_LIMIT } from "../src/lib/constants.ts";
 import { getBlurData } from "../src/lib/blur-data-generator.ts";
 import {
+  MovieExternalIdsResponse,
   MovieResult,
   TvResult,
-  MovieResponseAppended,
-  ShowResponseAppended,
-} from "../src/types/request-types.ts";
+} from "../src/types/request-types-snakecase.ts";
 import { db } from "../src/db/index.ts";
 import {
   listEntries,
@@ -26,7 +25,7 @@ import {
   getPopular,
   getUpcomingMovies,
 } from "../src/app/discover/actions.ts";
-import { eq, inArray } from "drizzle-orm";
+import { eq, inArray, not, or } from "drizzle-orm";
 import { getMovieDetails, getTvDetails } from "@/app/(media)/actions.ts";
 
 // now load your .env.local
@@ -57,13 +56,13 @@ async function backfillSummaries() {
   const [trendingMovies, trendingTv, popularMovies, popularTv, upcoming] =
     await Promise.all([
       getTrendingPages(
-        { media_type: "movie", time_window: "day", page: 1 },
-        2,
+        { media_type: "movie", time_window: "week", page: 1 },
+        3,
         options,
       ) as Promise<MovieResult[]>,
       getTrendingPages(
-        { media_type: "tv", time_window: "day", page: 1 },
-        2,
+        { media_type: "tv", time_window: "week", page: 1 },
+        3,
         options,
       ) as Promise<TvResult[]>,
       getPopular({ page: 1, "vote_average.gte": 6 }, "movie", options),
@@ -71,6 +70,12 @@ async function backfillSummaries() {
       getUpcomingMovies({ page: 1 }, options),
     ]);
 
+  const found = trendingMovies.filter(item => item.id === 19912)
+  if (found.length > 0)
+    console.log("found it!")
+  const found2 = popularMovies.results?.filter(item => item.id === 19912)
+  if (found2 && found2?.length > 0)
+    console.log("found it!")
   // Combine and dedupe
   const movies = uniqueBy([
     ...trendingMovies!,
@@ -84,10 +89,12 @@ async function backfillSummaries() {
 
   console.log(`Backfilling ${movies.length} movies...`);
 
+
   for (const m of movies) {
     const posterBlurUrl = m.poster_path
       ? await getBlurData(`${BaseImageUrl.BLUR}${m.poster_path}`)
       : null;
+    await pause(50)
 
     // Movie Summaries
     const releaseDate = m.release_date?.trim() || undefined;
@@ -125,6 +132,7 @@ async function backfillSummaries() {
     const posterBlurUrl = t.poster_path
       ? await getBlurData(`${BaseImageUrl.BLUR}${t.poster_path}`)
       : null;
+    await pause(50)
 
     const firstAirDate = t.first_air_date?.trim() || undefined;
 
@@ -158,52 +166,9 @@ async function backfillSummaries() {
   }
 
   await backfillDetails(movies, tvShows);
+  await backfillPositions(trendingTv, trendingMovies, popularTv.results as TvResult[], popularMovies.results as MovieResult[]);
+  await removeOldEntries(movies, tvShows)
 
-  console.log(`Backfilling Trending TV shows positions...`);
-  await db.transaction(async (tx) => {
-    // clear old entries for this list
-    await tx
-      .delete(listEntries)
-      .where(eq(listEntries.listName, "trending_series"));
-
-    // upsert each ID+pos
-    await Promise.all(
-      trendingTv.map((item, idx) =>
-        tx
-          .insert(listEntries)
-          .values({
-            listName: "trending_series",
-            tmdbId: item.id,
-            mediaType: "tv",
-            position: idx,
-          })
-          .onConflictDoNothing(),
-      ),
-    );
-  });
-
-  console.log(`Backfilling Trending Movies positions...`);
-  await db.transaction(async (tx) => {
-    // clear old entries for this list
-    await tx
-      .delete(listEntries)
-      .where(eq(listEntries.listName, "trending_movies"));
-
-    // upsert each ID+pos
-    await Promise.all(
-      trendingMovies.map((item, idx) =>
-        tx
-          .insert(listEntries)
-          .values({
-            listName: "trending_movies",
-            tmdbId: item.id,
-            mediaType: "movie",
-            position: idx,
-          })
-          .onConflictDoNothing(),
-      ),
-    );
-  });
 
   console.log("Backfill complete.");
 }
@@ -250,6 +215,7 @@ async function backfillDetails(movies: MovieResult[], tvShows: TvResult[]) {
       ? await getBlurData(`${BaseImageUrl.BLUR}${m.backdrop_path}`)
       : null;
     const details = await getMovieDetails({ id: m.id }, options);
+    console.log(details)
     await db
       .insert(movieDetails)
       .values({
@@ -310,6 +276,7 @@ async function backfillDetails(movies: MovieResult[], tvShows: TvResult[]) {
           watchProviders: details.watchProviders,
         },
       });
+    await pause(50)
   }
 
   // 4) Backfill tv_details
@@ -388,5 +355,134 @@ async function backfillDetails(movies: MovieResult[], tvShows: TvResult[]) {
           productionCountries: details.productionCountries,
         },
       });
+    await pause(50)
   }
 }
+
+async function backfillPositions(trendingTv: TvResult[], trendingMovies: MovieResult[], popularTv: TvResult[], popularMovies: MovieResult[]) {
+  console.log(`Backfilling Trending TV shows positions...`);
+  await db.transaction(async (tx) => {
+    // clear old entries for this list
+    await tx
+      .delete(listEntries)
+      .where(eq(listEntries.listName, "trending_tv"));
+
+    // upsert each ID+pos
+    await Promise.all(
+      trendingTv.map((item, idx) =>
+        tx
+          .insert(listEntries)
+          .values({
+            listName: "trending_tv",
+            tmdbId: item.id,
+            mediaType: "tv",
+            position: idx,
+          }).onConflictDoNothing()
+      ),
+    );
+  });
+
+  console.log(`Backfilling Trending Movies positions...`);
+  await db.transaction(async (tx) => {
+    // clear old entries for this list
+    await tx
+      .delete(listEntries)
+      .where(eq(listEntries.listName, "trending_movies"));
+
+    // upsert each ID+pos
+    await Promise.all(
+      trendingMovies.map((item, idx) =>
+        tx
+          .insert(listEntries)
+          .values({
+            listName: "trending_movies",
+            tmdbId: item.id,
+            mediaType: "movie",
+            position: idx,
+          })
+          .onConflictDoNothing(),
+      ),
+    );
+  });
+
+  console.log(`Backfilling Popular TV Shows positions...`);
+  await db.transaction(async (tx) => {
+    // clear old entries for this list
+    await tx
+      .delete(listEntries)
+      .where(eq(listEntries.listName, "popular_tv"));
+
+    // upsert each ID+pos
+    await Promise.all(
+      popularTv.map((item, idx) =>
+        tx
+          .insert(listEntries)
+          .values({
+            listName: "popular_tv",
+            tmdbId: item.id,
+            mediaType: "tv",
+            position: idx,
+          })
+          .onConflictDoNothing(),
+      ),
+    );
+  });
+
+  console.log(`Backfilling Popular Movies positions...`);
+  await db.transaction(async (tx) => {
+    // clear old entries for this list
+    await tx
+      .delete(listEntries)
+      .where(eq(listEntries.listName, "popular_movies"));
+
+    // upsert each ID+pos
+    await Promise.all(
+      popularMovies.map((item, idx) =>
+        tx
+          .insert(listEntries)
+          .values({
+            listName: "popular_movies",
+            tmdbId: item.id,
+            mediaType: "movie",
+            position: idx,
+          })
+          .onConflictDoNothing(),
+      ),
+    );
+  });
+
+}
+
+async function removeOldEntries(movies: MovieResult[], tvShows: TvResult[]) {
+  const currentMovieIds = movies.map(m => m.id);
+  const currentTvIds = tvShows.map(t => t.id);
+
+  console.log("Removing old entries...");
+  // remove old summaries & cascades details
+
+  await db
+    .delete(movieSummaries)
+    .where(not(inArray(movieSummaries.tmdbId, currentMovieIds)));
+
+  await db
+    .delete(tvSummaries)
+    .where(not(inArray(tvSummaries.tmdbId, currentTvIds)));
+  //
+  // await db
+  //   .delete(listEntries)
+  //   .where(eq(listEntries.listName, "trending_movies"));
+  //
+  // await db
+  //   .delete(listEntries)
+  //   .where(eq(listEntries.listName, "trending_tv"));
+  //
+  // // await db
+  // //   .delete(listEntries)
+  // //   .where(not(inArray(listEntries.tmdbId, currentTvIds.concat(currentMovieIds))));
+
+}
+
+function pause(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+

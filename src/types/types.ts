@@ -22,7 +22,7 @@ export interface Request {
   request_token?: string;
 }
 
-export interface Response {}
+export interface Response { }
 
 export interface AuthenticationToken extends Response {
   success?: boolean;

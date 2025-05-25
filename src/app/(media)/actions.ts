@@ -21,7 +21,7 @@ import {
   ShowResponseAppended,
   TvResultsResponse,
   TvReviewsResponse,
-} from "@/types/request-types";
+} from "@/types/request-types-snakecase";
 import {
   CreditsResponse,
   Genre,
@@ -68,15 +68,32 @@ export async function getMovieDetails(
   resOptions: RequestInit = options,
 ): Promise<FullMovie> {
   const res = await fetch(
-    `${BASE_API_URL}/movie/${request.id}?append_to_response=videos,releases,content_ratings,credits,aggregate_credits,episode_groups,watch/providers&language=en-US`,
+    `${BASE_API_URL}/movie/${request.id}` +
+    `?append_to_response=videos,releases,content_ratings,credits,aggregate_credits,` +
+    `episode_groups,watch/providers&language=en-US`,
     resOptions,
   );
   const data = await res.json();
-  const camel = camelcaseKeys(data, { deep: true }) as any;
 
-  if (data["watch/providers"]) camel.watchProviders = data["watch/providers"];
+  // data.watchProviders = watchProviders;
+  let dataFixed = {
+    ...data,
+    watchProviders: data["watch/providers"]
+  };
+
+  delete dataFixed["watch/providers"];
+
+  // camelCase everything else
+  const camel = camelcaseKeys<Record<string, unknown>>(dataFixed, {
+    deep: true,
+    exclude: [/^[A-Z]{2}$/]
+  }) as FullMovie;
+
+
+  // fix up dates, etc…
   if (camel.releaseDate) camel.releaseDate = new Date(camel.releaseDate);
-  console.log(camel);
+  // console.log(camel.watchProviders?.results?.US?.flatrate)
+  // console.log(camel.watchProviders?.results?.US)
   return camel as FullMovie;
 }
 

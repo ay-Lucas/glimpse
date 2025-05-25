@@ -15,6 +15,7 @@ import {
   BASE_ORIGINAL_IMAGE_URL,
   BASE_POSTER_IMAGE_URL,
   DEFAULT_BLUR_DATA_URL,
+  options,
 } from "@/lib/constants";
 import { RecommededSection } from "@/app/(media)/_components/recommendedSection";
 import ReviewSection from "@/app/(media)/_components/ReviewSection";
@@ -88,6 +89,13 @@ export default async function MoviePage({
     (movie?.releaseDate &&
       new Date(movie?.releaseDate!).valueOf() < Date.now()) ||
     false;
+  // console.log(movie.watchProviders?.results?.US?.flatrate)
+  // console.log(movie.watchProviders?.results)
+  // const details = await getMovieDetails({ id: params.id }, options);
+  // details;
+  console.log(movie.watchProviders)
+  console.log(movie.watchProviders?.results?.US?.flatrate)
+  // TODO: Add all watch providers
   return (
     <main>
       {movie && (
@@ -246,7 +254,7 @@ export default async function MoviePage({
                   >
                     {movie.watchProviders?.results?.US?.flatrate &&
                       movie.watchProviders?.results?.US?.flatrate?.length >
-                        0 && (
+                      0 && (
                         <div className="w-full md:w-1/2 md:pl-3 pt-3 md:pt-0 pb-3 md:pb-0">
                           <h2 className="text-2xl font-bold pb-4">
                             Streaming

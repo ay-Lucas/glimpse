@@ -92,12 +92,12 @@ export type FullMovie = {
   revenue?: number | null;
   runtime?: number | null;
   status?:
-    | "Rumored"
-    | "Planned"
-    | "In Production"
-    | "Post Production"
-    | "Released"
-    | "Canceled";
+  | "Rumored"
+  | "Planned"
+  | "In Production"
+  | "Post Production"
+  | "Released"
+  | "Canceled";
   tagline?: string | null;
   homepage?: string | null;
   genres?: Array<Genre>;
