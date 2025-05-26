@@ -49,7 +49,7 @@ function uniqueBy<T extends { id: number }>(arr: T[]): T[] {
   });
 }
 
-async function backfillSummaries() {
+export async function backfillSummaries() {
   console.log("Fetching TMDB lists...");
   const TMDB_ACCESS_TOKEN = process.env.TMDB_ACCESS_TOKEN!;
   if (!TMDB_ACCESS_TOKEN) throw new Error("Missing TMDB_ACCESS_TOKEN");
