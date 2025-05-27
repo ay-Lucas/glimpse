@@ -90,7 +90,6 @@ export default async function TvPage({ params }: { params: { id: number } }) {
   //         )
   //       : Promise.resolve([]),
   //   ]);
-  const userWatchlists = session ? await getWatchlists(session.user.id) : null;
   console.log(tv);
   if (!tv) return;
 

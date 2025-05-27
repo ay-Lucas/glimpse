@@ -21,6 +21,7 @@ import {
   ShowResponseAppended,
   TvResultsResponse,
   TvReviewsResponse,
+  TvSeasonResponse,
 } from "@/types/request-types-snakecase";
 import {
   CreditsResponse,
@@ -56,11 +57,22 @@ export async function getTvDetails(
     resOptions,
   );
   const data = await res.json();
-  const camel = camelcaseKeys(data, { deep: true }) as any;
 
-  if (data["watch/providers"]) camel.watchProviders = data["watch/providers"];
-  if (camel.releaseDate) camel.releaseDate = new Date(camel.releaseDate);
-  return camelcaseKeys(data, { deep: true });
+  // data.watchProviders = watchProviders;
+  let dataFixed = {
+    ...data,
+    watchProviders: data["watch/providers"]
+  };
+  delete dataFixed["watch/providers"];
+  // camelCase everything else
+  const camel = camelcaseKeys<Record<string, unknown>>(dataFixed, {
+    deep: true,
+    exclude: [/^[A-Z]{2}$/]
+  }) as FullTv;
+
+  // fix up dates, etc…
+  if (camel.firstAirDate) camel.firstAirDate = new Date(camel.firstAirDate);
+  return camel as FullTv;
 }
 
 export async function getMovieDetails(
@@ -91,8 +103,6 @@ export async function getMovieDetails(
 
   // fix up dates, etc…
   if (camel.releaseDate) camel.releaseDate = new Date(camel.releaseDate);
-  // console.log(camel.watchProviders?.results?.US?.flatrate)
-  // console.log(camel.watchProviders?.results?.US)
   return camel as FullMovie;
 }
 
@@ -142,7 +152,7 @@ export async function getSeasonData(
   id: number,
   seasonNumber: number,
   resOptions: RequestInit = options,
-) {
+): Promise<TvSeasonResponse> {
   const res = await fetch(
     `${BASE_API_URL}/tv/${id}/season/${seasonNumber}`,
     resOptions,
