@@ -5,10 +5,9 @@ import { dirname, join } from "path";
 // __dirname shim for ESM
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-import { BaseImageUrl, DISCOVER_LIMIT } from "../src/lib/constants.ts";
+import { BaseImageUrl } from "../src/lib/constants.ts";
 import { getBlurData } from "../src/lib/blur-data-generator.ts";
 import {
-  MovieExternalIdsResponse,
   MovieResult,
   TvResult,
 } from "../src/types/request-types-snakecase.ts";
@@ -25,7 +24,7 @@ import {
   getPopular,
   getUpcomingMovies,
 } from "../src/app/discover/actions.ts";
-import { eq, inArray, not, or } from "drizzle-orm";
+import { eq, inArray, not } from "drizzle-orm";
 import { getMovieDetails, getTvDetails } from "@/app/(media)/actions.ts";
 
 // now load your .env.local
@@ -70,12 +69,6 @@ export async function backfillSummaries() {
       getUpcomingMovies({ page: 1 }, options),
     ]);
 
-  const found = trendingMovies.filter(item => item.id === 19912)
-  if (found.length > 0)
-    console.log("found it!")
-  const found2 = popularMovies.results?.filter(item => item.id === 19912)
-  if (found2 && found2?.length > 0)
-    console.log("found it!")
   // Combine and dedupe
   const movies = uniqueBy([
     ...trendingMovies!,
@@ -215,7 +208,6 @@ async function backfillDetails(movies: MovieResult[], tvShows: TvResult[]) {
       ? await getBlurData(`${BaseImageUrl.BLUR}${m.backdrop_path}`)
       : null;
     const details = await getMovieDetails({ id: m.id }, options);
-    console.log(details)
     await db
       .insert(movieDetails)
       .values({
@@ -467,18 +459,6 @@ async function removeOldEntries(movies: MovieResult[], tvShows: TvResult[]) {
   await db
     .delete(tvSummaries)
     .where(not(inArray(tvSummaries.tmdbId, currentTvIds)));
-  //
-  // await db
-  //   .delete(listEntries)
-  //   .where(eq(listEntries.listName, "trending_movies"));
-  //
-  // await db
-  //   .delete(listEntries)
-  //   .where(eq(listEntries.listName, "trending_tv"));
-  //
-  // // await db
-  // //   .delete(listEntries)
-  // //   .where(not(inArray(listEntries.tmdbId, currentTvIds.concat(currentMovieIds))));
 
 }
 
