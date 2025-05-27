@@ -179,8 +179,7 @@ export default async function MoviePage({
                         rating={rating}
                         releaseDate={movie.releaseDate?.toString()}
                         overview={movie.overview!}
-                        status={movie.status}
-                      />
+                        status={movie.status} />
                       <MediaActions
                         data={movie}
                         videoPath={videoPath}

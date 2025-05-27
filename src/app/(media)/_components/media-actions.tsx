@@ -4,7 +4,7 @@ import { Session } from "next-auth";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { Play } from "lucide-react";
-import { FullMovie } from "@/types/camel-index";
+import { FullMovie, FullTv } from "@/types/camel-index";
 
 const AddToWatchlistDropdownClient = dynamic(
   () => import("@/components/add-to-watchlist-button"),
@@ -19,7 +19,7 @@ export default async function MediaActions({
 }: {
   tmdbId: number;
   session?: Session;
-  data: FullMovie;
+  data: FullMovie | FullTv;
   rating: string;
   videoPath?: string;
 }) {
