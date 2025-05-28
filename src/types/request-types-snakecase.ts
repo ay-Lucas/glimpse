@@ -236,6 +236,7 @@ export interface SimpleSeason {
   overview?: string;
   poster_path?: string;
   season_number?: number;
+  vote_average?: number;
 }
 
 export interface SimplePerson {

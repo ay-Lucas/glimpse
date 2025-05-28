@@ -31,6 +31,7 @@ export async function Seasons({
       };
     }),
   )) as Array<TvSeasonResponse>;
+  console.log(episodesData)
   return (
     <>
       {episodesWithBlur[0]?.episodes &&

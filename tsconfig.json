@@ -5,20 +5,28 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": [
+        "./src/*"
+      ]
     },
-    "lib": ["dom", "dom.iterable", "es6", "es5", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "es6",
+      "es5",
+      "esnext"
+    ],
     "target": "esnext",
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "checkJs": true,
-
     "noEmit": true,
     "incremental": true,
     "module": "esnext",
     "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "plugins": [
       {
         "name": "next"
@@ -36,5 +44,7 @@
     "**/*.cjs",
     "**/*.js"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules"
+  ]
 }

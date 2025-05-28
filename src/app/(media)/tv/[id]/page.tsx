@@ -1,21 +1,16 @@
 import dynamic from "next/dynamic";
 import { getFullTv, getTvDetails } from "@/app/(media)/actions";
 import Link from "next/link";
-import { Cast, Video } from "@/types/request-types-snakecase";
-import { MediaDetails } from "@/components/media-details";
+import { Video } from "@/types/request-types-snakecase";
 import Image from "next/image";
 import { auth } from "@/auth";
-import { Button } from "@/components/ui/button";
-import { getWatchlists } from "@/lib/actions";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   BASE_CAST_IMAGE_URL,
-  BASE_ORIGINAL_IMAGE_URL,
   BASE_POSTER_IMAGE_URL,
   DEFAULT_BLUR_DATA_URL,
 } from "@/lib/constants";
-import { Seasons } from "@/app/(media)/_components/seasons";
 import { RecommededSection } from "@/app/(media)/_components/recommendedSection";
 import ReviewSection from "@/app/(media)/_components/ReviewSection";
 import JustWatchLogo from "@/assets/justwatch-logo.svg";
@@ -23,6 +18,7 @@ import CastCard from "@/components/cast-card";
 import { TvDetails } from "../../_components/tv-details";
 import { ScoreCircle } from "../../_components/score-circle";
 import MediaActions from "../../_components/media-actions";
+import { ChevronRight } from "lucide-react";
 
 export const revalidate = 3600;
 
@@ -41,12 +37,6 @@ const ImageCarouselClient = dynamic(
     loading: () => <Skeleton className="w-full h-[356px] rounded-xl" />,
   },
 );
-
-const AddToWatchlistDropdownClient = dynamic(
-  () => import("@/components/add-to-watchlist-button"),
-  { ssr: false },
-);
-const SEASON_COMPONENT_HEIGHT = 52;
 
 function getTrailer(videoArray: Array<Video>) {
   const trailer: Array<Video> = videoArray.filter(
@@ -69,28 +59,6 @@ export default async function TvPage({ params }: { params: { id: number } }) {
   const dataPromise = res ? res : getTvDetails({ id: params.id });
   const [tv, session] = await Promise.all([dataPromise, auth()]);
 
-  // const watchlistPromise = session
-  //   ? getWatchlists(session.user.id)
-  //   : Promise.resolve(null);
-  //
-  // const [userWatchlists, posterBlurData, backdropBlurData, castWithBlur] =
-  //   await Promise.all([
-  //     watchlistPromise,
-  //     data.posterPath
-  //       ? getBlurData(`${BASE_BLUR_IMAGE_URL}${data.posterPath}`)
-  //       : Promise.resolve(null),
-  //     data.backdropPath
-  //       ? getBlurData(`${BASE_BLUR_IMAGE_URL}${data.backdropPath}`)
-  //       : Promise.resolve(null),
-  //     data.credits?.cast?.length
-  //       ? appendBlurDataToMediaArray(
-  //           data.credits.cast,
-  //           BaseImageUrl.BLUR,
-  //           data.credits.cast.map((c) => c.profilePath),
-  //         )
-  //       : Promise.resolve([]),
-  //   ]);
-  console.log(tv);
   if (!tv) return;
 
   let videoPath;
@@ -105,33 +73,12 @@ export default async function TvPage({ params }: { params: { id: number } }) {
     tv.firstAirDate !== undefined &&
     tv.firstAirDate !== null &&
     new Date(tv.firstAirDate).valueOf() < Date.now();
+  // console.log(tv.seasons)
   return (
     <main>
       {tv && (
         <>
           <div className="h-full w-full overflow-x-hidden">
-            <div className="absolute top-0 left-0 mb-10 w-screen h-screen">
-              {tv?.backdropPath ? (
-                <div className="absolute h-full w-full bg-gradient-to-t from-background via-background/95 via-30% to-transparent">
-                  <div className="bg-background/40 absolute h-full w-full"></div>
-                  <Image
-                    fill
-                    src={`${BASE_ORIGINAL_IMAGE_URL}${tv.backdropPath}`}
-                    quality={70}
-                    alt="header image"
-                    className={`object-cover -z-10`}
-                    sizes="100vw"
-                    placeholder="blur"
-                    blurDataURL={
-                      tv?.backdropBlurData ?? DEFAULT_BLUR_DATA_URL
-                    }
-                  />
-                </div>
-              ) : (
-                <div className="absolute z-0 top-0 left-0 h-full w-full items-center justify-center bg-gradient-to-b from-background to-background/50 via-gray-900" />
-              )}
-            </div>
-
             <div className="h-[6vh] md:h-[10vh]"></div>
             <div className="relative px-3 md:container items-end pt-16">
               <div className="items-end pb-5 md:pt-0 px-0 lg:px-40 space-y-5">
@@ -297,27 +244,27 @@ export default async function TvPage({ params }: { params: { id: number } }) {
                 </div>
                 {tv.numberOfSeasons && tv.numberOfSeasons > 0 && (
                   <>
-                    <div className="pb-5 space-y-2">
-                      <h2 className={`text-2xl font-bold pb-4 pt-3`}>Seasons</h2>
-                      <Suspense
-                        fallback={
-                          <div className="space-y-2">
-                            {Array.from({
-                              length: tv.numberOfSeasons ?? 1,
-                            }).map((_, index) => (
-                              <Skeleton
-                                key={index}
-                                className={`w-full h-[${SEASON_COMPONENT_HEIGHT}px] rounded-xl`}
-                              />
-                            ))}
-                          </div>
-                        }
-                      >
-                        <Seasons
-                          id={params.id}
-                          numberOfSeasons={tv.numberOfSeasons}
-                        />
-                      </Suspense>
+                    <div className="pb-5 space-y-2 flex">
+                      <Link href={`/tv/${params.id}/seasons`} className="pb-4 pt-3 flex items-end hover:text-gray-400"><h2 className={`text-2xl font-bold`}>Seasons </h2><ChevronRight size={30} /></Link>
+                      {/* <Suspense */}
+                      {/*   fallback={ */}
+                      {/*     <div className="space-y-2"> */}
+                      {/*       {Array.from({ */}
+                      {/*         length: tv.numberOfSeasons ?? 1, */}
+                      {/*       }).map((_, index) => ( */}
+                      {/*         <Skeleton */}
+                      {/*           key={index} */}
+                      {/*           className={`w-full h-[${SEASON_COMPONENT_HEIGHT}px] rounded-xl`} */}
+                      {/*         /> */}
+                      {/*       ))} */}
+                      {/*     </div> */}
+                      {/*   } */}
+                      {/* > */}
+                      {/*   <Seasons */}
+                      {/*     id={params.id} */}
+                      {/*     numberOfSeasons={tv.numberOfSeasons} */}
+                      {/*   /> */}
+                      {/* </Suspense> */}
                     </div>
                   </>
                 )}
