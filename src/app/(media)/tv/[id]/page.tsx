@@ -78,7 +78,7 @@ export default async function TvPage({ params }: { params: { id: number } }) {
     <main>
       {tv && (
         <>
-          <div className="h-full w-full overflow-x-hidden">
+          <div className="h-full w-full overflow-x-hidden pb-20">
             <div className="h-[6vh] md:h-[10vh]"></div>
             <div className="relative px-3 md:container items-end pt-16">
               <div className="items-end pb-5 md:pt-0 px-0 lg:px-40 space-y-5">

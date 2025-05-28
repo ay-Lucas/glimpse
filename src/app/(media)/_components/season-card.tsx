@@ -1,6 +1,7 @@
 import { BASE_POSTER_IMAGE_URL, DEFAULT_BLUR_DATA_URL } from "@/lib/constants"
 import Image from "next/image"
 import { ScoreCircle } from "./score-circle";
+import { ExpandableText } from "./expandable-overview";
 
 interface SeasonCardProps {
   seasonNumber?: number,
@@ -64,7 +65,7 @@ export default function SeasonCard({ seasonNumber, name, airDate, overview, post
                 )}
                 <div>
                   <div className="text-sm font-medium text-gray-400 uppercase">
-                    Epsiode Count
+                    Episode Count
                   </div>
                   <div className="mt-1">{episodeCount}</div>
                 </div>
@@ -83,7 +84,8 @@ export default function SeasonCard({ seasonNumber, name, airDate, overview, post
 
               </div>
 
-              <p className="md:text-md">{overview}</p>
+              {/* <p className="md:text-md">{overview}</p> */}
+              <ExpandableText text={overview || ""} />
             </section>
           </div>
         </div >
