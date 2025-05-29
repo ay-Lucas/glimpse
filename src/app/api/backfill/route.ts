@@ -4,6 +4,7 @@ import { backfillSummaries } from '@/../scripts/backfillSummaries';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 export const runtime = 'nodejs';
+export const maxDuration = 180;
 
 export function HEAD() {
   console.log("🔍 [backfill] HEAD ping");
