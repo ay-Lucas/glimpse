@@ -39,6 +39,7 @@ import {
 } from "@/types/request-types-camelcase";
 import camelcaseKeys from "camelcase-keys";
 import { eq } from "drizzle-orm";
+import { cache } from "react";
 
 export async function getPersonDetails(
   request: IdAppendToResponseRequest,
@@ -48,10 +49,10 @@ export async function getPersonDetails(
   return res.json();
 }
 
-export async function getTvDetails(
+export const getTvDetails = cache(async (
   request: IdAppendToResponseRequest,
   resOptions: RequestInit = options,
-): Promise<FullTv> {
+): Promise<FullTv> => {
   const res = await fetch(
     `${BASE_API_URL}/tv/${request.id}?append_to_response=videos,releases,content_ratings,credits,aggregate_credits,episode_groups,watch/providers&language=en-US`,
     resOptions,
@@ -73,12 +74,12 @@ export async function getTvDetails(
   // fix up dates, etc…
   if (camel.firstAirDate) camel.firstAirDate = new Date(camel.firstAirDate);
   return camel as FullTv;
-}
+});
 
-export async function getMovieDetails(
+export const getMovieDetails = cache(async (
   request: IdAppendToResponseRequest,
   resOptions: RequestInit = options,
-): Promise<FullMovie> {
+): Promise<FullMovie> => {
   const res = await fetch(
     `${BASE_API_URL}/movie/${request.id}` +
     `?append_to_response=videos,releases,content_ratings,credits,aggregate_credits,` +
@@ -104,7 +105,7 @@ export async function getMovieDetails(
   // fix up dates, etc…
   if (camel.releaseDate) camel.releaseDate = new Date(camel.releaseDate);
   return camel as FullMovie;
-}
+})
 
 export async function getReviews(
   type: "tv" | "movie",
@@ -177,7 +178,7 @@ export async function getWatchlistsWithItem(
   return watchlistsWithItem;
 }
 
-export async function getFullMovie(tmdbId: number): Promise<FullMovie | null> {
+export const getFullMovie = cache(async (tmdbId: number): Promise<FullMovie | null> => {
   const [row] = await db
     .select({
       // summaries
@@ -251,9 +252,9 @@ export async function getFullMovie(tmdbId: number): Promise<FullMovie | null> {
     watchProviders: row.watchProviders as WatchProviderResponse,
     originCountry: row.originCountry as string[],
   };
-}
+})
 
-export async function getFullTv(tmdbId: number): Promise<FullTv | null> {
+export const getFullTv = cache(async (tmdbId: number): Promise<FullTv | null> => {
   const [row] = await db
     .select({
       // summary fields
