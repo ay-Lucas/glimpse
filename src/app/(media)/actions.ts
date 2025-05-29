@@ -333,4 +333,4 @@ export const getFullTv = cache(async (tmdbId: number): Promise<FullTv | null> =>
     spokenLanguages: row.spokenLanguages as SpokenLanguage[],
     contentRatings: row.contentRatings as { results: RatingResponse[] },
   };
-}
+})
