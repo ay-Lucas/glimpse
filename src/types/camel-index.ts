@@ -129,7 +129,8 @@ export type FullTv = {
   voteCount?: number | null;
   firstAirDate?: Date | null;
   posterBlurData?: string | null;
-  backdropBlurData?: string | null;
+  backdropBlurDataUrl?: string | null;
+  darkVibrantBackdropHex?: string | null;
 
   // detail fields
   adult: boolean;

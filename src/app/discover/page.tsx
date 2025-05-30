@@ -1,8 +1,5 @@
 import { isUnique } from "@/lib/utils";
 import {
-  getUpcomingMovies,
-  getPopular,
-  getTrendingPages,
   getTrendingSeries,
   getTrendingMovies,
   getPopularSeries,
@@ -18,11 +15,10 @@ import {
   BaseImageUrl,
   DISCOVER_LIMIT,
 } from "@/lib/constants";
-import { appendBlurDataToMediaArray } from "@/lib/blur-data-generator";
 import dynamic from "next/dynamic";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export const revalidate = 600;
+export const revalidate = 43200; // 12 hours
 
 const MIN_TRENDING_POPULARITY = 50;
 const VOTE_AVERAGE_GTE = 6;
@@ -40,12 +36,6 @@ const ImageCarouselClient = dynamic(
   },
 );
 export async function makeCarouselCards(data: Array<TvResult | MovieResult>) {
-  // const posterPaths = data.map((item) => item.poster_path);
-  // const recsWithBlur = (await appendBlurDataToMediaArray(
-  //   data,
-  //   BaseImageUrl.BLUR,
-  //   posterPaths,
-  // )) as Array<TvResult | MovieResult>;
 
   return data.map(
     (item: MovieResult | TvResult | PersonResult, index: number) => {
@@ -94,58 +84,25 @@ export async function makeCarouselCards(data: Array<TvResult | MovieResult>) {
 }
 
 export default async function Discover() {
-  const [
-    trendingTvRes,
-    trendingMovieRes,
-    popularTvRes,
-    popularMoviesRes,
-    upcomingMoviesRes,
-  ] = await Promise.all([
-    getTrendingPages(
-      { media_type: "tv", time_window: "day", page: 1 },
-      NUMBER_OF_PAGES,
-    ),
-    getTrendingPages(
-      { media_type: "movie", time_window: "day", page: 1 },
-      NUMBER_OF_PAGES,
-    ),
-    getPopular({ page: 1, "vote_average.gte": VOTE_AVERAGE_GTE }, "tv"),
-    getPopular({ page: 1, "vote_average.gte": VOTE_AVERAGE_GTE }, "movie"),
-    getUpcomingMovies({ page: 1 }),
-  ]);
-  // const trendingTv = trendingTvRes.filter(
-  //   (item) =>
-  //     item.media_type === "tv" &&
-  //     item.original_language === "en" &&
-  //     item.backdrop_path &&
-  //     new Date(item.first_air_date ?? Date.now()).valueOf() > MIN_DATE,
-  // );
-  // const trendingMovies = trendingMovieRes.filter(
-  //   (item) =>
-  //     item.media_type === "movie" &&
-  //     item.original_language === "en" &&
-  //     (item.popularity ?? 0) > MIN_TRENDING_POPULARITY &&
-  //     new Date(item.release_date ?? Date.now()).valueOf() > MIN_DATE &&
-  //     new Date(item.release_date ?? Date.now()).valueOf() < Date.now(),
-  // );
-  // const trendingTvAndMovies = trendingTv.concat(trendingMovies);
-  // const filteredPopularTv = popularTvRes?.results?.filter(
-  //   (item: TvResult | MovieResult) => isUnique(item, trendingTvAndMovies),
-  // );
-  // // Discover api endpoint doesn't return media type
-  // filteredPopularTv?.forEach((item) => (item.media_type = "tv"));
-  // // const filteredPopularMovie = popularMoviesRes?.results?.filter(
-  // //   (item: MovieResult | TvResult) => isUnique(item, trendingTvAndMovies),
-  // // );
-  // const popularMovies = popularMoviesRes.results?.filter(
-  //   (item) => (item.media_type = "movie"),
-  // );
-  // upcomingMoviesRes.results?.forEach((item) => (item.media_type = "movie"));
-  //
-  //
-  trendingTvRes.map(item => {
-    console.log(`${(item as any).name} : ${item.original_language}`)
-  })
+  // const [
+  //   trendingTvRes,
+  //   trendingMovieRes,
+  //   popularTvRes,
+  //   popularMoviesRes,
+  //   upcomingMoviesRes,
+  // ] = await Promise.all([
+  //   getTrendingPages(
+  //     { media_type: "tv", time_window: "day", page: 1 },
+  //     NUMBER_OF_PAGES,
+  //   ),
+  //   getTrendingPages(
+  //     { media_type: "movie", time_window: "day", page: 1 },
+  //     NUMBER_OF_PAGES,
+  //   ),
+  //   getPopular({ page: 1, "vote_average.gte": VOTE_AVERAGE_GTE }, "tv"),
+  //   getPopular({ page: 1, "vote_average.gte": VOTE_AVERAGE_GTE }, "movie"),
+  //   getUpcomingMovies({ page: 1 }),
+  // ]);
   const [
     trendingTvItems,
     trendingMovieItems,
@@ -159,14 +116,6 @@ export default async function Discover() {
     getPopularSeries(DISCOVER_LIMIT),
     getPopularMovies(DISCOVER_LIMIT),
   ]);
-  // const trendingTv = trendingTvItems.filter(
-  //   (item) =>
-  //     item.media_type === "tv" &&
-  //     item.original_language === "en" &&
-  //     item.backdrop_path &&
-  //     new Date(item.first_air_date ?? Date.now()).valueOf() > MIN_DATE,
-  // );
-  // console.log(trendingTvItems);
 
   const mkCards = (items: DiscoverItem[], mediaType: "tv" | "movie") =>
     items.map((item) => (

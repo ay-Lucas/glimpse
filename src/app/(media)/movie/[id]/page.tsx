@@ -27,7 +27,8 @@ import { MovieDetails } from "../../_components/movie-details";
 import MediaActions from "../../_components/media-actions";
 import { ScoreCircle } from "../../_components/score-circle";
 
-export const revalidate = 3600;
+export const revalidate = 43200; // 12 hours
+
 const VideoPlayerClient = dynamic(
   () => import("@/app/(media)/_components/video-player"),
   {
@@ -77,7 +78,7 @@ export default async function MoviePage({
   // : Promise.resolve([]),
   // ]);
   const movie =
-    (await getFullMovie(tmdbId)) ?? (await getMovieDetails({ id: params.id }));
+    (await getFullMovie(tmdbId)) ?? (await getMovieDetails(params.id));
   const session = await auth();
 
   const videoPath = getTrailer(movie?.videos?.results || [])?.key;
@@ -91,10 +92,6 @@ export default async function MoviePage({
     false;
   // console.log(movie.watchProviders?.results?.US?.flatrate)
   // console.log(movie.watchProviders?.results)
-  const details = await getMovieDetails({ id: params.id }, options);
-  details;
-  if (movie.originCountry)
-    console.log(movie.originCountry[0])
   // TODO: Add all watch providers
   return (
     <main>

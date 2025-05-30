@@ -6,7 +6,7 @@ import { Suspense } from "react";
 import dynamic from "next/dynamic";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export const revalidate = 3600;
+export const revalidate = 43200; // 12 hours
 
 const BackgroundClient = dynamic(
   () => import("./(auth)/_components/background"),

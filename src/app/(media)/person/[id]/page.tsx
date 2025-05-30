@@ -10,13 +10,14 @@ import {
 import { PersonDetails } from "@/components/person-details";
 import Image from "next/image";
 
-export const revalidate = 3600;
+export const revalidate = 43200; // 12 hours
+
 export default async function PersonPage({
   params,
 }: {
   params: { type: "person"; id: number };
 }) {
-  const person = await getPersonDetails({ id: params.id });
+  const person = await getPersonDetails(params.id);
 
   const session = await auth();
   let userWatchlists;

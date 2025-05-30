@@ -26,6 +26,7 @@ import {
 } from "../src/app/discover/actions.ts";
 import { eq, inArray, not } from "drizzle-orm";
 import { getMovieDetails, getTvDetails } from "@/app/(media)/actions.ts";
+import { Vibrant } from "node-vibrant/node";
 
 // now load your .env.local
 dotenv.config({ path: join(__dirname, "../.env.local") });
@@ -207,7 +208,7 @@ async function backfillDetails(movies: MovieResult[], tvShows: TvResult[]) {
     const backdropBlurUrl = m.backdrop_path
       ? await getBlurData(`${BaseImageUrl.BLUR}${m.backdrop_path}`)
       : null;
-    const details = await getMovieDetails({ id: m.id }, options);
+    const details = await getMovieDetails(m.id, options);
     await db
       .insert(movieDetails)
       .values({
@@ -281,7 +282,16 @@ async function backfillDetails(movies: MovieResult[], tvShows: TvResult[]) {
       ? await getBlurData(`${BaseImageUrl.BLUR}${t.backdrop_path}`)
       : null;
 
-    const details = await getTvDetails({ id: t.id }, options);
+    let darkVibrantBackdropHex: string | null = null;
+    if (t.backdrop_path) {
+      const palette = await Vibrant.from(
+        `${BaseImageUrl.ORIGINAL}${t.backdrop_path}`
+      ).getPalette();
+      darkVibrantBackdropHex =
+        palette?.DarkVibrant?.hex ?? palette?.Vibrant?.hex ?? null;
+    }
+
+    const details = await getTvDetails(t.id, options);
 
     await db
       .insert(tvDetails)
@@ -315,6 +325,7 @@ async function backfillDetails(movies: MovieResult[], tvShows: TvResult[]) {
         backdropBlurDataUrl: backdropBlurUrl,
         productionCompanies: details.productionCompanies,
         productionCountries: details.productionCountries,
+        darkVibrantBackdropHex: darkVibrantBackdropHex
       })
       .onConflictDoUpdate({
         target: tvDetails.summaryId,
@@ -347,6 +358,7 @@ async function backfillDetails(movies: MovieResult[], tvShows: TvResult[]) {
           backdropBlurDataUrl: backdropBlurUrl,
           productionCompanies: details.productionCompanies,
           productionCountries: details.productionCountries,
+          darkVibrantBackdropHex: darkVibrantBackdropHex
         },
       });
     await pause(50)

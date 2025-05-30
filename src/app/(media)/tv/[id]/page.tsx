@@ -1,10 +1,10 @@
 import dynamic from "next/dynamic";
-import { getFullTv, getTvDetails } from "@/app/(media)/actions";
+import { fetchTv } from "@/app/(media)/actions";
 import Link from "next/link";
 import { Video } from "@/types/request-types-snakecase";
 import Image from "next/image";
 import { auth } from "@/auth";
-import { Suspense } from "react";
+import { Suspense, useContext } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   BASE_CAST_IMAGE_URL,
@@ -19,8 +19,6 @@ import { TvDetails } from "../../_components/tv-details";
 import { ScoreCircle } from "../../_components/score-circle";
 import MediaActions from "../../_components/media-actions";
 import { ChevronRight } from "lucide-react";
-
-export const revalidate = 3600;
 
 const VideoPlayerClient = dynamic(
   () => import("@/app/(media)/_components/video-player"),
@@ -54,10 +52,8 @@ function getTrailer(videoArray: Array<Video>) {
 
 export default async function TvPage({ params }: { params: { id: number } }) {
   const tmdbId = Number(params.id);
-
-  let res = await getFullTv(params.id);
-  const dataPromise = res ? res : getTvDetails({ id: params.id });
-  const [tv, session] = await Promise.all([dataPromise, auth()]);
+  const tv = await fetchTv(tmdbId);
+  const [session] = await Promise.all([auth()]);
 
   if (!tv) return;
 
@@ -73,6 +69,7 @@ export default async function TvPage({ params }: { params: { id: number } }) {
     tv.firstAirDate !== undefined &&
     tv.firstAirDate !== null &&
     new Date(tv.firstAirDate).valueOf() < Date.now();
+
   // console.log(tv.seasons)
   return (
     <main>
@@ -313,11 +310,13 @@ export default async function TvPage({ params }: { params: { id: number } }) {
               </Suspense>
             </div>
           </div>
+
           {videoPath && (
             <Suspense>
               <VideoPlayerClient youtubeId={videoPath} id={params.id} />
             </Suspense>
-          )}</>
+          )}
+        </>
       )}
     </main>
   );

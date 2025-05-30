@@ -10,7 +10,7 @@ import { getWatchlistsAndItems } from "@/lib/actions";
 import { BASE_API_URL, options } from "@/lib/constants";
 import { FullMovie, FullTv } from "@/types/camel-index";
 import {
-  IdAppendToResponseRequest,
+  IdAppendToResponseRequest as number,
   MovieContentRatingResponse,
   MovieResponseAppended,
   MovieResultsResponse,
@@ -40,21 +40,22 @@ import {
 import camelcaseKeys from "camelcase-keys";
 import { eq } from "drizzle-orm";
 import { cache } from "react";
+import { unstable_cache } from "next/cache";
 
 export async function getPersonDetails(
-  request: IdAppendToResponseRequest,
+  id: number,
   resOptions: RequestInit = options,
 ): Promise<Person> {
-  const res = await fetch(`${BASE_API_URL}/person/${request.id}`, resOptions);
+  const res = await fetch(`${BASE_API_URL}/person/${id}`, resOptions);
   return res.json();
 }
 
-export const getTvDetails = cache(async (
-  request: IdAppendToResponseRequest,
+export const getTvDetails = unstable_cache(async (
+  id: number,
   resOptions: RequestInit = options,
 ): Promise<FullTv> => {
   const res = await fetch(
-    `${BASE_API_URL}/tv/${request.id}?append_to_response=videos,releases,content_ratings,credits,aggregate_credits,episode_groups,watch/providers&language=en-US`,
+    `${BASE_API_URL}/tv/${id}?append_to_response=videos,releases,content_ratings,credits,aggregate_credits,episode_groups,watch/providers&language=en-US`,
     resOptions,
   );
   const data = await res.json();
@@ -73,15 +74,22 @@ export const getTvDetails = cache(async (
 
   // fix up dates, etc…
   if (camel.firstAirDate) camel.firstAirDate = new Date(camel.firstAirDate);
+  camel.tmdbId = camel.id;
+  camel.id = -1;
+  console.log("getTvDetails called")
   return camel as FullTv;
-});
+}, [],
+  {
+    revalidate: 36000,  // 10 hours
+  }
+);
 
-export const getMovieDetails = cache(async (
-  request: IdAppendToResponseRequest,
+export const getMovieDetails = unstable_cache(async (
+  id: number,
   resOptions: RequestInit = options,
 ): Promise<FullMovie> => {
   const res = await fetch(
-    `${BASE_API_URL}/movie/${request.id}` +
+    `${BASE_API_URL}/movie/${id}` +
     `?append_to_response=videos,releases,content_ratings,credits,aggregate_credits,` +
     `episode_groups,watch/providers&language=en-US`,
     resOptions,
@@ -105,7 +113,11 @@ export const getMovieDetails = cache(async (
   // fix up dates, etc…
   if (camel.releaseDate) camel.releaseDate = new Date(camel.releaseDate);
   return camel as FullMovie;
-})
+}, [],
+  {
+    revalidate: 36000,  // 10 hours
+  }
+)
 
 export async function getReviews(
   type: "tv" | "movie",
@@ -178,7 +190,7 @@ export async function getWatchlistsWithItem(
   return watchlistsWithItem;
 }
 
-export const getFullMovie = cache(async (tmdbId: number): Promise<FullMovie | null> => {
+export const getFullMovie = unstable_cache(async (tmdbId: number): Promise<FullMovie | null> => {
   const [row] = await db
     .select({
       // summaries
@@ -251,10 +263,13 @@ export const getFullMovie = cache(async (tmdbId: number): Promise<FullMovie | nu
       | undefined,
     watchProviders: row.watchProviders as WatchProviderResponse,
     originCountry: row.originCountry as string[],
-  };
+  }
+}, [], {
+  revalidate: 36000 // 10 hours
 })
 
-export const getFullTv = cache(async (tmdbId: number): Promise<FullTv | null> => {
+export const getFullTv = unstable_cache(async (tmdbId: number): Promise<FullTv | null> => {
+  console.log("getFullTv called")
   const [row] = await db
     .select({
       // summary fields
@@ -297,6 +312,7 @@ export const getFullTv = cache(async (tmdbId: number): Promise<FullTv | null> =>
       originCountry: tvDetails.originCountry,
       spokenLanguages: tvDetails.spokenLanguages,
       contentRatings: tvDetails.contentRatings,
+      darkVibrantBackdropHex: tvDetails.darkVibrantBackdropHex
     })
     .from(tvSummaries)
     .leftJoin(tvDetails, eq(tvDetails.summaryId, tvSummaries.id))
@@ -333,4 +349,18 @@ export const getFullTv = cache(async (tmdbId: number): Promise<FullTv | null> =>
     spokenLanguages: row.spokenLanguages as SpokenLanguage[],
     contentRatings: row.contentRatings as { results: RatingResponse[] },
   };
+}, [], {
+  revalidate: 36000 // 10 hours
 })
+
+// Doesn't F-ing work anyways
+// getTvDetails called in parallel by tv/[id]/page.tsx and tv/[id]/layout.tsx AREN'T deduped!
+export const fetchTv = unstable_cache(
+  async (id: number) => {
+    const full = await getFullTv(id);
+    if (full?.id) return full;
+    return await getTvDetails(id);
+  },
+  [],
+  { revalidate: 3600 }
+);

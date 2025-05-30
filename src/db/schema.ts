@@ -205,6 +205,7 @@ export const tvDetails = pgTable(
     tagline: text("tagline"),
     type: text("type"),
     backdropBlurDataUrl: text("backdrop_blur_data_url"),
+    darkVibrantBackdropHex: text("dark_vibrant_backdrop_hex"),
 
     // dates & counts
     lastAirDate: date("last_air_date"),
