@@ -28,7 +28,7 @@ export default function SeasonCard({ seasonNumber, name, airDate, overview, post
 
       <section className="border-gray-500 border-[0.5px] bg-gray-500/10 backdrop-blur-xl rounded-lg p-5">
         <div className="grid grid-cols-1 md:grid-cols-[100px,1fr] gap-5 items-start">
-          {posterPath && (
+          {posterPath ? (
             <figure className="w-full">
               <Image
                 quality={60}
@@ -36,16 +36,15 @@ export default function SeasonCard({ seasonNumber, name, airDate, overview, post
                 height={150}
                 src={`${BASE_POSTER_IMAGE_URL}${posterPath}`}
                 className="object-cover rounded-lg w-full h-full"
-                priority
                 placeholder="blur"
                 blurDataURL={
                   DEFAULT_BLUR_DATA_URL
                 }
                 alt={`${name} poster`}
-                loading="eager"
+                loading="lazy"
               />
             </figure>
-          )}
+          ) : (<div></div>)}
 
           <div className="space-y-2">
             <h1 className="text-xl md:text-2xl font-bold text-center md:text-left">
