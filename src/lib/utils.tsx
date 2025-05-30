@@ -1,12 +1,16 @@
 import { type ClassValue, clsx } from "clsx";
 import {
   MovieResult,
+  PersonResult,
   RatingResponse,
   TvResult,
   Video,
 } from "@/types/request-types-snakecase";
 import { twMerge } from "tailwind-merge";
 import camelcaseKeys from "camelcase-keys";
+import { Card } from "@/components/card";
+import { BaseImageUrl } from "./constants";
+import Link from "next/link";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -137,3 +141,52 @@ export function tmdbToCamel<T extends AnyObject>(raw: AnyObject): T {
   // 4) Assert to your API‐boundary type
   return camel as T;
 }
+
+export async function makeCarouselCards(data: Array<TvResult | MovieResult>) {
+
+  return data.map(
+    (item: MovieResult | TvResult | PersonResult, index: number) => {
+      let card: React.ReactNode;
+      switch (item.media_type) {
+        case "tv":
+          card = (
+            <Card
+              title={item.name}
+              overview={item.overview}
+              imagePath={`${BaseImageUrl.POSTER}${item.poster_path}`}
+              // blurDataURL={(item as any).blurDataURL}
+              loading="lazy"
+            />
+          );
+          break;
+        case "movie":
+          card = (
+            <Card
+              title={item.title}
+              overview={item.overview}
+              imagePath={`${BaseImageUrl.POSTER}${item.poster_path}`}
+              // blurDataURL={(item as any).blurDataURL}
+              loading="lazy"
+            />
+          );
+          break;
+        case "person":
+          card = (
+            <Card
+              title={item.name}
+              overview=""
+              imagePath={`${BaseImageUrl.CAST}${item.profile_path}`}
+              loading="lazy"
+            />
+          );
+          break;
+      }
+      return (
+        <Link href={`/${item.media_type}/${item.id}`} key={index}>
+          {card}
+        </Link>
+      );
+    },
+  );
+}
+

@@ -1,6 +1,8 @@
 import { SearchMultiRequest, SearchMultiResponse } from "@/types/request-types-snakecase";
 import { BASE_API_URL, options } from "@/lib/constants";
-import { makeCarouselCards } from "../discover/page";
+// import { makeCarouselCards } from "../discover/page";
+import { Card } from "@/components/card";
+import { makeCarouselCards } from "@/lib/utils";
 
 const MAX_PAGES = 10;
 

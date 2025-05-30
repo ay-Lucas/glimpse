@@ -35,7 +35,8 @@ const ImageCarouselClient = dynamic(
     loading: () => <Skeleton className="w-full h-[336px] rounded-xl" />,
   },
 );
-export async function makeCarouselCards(data: Array<TvResult | MovieResult>) {
+
+async function makeCarouselCards(data: Array<TvResult | MovieResult>) {
 
   return data.map(
     (item: MovieResult | TvResult | PersonResult, index: number) => {
