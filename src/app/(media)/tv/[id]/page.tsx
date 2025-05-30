@@ -10,6 +10,7 @@ import {
   BASE_CAST_IMAGE_URL,
   BASE_POSTER_IMAGE_URL,
   DEFAULT_BLUR_DATA_URL,
+  DISCOVER_LIMIT,
 } from "@/lib/constants";
 import { RecommededSection } from "@/app/(media)/_components/recommendedSection";
 import ReviewSection from "@/app/(media)/_components/ReviewSection";
@@ -19,6 +20,7 @@ import { TvDetails } from "../../_components/tv-details";
 import { ScoreCircle } from "../../_components/score-circle";
 import MediaActions from "../../_components/media-actions";
 import { ChevronRight } from "lucide-react";
+import { DiscoverItem, getPopularMovies, getPopularSeries, getTrendingMovies, getTrendingSeries, getUpcomingMovieSummaries } from "@/app/discover/actions";
 
 const VideoPlayerClient = dynamic(
   () => import("@/app/(media)/_components/video-player"),
@@ -48,6 +50,29 @@ function getTrailer(videoArray: Array<Video>) {
     );
     return teaser[0];
   }
+}
+
+// Generate all TV pages featured on Discover page at build
+export async function generateStaticParams() {
+  const [
+    trendingTvItems,
+    popularTvItems,
+  ] = await Promise.all([
+    getTrendingSeries(DISCOVER_LIMIT),
+    getPopularSeries(DISCOVER_LIMIT),
+  ]);
+
+  function getIds(discoverItemArrays: Array<DiscoverItem[]>) {
+    const discoverItems = discoverItemArrays.flat(1);
+    return discoverItems.map(item => item.tmdbId);
+  }
+
+  const discoverIds = getIds([
+    trendingTvItems,
+    popularTvItems,
+  ]);
+
+  return discoverIds.map((id) => ({ id: id.toString() }));
 }
 
 export default async function TvPage({ params }: { params: { id: number } }) {

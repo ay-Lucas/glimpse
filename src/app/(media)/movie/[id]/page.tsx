@@ -3,19 +3,13 @@ import Link from "next/link";
 import { Cast } from "@/types/request-types-camelcase";
 import Image from "next/image";
 import { auth } from "@/auth";
-import { getWatchlists } from "@/lib/actions";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
-  appendBlurDataToMediaArray,
-  getBlurData,
-} from "@/lib/blur-data-generator";
-import {
-  BASE_BLUR_IMAGE_URL,
   BASE_ORIGINAL_IMAGE_URL,
   BASE_POSTER_IMAGE_URL,
   DEFAULT_BLUR_DATA_URL,
-  options,
+  DISCOVER_LIMIT,
 } from "@/lib/constants";
 import { RecommededSection } from "@/app/(media)/_components/recommendedSection";
 import ReviewSection from "@/app/(media)/_components/ReviewSection";
@@ -26,6 +20,7 @@ import CastCard from "@/components/cast-card";
 import { MovieDetails } from "../../_components/movie-details";
 import MediaActions from "../../_components/media-actions";
 import { ScoreCircle } from "../../_components/score-circle";
+import { DiscoverItem, getPopularMovies, getTrendingMovies, getUpcomingMovieSummaries } from "@/app/discover/actions";
 
 export const revalidate = 43200; // 12 hours
 
@@ -45,6 +40,30 @@ const ImageCarouselClient = dynamic(
   },
 );
 
+// Generate all Movie pages featured on Discover page at build
+export async function generateStaticParams() {
+  const [
+    trendingMovieItems,
+    upcomingMovieItems,
+    popularMovieItems,
+  ] = await Promise.all([
+    getTrendingMovies(DISCOVER_LIMIT),
+    getUpcomingMovieSummaries(DISCOVER_LIMIT),
+    getPopularMovies(DISCOVER_LIMIT),
+  ]);
+
+  function getIds(discoverItemArrays: Array<DiscoverItem[]>) {
+    const discoverItems = discoverItemArrays.flat(1);
+    return discoverItems.map(item => item.tmdbId);
+  }
+
+  const discoverIds = getIds([
+    trendingMovieItems, upcomingMovieItems, popularMovieItems
+  ]);
+
+  return discoverIds.map((id) => ({ id: id.toString() }));
+}
+
 export default async function MoviePage({
   params,
 }: {
@@ -52,31 +71,6 @@ export default async function MoviePage({
 }) {
   const tmdbId = Number(params.id);
 
-  // const [movie, session] = await Promise.all([
-  //   getFullMovie(tmdbId) ?? getMovieDetails({ id: params.id }),
-  //   auth(),
-  // ]);
-
-  // const watchlistPromise = session
-  //   ? getWatchlists(session.user.id)
-  //   : Promise.resolve(null);
-
-  // const [userWatchlists, posterBlurData, backdropBlurData] = await Promise.all([
-  //   watchlistPromise,
-  // data.poster_path
-  //   ? getBlurData(`${BASE_BLUR_IMAGE_URL}${data.poster_path}`)
-  //   : Promise.resolve(null),
-  // data.backdrop_path
-  //   ? getBlurData(`${BASE_BLUR_IMAGE_URL}${data.backdrop_path}`)
-  //   : Promise.resolve(null),
-  // data.credits?.cast?.length
-  // ? appendBlurDataToMediaArray(
-  //     data.credits.cast,
-  //     BaseImageUrl.BLUR,
-  //     data.credits.cast.map((c) => c.profile_path),
-  //   )
-  // : Promise.resolve([]),
-  // ]);
   const movie =
     (await getFullMovie(tmdbId)) ?? (await getMovieDetails(params.id));
   const session = await auth();
