@@ -7,7 +7,7 @@ import {
   tvSummaries,
 } from "@/db/schema";
 import { getWatchlistsAndItems } from "@/lib/actions";
-import { BASE_API_URL, options } from "@/lib/constants";
+import { BASE_API_URL, DISCOVER_LIMIT, options } from "@/lib/constants";
 import { FullMovie, FullTv } from "@/types/camel-index";
 import {
   IdAppendToResponseRequest as number,
@@ -41,6 +41,7 @@ import camelcaseKeys from "camelcase-keys";
 import { eq } from "drizzle-orm";
 import { cache } from "react";
 import { unstable_cache } from "next/cache";
+import { DiscoverItem, getPopularMovies, getPopularSeries, getTrendingMovies, getTrendingSeries, getUpcomingMovieSummaries } from "../discover/actions";
 
 export async function getPersonDetails(
   id: number,
@@ -364,3 +365,41 @@ export const fetchTv = unstable_cache(
   [],
   { revalidate: 3600 }
 );
+
+export async function fetchDiscoverMovieIds() {
+  const [
+    trendingMovieItems,
+    upcomingMovieItems,
+    popularMovieItems,
+  ] = await Promise.all([
+    getTrendingMovies(DISCOVER_LIMIT),
+    getUpcomingMovieSummaries(DISCOVER_LIMIT),
+    getPopularMovies(DISCOVER_LIMIT),
+  ]);
+
+  function getIds(discoverItemArrays: Array<DiscoverItem[]>) {
+    const discoverItems = discoverItemArrays.flat(1);
+    return discoverItems.map(item => ({ id: String(item.tmdbId) }));
+  }
+
+  return getIds([trendingMovieItems, upcomingMovieItems, popularMovieItems]);
+  ;
+}
+
+export async function fetchDiscoverTvIds() {
+
+  const [
+    trendingTvItems,
+    popularTvItems,
+  ] = await Promise.all([
+    getTrendingSeries(DISCOVER_LIMIT),
+    getPopularSeries(DISCOVER_LIMIT),
+  ]);
+
+  function getIds(discoverItemArrays: Array<DiscoverItem[]>) {
+    const discoverItems = discoverItemArrays.flat(1);
+    return discoverItems.map(item => ({ id: String(item.tmdbId) }));
+  }
+
+  return getIds([trendingTvItems, popularTvItems]);
+}

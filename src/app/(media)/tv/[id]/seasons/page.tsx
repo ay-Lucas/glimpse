@@ -1,7 +1,12 @@
 import SeasonBanner from "@/app/(media)/_components/season-banner";
 import SeasonCard from "@/app/(media)/_components/season-card";
-import { fetchTv } from "@/app/(media)/actions";
+import { fetchDiscoverTvIds, fetchTv } from "@/app/(media)/actions";
 import { bannerColor } from "@/lib/bannerColor";
+
+export async function generateStaticParams() {
+  const discoverTvIds = await fetchDiscoverTvIds();
+  return discoverTvIds
+}
 
 export default async function Seasons({ params }: { params: { id: number } }) {
   const tmdbId = params.id
@@ -14,6 +19,7 @@ export default async function Seasons({ params }: { params: { id: number } }) {
     backdropPath,
     darkVibrantBackdropHex
   );
+
 
   return (
     <main className="pt-3">

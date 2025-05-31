@@ -9,18 +9,16 @@ import {
   BASE_ORIGINAL_IMAGE_URL,
   BASE_POSTER_IMAGE_URL,
   DEFAULT_BLUR_DATA_URL,
-  DISCOVER_LIMIT,
 } from "@/lib/constants";
 import { RecommededSection } from "@/app/(media)/_components/recommendedSection";
 import ReviewSection from "@/app/(media)/_components/ReviewSection";
-import { getFullMovie, getMovieDetails } from "../../actions";
+import { fetchDiscoverTvIds, getFullMovie, getMovieDetails } from "../../actions";
 import { getTrailer } from "@/lib/utils";
 import JustWatchLogo from "@/assets/justwatch-logo.svg";
 import CastCard from "@/components/cast-card";
 import { MovieDetails } from "../../_components/movie-details";
 import MediaActions from "../../_components/media-actions";
 import { ScoreCircle } from "../../_components/score-circle";
-import { DiscoverItem, getPopularMovies, getTrendingMovies, getUpcomingMovieSummaries } from "@/app/discover/actions";
 
 export const revalidate = 43200; // 12 hours
 
@@ -42,26 +40,7 @@ const ImageCarouselClient = dynamic(
 
 // Generate all Movie pages featured on Discover page at build
 export async function generateStaticParams() {
-  const [
-    trendingMovieItems,
-    upcomingMovieItems,
-    popularMovieItems,
-  ] = await Promise.all([
-    getTrendingMovies(DISCOVER_LIMIT),
-    getUpcomingMovieSummaries(DISCOVER_LIMIT),
-    getPopularMovies(DISCOVER_LIMIT),
-  ]);
-
-  function getIds(discoverItemArrays: Array<DiscoverItem[]>) {
-    const discoverItems = discoverItemArrays.flat(1);
-    return discoverItems.map(item => item.tmdbId);
-  }
-
-  const discoverIds = getIds([
-    trendingMovieItems, upcomingMovieItems, popularMovieItems
-  ]);
-
-  return discoverIds.map((id) => ({ id: id.toString() }));
+  return await fetchDiscoverTvIds()
 }
 
 export default async function MoviePage({
