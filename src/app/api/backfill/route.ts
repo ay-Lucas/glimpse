@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { backfillSummaries } from '@/../scripts/backfillSummaries';
+import { backfill } from '../../../../scripts/backfill';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -14,7 +14,7 @@ export function HEAD() {
 export async function GET() {
   try {
     console.log("🔄 [backfill] GET starting");
-    await backfillSummaries();
+    await backfill();
     console.log("✅ [backfill] GET finished");
     return NextResponse.json({ ok: true });
   } catch (err: any) {

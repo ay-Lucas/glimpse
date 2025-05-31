@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import dotenv from "dotenv";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
@@ -5,6 +6,7 @@ import { dirname, join } from "path";
 // __dirname shim for ESM
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+
 import { BaseImageUrl } from "../src/lib/constants.ts";
 import { getBlurData } from "../src/lib/blur-data-generator.ts";
 import {
@@ -28,7 +30,6 @@ import { eq, inArray, not } from "drizzle-orm";
 import { getMovieDetails, getTvDetails } from "@/app/(media)/actions.ts";
 import { Vibrant } from "node-vibrant/node";
 
-// now load your .env.local
 dotenv.config({ path: join(__dirname, "../.env.local") });
 
 const options = {
@@ -39,18 +40,36 @@ const options = {
   },
 } as const;
 
-// Utility to dedupe by tmdbId
-function uniqueBy<T extends { id: number }>(arr: T[]): T[] {
-  const seen = new Set<number>();
-  return arr.filter((item) => {
-    if (seen.has(item.id)) return false;
-    seen.add(item.id);
-    return true;
-  });
+// Main
+export async function backfill() {
+  try {
+    const { trendingMovies, trendingTv, popularMovies, popularTv, upcoming } = await fetchLists();
+
+    const movies = uniqueBy([
+      ...trendingMovies!,
+      ...(popularMovies.results ?? []),
+      ...(upcoming.results ?? []),
+    ]) as MovieResult[];
+
+    const tvShows = uniqueBy([
+      ...trendingTv!,
+      ...(popularTv.results ?? []),
+    ]) as TvResult[];
+
+    await backfillSummaries(movies, tvShows)
+    await backfillDetails(movies, tvShows);
+    await backfillPositions(trendingTv, trendingMovies, popularTv.results as TvResult[], popularMovies.results as MovieResult[]);
+    await removeOldEntries(movies, tvShows)
+
+    console.log("Backfill complete.");
+
+  } catch (error) {
+    console.error("There was an error completing the backfill " + error);
+  }
 }
 
-export async function backfillSummaries() {
-  console.log("Fetching TMDB lists...");
+async function fetchLists() {
+  console.log("Fetching popular and trending tv series and movies from TMDB...");
   const TMDB_ACCESS_TOKEN = process.env.TMDB_ACCESS_TOKEN!;
   if (!TMDB_ACCESS_TOKEN) throw new Error("Missing TMDB_ACCESS_TOKEN");
   const [trendingMovies, trendingTv, popularMovies, popularTv, upcoming] =
@@ -69,20 +88,11 @@ export async function backfillSummaries() {
       getPopular({ page: 1, "vote_average.gte": 6 }, "tv", options),
       getUpcomingMovies({ page: 1 }, options),
     ]);
+  return { trendingMovies, trendingTv, popularMovies, popularTv, upcoming };
+}
 
-  // Combine and dedupe
-  const movies = uniqueBy([
-    ...trendingMovies!,
-    ...(popularMovies.results ?? []),
-    ...(upcoming.results ?? []),
-  ]) as MovieResult[];
-  const tvShows = uniqueBy([
-    ...trendingTv!,
-    ...(popularTv.results ?? []),
-  ]) as TvResult[];
-
-  console.log(`Backfilling ${movies.length} movies...`);
-
+async function backfillSummaries(movies: MovieResult[], tvShows: TvResult[]) {
+  console.log(`Backfilling ${movies.length} movie summaries...`);
 
   for (const m of movies) {
     const posterBlurUrl = m.poster_path
@@ -121,7 +131,8 @@ export async function backfillSummaries() {
       });
   }
 
-  console.log(`Backfilling ${tvShows.length} TV shows...`);
+  console.log(`Backfilling ${tvShows.length} TV show summaries...`);
+
   for (const t of tvShows) {
     const posterBlurUrl = t.poster_path
       ? await getBlurData(`${BaseImageUrl.BLUR}${t.poster_path}`)
@@ -159,18 +170,7 @@ export async function backfillSummaries() {
       });
   }
 
-  await backfillDetails(movies, tvShows);
-  await backfillPositions(trendingTv, trendingMovies, popularTv.results as TvResult[], popularMovies.results as MovieResult[]);
-  await removeOldEntries(movies, tvShows)
-
-
-  console.log("Backfill complete.");
 }
-
-backfillSummaries().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
 
 async function backfillDetails(movies: MovieResult[], tvShows: TvResult[]) {
   const movieIdMap = new Map<number, number>();
@@ -478,5 +478,15 @@ async function removeOldEntries(movies: MovieResult[], tvShows: TvResult[]) {
 
 function pause(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// Utility to dedupe by tmdbId
+function uniqueBy<T extends { id: number }>(arr: T[]): T[] {
+  const seen = new Set<number>();
+  return arr.filter((item) => {
+    if (seen.has(item.id)) return false;
+    seen.add(item.id);
+    return true;
+  });
 }
 
