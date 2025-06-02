@@ -12,10 +12,13 @@ import {
   UpcomingMoviesResponse,
 } from "@/types/request-types-snakecase";
 
+
 import { db } from "@/db";
 import { listEntries, movieDetails, movieSummaries, tvDetails } from "@/db/schema";
 import { tvSummaries } from "@/db/schema";
 import { and, asc, desc, eq, gte, inArray, isNotNull, lte, not, or } from "drizzle-orm";
+import camelcaseKeys from "camelcase-keys";
+import { MovieResult, TvResult } from "@/types/request-types-camelcase";
 
 export async function getTrending(
   request: TrendingRequest,
@@ -31,6 +34,7 @@ export async function getTrending(
 export async function getTrendingPages(
   request: TrendingRequest,
   numberOfPages: number,
+  camelcase?: boolean,
   reqOptions: RequestInit = options,
 ) {
   const requests = [];
@@ -48,23 +52,34 @@ export async function getTrendingPages(
   }
   const array = await Promise.all(requests);
   const arrays = array.flatMap((page) => page.results);
+
+  if (camelcase) {
+    return camelcaseKeys(arrays as any) as MovieResult[] | TvResult[];
+  }
   return arrays;
 }
 
 export async function getPopular(
   request: DiscoverMovieRequest | DiscoverTvRequest,
   mediaType: "movie" | "tv",
+  camelcase?: boolean,
   reqOptions: RequestInit = options,
-): Promise<DiscoverTvResponse | DiscoverMovieResponse> {
+) {
   const res = await fetch(
     `${BASE_API_URL}/discover/${mediaType}?include_adult=false&language=en-US&region=US&page=${request.page}&sort_by=popularity.desc&vote_average.gte=${request["vote_average.gte"]}&with_original_language=en`,
     reqOptions,
   );
-  return res.json();
+  const data = await res.json();
+
+  if (camelcase) {
+    return camelcaseKeys(data);
+  }
+  return data;
 }
 
 export async function getUpcomingMovies(
   request: UpcomingMoviesRequest,
+  camelcase?: boolean,
   reqOptions: RequestInit = options,
 ): Promise<UpcomingMoviesResponse> {
   const today = new Date().toISOString().split("T")[0];
@@ -72,7 +87,12 @@ export async function getUpcomingMovies(
     `${BASE_API_URL}/discover/movie?include_adult=false&include_video=false&language=en-US&region=US&&page=${request.page}&primary_release_date.gte=${today}&release_date.gte=2024-06-26&sort_by=popularity.desc`,
     reqOptions,
   );
-  return res.json();
+  const data = await res.json();
+
+  if (camelcase) {
+    return camelcaseKeys(data);
+  }
+  return data;
 }
 
 // export async function getDeviceType(): Promise<string> {

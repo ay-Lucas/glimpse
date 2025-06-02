@@ -79,17 +79,16 @@ async function fetchLists() {
     await Promise.all([
       getTrendingPages(
         { media_type: "movie", time_window: "day", page: 1 },
-        3,
-        options,
+        3, false, options
       ) as Promise<MovieResult[]>,
       getTrendingPages(
         { media_type: "tv", time_window: "day", page: 1 },
         3,
-        options,
+        false, options,
       ) as Promise<TvResult[]>,
-      getPopular({ page: 1, "vote_average.gte": 6 }, "movie", options),
-      getPopular({ page: 1, "vote_average.gte": 6 }, "tv", options),
-      getUpcomingMovies({ page: 1 }, options),
+      getPopular({ page: 1, "vote_average.gte": 6 }, "movie", false, options),
+      getPopular({ page: 1, "vote_average.gte": 6 }, "tv", false, options),
+      getUpcomingMovies({ page: 1 }, false, options),
     ]);
   return { trendingMovies, trendingTv, popularMovies, popularTv, upcoming };
 }

@@ -1,14 +1,15 @@
 "use client";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Swiper as SwiperCore, SwiperOptions } from "swiper/types";
-import { ReactNode, useEffect, useRef, useState } from "react";
+import React, { ReactNode, useEffect, useRef, useState } from "react";
 import { FreeMode, Navigation, Virtual } from "swiper/modules";
 import "swiper/css";
 import { Button } from "./ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export interface ImageCarouselProps {
-  title?: string;
+  title?: ReactNode | string;
+  titleString?: string;
   variant?: string;
   userAgent?: string | null;
   breakpoints?: "default" | "page" | "cast";
@@ -97,6 +98,7 @@ const carouselBreakpoints = {
 
 export default function ImageCarousel({
   title,
+  titleString,
   userAgent,
   className,
   breakpoints = "default",
@@ -143,9 +145,11 @@ export default function ImageCarousel({
     <>
       <div className={`${className ?? ""}`}>
         <div className="space-x-2 flex justify-between">
-          <h2 className={`text-2xl font-bold ml-6 md:ml-1`}>
-            {title && title}
-          </h2>
+          {title ? title :
+            <h2 className={`text-2xl font-bold ml-6 md:ml-1`}>
+              {titleString}
+            </h2>
+          }
           <div className="whitespace-nowrap opacity-0 lg:opacity-100">
             <Button
               size="icon"
