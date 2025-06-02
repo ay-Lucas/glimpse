@@ -1,4 +1,3 @@
-"use server";
 import { headers } from "next/headers";
 import { BASE_API_URL, options } from "@/lib/constants";
 import {
@@ -19,24 +18,25 @@ import { tvSummaries } from "@/db/schema";
 import { and, asc, desc, eq, gte, inArray, isNotNull, lte, not, or } from "drizzle-orm";
 import camelcaseKeys from "camelcase-keys";
 import { MovieResult, TvResult } from "@/types/request-types-camelcase";
+import { unstable_cache } from "next/cache";
 
-export async function getTrending(
+export const getTrending = unstable_cache(async (
   request: TrendingRequest,
   reqOptions: RequestInit = options,
-): Promise<TrendingResponse> {
+): Promise<TrendingResponse> => {
   const res = await fetch(
     `${BASE_API_URL}/trending/${request.media_type}/${request.time_window}?&page=${request.page}`,
     reqOptions,
   );
   return res.json();
-}
+}, [], { revalidate: 43200 })
 
-export async function getTrendingPages(
+export const getTrendingPages = unstable_cache(async (
   request: TrendingRequest,
   numberOfPages: number,
   camelcase?: boolean,
   reqOptions: RequestInit = options,
-) {
+) => {
   const requests = [];
   for (let i = 0; i < numberOfPages; i++) {
     requests.push(
@@ -57,14 +57,14 @@ export async function getTrendingPages(
     return camelcaseKeys(arrays as any, { deep: true }) as MovieResult[] | TvResult[];
   }
   return arrays;
-}
+}, [], { revalidate: 43200 })
 
-export async function getPopular(
+export const getPopular = unstable_cache(async (
   request: DiscoverMovieRequest | DiscoverTvRequest,
   mediaType: "movie" | "tv",
   camelcase?: boolean,
   reqOptions: RequestInit = options,
-) {
+) => {
   const res = await fetch(
     `${BASE_API_URL}/discover/${mediaType}?include_adult=false&language=en-US&region=US&page=${request.page}&sort_by=popularity.desc&vote_average.gte=${request["vote_average.gte"]}&with_original_language=en`,
     reqOptions,
@@ -75,15 +75,15 @@ export async function getPopular(
     return camelcaseKeys(data, { deep: true })
   }
   return data;
-}
+}, [], { revalidate: 43200 })
 
-export async function getPopularPages(
+export const getPopularPages = unstable_cache(async (
   request: DiscoverMovieRequest | DiscoverTvRequest,
   mediaType: "movie" | "tv",
   numberOfPages: number,
   camelcase?: boolean,
   reqOptions: RequestInit = options,
-) {
+) => {
   const requests = [];
   for (let i = 0; i < numberOfPages; i++) {
     requests.push(
@@ -95,18 +95,18 @@ export async function getPopularPages(
   const array = await Promise.all(requests);
   const arrays = array.flatMap((page) => page.results);
 
-  console.log(arrays)
   if (camelcase) {
+    console.log("getPopularPages called")
     return camelcaseKeys(arrays as any, { deep: true }) as MovieResult[] | TvResult[];
   }
   return arrays;
-}
+}, [], { revalidate: 43200 })
 
-export async function getUpcomingMovies(
+export const getUpcomingMovies = unstable_cache(async (
   request: UpcomingMoviesRequest,
   camelcase?: boolean,
   reqOptions: RequestInit = options,
-) {
+) => {
   const today = new Date().toISOString().split("T")[0];
   const res = await fetch(
     `${BASE_API_URL}/discover/movie?include_adult=false&include_video=false&language=en-US&region=US&&page=${request.page}&primary_release_date.gte=${today}&release_date.gte=2024-06-26&sort_by=popularity.desc`,
@@ -118,7 +118,7 @@ export async function getUpcomingMovies(
     return camelcaseKeys(data, { deep: true })
   // exclude: [/^[A-Z]{2}$/]
   return data;
-}
+}, [], { revalidate: 43200 })
 
 // export async function getDeviceType(): Promise<string> {
 //   const headersList = headers();

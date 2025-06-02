@@ -1,3 +1,4 @@
+export const runtime = 'nodejs';
 import {
   DiscoverItem,
   getTrendingPages,
@@ -9,12 +10,12 @@ import Link from "next/link";
 import {
   BaseImageUrl,
   DEFAULT_BLUR_DATA_URL,
-  DISCOVER_LIMIT,
 } from "@/lib/constants";
 import ImageCarousel from "@/components/image-carousel";
 import { MovieResult, TvResult, UpcomingMoviesResponse } from "@/types/request-types-camelcase";
 import { getBlurData } from "@/lib/blur-data-generator";
 import CarouselToggle from "../(media)/_components/carousel-toggle";
+import { unstable_cache } from "next/cache";
 
 export const revalidate = 43200; // 12 hours
 
@@ -87,7 +88,6 @@ export default async function Discover() {
   const trendingTvIds = new Set([...trendingTvDaily.map(item => item.id), ...trendingTvWeekly.map(item => item.id)])
   const popularTv = popularTvRes?.filter(item => !trendingTvIds.has(item.id)) ?? []
 
-  console.log(trendingTvDaily)
   const trendingMovieIds = new Set([
     ...trendingMoviesDaily.map(item => item.id), ...trendingMoviesWeekly.map(item => item.id)
   ])
@@ -129,9 +129,9 @@ export default async function Discover() {
   );
 }
 
-async function convertToDiscoverItems(
+const convertToDiscoverItems = unstable_cache(async (
   array: MovieResult[] | TvResult[]
-): Promise<DiscoverItem[]> {
+): Promise<DiscoverItem[]> => {
 
   const promises = array.map(async (item) => {
     const title = (item as MovieResult).title || (item as TvResult).name;
@@ -150,4 +150,4 @@ async function convertToDiscoverItems(
   });
 
   return await Promise.all(promises);
-}
+})
