@@ -25,6 +25,8 @@ import {
   getTrendingPages,
   getPopular,
   getUpcomingMovies,
+  getAllTv,
+  getAllMovies,
 } from "../src/app/discover/actions.ts";
 import { eq, inArray, not } from "drizzle-orm";
 import { getMovieDetails, getTvDetails } from "@/app/(media)/actions.ts";
@@ -56,11 +58,12 @@ export async function backfill() {
       ...(popularTv.results ?? []),
     ]) as TvResult[];
 
-    await backfillSummaries(movies, tvShows)
+    await logChanges(movies, tvShows);
+    await backfillSummaries(movies, tvShows);
     await backfillDetails(movies, tvShows);
     await backfillPositions(trendingTv, trendingMovies, popularTv.results as TvResult[], popularMovies.results as MovieResult[]);
-    await removeOldEntries(movies, tvShows)
-
+    await removeOldEntries(movies, tvShows);
+    await revalidatePaths(movies, tvShows);
     console.log("Backfill complete.");
 
   } catch (error) {
@@ -75,12 +78,12 @@ async function fetchLists() {
   const [trendingMovies, trendingTv, popularMovies, popularTv, upcoming] =
     await Promise.all([
       getTrendingPages(
-        { media_type: "movie", time_window: "week", page: 1 },
+        { media_type: "movie", time_window: "day", page: 1 },
         3,
         options,
       ) as Promise<MovieResult[]>,
       getTrendingPages(
-        { media_type: "tv", time_window: "week", page: 1 },
+        { media_type: "tv", time_window: "day", page: 1 },
         3,
         options,
       ) as Promise<TvResult[]>,
@@ -476,6 +479,58 @@ async function removeOldEntries(movies: MovieResult[], tvShows: TvResult[]) {
 
 }
 
+async function revalidatePaths(movies: MovieResult[], tvShows: TvResult[]) {
+  try {
+    console.log("Revalidating paths...")
+
+    const tvPaths = tvShows.map(item => `/tv/${item.id}`)
+    const tvSeasonPaths = tvPaths.map(tvPath => `${tvPath}/seasons`)
+    const moviePaths = movies.map(item => `/movie/${item.id}`)
+    const allPaths = [...tvPaths, ...tvSeasonPaths, ...moviePaths, "/discover"];
+    const baseUrl = getBaseUrl();
+    const response = await fetch(`${baseUrl}/api/revalidate`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          secret: process.env.REVALIDATE_SECRET,
+          paths: allPaths,
+        }),
+      }
+    );
+
+    const json = await response.json();
+    console.log("Revalidate response: ", json);
+  } catch (error) {
+    console.error("Backfill + revalidate failed: ", error)
+  }
+}
+
+// TODO:Fix inaccurate logging
+async function logChanges(movies: MovieResult[], tvShows: TvResult[]) {
+
+  const currentTvItems = await getAllTv();
+  const currentMovieItems = await getAllMovies();
+  const currentMovieIds = new Set(currentMovieItems.map((m) => m.tmdbId));
+  const currentTvIds = new Set(currentTvItems.map((t) => t.tmdbId));
+
+  const newMovieIds = new Set(movies.map((m) => m.id));
+  const newTvIds = new Set(tvShows.map((t) => t.id));
+
+  const addedMovies = movies.filter((m) => !currentMovieIds.has(m.id));
+  const removedMovies = currentMovieItems.filter((m) => !newMovieIds.has(m.tmdbId));
+
+  const addedTv = tvShows.filter((t) => !currentTvIds.has(t.id));
+  const removedTv = currentTvItems.filter((t) => !newTvIds.has(t.tmdbId));
+
+  // Inaccurate
+  console.log("Movies added since last run:", addedMovies.map(m => m.title));
+  console.log("Movies removed since last run:", removedMovies.map(m => m.title));
+  console.log("TV shows added since last run:", addedTv.map(t => t.name));
+  console.log("TV shows removed since last run:", removedTv.map(t => t.title));
+
+}
+
 function pause(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -490,3 +545,11 @@ function uniqueBy<T extends { id: number }>(arr: T[]): T[] {
   });
 }
 
+function getBaseUrl() {
+  if (process.env.NODE_ENV === 'development') {
+    return 'http://localhost:3000';
+  }
+  return process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : 'http://localhost:3000';
+}
