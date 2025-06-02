@@ -76,7 +76,7 @@ export default async function TvPage({ params }: { params: { id: number } }) {
     tv.firstAirDate !== null &&
     new Date(tv.firstAirDate).valueOf() < Date.now();
 
-  // console.log(tv.seasons)
+  console.log(tv.originalLanguage)
   return (
     <main>
       {tv && (

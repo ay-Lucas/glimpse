@@ -537,3 +537,38 @@ export interface Network {
   logoPath?: string;
   originCountry?: string;
 }
+
+export interface UpcomingMoviesResponse extends MovieNowPlayingResponse {
+  results?: Array<MovieResult>;
+  dates?: {
+    maximum?: string;
+    minimum?: string;
+  };
+}
+
+export interface MovieNowPlayingResponse extends PaginatedResponse {
+  results?: Array<MovieResult>;
+  dates?: {
+    maximum?: string;
+    minimum?: string;
+  };
+}
+
+export interface PaginatedResponse extends Response {
+  page?: number;
+  totalResults: number;
+  totalPages: number;
+}
+
+export interface PopularMoviesResponse extends DiscoverMovieResponse { }
+
+export interface DiscoverMovieResponse extends PaginatedResponse {
+  results?: Array<MovieResult>;
+  credits?: CreditsResponse;
+}
+
+export interface PopularTvResponse extends DiscoverTvResponse { }
+
+export interface DiscoverTvResponse extends PaginatedResponse {
+  results?: Array<TvResult>;
+}

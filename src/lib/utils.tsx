@@ -209,3 +209,14 @@ export function countryCodeToEnglishName(code: string): string {
   // 2) .of(code) returns the country name in English. If the code is invalid it returns the code itself.
   return displayNames.of(code.toUpperCase()) ?? code;
 }
+
+
+// Utility to dedupe by tmdbId
+export function uniqueBy<T extends { id: number }>(arr: T[]): T[] {
+  const seen = new Set<number>();
+  return arr.filter((item) => {
+    if (seen.has(item.id)) return false;
+    seen.add(item.id);
+    return true;
+  });
+}

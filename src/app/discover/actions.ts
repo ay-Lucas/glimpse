@@ -54,7 +54,7 @@ export async function getTrendingPages(
   const arrays = array.flatMap((page) => page.results);
 
   if (camelcase) {
-    return camelcaseKeys(arrays as any) as MovieResult[] | TvResult[];
+    return camelcaseKeys(arrays as any, { deep: true }) as MovieResult[] | TvResult[];
   }
   return arrays;
 }
@@ -72,16 +72,41 @@ export async function getPopular(
   const data = await res.json();
 
   if (camelcase) {
-    return camelcaseKeys(data);
+    return camelcaseKeys(data, { deep: true })
   }
   return data;
+}
+
+export async function getPopularPages(
+  request: DiscoverMovieRequest | DiscoverTvRequest,
+  mediaType: "movie" | "tv",
+  numberOfPages: number,
+  camelcase?: boolean,
+  reqOptions: RequestInit = options,
+) {
+  const requests = [];
+  for (let i = 0; i < numberOfPages; i++) {
+    requests.push(
+      getPopular({
+        page: i + 1,
+      }, mediaType, true, reqOptions)
+    );
+  }
+  const array = await Promise.all(requests);
+  const arrays = array.flatMap((page) => page.results);
+
+  console.log(arrays)
+  if (camelcase) {
+    return camelcaseKeys(arrays as any, { deep: true }) as MovieResult[] | TvResult[];
+  }
+  return arrays;
 }
 
 export async function getUpcomingMovies(
   request: UpcomingMoviesRequest,
   camelcase?: boolean,
   reqOptions: RequestInit = options,
-): Promise<UpcomingMoviesResponse> {
+) {
   const today = new Date().toISOString().split("T")[0];
   const res = await fetch(
     `${BASE_API_URL}/discover/movie?include_adult=false&include_video=false&language=en-US&region=US&&page=${request.page}&primary_release_date.gte=${today}&release_date.gte=2024-06-26&sort_by=popularity.desc`,
@@ -89,9 +114,9 @@ export async function getUpcomingMovies(
   );
   const data = await res.json();
 
-  if (camelcase) {
-    return camelcaseKeys(data);
-  }
+  if (camelcase)
+    return camelcaseKeys(data, { deep: true })
+  // exclude: [/^[A-Z]{2}$/]
   return data;
 }
 

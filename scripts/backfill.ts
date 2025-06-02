@@ -31,6 +31,7 @@ import {
 import { eq, inArray, not } from "drizzle-orm";
 import { getMovieDetails, getTvDetails } from "@/app/(media)/actions.ts";
 import { Vibrant } from "node-vibrant/node";
+import { uniqueBy } from "@/lib/utils.tsx";
 
 dotenv.config({ path: join(__dirname, "../.env.local") });
 
@@ -534,15 +535,6 @@ function pause(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-// Utility to dedupe by tmdbId
-function uniqueBy<T extends { id: number }>(arr: T[]): T[] {
-  const seen = new Set<number>();
-  return arr.filter((item) => {
-    if (seen.has(item.id)) return false;
-    seen.add(item.id);
-    return true;
-  });
-}
 
 function getBaseUrl() {
   if (process.env.NODE_ENV === 'development') {
