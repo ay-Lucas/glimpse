@@ -308,3 +308,41 @@ export async function getPopularMovies(limit = 10): Promise<DiscoverItem[]> {
     voteCount: r.voteCount ?? undefined,
   }));
 }
+
+export async function getAllTv(): Promise<DiscoverItem[]> {
+  const rows = await db
+    .select({
+      tmdbId: tvSummaries.tmdbId,
+      title: tvSummaries.name,
+    })
+    .from(tvSummaries)
+    .leftJoin(
+      tvDetails,
+      eq(tvDetails.summaryId, tvSummaries.id),
+    )
+
+  return rows.map((r) => ({
+    tmdbId: r.tmdbId,
+    mediaType: "tv",
+    title: r.title,
+  }));
+}
+
+export async function getAllMovies(): Promise<DiscoverItem[]> {
+  const rows = await db
+    .select({
+      tmdbId: movieSummaries.tmdbId,
+      title: movieSummaries.title,
+    })
+    .from(movieSummaries)
+    .leftJoin(
+      movieDetails,
+      eq(movieDetails.summaryId, movieSummaries.id),
+    )
+
+  return rows.map((r) => ({
+    tmdbId: r.tmdbId,
+    mediaType: "movie",
+    title: r.title,
+  }));
+}
