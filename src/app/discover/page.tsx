@@ -1,4 +1,3 @@
-import { isUnique } from "@/lib/utils";
 import {
   getTrendingSeries,
   getTrendingMovies,
@@ -7,103 +6,17 @@ import {
   getUpcomingMovieSummaries,
   DiscoverItem,
 } from "@/app/discover/actions";
-import { MovieResult, PersonResult, TvResult } from "@/types/request-types-snakecase";
 import { Card } from "@/components/card";
 import Link from "next/link";
 import {
-  BASE_POSTER_IMAGE_URL,
   BaseImageUrl,
   DISCOVER_LIMIT,
 } from "@/lib/constants";
-import dynamic from "next/dynamic";
-import { Skeleton } from "@/components/ui/skeleton";
+import ImageCarousel from "@/components/image-carousel";
 
 export const revalidate = 43200; // 12 hours
 
-const MIN_TRENDING_POPULARITY = 50;
-const VOTE_AVERAGE_GTE = 6;
-const NUMBER_OF_PAGES = 10;
-const TRENDING_YEARS_OLD = 3;
-const MIN_DATE = new Date().setFullYear(
-  new Date().getFullYear() - TRENDING_YEARS_OLD,
-);
-
-const ImageCarouselClient = dynamic(
-  () => import("@/components/image-carousel"),
-  {
-    ssr: true,
-    loading: () => <Skeleton className="w-full h-[336px] rounded-xl" />,
-  },
-);
-
-async function makeCarouselCards(data: Array<TvResult | MovieResult>) {
-
-  return data.map(
-    (item: MovieResult | TvResult | PersonResult, index: number) => {
-      let card: React.ReactNode;
-      switch (item.media_type) {
-        case "tv":
-          card = (
-            <Card
-              title={item.name}
-              overview={item.overview}
-              imagePath={`${BaseImageUrl.POSTER}${item.poster_path}`}
-              // blurDataURL={(item as any).blurDataURL}
-              loading="lazy"
-            />
-          );
-          break;
-        case "movie":
-          card = (
-            <Card
-              title={item.title}
-              overview={item.overview}
-              imagePath={`${BaseImageUrl.POSTER}${item.poster_path}`}
-              // blurDataURL={(item as any).blurDataURL}
-              loading="lazy"
-            />
-          );
-          break;
-        case "person":
-          card = (
-            <Card
-              title={item.name}
-              overview=""
-              imagePath={`${BaseImageUrl.CAST}${item.profile_path}`}
-              loading="lazy"
-            />
-          );
-          break;
-      }
-      return (
-        <Link href={`/${item.media_type}/${item.id}`} key={index}>
-          {card}
-        </Link>
-      );
-    },
-  );
-}
-
 export default async function Discover() {
-  // const [
-  //   trendingTvRes,
-  //   trendingMovieRes,
-  //   popularTvRes,
-  //   popularMoviesRes,
-  //   upcomingMoviesRes,
-  // ] = await Promise.all([
-  //   getTrendingPages(
-  //     { media_type: "tv", time_window: "day", page: 1 },
-  //     NUMBER_OF_PAGES,
-  //   ),
-  //   getTrendingPages(
-  //     { media_type: "movie", time_window: "day", page: 1 },
-  //     NUMBER_OF_PAGES,
-  //   ),
-  //   getPopular({ page: 1, "vote_average.gte": VOTE_AVERAGE_GTE }, "tv"),
-  //   getPopular({ page: 1, "vote_average.gte": VOTE_AVERAGE_GTE }, "movie"),
-  //   getUpcomingMovies({ page: 1 }),
-  // ]);
   const [
     trendingTvItems,
     trendingMovieItems,
@@ -134,23 +47,23 @@ export default async function Discover() {
   return (
     <main className="w-screen max-w-[1920px] mx-auto">
       <div className="px-0 lg:px-10 space-y-3 py-6 overflow-hidden">
-        <ImageCarouselClient
+        <ImageCarousel
           items={mkCards(trendingTvItems, "tv")}
           title="Trending Series"
         />
-        <ImageCarouselClient
+        <ImageCarousel
           items={mkCards(trendingMovieItems, "movie")}
           title="Trending Movies"
         />
-        <ImageCarouselClient
+        <ImageCarousel
           items={mkCards(upcomingMovieItems, "movie")}
           title="Upcoming Movies"
         />
-        <ImageCarouselClient
+        <ImageCarousel
           items={mkCards(popularTvItems, "tv")}
           title="Popular Series"
         />
-        <ImageCarouselClient
+        <ImageCarousel
           items={mkCards(popularMovieItems, "movie")}
           title="Popular Movies"
         />
