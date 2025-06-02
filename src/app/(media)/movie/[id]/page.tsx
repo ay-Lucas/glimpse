@@ -13,7 +13,7 @@ import {
 import { RecommededSection } from "@/app/(media)/_components/recommendedSection";
 import ReviewSection from "@/app/(media)/_components/ReviewSection";
 import { fetchDiscoverTvIds, getFullMovie, getMovieDetails } from "../../actions";
-import { getTrailer } from "@/lib/utils";
+import { countryCodeToEnglishName, getTrailer, languageCodeToEnglishName } from "@/lib/utils";
 import JustWatchLogo from "@/assets/justwatch-logo.svg";
 import CastCard from "@/components/cast-card";
 import { MovieDetails } from "../../_components/movie-details";
@@ -193,10 +193,12 @@ export default async function MoviePage({
                           <span>${movie.budget?.toLocaleString()}</span>
                         </li>
                       )}
-                      <li className="grid grid-cols-2 border-b">
-                        <div>Vote Average</div>
-                        <span>{movie?.voteAverage?.toFixed(1)}</span>
-                      </li>
+                      {movie.voteAverage &&
+                        <li className="grid grid-cols-2 border-b">
+                          <div>Vote Average</div>
+                          <span>{movie.voteAverage.toFixed(1)}</span>
+                        </li>
+                      }
                       <li className="grid grid-cols-2 border-b">
                         <div>Vote Count</div>
                         <span>{movie?.voteCount}</span>
@@ -207,11 +209,11 @@ export default async function MoviePage({
                       </li>
                       <li className="grid grid-cols-2 border-b">
                         <div>Language</div>
-                        <div>{movie.spokenLanguages?.at(0)?.name}</div>
+                        <div>{languageCodeToEnglishName(movie.originalLanguage!)}</div>
                       </li>
                       <li className="grid grid-cols-2">
                         <div>Origin Country</div>
-                        <span>{movie.originCountry?.join(", ")}</span>
+                        <span>{movie.originCountry?.map(code => countryCodeToEnglishName(code))?.join(", ")}</span>
                       </li>
                       <span className="mr-32"></span>
                     </ul>

@@ -19,6 +19,7 @@ import { TvDetails } from "../../_components/tv-details";
 import { ScoreCircle } from "../../_components/score-circle";
 import MediaActions from "../../_components/media-actions";
 import { ChevronRight } from "lucide-react";
+import { countryCodeToEnglishName, languageCodeToEnglishName } from "@/lib/utils";
 
 const VideoPlayerClient = dynamic(
   () => import("@/app/(media)/_components/video-player"),
@@ -180,10 +181,12 @@ export default async function TvPage({ params }: { params: { id: number } }) {
                           ))}
                         </div>
                       </li>
-                      <li className="grid grid-cols-2 border-b">
-                        <div>Vote Average</div>
-                        <span>{tv.voteAverage!.toFixed(1)}</span>
-                      </li>
+                      {tv.voteAverage &&
+                        <li className="grid grid-cols-2 border-b">
+                          <div>Vote Average</div>
+                          <span>{tv.voteAverage.toFixed(1)}</span>
+                        </li>
+                      }
                       <li className="grid grid-cols-2 border-b">
                         <div>Vote Count</div>
                         <span>{tv.voteCount}</span>
@@ -194,11 +197,11 @@ export default async function TvPage({ params }: { params: { id: number } }) {
                       </li>
                       <li className="grid grid-cols-2 border-b">
                         <div>Language</div>
-                        <div>{tv.spokenLanguages?.at(0)?.name}</div>
+                        <div>{languageCodeToEnglishName(tv.originalLanguage!)}</div>
                       </li>
                       <li className="grid grid-cols-2">
                         <div>Origin Country</div>
-                        <span>{tv.originCountry}</span>
+                        <span>{tv.originCountry?.map(code => countryCodeToEnglishName(code))?.join(", ")}</span>
                       </li>
                     </ul>
                   </div>
