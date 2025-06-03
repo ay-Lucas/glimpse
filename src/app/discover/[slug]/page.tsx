@@ -16,6 +16,7 @@ import { MovieResult, TvResult, UpcomingMoviesResponse } from "@/types/request-t
 import { getBlurData } from "@/lib/blur-data-generator";
 import CarouselToggle from "@/app/(media)/_components/carousel-toggle";
 import { unstable_cache } from "next/cache";
+import { DiscoverSearch } from "./_components/discover-search";
 
 export const revalidate = 43200; // 12 hours
 
@@ -114,6 +115,7 @@ export default async function DiscoverPage({ params }: { params: { slug: string 
   return (
     <main className="w-screen max-w-[1920px] mx-auto">
       <div className="px-0 lg:px-10 space-y-3 py-6 overflow-hidden">
+        <div className="flex flex-col w-full pb-8 mx-auto space-y-3 px-1"><h1 className="text-3xl text-center font-semibold">Discover Movies &amp; TV Shows</h1><DiscoverSearch /></div>
         <CarouselToggle options={[{ items: trendingTvDailyCards, label: "Daily" }, { items: trendingTvWeeklyCards, label: "Weekly" }]} title="Trending Series" />
         <CarouselToggle options={[{ items: trendingMoviesDailyCards, label: "Daily" }, { items: trendingMoviesWeeklyCards, label: "Weekly" }]} title="Trending Movies" />
         <ImageCarousel
