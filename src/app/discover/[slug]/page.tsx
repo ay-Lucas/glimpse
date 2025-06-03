@@ -28,28 +28,30 @@ export function generateStaticParams() {
   return [{ slug: "main" }]
 }
 
+const NUM_PAGES = 2;
+
 export default async function DiscoverPage({ params }: { params: { slug: string } }) {
 
   const [trendingMoviesDailyRes, trendingMoviesWeeklyRes, trendingTvDailyRes, trendingTvWeeklyRes, popularMoviesRes, popularTvRes, upcomingMoviesRes] =
     await Promise.all([
       getTrendingPages(
         { media_type: "movie", time_window: "day", page: 1 },
-        3, true
+        NUM_PAGES, true
       ) as Promise<MovieResult[]>,
       getTrendingPages(
         { media_type: "movie", time_window: "week", page: 1 },
-        3, true
+        NUM_PAGES, true
       ) as Promise<MovieResult[]>,
       getTrendingPages(
         { media_type: "tv", time_window: "day", page: 1 },
-        3, true
+        NUM_PAGES, true
       ) as Promise<TvResult[]>,
       getTrendingPages(
         { media_type: "tv", time_window: "week", page: 1 },
-        3, true
+        NUM_PAGES, true
       ) as Promise<TvResult[]>,
-      getPopularPages({ "vote_average.gte": 6 }, "movie", 2, true) as Promise<MovieResult[]>,
-      getPopularPages({ "vote_average.gte": 6 }, "tv", 2, true) as Promise<TvResult[]>,
+      getPopularPages({ "vote_average.gte": 6 }, "movie", NUM_PAGES, true) as Promise<MovieResult[]>,
+      getPopularPages({ "vote_average.gte": 6 }, "tv", NUM_PAGES, true) as Promise<TvResult[]>,
       getUpcomingMovies({ page: 1 }, true) as Promise<UpcomingMoviesResponse>,
     ]);
 
