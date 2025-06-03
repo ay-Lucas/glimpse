@@ -1,10 +1,7 @@
 "use client";
 
 import { ReactNode, useState } from "react";
-import type { DiscoverItem } from "@/app/discover/actions";
 import ImageCarousel from "@/components/image-carousel";
-import { Card } from "@/components/card";
-import { BASE_POSTER_IMAGE_URL } from "@/lib/constants";
 
 interface CarouselToggleProps {
   weeklyItems: ReactNode[];

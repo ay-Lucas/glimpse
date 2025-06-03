@@ -3,19 +3,19 @@ import { getBackgrounds } from "./(auth)/_components/backdrops";
 import { getBlurData } from "@/lib/blur-data-generator";
 import { Button } from "@/components/ui/button";
 import { Suspense } from "react";
-import dynamic from "next/dynamic";
-import { Skeleton } from "@/components/ui/skeleton";
+// import dynamic from "next/dynamic";
+import Background from "./(auth)/_components/background";
 
 export const revalidate = 43200; // 12 hours
 
-const BackgroundClient = dynamic(
-  () => import("./(auth)/_components/background"),
-  {
-    ssr: false,
-    loading: () => <Skeleton className="w-full h-full" />,
-  },
-);
-
+// const BackgroundClient = dynamic(
+//   () => import("./(auth)/_components/background"),
+//   {
+//     ssr: false,
+//     loading: () => <Skeleton className="w-full h-full" />,
+//   },
+// );
+//
 export default async function HomePage() {
   const backdrops = await getBackgrounds();
   const firstBackdrop = backdrops.at(0);
@@ -25,7 +25,7 @@ export default async function HomePage() {
       <div className="-z-40 absolute flex left-0 top-0 h-full w-full items-center">
         <Suspense>
           {backdrops && firstBackdrop && (
-            <BackgroundClient
+            <Background
               images={backdrops}
               firstBackdropBlurData={await getBlurData(firstBackdrop)}
             />

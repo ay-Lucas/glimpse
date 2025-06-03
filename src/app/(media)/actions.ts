@@ -39,9 +39,8 @@ import {
 } from "@/types/request-types-camelcase";
 import camelcaseKeys from "camelcase-keys";
 import { eq } from "drizzle-orm";
-import { cache } from "react";
 import { unstable_cache } from "next/cache";
-import { DiscoverItem, getPopularMovies, getPopularSeries, getTrendingMovies, getTrendingSeries, getUpcomingMovieSummaries } from "../discover/actions";
+import { DiscoverItem, getPopularMovies, getPopularSeries, getTrendingMovies, getTrendingSeries, getUpcomingMovieSummaries } from "@/app/discover/[slug]/actions";
 
 export async function getPersonDetails(
   id: number,

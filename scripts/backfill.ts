@@ -7,27 +7,27 @@ import { dirname, join } from "path";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-import { BaseImageUrl } from "../src/lib/constants.ts";
-import { getBlurData } from "../src/lib/blur-data-generator.ts";
+import { BaseImageUrl } from "@/lib/constants.ts";
+import { getBlurData } from "@/lib/blur-data-generator.ts";
 import {
   MovieResult,
   TvResult,
-} from "../src/types/request-types-snakecase.ts";
-import { db } from "../src/db/index.ts";
+} from "@/types/request-types-snakecase.ts";
+import { db } from "@/db/index.ts";
 import {
   listEntries,
   movieDetails,
   movieSummaries,
   tvDetails,
   tvSummaries,
-} from "../src/db/schema.ts";
+} from "@/db/schema.ts";
 import {
   getTrendingPages,
   getPopular,
   getUpcomingMovies,
   getAllTv,
   getAllMovies,
-} from "../src/app/discover/actions.ts";
+} from "@/app/discover/[slug]/actions.ts";
 import { eq, inArray, not } from "drizzle-orm";
 import { getMovieDetails, getTvDetails } from "@/app/(media)/actions.ts";
 import { Vibrant } from "node-vibrant/node";

@@ -4,7 +4,7 @@ import {
   getTrendingPages,
   getUpcomingMovies,
   getPopularPages,
-} from "@/app/discover/actions";
+} from "@/app/discover/[slug]/actions";
 import { Card } from "@/components/card";
 import Link from "next/link";
 import {
@@ -14,25 +14,21 @@ import {
 import ImageCarousel from "@/components/image-carousel";
 import { MovieResult, TvResult, UpcomingMoviesResponse } from "@/types/request-types-camelcase";
 import { getBlurData } from "@/lib/blur-data-generator";
-import CarouselToggle from "../(media)/_components/carousel-toggle";
+import CarouselToggle from "@/app/(media)/_components/carousel-toggle";
 import { unstable_cache } from "next/cache";
 
 export const revalidate = 43200; // 12 hours
 
-export default async function Discover() {
-  // const [
-  //   trendingTvItems,
-  //   trendingMovieItems,
-  //   upcomingMovieItems,
-  //   popularTvItems,
-  //   popularMovieItems,
-  // ] = await Promise.all([
-  //   getTrendingSeries(DISCOVER_LIMIT),
-  //   getTrendingMovies(DISCOVER_LIMIT),
-  //   getUpcomingMovieSummaries(DISCOVER_LIMIT),
-  //   getPopularSeries(DISCOVER_LIMIT),
-  //   getPopularMovies(DISCOVER_LIMIT),
-  // ]);
+export const metadata = {
+  title: "Glimpse",
+  description: "Discover new Movies & TV Shows",
+};
+
+export function generateStaticParams() {
+  return [{ slug: "main" }]
+}
+
+export default async function DiscoverPage({ params }: { params: { slug: string } }) {
 
   const [trendingMoviesDailyRes, trendingMoviesWeeklyRes, trendingTvDailyRes, trendingTvWeeklyRes, popularMoviesRes, popularTvRes, upcomingMoviesRes] =
     await Promise.all([

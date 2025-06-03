@@ -1,3 +1,4 @@
+"server only";
 import { headers } from "next/headers";
 import { BASE_API_URL, options } from "@/lib/constants";
 import {

@@ -35,7 +35,7 @@ export const options: RequestInit = {
     Authorization: `Bearer ${process.env.TMDB_ACCESS_TOKEN}`,
   },
   // cache: "force-cache",
-  next: { revalidate: 360 },
+  next: { revalidate: 43200 },
 };
 
 export const DISCOVER_LIMIT = 20 as const;
