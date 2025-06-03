@@ -1,8 +1,8 @@
 name: Revalidate ISR Pages
 
 on:
+  workflow_dispatch:
   schedule:
-    # Runs daily at 02:00 UTC and 14:00 UTC.
     - cron: "0 2,14 * * *"
 
 jobs:
