@@ -4,6 +4,7 @@ import {
   getTrendingPages,
   getUpcomingMovies,
   getPopularPages,
+  fetchTmdbLists,
 } from "@/app/discover/[slug]/actions";
 import { Card } from "@/components/card";
 import Link from "next/link";
@@ -30,73 +31,8 @@ export function generateStaticParams() {
   return [{ slug: "main" }]
 }
 
-const NUM_PAGES = 2;
 
 
-export async function fetchTmdbLists(
-  reqOptions: RequestInit = options,
-) {
-  function isAnime(item: TvResult) {
-    return item.originalLanguage?.toUpperCase() === "JA" && item.originCountry?.some(country => country.toUpperCase() === "JP")
-  }
-
-  const [trendingMoviesDailyRes, trendingMoviesWeeklyRes, trendingTvDailyRes, trendingTvWeeklyRes, popularMoviesRes, popularTvRes, upcomingMoviesRes] =
-    await Promise.all([
-      getTrendingPages(
-        { media_type: "movie", time_window: "day", page: 1 },
-        NUM_PAGES, true, reqOptions
-      ) as Promise<MovieResult[]>,
-      getTrendingPages(
-        { media_type: "movie", time_window: "week", page: 1 },
-        NUM_PAGES, true, reqOptions
-      ) as Promise<MovieResult[]>,
-      getTrendingPages(
-        { media_type: "tv", time_window: "day", page: 1 },
-        NUM_PAGES, true, reqOptions
-      ) as Promise<TvResult[]>,
-      getTrendingPages(
-        { media_type: "tv", time_window: "week", page: 1 },
-        NUM_PAGES, true, reqOptions
-      ) as Promise<TvResult[]>,
-      getPopularPages({ "vote_average.gte": 6 }, "movie", NUM_PAGES, true, reqOptions) as Promise<MovieResult[]>,
-      getPopularPages({ "vote_average.gte": 6 }, "tv", NUM_PAGES, true, reqOptions) as Promise<TvResult[]>,
-      getUpcomingMovies({ page: 1 }, true, reqOptions) as Promise<UpcomingMoviesResponse>,
-    ]);
-
-  const trendingTvWeekly = trendingTvWeeklyRes.filter(
-    (item) =>
-      (isAnime(item) || item.originalLanguage?.toUpperCase() === "EN") &&
-      new Date(item.firstAirDate ?? Date.now()).valueOf() < new Date().valueOf(),
-  );
-  const trendingTvDaily = trendingTvDailyRes.filter(
-    (item) =>
-      (isAnime(item) || item.originalLanguage?.toUpperCase() === "EN") &&
-      new Date(item.firstAirDate ?? Date.now()).valueOf() < new Date().valueOf(),
-  );
-
-  const trendingMoviesWeekly = trendingMoviesWeeklyRes.filter(
-    (item) =>
-      item.originalLanguage?.toUpperCase() === "EN" &&
-      new Date(item.releaseDate ?? Date.now()).valueOf() < new Date().valueOf(),
-  );
-  const trendingMoviesDaily = trendingMoviesDailyRes.filter(
-    (item) =>
-      item.originalLanguage?.toUpperCase() === "EN" &&
-      new Date(item.releaseDate ?? Date.now()).valueOf() < new Date().valueOf(),
-  );
-
-  const upcomingMovies = upcomingMoviesRes.results?.filter(item => item.originalLanguage?.toUpperCase() === "EN") ?? []
-
-  const trendingTvIds = new Set([...trendingTvDaily.map(item => item.id), ...trendingTvWeekly.map(item => item.id)])
-  const popularTv = popularTvRes?.filter(item => !trendingTvIds.has(item.id)) ?? []
-
-  const trendingMovieIds = new Set([
-    ...trendingMoviesDaily.map(item => item.id), ...trendingMoviesWeekly.map(item => item.id)
-  ])
-  const popularMovies = popularMoviesRes?.filter(item => !trendingMovieIds.has(item.id)) ?? []
-
-  return { trendingMoviesDaily, trendingMoviesWeekly, trendingTvDaily, trendingTvWeekly, popularMovies, popularTv, upcomingMovies }
-}
 
 export default async function DiscoverPage({ params }: { params: { slug: string } }) {
   const { trendingMoviesDaily, trendingMoviesWeekly, trendingTvDaily, trendingTvWeekly, popularMovies, popularTv, upcomingMovies } = await fetchTmdbLists();

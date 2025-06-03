@@ -890,7 +890,7 @@ export interface UpcomingMoviesRequest extends MovieNowPlayingRequest {
   region?: string;
 }
 
-export interface UpcomingMoviesResponse extends MovieNowPlayingResponse {
+export interface UpcomingMoviesResponseSnake extends MovieNowPlayingResponse {
   results?: Array<MovieResult>;
   dates?: {
     maximum?: string;

@@ -1,9 +1,9 @@
+import { fetchTmdbLists } from "@/app/discover/[slug]/actions";
 import { getBaseUrl } from "@/lib/utils";
 import { MovieResult, TvResult } from "@/types/request-types-camelcase";
 
 import dotenv from "dotenv";
 import { join } from "path";
-import { fetchTmdbLists } from "@/app/discover/[slug]/page";
 
 dotenv.config({ path: join(__dirname, "../.env.local") });
 
