@@ -1,0 +1,38 @@
+# .github/workflows/revalidate.yml
+
+name: Revalidate ISR Pages
+
+# Only run on schedule (no push/pull request trigger needed)
+on:
+  schedule:
+    # Runs daily at 02:00 UTC and 14:00 UTC.
+    # Adjust “0 2,14 * * *” to your desired cron (UTC).
+    - cron: "0 2,14 * * *"
+
+jobs:
+  revalidate:
+    # Run this job on the latest Ubuntu runner
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: “Hit /api/revalidate endpoint”
+        # No need to check out your repo if you’re only calling an external URL,
+        # but you can include this if you want to see logs in context:
+        uses: actions/checkout@v4
+
+      - name: “Call revalidate API”
+        env:
+          REVALIDATE_SECRET: ${{ secrets.REVALIDATE_SECRET }}
+          SITE_URL: ${{ secrets.SITE_URL }}
+        run: |
+          # List the pages you want to revalidate. For example:
+          PATHS='["/discover","/tv/100","/movie/200"]'
+
+          echo "Revalidating pages at $(date -u)"
+          curl -X POST "$SITE_URL/api/revalidate" \
+            -H "Content-Type: application/json" \
+            -d '{"secret":"'"$REVALIDATE_SECRET"'","paths":'"$PATHS"'}' \
+            -o revalidate-response.json
+
+          # Optional: print the JSON response to the Actions log
+          cat revalidate-response.json

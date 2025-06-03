@@ -31,7 +31,7 @@ import {
 import { eq, inArray, not } from "drizzle-orm";
 import { getMovieDetails, getTvDetails } from "@/app/(media)/actions.ts";
 import { Vibrant } from "node-vibrant/node";
-import { uniqueBy } from "@/lib/utils.tsx";
+import { getBaseUrl, uniqueBy } from "@/lib/utils.tsx";
 
 dotenv.config({ path: join(__dirname, "../.env.local") });
 
@@ -536,11 +536,3 @@ function pause(ms: number) {
 }
 
 
-function getBaseUrl() {
-  if (process.env.NODE_ENV === 'development') {
-    return 'http://localhost:3000';
-  }
-  return process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : 'http://localhost:3000';
-}
