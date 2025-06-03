@@ -10,6 +10,7 @@ import Link from "next/link";
 import {
   BaseImageUrl,
   DEFAULT_BLUR_DATA_URL,
+  options,
 } from "@/lib/constants";
 import ImageCarousel from "@/components/image-carousel";
 import { MovieResult, TvResult, UpcomingMoviesResponse } from "@/types/request-types-camelcase";
@@ -31,34 +32,36 @@ export function generateStaticParams() {
 
 const NUM_PAGES = 2;
 
-export default async function DiscoverPage({ params }: { params: { slug: string } }) {
+
+export async function fetchTmdbLists(
+  reqOptions: RequestInit = options,
+) {
+  function isAnime(item: TvResult) {
+    return item.originalLanguage?.toUpperCase() === "JA" && item.originCountry?.some(country => country.toUpperCase() === "JP")
+  }
 
   const [trendingMoviesDailyRes, trendingMoviesWeeklyRes, trendingTvDailyRes, trendingTvWeeklyRes, popularMoviesRes, popularTvRes, upcomingMoviesRes] =
     await Promise.all([
       getTrendingPages(
         { media_type: "movie", time_window: "day", page: 1 },
-        NUM_PAGES, true
+        NUM_PAGES, true, reqOptions
       ) as Promise<MovieResult[]>,
       getTrendingPages(
         { media_type: "movie", time_window: "week", page: 1 },
-        NUM_PAGES, true
+        NUM_PAGES, true, reqOptions
       ) as Promise<MovieResult[]>,
       getTrendingPages(
         { media_type: "tv", time_window: "day", page: 1 },
-        NUM_PAGES, true
+        NUM_PAGES, true, reqOptions
       ) as Promise<TvResult[]>,
       getTrendingPages(
         { media_type: "tv", time_window: "week", page: 1 },
-        NUM_PAGES, true
+        NUM_PAGES, true, reqOptions
       ) as Promise<TvResult[]>,
-      getPopularPages({ "vote_average.gte": 6 }, "movie", NUM_PAGES, true) as Promise<MovieResult[]>,
-      getPopularPages({ "vote_average.gte": 6 }, "tv", NUM_PAGES, true) as Promise<TvResult[]>,
-      getUpcomingMovies({ page: 1 }, true) as Promise<UpcomingMoviesResponse>,
+      getPopularPages({ "vote_average.gte": 6 }, "movie", NUM_PAGES, true, reqOptions) as Promise<MovieResult[]>,
+      getPopularPages({ "vote_average.gte": 6 }, "tv", NUM_PAGES, true, reqOptions) as Promise<TvResult[]>,
+      getUpcomingMovies({ page: 1 }, true, reqOptions) as Promise<UpcomingMoviesResponse>,
     ]);
-
-  function isAnime(item: TvResult) {
-    return item.originalLanguage?.toUpperCase() === "JA" && item.originCountry?.some(country => country.toUpperCase() === "JP")
-  }
 
   const trendingTvWeekly = trendingTvWeeklyRes.filter(
     (item) =>
@@ -92,6 +95,11 @@ export default async function DiscoverPage({ params }: { params: { slug: string 
   ])
   const popularMovies = popularMoviesRes?.filter(item => !trendingMovieIds.has(item.id)) ?? []
 
+  return { trendingMoviesDaily, trendingMoviesWeekly, trendingTvDaily, trendingTvWeekly, popularMovies, popularTv, upcomingMovies }
+}
+
+export default async function DiscoverPage({ params }: { params: { slug: string } }) {
+  const { trendingMoviesDaily, trendingMoviesWeekly, trendingTvDaily, trendingTvWeekly, popularMovies, popularTv, upcomingMovies } = await fetchTmdbLists();
 
   const mkCards = (items: DiscoverItem[], mediaType: "tv" | "movie"): JSX.Element[] =>
     items.map((item) => (
@@ -115,9 +123,9 @@ export default async function DiscoverPage({ params }: { params: { slug: string 
   return (
     <main className="w-screen max-w-[1920px] mx-auto">
       <div className="px-0 lg:px-10 space-y-3 py-6 overflow-hidden">
-        <div className="flex flex-col w-full pb-8 mx-auto space-y-3 px-1"><h1 className="text-3xl text-center font-semibold">Discover Movies &amp; TV Shows</h1><DiscoverSearch /></div>
-        <CarouselToggle options={[{ items: trendingTvDailyCards, label: "Daily" }, { items: trendingTvWeeklyCards, label: "Weekly" }]} title="Trending Series" />
-        <CarouselToggle options={[{ items: trendingMoviesDailyCards, label: "Daily" }, { items: trendingMoviesWeeklyCards, label: "Weekly" }]} title="Trending Movies" />
+        <div className="flex flex-col w-full pb-8 mx-auto space-y-3 px-1"><h1 className="text-2xl text-center font-semibold">Discover Movies &amp; TV Shows</h1><DiscoverSearch /></div>
+        <CarouselToggle options={[{ items: trendingTvDailyCards, label: "Today" }, { items: trendingTvWeeklyCards, label: "This Week" }]} title="Trending Series" />
+        <CarouselToggle options={[{ items: trendingMoviesDailyCards, label: "Today" }, { items: trendingMoviesWeeklyCards, label: "This Week" }]} title="Trending Movies" />
         <ImageCarousel
           items={mkCards(await convertToDiscoverItems(upcomingMovies), "movie")}
           titleString="Upcoming Movies"
