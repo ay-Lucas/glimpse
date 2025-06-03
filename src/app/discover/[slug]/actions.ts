@@ -18,7 +18,7 @@ import camelcaseKeys from "camelcase-keys";
 import { MovieResult, TvResult, UpcomingMoviesResponse } from "@/types/request-types-camelcase";
 import { unstable_cache } from "next/cache";
 
-export const getTrending = unstable_cache(async (
+export const getTrending = async (
   request: TrendingRequest,
   reqOptions: RequestInit = options,
 ): Promise<TrendingResponse> => {
@@ -27,9 +27,9 @@ export const getTrending = unstable_cache(async (
     reqOptions,
   );
   return res.json();
-}, [], { revalidate: 43200 })
+}
 
-export const getTrendingPages = unstable_cache(async (
+export const getTrendingPages = async (
   request: TrendingRequest,
   numberOfPages: number,
   camelcase?: boolean,
@@ -55,9 +55,9 @@ export const getTrendingPages = unstable_cache(async (
     return camelcaseKeys(arrays as any, { deep: true }) as MovieResult[] | TvResult[];
   }
   return arrays;
-}, [], { revalidate: 43200 })
+}
 
-export const getPopular = unstable_cache(async (
+export const getPopular = async (
   request: DiscoverMovieRequest | DiscoverTvRequest,
   mediaType: "movie" | "tv",
   camelcase?: boolean,
@@ -73,9 +73,9 @@ export const getPopular = unstable_cache(async (
     return camelcaseKeys(data, { deep: true })
   }
   return data;
-}, [], { revalidate: 43200 })
+}
 
-export const getPopularPages = unstable_cache(async (
+export const getPopularPages = async (
   request: DiscoverMovieRequest | DiscoverTvRequest,
   mediaType: "movie" | "tv",
   numberOfPages: number,
@@ -98,9 +98,9 @@ export const getPopularPages = unstable_cache(async (
     return camelcaseKeys(arrays as any, { deep: true }) as MovieResult[] | TvResult[];
   }
   return arrays;
-}, [], { revalidate: 43200 })
+}
 
-export const getUpcomingMovies = unstable_cache(async (
+export const getUpcomingMovies = async (
   request: UpcomingMoviesRequest,
   camelcase?: boolean,
   reqOptions: RequestInit = options,
@@ -116,7 +116,7 @@ export const getUpcomingMovies = unstable_cache(async (
     return camelcaseKeys(data, { deep: true })
   // exclude: [/^[A-Z]{2}$/]
   return data;
-}, [], { revalidate: 43200 })
+}
 
 // export async function getDeviceType(): Promise<string> {
 //   const headersList = headers();
@@ -458,3 +458,5 @@ export async function fetchTmdbLists(
 
   return { trendingMoviesDaily, trendingMoviesWeekly, trendingTvDaily, trendingTvWeekly, popularMovies, popularTv, upcomingMovies }
 }
+
+export const fetchTmdbListsCached = unstable_cache(fetchTmdbLists)

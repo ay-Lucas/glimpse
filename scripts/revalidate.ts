@@ -1,9 +1,14 @@
 import { fetchTmdbLists } from "@/app/discover/[slug]/actions";
 import { getBaseUrl } from "@/lib/utils";
 import { MovieResult, TvResult } from "@/types/request-types-camelcase";
+import { fileURLToPath } from "url";
+
+// __dirname shim for ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 import dotenv from "dotenv";
-import { join } from "path";
+import { join, dirname } from "path";
 
 dotenv.config({ path: join(__dirname, "../.env.local") });
 
@@ -29,7 +34,7 @@ async function revalidatePaths(movies: MovieResult[], tvShows: TvResult[]) {
     const tvPaths = tvShows.map(item => `/tv/${item.id}`)
     const tvSeasonPaths = tvPaths.map(tvPath => `${tvPath}/seasons`)
     const moviePaths = movies.map(item => `/movie/${item.id}`)
-    const allPaths = [...tvPaths, ...tvSeasonPaths, ...moviePaths, "/discover"];
+    const allPaths = [...tvPaths, ...tvSeasonPaths, ...moviePaths, "/discover/main", "/discover"];
     const baseUrl = getBaseUrl();
     const response = await fetch(`${baseUrl}/api/revalidate`,
       {
@@ -48,3 +53,4 @@ async function revalidatePaths(movies: MovieResult[], tvShows: TvResult[]) {
     console.error("Backfill + revalidate failed: ", error)
   }
 }
+revalidate().then(res => console.log(`Successfully revalidated routes:\n ${res}`)).catch(error => console.error(error))

@@ -1,20 +1,16 @@
 export const runtime = 'nodejs';
 import {
   DiscoverItem,
-  getTrendingPages,
-  getUpcomingMovies,
-  getPopularPages,
-  fetchTmdbLists,
+  fetchTmdbListsCached,
 } from "@/app/discover/[slug]/actions";
 import { Card } from "@/components/card";
 import Link from "next/link";
 import {
   BaseImageUrl,
   DEFAULT_BLUR_DATA_URL,
-  options,
 } from "@/lib/constants";
 import ImageCarousel from "@/components/image-carousel";
-import { MovieResult, TvResult, UpcomingMoviesResponse } from "@/types/request-types-camelcase";
+import { MovieResult, TvResult } from "@/types/request-types-camelcase";
 import { getBlurData } from "@/lib/blur-data-generator";
 import CarouselToggle from "@/app/(media)/_components/carousel-toggle";
 import { unstable_cache } from "next/cache";
@@ -31,11 +27,8 @@ export function generateStaticParams() {
   return [{ slug: "main" }]
 }
 
-
-
-
 export default async function DiscoverPage({ params }: { params: { slug: string } }) {
-  const { trendingMoviesDaily, trendingMoviesWeekly, trendingTvDaily, trendingTvWeekly, popularMovies, popularTv, upcomingMovies } = await fetchTmdbLists();
+  const { trendingMoviesDaily, trendingMoviesWeekly, trendingTvDaily, trendingTvWeekly, popularMovies, popularTv, upcomingMovies } = await fetchTmdbListsCached();
 
   const mkCards = (items: DiscoverItem[], mediaType: "tv" | "movie"): JSX.Element[] =>
     items.map((item) => (
