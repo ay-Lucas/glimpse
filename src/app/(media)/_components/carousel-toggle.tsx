@@ -1,25 +1,21 @@
 "use client";
 
-import { ReactNode, useState } from "react";
+import { useState } from "react";
 import ImageCarousel from "@/components/image-carousel";
 
 interface CarouselToggleProps {
-  weeklyItems: ReactNode[];
-  dailyItems: ReactNode[];
+  options: {
+    items: JSX.Element[]
+    label: string;
+  }[];
   title: string
 }
 
 export default function CarouselToggle({
-  weeklyItems,
-  dailyItems,
+  options,
   title
 }: CarouselToggleProps) {
   const [view, setView] = useState<0 | 1>(0);
-
-  const options = [
-    { label: "Weekly", items: weeklyItems },
-    { label: "Daily", items: dailyItems },
-  ];
 
   return (
     <div className="space-y-4">

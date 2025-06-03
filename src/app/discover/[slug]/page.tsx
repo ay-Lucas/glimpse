@@ -92,7 +92,7 @@ export default async function DiscoverPage({ params }: { params: { slug: string 
   const popularMovies = popularMoviesRes?.filter(item => !trendingMovieIds.has(item.id)) ?? []
 
 
-  const mkCards = (items: DiscoverItem[], mediaType: "tv" | "movie") =>
+  const mkCards = (items: DiscoverItem[], mediaType: "tv" | "movie"): JSX.Element[] =>
     items.map((item) => (
       <Link href={`/${mediaType}/${item.tmdbId}`} key={item.tmdbId}>
         <Card
@@ -105,23 +105,22 @@ export default async function DiscoverPage({ params }: { params: { slug: string 
       </Link>
     ));
 
+  const trendingTvDailyCards = mkCards(await convertToDiscoverItems(trendingTvDaily), "tv");
+  const trendingTvWeeklyCards = mkCards(await convertToDiscoverItems(trendingTvWeekly), "tv");
+  const trendingMoviesDailyCards = mkCards(await convertToDiscoverItems(trendingMoviesDaily), "movie")
+  const trendingMoviesWeeklyCards = mkCards(await convertToDiscoverItems(trendingMoviesWeekly), "movie")
+  const popularMoviesCards = mkCards(await convertToDiscoverItems(popularMovies), "movie");
+  const popularTvCards = mkCards(await convertToDiscoverItems(popularTv), "tv");
   return (
     <main className="w-screen max-w-[1920px] mx-auto">
       <div className="px-0 lg:px-10 space-y-3 py-6 overflow-hidden">
-        <CarouselToggle dailyItems={mkCards(await convertToDiscoverItems(trendingTvDaily), "tv")} weeklyItems={mkCards(await convertToDiscoverItems(trendingTvWeekly), "tv")} title="Trending Series" />
-        <CarouselToggle dailyItems={mkCards(await convertToDiscoverItems(trendingMoviesDaily), "movie")} weeklyItems={mkCards(await convertToDiscoverItems(trendingMoviesWeekly), "movie")} title="Trending Movies" />
+        <CarouselToggle options={[{ items: trendingTvDailyCards, label: "Daily" }, { items: trendingTvWeeklyCards, label: "Weekly" }]} title="Trending Series" />
+        <CarouselToggle options={[{ items: trendingMoviesDailyCards, label: "Daily" }, { items: trendingMoviesWeeklyCards, label: "Weekly" }]} title="Trending Movies" />
         <ImageCarousel
           items={mkCards(await convertToDiscoverItems(upcomingMovies), "movie")}
           titleString="Upcoming Movies"
         />
-        <ImageCarousel
-          items={mkCards(await convertToDiscoverItems(popularTv), "tv")}
-          titleString="Popular Series"
-        />
-        <ImageCarousel
-          items={mkCards(await convertToDiscoverItems(popularMovies), "movie")}
-          titleString="Popular Movies"
-        />
+        <CarouselToggle options={[{ items: popularTvCards, label: "Series" }, { items: popularMoviesCards, label: "Movies" }]} title="Popular" />
       </div>
     </main>
   );
