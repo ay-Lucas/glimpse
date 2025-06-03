@@ -1,25 +1,18 @@
-# .github/workflows/revalidate.yml
-
 name: Revalidate ISR Pages
 
-# Only run on schedule (no push/pull request trigger needed)
 on:
   schedule:
     # Runs daily at 02:00 UTC and 14:00 UTC.
-    # Adjust “0 2,14 * * *” to your desired cron (UTC).
     - cron: "0 2,14 * * *"
 
 jobs:
   revalidate:
-    # Run this job on the latest Ubuntu runner
     runs-on: ubuntu-latest
 
     steps:
-      # 1) Check out the repository
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2) Set up Node.js (adjust the Node version to match your project)
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -28,14 +21,10 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # 4) Run the revalidate.ts script via ts-node
       - name: Run revalidate script
         env:
           TMDB_ACCESS_TOKEN: ${{ secrets.TMDB_ACCESS_TOKEN }}
           REVALIDATE_SECRET:   ${{ secrets.REVALIDATE_SECRET }}
           SITE_URL:            ${{ secrets.SITE_URL }}
-          # If your script reads .env.local via `dotenv.config(...)`, 
-          # you can also write a temporary .env.local here:
-          # For example:
-          # echo "TMDB_ACCESS_TOKEN=$TMDB_ACCESS_TOKEN\nREVALIDATE_SECRET=$REVALIDATE_SECRET\nSITE_URL=$SITE_URL" > .env.local
+
         run: npm run revalidate
