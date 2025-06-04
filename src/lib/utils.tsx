@@ -221,12 +221,14 @@ export function uniqueBy<T extends { id: number }>(arr: T[]): T[] {
   });
 }
 
-
 export function getBaseUrl() {
-  if (process.env.NODE_ENV === 'development') {
-    return 'http://localhost:3000';
+  if (process.env.SITE_URL) {
+    return process.env.SITE_URL;
   }
-  return process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : 'http://localhost:3000';
+
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+
+  return `http://localhost:${process.env.PORT ?? 3000}`;
 }
