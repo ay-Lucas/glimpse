@@ -21,10 +21,25 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Verify required environment variables
+        env:
+          TMDB_ACCESS_TOKEN: ${{ secrets.TMDB_ACCESS_TOKEN }}
+          REVALIDATE_SECRET:   ${{ secrets.REVALIDATE_SECRET }}
+          SITE_URL:            ${{ secrets.SITE_URL }}
+        run: |
+          vars=(TMDB_ACCESS_TOKEN REVALIDATE_SECRET SITE_URL)
+          for v in "${vars[@]}"; do
+            if [ -z "${!v}" ]; then
+              echo "❌ $v is not set"
+              exit 1
+            else
+              echo "✅ $v is set"
+            fi
+          done
+
       - name: Run revalidate script
         env:
           TMDB_ACCESS_TOKEN: ${{ secrets.TMDB_ACCESS_TOKEN }}
           REVALIDATE_SECRET:   ${{ secrets.REVALIDATE_SECRET }}
           SITE_URL:            ${{ secrets.SITE_URL }}
-
         run: npm run revalidate
