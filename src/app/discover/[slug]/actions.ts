@@ -22,11 +22,15 @@ export const getTrending = async (
   request: TrendingRequest,
   reqOptions: RequestInit = options,
 ): Promise<TrendingResponse> => {
+  console.log("options: ", options)
+  console.log(`${BASE_API_URL}/trending/${request.media_type}/${request.time_window}?&page=${request.page}`)
   const res = await fetch(
     `${BASE_API_URL}/trending/${request.media_type}/${request.time_window}?&page=${request.page}`,
     reqOptions,
   );
-  return res.json();
+  const data = res.json();
+  console.log(data)
+  return data;
 }
 
 export const getTrendingPages = async (
