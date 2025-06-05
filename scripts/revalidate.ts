@@ -1,4 +1,4 @@
-import { fetchTmdbLists } from "@/app/discover/[slug]/actions";
+import { fetchTmdbMovieLists, fetchTmdbTvLists } from "@/app/discover/[slug]/actions";
 import { getBaseUrl } from "@/lib/utils";
 import { MovieResult, TvResult } from "@/types/request-types-camelcase";
 import { fileURLToPath } from "url";
@@ -21,7 +21,9 @@ const options = {
 } as const;
 
 export async function revalidate() {
-  const { trendingMoviesDaily, trendingMoviesWeekly, trendingTvDaily, trendingTvWeekly, popularMovies, popularTv, upcomingMovies } = await fetchTmdbLists(options);
+  const { trendingMoviesDaily, trendingMoviesWeekly, popularMovies, upcomingMovies } = await fetchTmdbMovieLists(options);
+  const { trendingTvWeekly, trendingTvDaily, popularTv } = await fetchTmdbTvLists(options);
+
   const tvShows = [...trendingTvWeekly, ...trendingTvDaily, ...popularTv]
   const movies = [...trendingMoviesDaily, ...trendingMoviesWeekly, ...popularMovies, ...upcomingMovies]
   await revalidatePaths(movies, tvShows);

@@ -36,11 +36,13 @@ import {
   AggregateCreditsResponse,
   RatingResponse,
   VideosResponse,
+  MovieResult,
+  TvResult,
 } from "@/types/request-types-camelcase";
 import camelcaseKeys from "camelcase-keys";
 import { eq } from "drizzle-orm";
 import { unstable_cache } from "next/cache";
-import { DiscoverItem, getPopularMovies, getPopularSeries, getTrendingMovies, getTrendingSeries, getUpcomingMovieSummaries } from "@/app/discover/[slug]/actions";
+import { DiscoverItem, fetchTmdbMovieLists, fetchTmdbTvLists, getPopularMovies, getPopularSeries, getTrendingMovies, getTrendingSeries, getUpcomingMovieSummaries } from "@/app/discover/[slug]/actions";
 
 export async function getPersonDetails(
   id: number,
@@ -367,6 +369,38 @@ export const fetchTv = unstable_cache(
 
 export async function fetchDiscoverMovieIds() {
   const [
+    { trendingMoviesDaily, trendingMoviesWeekly, popularMovies, upcomingMovies },
+  ] = await Promise.all([
+    fetchTmdbMovieLists(),
+  ]);
+
+  function getIds(discoverItemArrays: Array<MovieResult[] | TvResult[]>) {
+    const discoverItems = discoverItemArrays.flat(1);
+    return discoverItems.map(item => ({ id: String(item.id) }));
+  }
+
+  return getIds([trendingMoviesDaily, trendingMoviesWeekly, popularMovies, upcomingMovies]);
+  ;
+}
+
+export async function fetchDiscoverTvIds() {
+  const [
+    { trendingTvDaily, trendingTvWeekly, popularTv },
+  ] = await Promise.all([
+    fetchTmdbTvLists(),
+  ]);
+
+  function getIds(discoverItemArrays: Array<MovieResult[] | TvResult[]>) {
+    const discoverItems = discoverItemArrays.flat(1);
+    return discoverItems.map(item => ({ id: String(item.id) }));
+  }
+
+  return getIds([trendingTvDaily, trendingTvWeekly, popularTv]);
+  ;
+}
+
+export async function fetchDbDiscoverMovieIds() {
+  const [
     trendingMovieItems,
     upcomingMovieItems,
     popularMovieItems,
@@ -385,7 +419,7 @@ export async function fetchDiscoverMovieIds() {
   ;
 }
 
-export async function fetchDiscoverTvIds() {
+export async function fetchDbDiscoverTvIds() {
 
   const [
     trendingTvItems,

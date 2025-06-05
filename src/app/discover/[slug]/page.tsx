@@ -1,7 +1,8 @@
 export const runtime = 'nodejs';
 import {
   DiscoverItem,
-  fetchTmdbListsCached,
+  fetchTmdbMovieLists,
+  fetchTmdbTvLists,
 } from "@/app/discover/[slug]/actions";
 import { Card } from "@/components/card";
 import Link from "next/link";
@@ -28,7 +29,8 @@ export function generateStaticParams() {
 }
 
 export default async function DiscoverPage({ params }: { params: { slug: string } }) {
-  const { trendingMoviesDaily, trendingMoviesWeekly, trendingTvDaily, trendingTvWeekly, popularMovies, popularTv, upcomingMovies } = await fetchTmdbListsCached();
+  const { trendingMoviesDaily, trendingMoviesWeekly, popularMovies, upcomingMovies } = await fetchTmdbMovieLists();
+  const { trendingTvDaily, trendingTvWeekly, popularTv } = await fetchTmdbTvLists();
 
   const mkCards = (items: DiscoverItem[], mediaType: "tv" | "movie"): JSX.Element[] =>
     items.map((item) => (
@@ -55,11 +57,11 @@ export default async function DiscoverPage({ params }: { params: { slug: string 
         <div className="flex flex-col w-full pb-8 mx-auto space-y-3 px-1"><h1 className="text-2xl text-center font-semibold">Discover Movies &amp; TV Shows</h1><DiscoverSearch /></div>
         <CarouselToggle options={[{ items: trendingTvDailyCards, label: "Today" }, { items: trendingTvWeeklyCards, label: "This Week" }]} title="Trending Series" />
         <CarouselToggle options={[{ items: trendingMoviesDailyCards, label: "Today" }, { items: trendingMoviesWeeklyCards, label: "This Week" }]} title="Trending Movies" />
+        <CarouselToggle options={[{ items: popularTvCards, label: "Series" }, { items: popularMoviesCards, label: "Movies" }]} title="Popular" />
         <ImageCarousel
           items={mkCards(await convertToDiscoverItems(upcomingMovies), "movie")}
           titleString="Upcoming Movies"
         />
-        <CarouselToggle options={[{ items: popularTvCards, label: "Series" }, { items: popularMoviesCards, label: "Movies" }]} title="Popular" />
       </div>
     </main>
   );
