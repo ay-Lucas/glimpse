@@ -1,12 +1,9 @@
 import { ReactNode, Suspense } from "react";
 import Image from "next/image";
 import { fetchTv } from "@/app/(media)/actions";
-import { BASE_ORIGINAL_IMAGE_URL, BASE_BLUR_IMAGE_URL, DEFAULT_BLUR_DATA_URL } from "@/lib/constants";
+import { BASE_ORIGINAL_IMAGE_URL, BASE_BLUR_IMAGE_URL } from "@/lib/constants";
 import { getBlurData } from "@/lib/blur-data-generator";
-import { TvProvider } from "@/context/tv";
 import PrefetchBannerColor from "../../_components/prefetch-banner-color";
-
-export const revalidate = 43200; // 12 hours
 
 export default async function TvLayout({
   params,

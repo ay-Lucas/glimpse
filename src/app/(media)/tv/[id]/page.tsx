@@ -1,9 +1,7 @@
-import dynamic from "next/dynamic";
 import { fetchDiscoverTvIds, fetchTv } from "@/app/(media)/actions";
 import Link from "next/link";
 import { Video } from "@/types/request-types-snakecase";
 import Image from "next/image";
-import { auth } from "@/auth";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -20,22 +18,8 @@ import { ScoreCircle } from "../../_components/score-circle";
 import MediaActions from "../../_components/media-actions";
 import { ChevronRight } from "lucide-react";
 import { countryCodeToEnglishName, languageCodeToEnglishName } from "@/lib/utils";
-
-const VideoPlayerClient = dynamic(
-  () => import("@/app/(media)/_components/video-player"),
-  {
-    ssr: false,
-    loading: () => <Skeleton className="w-full h-[194px] rounded-xl" />,
-  },
-);
-
-const ImageCarouselClient = dynamic(
-  () => import("@/components/image-carousel"),
-  {
-    ssr: false,
-    loading: () => <Skeleton className="w-full h-[356px] rounded-xl" />,
-  },
-);
+import ImageCarousel from "@/components/image-carousel";
+import VideoPlayer from "../../_components/video-player";
 
 function getTrailer(videoArray: Array<Video>) {
   const trailer: Array<Video> = videoArray.filter(
@@ -59,7 +43,6 @@ export async function generateStaticParams() {
 export default async function TvPage({ params }: { params: { id: number } }) {
   const tmdbId = Number(params.id);
   const tv = await fetchTv(tmdbId);
-  const [session] = await Promise.all([auth()]);
 
   if (!tv) return;
 
@@ -145,7 +128,6 @@ export default async function TvPage({ params }: { params: { id: number } }) {
                         videoPath={videoPath}
                         tmdbId={params.id}
                         rating={rating}
-                        session={session ?? undefined}
                       />
                     </div>
                   </div>
@@ -279,7 +261,7 @@ export default async function TvPage({ params }: { params: { id: number } }) {
                     <div>
                       <h2 className={`text-2xl font-bold -mb-9`}>Cast</h2>
                       <div className="pt-2 pb-4 pl-8 md:pl-3 -ml-8 md:ml-0 md:w-full w-screen">
-                        <ImageCarouselClient
+                        <ImageCarousel
                           items={tv.credits?.cast?.map((item, index: number) => (
                             <Link href={`/person/${item.id}`} key={index}>
                               <CastCard
@@ -320,7 +302,7 @@ export default async function TvPage({ params }: { params: { id: number } }) {
 
           {videoPath && (
             <Suspense>
-              <VideoPlayerClient youtubeId={videoPath} id={params.id} />
+              <VideoPlayer youtubeId={videoPath} id={params.id} />
             </Suspense>
           )}
         </>

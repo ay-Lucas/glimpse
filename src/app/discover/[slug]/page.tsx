@@ -18,6 +18,7 @@ import { unstable_cache } from "next/cache";
 import { DiscoverSearch } from "./_components/discover-search";
 
 export const revalidate = 43200; // 12 hours
+export const dynamic = 'force-static';
 
 export const metadata = {
   title: "Glimpse",
@@ -51,6 +52,7 @@ export default async function DiscoverPage({ params }: { params: { slug: string 
   const trendingMoviesWeeklyCards = mkCards(await convertToDiscoverItems(trendingMoviesWeekly), "movie")
   const popularMoviesCards = mkCards(await convertToDiscoverItems(popularMovies), "movie");
   const popularTvCards = mkCards(await convertToDiscoverItems(popularTv), "tv");
+
   return (
     <main className="w-screen max-w-[1920px] mx-auto">
       <div className="px-0 lg:px-10 space-y-3 py-6 overflow-hidden">

@@ -1,8 +1,6 @@
-import dynamic from "next/dynamic";
 import Link from "next/link";
 import { Cast } from "@/types/request-types-camelcase";
 import Image from "next/image";
-import { auth } from "@/auth";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -19,24 +17,8 @@ import CastCard from "@/components/cast-card";
 import { MovieDetails } from "../../_components/movie-details";
 import MediaActions from "../../_components/media-actions";
 import { ScoreCircle } from "../../_components/score-circle";
-
-export const revalidate = 43200; // 12 hours
-
-const VideoPlayerClient = dynamic(
-  () => import("@/app/(media)/_components/video-player"),
-  {
-    ssr: false,
-    loading: () => <Skeleton className="w-full h-[194px] rounded-xl" />,
-  },
-);
-
-const ImageCarouselClient = dynamic(
-  () => import("@/components/image-carousel"),
-  {
-    ssr: false,
-    loading: () => <Skeleton className="w-full h-[356px] rounded-xl" />,
-  },
-);
+import ImageCarousel from "@/components/image-carousel";
+import VideoPlayer from "../../_components/video-player";
 
 // Generate all Movie pages featured on Discover page at build
 export async function generateStaticParams() {
@@ -52,7 +34,6 @@ export default async function MoviePage({
 
   const movie =
     (await getFullMovie(tmdbId)) ?? (await getMovieDetails(params.id));
-  const session = await auth();
 
   const videoPath = getTrailer(movie?.videos?.results || [])?.key;
   const rating =
@@ -155,7 +136,6 @@ export default async function MoviePage({
                         videoPath={videoPath}
                         tmdbId={params.id}
                         rating={rating}
-                        session={session ?? undefined}
                       />
                     </div>
                   </div>
@@ -275,7 +255,7 @@ export default async function MoviePage({
                       <div>
                         <h2 className={`text-2xl font-bold -mb-9`}>Cast</h2>
                         <div className="pt-2 pb-4 pl-8 md:pl-3 -ml-8 md:ml-0 md:w-full w-screen">
-                          <ImageCarouselClient
+                          <ImageCarousel
                             items={movie.credits.cast.map(
                               (item: Cast, index: number) => (
                                 <Link href={`/person/${item.id}`} key={index}>
@@ -320,7 +300,7 @@ export default async function MoviePage({
           </div>
           {videoPath !== undefined && (
             <Suspense>
-              <VideoPlayerClient youtubeId={videoPath} id={params.id} />
+              <VideoPlayer youtubeId={videoPath} id={params.id} />
             </Suspense>
           )}
         </>
