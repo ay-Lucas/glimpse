@@ -45,6 +45,10 @@ export default function MediaActions({
     })();
   }, [session]);
 
+  if (status === "loading") {
+    return <div>Checking authentication…</div>;
+  }
+
   const isLoggedIn = Boolean(session?.user?.id);
 
   return (
