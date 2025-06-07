@@ -190,12 +190,16 @@ export async function makeCarouselCards(data: Array<TvResult | MovieResult>) {
   );
 }
 export function languageCodeToEnglishName(code: string): string {
-  // 1) Create an Intl.DisplayNames instance scoped to English
-  const displayNames = new Intl.DisplayNames(["en"], { type: "language" });
+  if (!code || typeof code !== "string" || code.length !== 2) {
+    return "Unknown";
+  }
 
-  // 2) .of(code) returns the language name in English
-  //    If the code is invalid, it returns the code itself (e.g. "zz" → "zz")
-  return displayNames.of(code) ?? code;
+  try {
+    const displayNames = new Intl.DisplayNames(["en"], { type: "language" });
+    return displayNames.of(code) ?? code;
+  } catch {
+    return "Unknown";
+  }
 }
 
 /**
@@ -203,11 +207,16 @@ export function languageCodeToEnglishName(code: string): string {
  * return its English short country name (e.g. "United States", "United Kingdom", "France").
  */
 export function countryCodeToEnglishName(code: string): string {
-  // 1) Create a DisplayNames instance for regions, localized to English
-  const displayNames = new Intl.DisplayNames(["en"], { type: "region" });
+  if (!code || typeof code !== "string" || code.length !== 2) {
+    return "Unknown";
+  }
 
-  // 2) .of(code) returns the country name in English. If the code is invalid it returns the code itself.
-  return displayNames.of(code.toUpperCase()) ?? code;
+  try {
+    const displayNames = new Intl.DisplayNames(["en"], { type: "region" });
+    return displayNames.of(code.toUpperCase()) ?? code;
+  } catch {
+    return "Unknown";
+  }
 }
 
 
