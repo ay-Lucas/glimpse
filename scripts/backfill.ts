@@ -29,7 +29,7 @@ import {
   getAllMovies,
 } from "@/app/discover/[slug]/actions.ts";
 import { eq, inArray, not } from "drizzle-orm";
-import { getMovieDetails, getTvDetails } from "@/app/(media)/actions.ts";
+import { fetchMovieDetails, fetchTvDetails } from "@/app/(media)/actions.ts";
 import { Vibrant } from "node-vibrant/node";
 import { getBaseUrl, uniqueBy } from "@/lib/utils.tsx";
 
@@ -211,7 +211,7 @@ async function backfillDetails(movies: MovieResult[], tvShows: TvResult[]) {
     const backdropBlurUrl = m.backdrop_path
       ? await getBlurData(`${BaseImageUrl.BLUR}${m.backdrop_path}`)
       : null;
-    const details = await getMovieDetails(m.id, options);
+    const details = await fetchMovieDetails(m.id, options);
     await db
       .insert(movieDetails)
       .values({
@@ -294,7 +294,7 @@ async function backfillDetails(movies: MovieResult[], tvShows: TvResult[]) {
         palette?.DarkVibrant?.hex ?? palette?.Vibrant?.hex ?? null;
     }
 
-    const details = await getTvDetails(t.id, options);
+    const details = await fetchTvDetails(t.id, options);
 
     await db
       .insert(tvDetails)

@@ -10,7 +10,7 @@ import {
 } from "@/lib/constants";
 import { RecommededSection } from "@/app/(media)/_components/recommendedSection";
 import ReviewSection from "@/app/(media)/_components/ReviewSection";
-import { fetchDiscoverTvIds, getFullMovie, getMovieDetails } from "../../actions";
+import { fetchMovieDetails, fetchDiscoverMovieIds } from "../../actions";
 import { countryCodeToEnglishName, getTrailer, languageCodeToEnglishName } from "@/lib/utils";
 import JustWatchLogo from "@/assets/justwatch-logo.svg";
 import CastCard from "@/components/cast-card";
@@ -20,9 +20,12 @@ import { ScoreCircle } from "../../_components/score-circle";
 import ImageCarousel from "@/components/image-carousel";
 import VideoPlayer from "../../_components/video-player";
 
+export const revalidate = 43200; // 12 hours
+export const dynamic = "force-static"
+
 // Generate all Movie pages featured on Discover page at build
 export async function generateStaticParams() {
-  return await fetchDiscoverTvIds()
+  return await fetchDiscoverMovieIds()
 }
 
 export default async function MoviePage({
@@ -31,9 +34,7 @@ export default async function MoviePage({
   params: { id: number };
 }) {
   const tmdbId = Number(params.id);
-
-  const movie =
-    (await getFullMovie(tmdbId)) ?? (await getMovieDetails(params.id));
+  const movie = await fetchMovieDetails(tmdbId);
 
   const videoPath = getTrailer(movie?.videos?.results || [])?.key;
   const rating =
@@ -44,6 +45,7 @@ export default async function MoviePage({
     (movie?.releaseDate &&
       new Date(movie?.releaseDate!).valueOf() < Date.now()) ||
     false;
+  // console.log(`Movie page rendered! ${movie.title}`)
   // console.log(movie.watchProviders?.results?.US?.flatrate)
   // console.log(movie.watchProviders?.results)
   // TODO: Add all watch providers

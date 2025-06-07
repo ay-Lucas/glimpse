@@ -1,4 +1,4 @@
-import { fetchDiscoverTvIds, fetchTv } from "@/app/(media)/actions";
+import { fetchDiscoverTvIds, fetchTvDetails } from "@/app/(media)/actions";
 import Link from "next/link";
 import { Video } from "@/types/request-types-snakecase";
 import Image from "next/image";
@@ -42,7 +42,7 @@ export async function generateStaticParams() {
 
 export default async function TvPage({ params }: { params: { id: number } }) {
   const tmdbId = Number(params.id);
-  const tv = await fetchTv(tmdbId);
+  const tv = await fetchTvDetails(tmdbId);
 
   if (!tv) return;
 
@@ -58,6 +58,8 @@ export default async function TvPage({ params }: { params: { id: number } }) {
     tv.firstAirDate !== undefined &&
     tv.firstAirDate !== null &&
     new Date(tv.firstAirDate).valueOf() < Date.now();
+
+  // console.log(`Tv page rendered! ${tv.name}`)
 
   return (
     <main>
@@ -231,7 +233,10 @@ export default async function TvPage({ params }: { params: { id: number } }) {
                 {tv.numberOfSeasons && tv.numberOfSeasons > 0 && (
                   <>
                     <div className="pb-5 space-y-2 flex">
-                      <Link href={`/tv/${params.id}/seasons`} className="pb-4 pt-3 flex items-end hover:text-gray-400"><h2 className={`text-2xl font-bold`}>Seasons </h2><ChevronRight size={30} /></Link>
+                      <Link href={`/tv/${params.id}/seasons`} className="pb-4 pt-3 flex items-end hover:text-gray-400">
+                        <h2 className={`text-2xl font-bold`}>Seasons </h2>
+                        <ChevronRight size={30} />
+                      </Link>
                       {/* <Suspense */}
                       {/*   fallback={ */}
                       {/*     <div className="space-y-2"> */}

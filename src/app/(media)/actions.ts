@@ -10,7 +10,6 @@ import { getWatchlistsAndItems } from "@/lib/actions";
 import { BASE_API_URL, DISCOVER_LIMIT, options } from "@/lib/constants";
 import { FullMovie, FullTv } from "@/types/camel-index";
 import {
-  IdAppendToResponseRequest as number,
   MovieContentRatingResponse,
   MovieResponseAppended,
   MovieResultsResponse,
@@ -52,69 +51,78 @@ export async function getPersonDetails(
   return res.json();
 }
 
-export const getTvDetails = unstable_cache(async (
+export const fetchTvDetails = unstable_cache(async (
   id: number,
   resOptions: RequestInit = options,
 ): Promise<FullTv> => {
-  const res = await fetch(
-    `${BASE_API_URL}/tv/${id}?append_to_response=videos,releases,content_ratings,credits,aggregate_credits,episode_groups,watch/providers&language=en-US`,
-    resOptions,
-  );
-  const data = await res.json();
+  try {
+    const res = await fetch(
+      `${BASE_API_URL}/tv/${id}?append_to_response=videos,releases,content_ratings,credits,aggregate_credits,episode_groups,watch/providers&language=en-US`,
+      resOptions,
+    );
+    const data = await res.json();
 
-  // data.watchProviders = watchProviders;
-  let dataFixed = {
-    ...data,
-    watchProviders: data["watch/providers"]
-  };
-  delete dataFixed["watch/providers"];
-  // camelCase everything else
-  const camel = camelcaseKeys<Record<string, unknown>>(dataFixed, {
-    deep: true,
-    exclude: [/^[A-Z]{2}$/]
-  }) as FullTv;
+    // data.watchProviders = watchProviders;
+    let dataFixed = {
+      ...data,
+      watchProviders: data["watch/providers"]
+    };
+    delete dataFixed["watch/providers"];
+    // camelCase everything else
+    const camel = camelcaseKeys<Record<string, unknown>>(dataFixed, {
+      deep: true,
+      exclude: [/^[A-Z]{2}$/]
+    }) as FullTv;
 
-  // fix up dates, etc…
-  if (camel.firstAirDate) camel.firstAirDate = new Date(camel.firstAirDate);
-  camel.tmdbId = camel.id;
-  camel.id = -1;
-  console.log("getTvDetails called")
-  return camel as FullTv;
+    // fix up dates, etc…
+    if (camel.firstAirDate) camel.firstAirDate = new Date(camel.firstAirDate);
+    camel.tmdbId = camel.id;
+    camel.id = -1;
+    return camel as FullTv;
+  } catch (err) {
+    console.error("fetchTvDetails failed for,", id, err)
+    throw err;
+  }
 }, [],
   {
     revalidate: 36000,  // 10 hours
   }
 );
 
-export const getMovieDetails = unstable_cache(async (
+export const fetchMovieDetails = unstable_cache(async (
   id: number,
   resOptions: RequestInit = options,
 ): Promise<FullMovie> => {
-  const res = await fetch(
-    `${BASE_API_URL}/movie/${id}` +
-    `?append_to_response=videos,releases,content_ratings,credits,aggregate_credits,` +
-    `episode_groups,watch/providers&language=en-US`,
-    resOptions,
-  );
-  const data = await res.json();
+  try {
+    const res = await fetch(
+      `${BASE_API_URL}/movie/${id}` +
+      `?append_to_response=videos,releases,content_ratings,credits,aggregate_credits,` +
+      `episode_groups,watch/providers&language=en-US`,
+      resOptions,
+    );
+    const data = await res.json();
 
-  // data.watchProviders = watchProviders;
-  let dataFixed = {
-    ...data,
-    watchProviders: data["watch/providers"]
-  };
+    // data.watchProviders = watchProviders;
+    let dataFixed = {
+      ...data,
+      watchProviders: data["watch/providers"]
+    };
 
-  delete dataFixed["watch/providers"];
+    delete dataFixed["watch/providers"];
 
-  // camelCase everything else
-  const camel = camelcaseKeys<Record<string, unknown>>(dataFixed, {
-    deep: true,
-    exclude: [/^[A-Z]{2}$/]
-  }) as FullMovie;
+    // camelCase everything else
+    const camel = camelcaseKeys<Record<string, unknown>>(dataFixed, {
+      deep: true,
+      exclude: [/^[A-Z]{2}$/]
+    }) as FullMovie;
 
-  // fix up dates, etc…
-  if (camel.releaseDate) camel.releaseDate = new Date(camel.releaseDate);
-  return camel as FullMovie;
+    // fix up dates, etc…
+    if (camel.releaseDate) camel.releaseDate = new Date(camel.releaseDate);
+    return camel as FullMovie;
+  } catch (err) {
+    console.error("fetchMovieDetails failed for,", id, err)
+    throw err;
+  }
 }, [],
   {
     revalidate: 36000,  // 10 hours
@@ -355,18 +363,6 @@ export const getFullTv = unstable_cache(async (tmdbId: number): Promise<FullTv |
   revalidate: 36000 // 10 hours
 })
 
-// Doesn't F-ing work anyways
-// getTvDetails called in parallel by tv/[id]/page.tsx and tv/[id]/layout.tsx AREN'T deduped!
-export const fetchTv = unstable_cache(
-  async (id: number) => {
-    const full = await getFullTv(id);
-    if (full?.id) return full;
-    return await getTvDetails(id);
-  },
-  [],
-  { revalidate: 3600 }
-);
-
 export async function fetchDiscoverMovieIds() {
   const [
     { trendingMoviesDaily, trendingMoviesWeekly, popularMovies, upcomingMovies },
@@ -374,7 +370,7 @@ export async function fetchDiscoverMovieIds() {
     fetchTmdbMovieLists(),
   ]);
 
-  function getIds(discoverItemArrays: Array<MovieResult[] | TvResult[]>) {
+  function getIds(discoverItemArrays: Array<MovieResult[]>) {
     const discoverItems = discoverItemArrays.flat(1);
     return discoverItems.map(item => ({ id: String(item.id) }));
   }
@@ -390,7 +386,7 @@ export async function fetchDiscoverTvIds() {
     fetchTmdbTvLists(),
   ]);
 
-  function getIds(discoverItemArrays: Array<MovieResult[] | TvResult[]>) {
+  function getIds(discoverItemArrays: Array<TvResult[]>) {
     const discoverItems = discoverItemArrays.flat(1);
     return discoverItems.map(item => ({ id: String(item.id) }));
   }

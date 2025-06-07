@@ -1,9 +1,12 @@
 import { ReactNode, Suspense } from "react";
 import Image from "next/image";
-import { fetchTv } from "@/app/(media)/actions";
+import { fetchTvDetails } from "@/app/(media)/actions";
 import { BASE_ORIGINAL_IMAGE_URL, BASE_BLUR_IMAGE_URL } from "@/lib/constants";
 import { getBlurData } from "@/lib/blur-data-generator";
 import PrefetchBannerColor from "../../_components/prefetch-banner-color";
+
+export const revalidate = 43200; // 12 hours
+export const dynamic = "force-static"
 
 export default async function TvLayout({
   params,
@@ -13,9 +16,9 @@ export default async function TvLayout({
   children: ReactNode;
 }) {
   const tmdbId = params.id;
-  const tv = await fetchTv(tmdbId);
+  const tv = await fetchTvDetails(tmdbId);
   const blurDataUrl = tv.backdropBlurDataUrl ?? (await getBlurData(`${BASE_BLUR_IMAGE_URL}${tv.backdropPath}`))
-
+  // console.log(`TV layout rendered ${tv.name}`)
   return (
 
     <div className="relative h-full"

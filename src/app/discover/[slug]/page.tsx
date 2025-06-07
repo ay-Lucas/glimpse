@@ -14,7 +14,6 @@ import ImageCarousel from "@/components/image-carousel";
 import { MovieResult, TvResult } from "@/types/request-types-camelcase";
 import { getBlurData } from "@/lib/blur-data-generator";
 import CarouselToggle from "@/app/(media)/_components/carousel-toggle";
-import { unstable_cache } from "next/cache";
 import { DiscoverSearch } from "./_components/discover-search";
 
 export const revalidate = 43200; // 12 hours
@@ -30,17 +29,19 @@ export function generateStaticParams() {
 }
 
 export default async function DiscoverPage({ params }: { params: { slug: string } }) {
-  const { trendingMoviesDaily, trendingMoviesWeekly, popularMovies, upcomingMovies } = await fetchTmdbMovieLists();
-  const { trendingTvDaily, trendingTvWeekly, popularTv } = await fetchTmdbTvLists();
+
+  const [{ trendingMoviesDaily, trendingMoviesWeekly, popularMovies, upcomingMovies }, { trendingTvDaily, trendingTvWeekly, popularTv }] =
+    await Promise.all([fetchTmdbMovieLists(), fetchTmdbTvLists()])
 
   const mkCards = (items: DiscoverItem[], mediaType: "tv" | "movie"): JSX.Element[] =>
     items.map((item) => (
-      <Link href={`/${mediaType}/${item.tmdbId}`} key={item.tmdbId}>
+      <Link href={`/${mediaType}/${item.tmdbId}`} key={item.tmdbId} prefetch={true}>
         <Card
           title={item.title}
           overview={item.overview}
-          blurDataURL={item.posterBlurDataUrl}
+          // blurDataURL={`${BaseImageUrl.BLUR}${item.posterPath}`}
           imagePath={`${BaseImageUrl.POSTER}${item.posterPath}`}
+          blurDataURL={item.posterBlurDataUrl ?? DEFAULT_BLUR_DATA_URL}
           loading="lazy"
         />
       </Link>
@@ -52,6 +53,8 @@ export default async function DiscoverPage({ params }: { params: { slug: string 
   const trendingMoviesWeeklyCards = mkCards(await convertToDiscoverItems(trendingMoviesWeekly), "movie")
   const popularMoviesCards = mkCards(await convertToDiscoverItems(popularMovies), "movie");
   const popularTvCards = mkCards(await convertToDiscoverItems(popularTv), "tv");
+
+  // console.log("Discover page rendered!")
 
   return (
     <main className="w-screen max-w-[1920px] mx-auto">
@@ -69,7 +72,7 @@ export default async function DiscoverPage({ params }: { params: { slug: string 
   );
 }
 
-const convertToDiscoverItems = unstable_cache(async (
+const convertToDiscoverItems = (async (
   array: MovieResult[] | TvResult[]
 ): Promise<DiscoverItem[]> => {
 
@@ -78,10 +81,9 @@ const convertToDiscoverItems = unstable_cache(async (
     const posterBlurDataUrl = item.posterPath
       ? await getBlurData(`${BaseImageUrl.BLUR}${item.posterPath}`)
       : DEFAULT_BLUR_DATA_URL;
-
     return {
       tmdbId: item.id,
-      title,
+      title: title,
       posterPath: item.posterPath,
       backdropPath: item.backdropPath,
       posterBlurDataUrl,
