@@ -2,13 +2,13 @@ import { ReactNode } from "react";
 import SessionProvider from "@/components/session-provider";
 import { auth } from "@/auth";
 import Background from "./_components/background";
-import { getBackgrounds } from "./_components/backdrops";
+import { getBackdrops } from "./_components/backdrops";
 import { WatchlistProvider } from "@/context/watchlist";
 import { getBlurData } from "@/lib/blur-data-generator";
 
 export default async function Layout({ children }: { children: ReactNode }) {
   const session = await auth();
-  const backdrops = await getBackgrounds();
+  const backdrops = await getBackdrops();
   const firstBackdrop = backdrops.at(0);
 
   return (

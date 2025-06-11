@@ -1,40 +1,15 @@
-import { shuffle } from "@/lib/utils";
-import {
-  BASE_API_URL,
-  BASE_ORIGINAL_IMAGE_URL,
-  options,
-} from "@/lib/constants";
-import {
-  MovieResult,
-  MovieResultsResponse,
-  TrendingResponse,
-  TvResult,
-  TvResultsResponse,
-} from "@/types/request-types-snakecase";
+import { fetchTmdbMovieLists, fetchTmdbTvLists } from "@/app/discover/[slug]/actions";
 
-const trendingTvUrl = `${BASE_API_URL}/trending/tv/day?language=en-US`;
-const trendingMoviesUrl = `${BASE_API_URL}/trending/movie/day?language=en-US`;
-const MIN_POPULARITY = 10;
+export async function getBackdrops() {
+  const { trendingMoviesDaily } = await fetchTmdbMovieLists();
+  const { trendingTvDaily } = await fetchTmdbTvLists();
 
-export async function getBackgrounds() {
-  let [res1, res2]: [TvResultsResponse, MovieResultsResponse] =
-    await Promise.all([
-      fetch(trendingTvUrl, options).then((response) => response.json()),
-      fetch(trendingMoviesUrl, options).then((response) => response.json()),
-    ]);
+  const allPaths = [...trendingMoviesDaily, ...trendingTvDaily]
+    .map(item => item.backdropPath);
 
-  const backdropUrls: string[] = [];
+  const combined: string[] = allPaths.filter(
+    (p): p is string => typeof p === "string" && p.length > 0
+  );
 
-  res1.results?.forEach((item) => {
-    if (item.popularity! > MIN_POPULARITY)
-      backdropUrls.push(`${BASE_ORIGINAL_IMAGE_URL}${item.backdrop_path}`);
-  });
-
-  res2.results?.forEach((item) => {
-    if (item.popularity! > MIN_POPULARITY)
-      backdropUrls.push(`${BASE_ORIGINAL_IMAGE_URL}${item.backdrop_path}`);
-  });
-
-  shuffle(backdropUrls);
-  return backdropUrls;
+  return combined;
 }
