@@ -27,7 +27,7 @@ import {
   getUpcomingMovies,
   getAllTv,
   getAllMovies,
-} from "@/app/discover/[slug]/actions.ts";
+} from "@/app/discover/actions.ts";
 import { eq, inArray, not } from "drizzle-orm";
 import { fetchMovieDetails, fetchTvDetails } from "@/app/(media)/actions.ts";
 import { Vibrant } from "node-vibrant/node";

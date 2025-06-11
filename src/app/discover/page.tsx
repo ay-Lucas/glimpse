@@ -3,7 +3,7 @@ import {
   DiscoverItem,
   fetchTmdbMovieLists,
   fetchTmdbTvLists,
-} from "@/app/discover/[slug]/actions";
+} from "@/app/discover/actions";
 import { Card } from "@/components/card";
 import Link from "next/link";
 import {
@@ -24,11 +24,7 @@ export const metadata = {
   description: "Discover new Movies & TV Shows",
 };
 
-export function generateStaticParams() {
-  return [{ slug: "main" }]
-}
-
-export default async function DiscoverPage({ params }: { params: { slug: string } }) {
+export default async function DiscoverPage() {
 
   const [{ trendingMoviesDaily, trendingMoviesWeekly, popularMovies, upcomingMovies }, { trendingTvDaily, trendingTvWeekly, popularTv }] =
     await Promise.all([fetchTmdbMovieLists(), fetchTmdbTvLists()])

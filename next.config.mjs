@@ -3,14 +3,6 @@ import withPlaiceholder from "@plaiceholder/next";
 import withBundleAnalyzer from "@next/bundle-analyzer";
 
 const nextConfig = {
-  async rewrites() {
-    return [
-      {
-        source: '/discover',
-        destination: '/discover/main',
-      },
-    ]
-  },
   reactStrictMode: true,
   images: {
     dangerouslyAllowSVG: true,

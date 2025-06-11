@@ -41,7 +41,7 @@ import {
 import camelcaseKeys from "camelcase-keys";
 import { eq } from "drizzle-orm";
 import { unstable_cache } from "next/cache";
-import { DiscoverItem, fetchTmdbMovieLists, fetchTmdbTvLists, getPopularMovies, getPopularSeries, getTrendingMovies, getTrendingSeries, getUpcomingMovieSummaries } from "@/app/discover/[slug]/actions";
+import { DiscoverItem, fetchTmdbMovieLists, fetchTmdbTvLists, getPopularMovies, getPopularSeries, getTrendingMovies, getTrendingSeries, getUpcomingMovieSummaries } from "@/app/discover/actions";
 
 export async function getPersonDetails(
   id: number,

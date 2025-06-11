@@ -424,6 +424,8 @@ export async function fetchTmdbMovieLists(
   const trendingMovieIds = new Set([
     ...trendingMoviesDaily.map(item => item.id), ...trendingMoviesWeekly.map(item => item.id)
   ])
+
+  // Dedupe popular from trending
   const popularMovies = popularMoviesRes?.filter(item => !trendingMovieIds.has(item.id)) ?? []
 
   return { trendingMoviesDaily, trendingMoviesWeekly, popularMovies, upcomingMovies }
@@ -464,9 +466,46 @@ export async function fetchTmdbTvLists(
   );
 
   const trendingTvIds = new Set([...trendingTvDaily.map(item => item.id), ...trendingTvWeekly.map(item => item.id)])
+
+  // Dedupe popular from trending
   const popularTv = popularTvRes?.filter(item => !trendingTvIds.has(item.id)) ?? []
 
   return { trendingTvDaily, trendingTvWeekly, popularTv }
+}
+
+export async function fetchAllMovies(reqOptions?: RequestInit) {
+  const lists = await fetchTmdbMovieLists(reqOptions);
+  const combined = [
+    ...lists.trendingMoviesDaily,
+    ...lists.trendingMoviesWeekly,
+    ...lists.popularMovies,
+    ...lists.upcomingMovies,
+  ];
+
+  // Dedupe (weekly and daily trending)
+  const seen = new Set<number>();
+  return combined.filter((m) => {
+    if (seen.has(m.id)) return false;
+    seen.add(m.id);
+    return true;
+  });
+}
+
+export async function fetchAllTv(reqOptions?: RequestInit) {
+  const lists = await fetchTmdbTvLists(reqOptions)
+  const combined = [
+    ...lists.popularTv,
+    ...lists.trendingTvWeekly,
+    ...lists.trendingTvDaily
+  ];
+
+  // Dedupe (weekly and daily trending)
+  const seen = new Set<number>();
+  return combined.filter((m) => {
+    if (seen.has(m.id)) return false;
+    seen.add(m.id);
+    return true;
+  });
 }
 
 // export const fetchTmdbListsCached = unstable_cache(fetchTmdbLists, [], { revalidate: 43200 }) // 12 hours

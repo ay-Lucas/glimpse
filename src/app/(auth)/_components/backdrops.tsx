@@ -1,4 +1,4 @@
-import { fetchTmdbMovieLists, fetchTmdbTvLists } from "@/app/discover/[slug]/actions";
+import { fetchTmdbMovieLists, fetchTmdbTvLists } from "@/app/discover/actions";
 
 export async function getBackdrops() {
   const { trendingMoviesDaily } = await fetchTmdbMovieLists();
