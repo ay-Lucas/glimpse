@@ -10,7 +10,7 @@ import {
 } from "@/lib/constants";
 import { RecommededSection } from "@/app/(media)/_components/recommendedSection";
 import ReviewSection from "@/app/(media)/_components/ReviewSection";
-import { fetchMovieDetails, fetchDiscoverMovieIds } from "../../actions";
+import { fetchMovieDetails, fetchDiscoverMovieIds, getRecommendations } from "../../actions";
 import { countryCodeToEnglishName, getTrailer, languageCodeToEnglishName } from "@/lib/utils";
 import JustWatchLogo from "@/assets/justwatch-logo.svg";
 import CastCard from "@/components/cast-card";
@@ -23,9 +23,27 @@ import VideoPlayer from "../../_components/video-player";
 export const revalidate = 43200; // 12 hours
 export const dynamic = "force-static"
 
-// Generate all Movie pages featured on Discover page at build
+// Generate all Movie pages featured on Discover page (and their recommendations) at build
 export async function generateStaticParams() {
-  return await fetchDiscoverMovieIds()
+  const movieIds = await fetchDiscoverMovieIds();
+
+  const baseParams = movieIds.map((item) => ({ id: String(item.id) }));
+
+  if (process.env.IS_LOCALHOST === "true") {
+    return baseParams;
+  }
+
+  const recResponses = await Promise.all(
+    movieIds.map((item) => getRecommendations(Number(item.id), "movie"))
+  );
+
+  const recIds = recResponses.flatMap((res) =>
+    res?.results?.map((m) => m.id) ?? []
+  );
+
+  const uniqueIds = Array.from(new Set([...movieIds, ...recIds]));
+
+  return uniqueIds.map((id) => ({ id: id.toString() }));
 }
 
 export default async function MoviePage({

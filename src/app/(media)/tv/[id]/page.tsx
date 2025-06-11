@@ -1,6 +1,6 @@
-import { fetchDiscoverTvIds, fetchTvDetails } from "@/app/(media)/actions";
+import { fetchDiscoverTvIds, fetchTvDetails, getRecommendations } from "@/app/(media)/actions";
 import Link from "next/link";
-import { Video } from "@/types/request-types-snakecase";
+import { ShowResponseAppended, TvResultsResponse, Video } from "@/types/request-types-snakecase";
 import Image from "next/image";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -35,9 +35,27 @@ function getTrailer(videoArray: Array<Video>) {
   }
 }
 
-// Generate all TV pages featured on Discover page at build
+// Generate all TV pages featured on Discover page (and their recommendations) at build
 export async function generateStaticParams() {
-  return await fetchDiscoverTvIds();
+  const tvIds = await fetchDiscoverTvIds();
+
+  const baseParams = tvIds.map((item) => ({ id: item.id }));
+
+  if (process.env.IS_LOCALHOST === "true") {
+    return baseParams;
+  }
+
+  const recResponses = await Promise.all(
+    tvIds.map((item) => getRecommendations(Number(item.id), "tv"))
+  );
+
+  const recIds = recResponses.flatMap((res) =>
+    res?.results?.map((m) => m.id) ?? []
+  );
+
+  const uniqueIds = Array.from(new Set([...tvIds, ...recIds]));
+
+  return uniqueIds.map((id) => ({ id: id.toString() }));
 }
 
 export default async function TvPage({ params }: { params: { id: number } }) {
