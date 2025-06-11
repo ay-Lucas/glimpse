@@ -49,10 +49,41 @@ async function revalidatePaths(movies: MovieResult[], tvShows: TvResult[]) {
       }
     );
 
-    const json = await response.json();
-    console.log("Revalidate response: ", json);
+    const json: { revalidated: string[] } | undefined = await response.json();
+    if (!json) throw new Error("revalidatePaths failed, 0 paths revalidated")
+
+    let tvPathsNum = 0, tvSeasonPathsNum = 0, moviePathsNum = 0;
+    let unmatchedPaths: string[] = [];
+
+    json?.revalidated.forEach(path => {
+      if (isTvPath(path) && !isTvSeasonPath(path))
+        tvPathsNum++;
+      else if (isTvSeasonPath(path))
+        tvSeasonPathsNum++;
+      else if (isMoviePath(path))
+        moviePathsNum++;
+      else
+        unmatchedPaths.push(path)
+    })
+
+    console.log("Revalidate response:\n" + JSON.stringify(json, null, 2));
+    console.log(`Revalidated: \n${tvPathsNum} TV Paths\n${tvSeasonPathsNum} TV Season Paths\n${moviePathsNum} Movie Paths\n${unmatchedPaths.length} Unmatched Paths`)
+    console.log(`\nRevalidated ${unmatchedPaths.length} Unmatched Paths: \n` + JSON.stringify(unmatchedPaths, null, 2));
   } catch (error) {
     console.error("Backfill + revalidate failed: ", error)
   }
 }
-revalidate().then(res => console.log(`Successfully revalidated routes:\n ${res}`)).catch(error => console.error(error))
+
+function isTvPath(str: string) {
+  return str.startsWith("/tv")
+}
+
+function isTvSeasonPath(str: string) {
+  return str.startsWith("/tv") && str.endsWith("/seasons")
+}
+
+function isMoviePath(str: string) {
+  return str.startsWith("/movie")
+}
+
+revalidate().then(res => console.log(`Script completed`)).catch(error => console.error(error))
