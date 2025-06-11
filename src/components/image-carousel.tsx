@@ -21,6 +21,14 @@ export interface ImageCarouselProps {
 const carouselBreakpoints = {
   default: {
     300: {
+      slidesPerView: 1,
+      slidesPerGroup: 1,
+      spaceBetween: 20,
+      speed: 500,
+      cssMode: true,
+      slidesOffsetBefore: 0,
+    },
+    460: {
       slidesPerView: 2,
       slidesPerGroup: 1,
       spaceBetween: 20,
@@ -28,48 +36,48 @@ const carouselBreakpoints = {
       cssMode: true,
       slidesOffsetBefore: 0,
     },
-    500: {
+    700: {
       slidesPerView: 3,
       slidesPerGroup: 1,
       spaceBetween: 30,
       cssMode: true,
     },
-    868: {
+    1000: {
       slidesPerView: 4,
       slidesPerGroup: 1,
       spaceBetween: 30,
       cssMode: true,
     },
-    1100: {
+    1260: {
       slidesPerView: 5,
       slidesPerGroup: 5,
       spaceBetween: 30,
     },
-    1300: {
+    1500: {
       slidesPerView: 6,
       slidesPerGroup: 6,
       spaceBetween: 30,
     },
-    1500: {
+    1750: {
       slidesPerView: 7,
       slidesPerGroup: 4,
       spaceBetween: 10,
     },
   },
   page: {
-    350: {
+    500: {
       slidesPerView: 2,
       slidesPerGroup: 2,
       spaceBetween: 10,
       cssMode: true,
     },
-    500: {
+    746: {
       slidesPerView: 3,
       slidesPerGroup: 3,
       spaceBetween: 10,
       cssMode: true,
     },
-    1200: {
+    1300: {
       slidesPerView: 4,
       slidesPerGroup: 4,
       spaceBetween: 10,
@@ -186,7 +194,7 @@ export default function ImageCarousel({
           }}
           breakpoints={breakpointsOption}
           lazyPreloadPrevNext={3}
-          modules={[Navigation, FreeMode, Virtual]}
+          modules={[Navigation, FreeMode]}
           className="mySwiper"
           watchSlidesProgress={true}
         >
@@ -194,7 +202,7 @@ export default function ImageCarousel({
             <SwiperSlide
               key={i}
               className={`group py-2 px-0 ${i === 0 ? "ml-2" : " "}`}
-              virtualIndex={i}
+            // virtualIndex={i}
             >
               {item}
             </SwiperSlide>
