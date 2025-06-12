@@ -21,9 +21,9 @@ export async function Recommended({
     <>
       {items?.length > 0 && (
         <>
-          <h2 className="text-2xl font-bold -mb-9">Recommended</h2>
-          <div className="pt-2 pb-4 pl-8 md:pl-3 -ml-8 md:ml-0 md:w-full w-screen">
+          <div className="pt-2 pb-4">
             <ImageCarousel
+              title={<h2 className={`text-2xl font-bold`}>Recommended</h2>}
               items={items.map(
                 (item: MovieResult | TvResult, index: number) => {
                   if (!item.poster_path) return;
@@ -57,7 +57,6 @@ export async function Recommended({
                   );
                 },
               )}
-              className="md:-ml-11"
               loading="lazy"
               breakpoints="page"
             />

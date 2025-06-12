@@ -54,8 +54,11 @@ export default async function DiscoverPage() {
 
   return (
     <main className="w-screen max-w-[1920px] mx-auto">
-      <div className="px-0 lg:px-10 space-y-3 py-6 overflow-hidden">
-        <div className="flex flex-col w-full pb-8 mx-auto space-y-3 px-1"><h1 className="text-2xl text-center font-semibold">Discover Movies &amp; TV Shows</h1><DiscoverSearch /></div>
+      <div className="px-2 md:px-5 lg:px-10 space-y-3 py-6 overflow-hidden">
+        <div className="flex flex-col w-full pb-8 mx-auto space-y-3 px-1">
+          <h1 className="text-xl sm:text-2xl text-center font-semibold">Discover Movies &amp; TV Shows</h1>
+          <DiscoverSearch />
+        </div>
         <CarouselToggle options={[{ items: trendingTvDailyCards, label: "Today" }, { items: trendingTvWeeklyCards, label: "This Week" }]} title="Trending Series" />
         <CarouselToggle options={[{ items: trendingMoviesDailyCards, label: "Today" }, { items: trendingMoviesWeeklyCards, label: "This Week" }]} title="Trending Movies" />
         <CarouselToggle options={[{ items: popularTvCards, label: "Series" }, { items: popularMoviesCards, label: "Movies" }]} title="Popular" />

@@ -281,26 +281,23 @@ export default async function TvPage({ params }: { params: { id: number } }) {
                   <Suspense
                     fallback={<Skeleton className="w-full h-[356px] rounded-xl" />}
                   >
-                    <div>
-                      <h2 className={`text-2xl font-bold -mb-9`}>Cast</h2>
-                      <div className="pt-2 pb-4 pl-8 md:pl-3 -ml-8 md:ml-0 md:w-full w-screen">
-                        <ImageCarousel
-                          items={tv.credits?.cast?.map((item, index: number) => (
-                            <Link href={`/person/${item.id}`} key={index}>
-                              <CastCard
-                                name={item.name}
-                                character={item.character}
-                                imagePath={`${BASE_CAST_IMAGE_URL}${item.profilePath}`}
-                                index={index}
-                                blurDataURL={DEFAULT_BLUR_DATA_URL}
-                              />
-                            </Link>
-                          ))}
-                          breakpoints="cast"
-                          className="md:-ml-6"
-                        />
-                      </div>
-                    </div>
+                    <ImageCarousel
+                      title={
+                        <h2 className={`text-2xl font-bold`}>Cast</h2>
+                      }
+                      items={tv.credits?.cast?.map((item, index: number) => (
+                        <Link href={`/person/${item.id}`} key={index}>
+                          <CastCard
+                            name={item.name}
+                            character={item.character}
+                            imagePath={`${BASE_CAST_IMAGE_URL}${item.profilePath}`}
+                            index={index}
+                            blurDataURL={DEFAULT_BLUR_DATA_URL}
+                          />
+                        </Link>
+                      ))}
+                      breakpoints="cast"
+                    />
                   </Suspense>
                 )}
                 <Suspense

@@ -271,30 +271,25 @@ export default async function MoviePage({
                       <Skeleton className="w-full h-[356px] rounded-xl" />
                     }
                   >
-                    {movie.credits.cast && (
-                      <div>
-                        <h2 className={`text-2xl font-bold -mb-9`}>Cast</h2>
-                        <div className="pt-2 pb-4 pl-8 md:pl-3 -ml-8 md:ml-0 md:w-full w-screen">
-                          <ImageCarousel
-                            items={movie.credits.cast.map(
-                              (item: Cast, index: number) => (
-                                <Link href={`/person/${item.id}`} key={index}>
-                                  <CastCard
-                                    name={item.name}
-                                    character={item.character}
-                                    imagePath={item.profilePath ?? undefined}
-                                    index={index}
-                                    blurDataURL={DEFAULT_BLUR_DATA_URL}
-                                  />
-                                </Link>
-                              ),
-                            )}
-                            breakpoints="cast"
-                            className="md:-ml-6"
-                          />
-                        </div>
-                      </div>
-                    )}
+                    <ImageCarousel
+                      title={
+                        <h2 className={`text-2xl font-bold`}>Cast</h2>
+                      }
+                      items={movie.credits.cast.map(
+                        (item: Cast, index: number) => (
+                          <Link href={`/person/${item.id}`} key={index}>
+                            <CastCard
+                              name={item.name}
+                              character={item.character}
+                              imagePath={item.profilePath ?? undefined}
+                              index={index}
+                              blurDataURL={DEFAULT_BLUR_DATA_URL}
+                            />
+                          </Link>
+                        ),
+                      )}
+                      breakpoints="cast"
+                    />
                   </Suspense>
                 )}
                 <Suspense

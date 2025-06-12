@@ -18,17 +18,30 @@ export interface ImageCarouselProps {
   items: Array<ReactNode>;
 }
 
-const carouselBreakpoints = {
+const carouselBreakpoints: {
   default: {
-    300: {
-      slidesPerView: 1,
-      slidesPerGroup: 1,
-      spaceBetween: 20,
-      speed: 500,
-      cssMode: true,
-      slidesOffsetBefore: 0,
-    },
-    460: {
+    [width: number]: SwiperOptions
+    [ratio: string]: SwiperOptions
+  }
+  page: {
+    [width: number]: SwiperOptions
+    [ratio: string]: SwiperOptions
+  }
+  cast: {
+    [width: number]: SwiperOptions
+    [ratio: string]: SwiperOptions
+  }
+} = {
+  default: {
+    // 300: {
+    //   slidesPerView: 1,
+    //   slidesPerGroup: 1,
+    //   spaceBetween: 20,
+    //   speed: 500,
+    //   cssMode: true,
+    //   slidesOffsetBefore: 0,
+    // },
+    100: {
       slidesPerView: 2,
       slidesPerGroup: 1,
       spaceBetween: 20,
@@ -65,13 +78,13 @@ const carouselBreakpoints = {
     },
   },
   page: {
-    500: {
+    100: {
       slidesPerView: 2,
       slidesPerGroup: 2,
       spaceBetween: 10,
       cssMode: true,
     },
-    746: {
+    650: {
       slidesPerView: 3,
       slidesPerGroup: 3,
       spaceBetween: 10,
@@ -84,21 +97,33 @@ const carouselBreakpoints = {
     },
   },
   cast: {
-    350: {
-      slidesPerView: 2,
-      slidesPerGroup: 2,
-      spaceBetween: 10,
-      cssMode: true,
-    },
-    500: {
+    // 200: {
+    //   slidesPerView: 2,
+    //   slidesPerGroup: 2,
+    //   spaceBetween: 10,
+    //   cssMode: true,
+    // },
+    200: {
       slidesPerView: 3,
       slidesPerGroup: 3,
       spaceBetween: 10,
       cssMode: true,
     },
-    1200: {
+    600: {
+      slidesPerView: 4,
+      slidesPerGroup: 4,
+      spaceBetween: 10,
+      cssMode: true,
+    },
+    800: {
       slidesPerView: 5,
       slidesPerGroup: 5,
+      spaceBetween: 10,
+      cssMode: true,
+    },
+    1200: {
+      slidesPerView: 6,
+      slidesPerGroup: 3,
       spaceBetween: 10,
     },
   },
@@ -132,6 +157,10 @@ export default function ImageCarousel({
     }
   }, []);
 
+  useEffect(() => {
+
+  })
+
   let breakpointsOption: {
     [width: number]: SwiperOptions;
     [ratio: string]: SwiperOptions;
@@ -149,66 +178,72 @@ export default function ImageCarousel({
       break;
   }
 
+  const handleBreakpointChange = (event: SwiperCore) => {
+    if (event.currentBreakpoint <= 950)
+      swiperRef.current?.disable()
+    else if (event.currentBreakpoint > 950)
+      swiperRef.current?.enable()
+  }
+
   return (
-    <>
-      <div className={`${className ?? ""}`}>
-        <div className="space-x-2 flex justify-between">
-          {title ? title :
-            <h2 className={`text-2xl font-bold ml-6 md:ml-1`}>
-              {titleString}
-            </h2>
-          }
-          <div className="whitespace-nowrap opacity-0 lg:opacity-100">
-            <Button
-              size="icon"
-              variant="ghost"
-              className={`transition-opacity ${isPrevDisabled ? "opacity-30" : "opacity-100"}`}
-              onClick={() => swiperRef.current?.slidePrev()}
-            >
-              <ChevronLeft />
-            </Button>
-            <Button
-              size="icon"
-              variant="ghost"
-              className={`transition-opacity ${isNextDisabled ? "opacity-30" : "opacity-100"}`}
-              onClick={() => swiperRef.current?.slideNext()}
-            >
-              <ChevronRight />
-            </Button>
-          </div>
+    <div className={`${className ?? ""}`}>
+      <div className="space-x-2 flex justify-between ">
+        {title ? title :
+          <h2 className={`text-xl sm:text-2xl font-bold sm:pl-2 pr-2`}>
+            {titleString}
+          </h2>
+        }
+        <div className={`whitespace-nowrap lg:flex hidden pr-5`}>
+          <Button
+            size="icon"
+            variant="ghost"
+            className={`transition-opacity ${isPrevDisabled ? "opacity-30" : "opacity-100"}`}
+            onClick={() => swiperRef.current?.slidePrev()}
+          >
+            <ChevronLeft />
+          </Button>
+          <Button
+            size="icon"
+            variant="ghost"
+            className={`transition-opacity ${isNextDisabled ? "opacity-30" : "opacity-100"}`}
+            onClick={() => swiperRef.current?.slideNext()}
+          >
+            <ChevronRight />
+          </Button>
         </div>
-        <Swiper
-          speed={750}
-          spaceBetween={10}
-          freeMode={{
-            enabled: true,
-            sticky: false,
-            momentumRatio: 1,
-            momentumBounceRatio: 1,
-          }}
-          simulateTouch={false}
-          userAgent={userAgent}
-          onSlideChange={handleSlideChange}
-          onBeforeInit={(swiper) => {
-            swiperRef.current = swiper;
-          }}
-          breakpoints={breakpointsOption}
-          lazyPreloadPrevNext={3}
-          modules={[Navigation, FreeMode]}
-          className="mySwiper"
-          watchSlidesProgress={true}
-        >
-          {items.map((item: ReactNode, i: number) => (
-            <SwiperSlide
-              key={i}
-              className={`group py-2 px-0 ${i === 0 ? "ml-2" : " "}`}
-            // virtualIndex={i}
-            >
-              {item}
-            </SwiperSlide>
-          ))}
-        </Swiper>
       </div>
-    </>
+      <Swiper
+        speed={750}
+        spaceBetween={10}
+        freeMode={{
+          enabled: true,
+          sticky: false,
+          momentumRatio: 1,
+          momentumBounceRatio: 1,
+        }}
+        simulateTouch={false}
+        userAgent={userAgent}
+        onSlideChange={handleSlideChange}
+        onBeforeInit={(swiper) => {
+          swiperRef.current = swiper;
+        }}
+        onBreakpoint={handleBreakpointChange}
+        breakpoints={breakpointsOption}
+        lazyPreloadPrevNext={3}
+        modules={[Navigation, FreeMode, Virtual]}
+        className="mySwiper min-w-[500px] sm:min-w-[768px] !pl-2 !-ml-2"
+        watchSlidesProgress={true}
+      >
+        {items.map((item: ReactNode, i: number) => (
+          <SwiperSlide
+            key={i}
+            className={`group py-2 px-0`}
+            virtualIndex={i}
+          >
+            {item}
+          </SwiperSlide>
+        ))}
+      </Swiper>
+    </div>
   );
 }

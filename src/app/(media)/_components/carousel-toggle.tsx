@@ -21,8 +21,8 @@ export default function CarouselToggle({
     <div className="space-y-4">
       <ImageCarousel
         title={
-          <div className="flex space-x-4 items-center">
-            <h2 className={`text-2xl font-bold ml-6 md:ml-1`}>
+          <div className="grid grid-flow-col sm:grid-cols-[225px_1fr_auto] items-center w-full auto-cols-max justify-between">
+            <h2 className={`text-2xl font-bold sm:pl-2`}>
               {title}
             </h2>
             <div className="flex space-x-2 items-center">
@@ -30,7 +30,7 @@ export default function CarouselToggle({
                 <button
                   key={index}
                   onClick={() => setView(index as 0 | 1)}
-                  className={`px-3 rounded-2xl transition ${view === index
+                  className={`px-3 rounded-2xl transition font-semibold text-sm sm:text-md ${view === index
                     ? "bg-blue-500/80 text-white backdrop-blur-lg"
                     : "bg-gray-200 text-gray-700"
                     }`}
