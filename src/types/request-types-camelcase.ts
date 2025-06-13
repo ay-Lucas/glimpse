@@ -572,3 +572,74 @@ export interface PopularTvResponse extends DiscoverTvResponse { }
 export interface DiscoverTvResponse extends PaginatedResponse {
   results?: Array<TvResult>;
 }
+
+
+export interface PersonCombinedCreditsResponse extends Response {
+  id?: number;
+  cast?: Array<{
+    id?: number;
+    originalLanguage?: string;
+    episodeCount?: number;
+    overview?: string;
+    originCountry?: string[];
+    originalName?: string;
+    genreIds?: number[];
+    name?: string;
+    mediaType?: string;
+    posterPath?: string | null;
+    firstAirDate?: string;
+    voteAverage?: number | number;
+    voteCount?: number;
+    character?: string;
+    backdropPath?: string | null;
+    popularity?: number;
+    creditId?: string;
+    originalTitle?: string;
+    video?: boolean;
+    releaseDate?: string;
+    title?: string;
+    adult?: boolean;
+  }>;
+  crew?: Array<{
+    id?: number;
+    department?: string;
+    originalLanguage?: string;
+    episodeCount?: number;
+    job?: string;
+    overview?: string;
+    originCountry?: string[];
+    originalName?: string;
+    voteCount?: number;
+    name?: string;
+    mediaType?: string;
+    popularity?: number;
+    creditId?: string;
+    backdropPath?: string | null;
+    firstAirDate?: string;
+    voteAverage?: number;
+    genreIds?: number[];
+    posterPath?: string | null;
+    originalTitle?: string;
+    video?: boolean;
+    title?: string;
+    adult?: boolean;
+    releaseDate?: string;
+  }>;
+}
+
+export interface PersonImagesResponse extends Response {
+  id?: number;
+  profiles?: Array<Profile>;
+}
+
+interface PersonTaggedImage extends BaseImage {
+  id?: string;
+  iso6391?: string | null;
+  imageType?: string;
+  media?: MovieResult | TvResult;
+}
+
+export interface PersonTaggedImagesResponse extends PaginatedResponse {
+  id?: number;
+  results?: Array<PersonTaggedImage>;
+}

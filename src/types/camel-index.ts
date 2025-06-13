@@ -16,6 +16,10 @@ import {
   Network,
   SimplePerson,
   RatingResponse,
+  Person,
+  PersonCombinedCreditsResponse,
+  PersonTaggedImagesResponse,
+  PersonImagesResponse
 } from "./request-types-camelcase";
 
 export interface CardTypes {
@@ -64,6 +68,15 @@ export interface WatchlistItemI {
   backdropPath: string | null;
   summary: string;
 }
+
+export type DiscoverItem = {
+  tmdbId: number;
+  title: string;
+  posterPath?: string;
+  backdropPath?: string;
+  posterBlurDataUrl?: string;
+  overview?: string;
+};
 
 export type FullMovie = {
   // summary fields
@@ -163,4 +176,10 @@ export type FullTv = {
   // e.g. { results: RatingResponse[] }
   spokenLanguages?: Array<SpokenLanguage>;
   contentRatings?: { results: RatingResponse[] };
+};
+
+export interface FullPerson extends Person {
+  combinedCredits: PersonCombinedCreditsResponse
+  images: PersonImagesResponse
+  taggedImages: PersonTaggedImagesResponse
 };
