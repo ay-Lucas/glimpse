@@ -1,5 +1,6 @@
-import { Github, LogOut, LucideList, Settings } from "lucide-react";
+"use client"
 
+import { Github, LogOut, LucideList, Settings } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,10 +11,11 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import { signout } from "@/lib/actions";
 import Link from "next/link";
-import { auth } from "@/auth";
+import { useSession } from "next-auth/react";
 
-export async function AvatarDropdown() {
-  const session = await auth();
+export function AvatarDropdown() {
+  const { data: session } = useSession();
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>

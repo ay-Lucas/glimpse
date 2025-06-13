@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { TopNav } from "@/components/top-nav";
 import { Footer } from "@/components/footer";
 import { Analytics } from "@vercel/analytics/react";
+import SessionProvider from "@/components/session-provider";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -29,17 +30,19 @@ export default async function RootLayout({
           fontSans.variable,
         )}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <TopNav />
-          {children}
-          <Analytics />
-          <Footer />
-        </ThemeProvider>
+        <SessionProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <TopNav />
+            {children}
+            <Analytics />
+            <Footer />
+          </ThemeProvider>
+        </SessionProvider>
       </body>
     </html>
   );

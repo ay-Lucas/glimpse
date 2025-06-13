@@ -21,7 +21,6 @@ import ImageCarousel from "@/components/image-carousel";
 import VideoPlayer from "../../_components/video-player";
 
 export const revalidate = 43200; // 12 hours
-export const dynamic = "force-static"
 
 // Generate all Movie pages featured on Discover page (and their recommendations) at build
 export async function generateStaticParams() {

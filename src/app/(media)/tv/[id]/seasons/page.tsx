@@ -4,8 +4,6 @@ import { fetchDiscoverTvIds, fetchTvDetails } from "@/app/(media)/actions";
 import { bannerColor } from "@/lib/bannerColor";
 
 export const revalidate = 43200; // 12 hours
-export const dynamic = "force-static"
-
 
 export async function generateStaticParams() {
   const discoverTvIds = await fetchDiscoverTvIds();

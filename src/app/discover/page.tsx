@@ -1,4 +1,3 @@
-export const runtime = 'nodejs';
 import {
   DiscoverItem,
   fetchTmdbMovieLists,
@@ -17,7 +16,6 @@ import CarouselToggle from "@/app/(media)/_components/carousel-toggle";
 import { DiscoverSearch } from "./_components/discover-search";
 
 export const revalidate = 43200; // 12 hours
-export const dynamic = 'force-static';
 
 export const metadata = {
   title: "Glimpse",

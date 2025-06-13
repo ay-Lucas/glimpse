@@ -1,12 +1,15 @@
+"use client"
+
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { AvatarDropdown } from "./avatar-dropdown";
 import { Search } from "./search";
-import { auth } from "@/auth";
 import { LucideList, LucideTv } from "lucide-react";
+import { useSession } from "next-auth/react";
 
-export async function TopNav() {
-  const session = await auth();
+export function TopNav() {
+  const { data: session, status } = useSession();
+
   return (
     <div className="sticky top-0 left-0 border-b border-transparent/10 z-10 backdrop-blur-sm bg-background/80">
       <nav className="grid grid-cols-3 items-center p-1 px-4 text-md font-bold">
@@ -30,8 +33,10 @@ export async function TopNav() {
             </Button>
           </Link>
         </div>
-        <section className="grid justify-end space-x-4 items-center group-active:bg-background/70 ">
-          {session ? (
+        <section className="grid justify-end space-x-4 items-center">
+          {status === "loading" ? (
+            <div>Checking…</div>
+          ) : session ? (
             <AvatarDropdown />
           ) : (
             <Button asChild size="sm">

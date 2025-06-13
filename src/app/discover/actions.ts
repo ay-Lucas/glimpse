@@ -1,5 +1,5 @@
 "server only";
-import { headers } from "next/headers";
+// import { headers } from "next/headers";
 import { BASE_API_URL, options } from "@/lib/constants";
 import {
   DiscoverMovieRequest,
@@ -128,12 +128,12 @@ export const getUpcomingMovies = async (
 //     ? "mobile"
 //     : "desktop";
 // }
-export async function getDeviceType() {
-  const headersList = headers();
-  const userAgent = headersList.get("user-agent");
-
-  return userAgent;
-}
+// export async function getDeviceType() {
+//   const headersList = headers();
+//   const userAgent = headersList.get("user-agent");
+//
+//   return userAgent;
+// }
 
 // src/app/discover/actions.ts
 export type DiscoverItem = {

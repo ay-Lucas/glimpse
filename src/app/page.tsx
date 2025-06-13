@@ -6,7 +6,6 @@ import Background from "./(auth)/_components/background";
 import { BASE_ORIGINAL_IMAGE_URL } from "@/lib/constants";
 
 export const revalidate = 43200; // 12 hours
-export const dynamic = 'force-static';
 
 export default async function HomePage() {
   const backdropsUrls = await getBackdrops();

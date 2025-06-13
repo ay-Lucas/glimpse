@@ -6,7 +6,6 @@ import { getBlurData } from "@/lib/blur-data-generator";
 import PrefetchBannerColor from "../../_components/prefetch-banner-color";
 
 export const revalidate = 43200; // 12 hours
-export const dynamic = "force-static"
 
 export default async function TvLayout({
   params,

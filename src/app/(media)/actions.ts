@@ -8,13 +8,12 @@ import {
 } from "@/db/schema";
 import { getWatchlistsAndItems } from "@/lib/actions";
 import { BASE_API_URL, DISCOVER_LIMIT, options } from "@/lib/constants";
-import { FullMovie, FullTv } from "@/types/camel-index";
+import { FullMovie, FullPerson, FullTv } from "@/types/camel-index";
 import {
   MovieContentRatingResponse,
   MovieResponseAppended,
   MovieResultsResponse,
   MovieReviewsResponse,
-  Person,
   ReleaseDate,
   ShowContentRatingResponse,
   ShowResponseAppended,
@@ -37,19 +36,25 @@ import {
   VideosResponse,
   MovieResult,
   TvResult,
+  Person,
 } from "@/types/request-types-camelcase";
 import camelcaseKeys from "camelcase-keys";
 import { eq } from "drizzle-orm";
 import { unstable_cache } from "next/cache";
 import { DiscoverItem, fetchTmdbMovieLists, fetchTmdbTvLists, getPopularMovies, getPopularSeries, getTrendingMovies, getTrendingSeries, getUpcomingMovieSummaries } from "@/app/discover/actions";
 
-export async function getPersonDetails(
+export const fetchPersonDetails = unstable_cache(async (
   id: number,
   resOptions: RequestInit = options,
-): Promise<Person> {
-  const res = await fetch(`${BASE_API_URL}/person/${id}`, resOptions);
-  return res.json();
-}
+): Promise<FullPerson> => {
+  const res = await fetch(`${BASE_API_URL}/person/${id}?append_to_response=combined_credits,images,tagged_images`, resOptions);
+  const data = await res.json();
+  const camel = camelcaseKeys(data, {
+    deep: true,
+  }) as FullPerson;
+  console.log(camel)
+  return camel;
+})
 
 export const fetchTvDetails = unstable_cache(async (
   id: number,
