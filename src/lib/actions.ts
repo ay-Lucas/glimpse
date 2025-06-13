@@ -3,7 +3,6 @@
 import { AuthError } from "next-auth";
 import {
   addUserToDb,
-  auth,
   isExistingUser,
   passwordToSalt,
   signIn,
@@ -12,7 +11,7 @@ import {
 import { redirect } from "next/navigation";
 import { loginSchema, watchlistNameSchema } from "@/types/schema";
 import { db } from "@/db/index";
-import { and, asc, eq, gt, sql } from "drizzle-orm";
+import { and, asc, eq, gt, sql, gte, inArray, isNotNull, lte, not, or } from "drizzle-orm";
 import {
   rateLimitViolation,
   users,
@@ -27,14 +26,11 @@ import {
 } from "@/types/camel-index";
 import { rateLimitLog } from "@/db/schema";
 import { nanoid } from "nanoid";
-import {
-  MovieResponse,
-  MovieResponseAppended,
-  MovieResultsResponse,
-  ShowResponseAppended,
-  TvResultsResponse,
-} from "@/types/request-types-snakecase";
 import { Genre } from "@/types/types";
+import { listEntries, movieDetails, movieSummaries, tvDetails } from "@/db/schema";
+import { tvSummaries } from "@/db/schema";
+import { DiscoverItem } from "@/types/camel-index";
+
 
 const LIMIT = 10;
 const WINDOW = 60_000;
@@ -562,6 +558,250 @@ export async function getWatchlistsAndItems(
   });
 
   return watchlists;
+}
+
+export async function getTrendingSeries(limit = 10): Promise<DiscoverItem[]> {
+  const rows = await db
+    .select({
+      tmdbId: tvSummaries.tmdbId,
+      title: tvSummaries.name,
+      overview: tvSummaries.overview,
+      posterPath: tvSummaries.posterPath,
+      backdropPath: tvSummaries.backdropPath,
+      posterBlurDataUrl: tvSummaries.posterBlurDataUrl,
+      releaseDate: tvSummaries.firstAirDate,
+    })
+    .from(tvSummaries)
+    .leftJoin(
+      tvDetails,
+      eq(tvDetails.summaryId, tvSummaries.id),
+    )
+    .innerJoin(
+      listEntries,
+      and(
+        eq(listEntries.tmdbId, tvSummaries.tmdbId),
+        eq(listEntries.listName, "trending_tv"),
+        or(eq(tvDetails.originalLanguage, "en"), eq(tvDetails.originalLanguage, "ja"))
+      ),
+    )
+    .orderBy(asc(listEntries.position))
+    .limit(limit);
+
+  return rows.map((r) => ({
+    tmdbId: r.tmdbId,
+    mediaType: "tv",
+    title: r.title,
+    overview: r.overview ?? undefined,
+    posterPath: r.posterPath ?? undefined,
+    backdropPath: r.backdropPath ?? undefined,
+    posterBlurDataUrl: r.posterBlurDataUrl ?? undefined,
+    releaseDate: r.releaseDate ?? undefined,
+  }));
+}
+
+export async function getTrendingMovies(limit = 10): Promise<DiscoverItem[]> {
+  const today = new Date().toISOString().split('T')[0];
+  const rows = await db
+    .select({
+      tmdbId: movieSummaries.tmdbId,
+      title: movieSummaries.title,
+      overview: movieSummaries.overview,
+      posterPath: movieSummaries.posterPath,
+      backdropPath: movieSummaries.backdropPath,
+      posterBlurDataUrl: movieSummaries.posterBlurDataUrl,
+      releaseDate: movieSummaries.releaseDate,
+    })
+    .from(movieSummaries)
+    .leftJoin(
+      movieDetails,
+      eq(movieDetails.summaryId, movieSummaries.id),
+    )
+    .innerJoin(
+      listEntries,
+      and(
+        eq(listEntries.tmdbId, movieSummaries.tmdbId),
+        eq(listEntries.listName, "trending_movies"),
+      ),
+    )
+    .where(
+      and(
+        isNotNull(movieSummaries.releaseDate),
+        // <= today
+        lte(movieSummaries.releaseDate, today!), // no unreleased movies
+        eq(movieDetails.originalLanguage, "en")
+        // other filters…
+        // gt(movieSummaries.popularity, MIN_POPULARITY),
+        // movieSummaries.voteAverage.gte(MIN_RATING),
+      )
+    )
+    .orderBy(asc(listEntries.position))
+    .limit(limit);
+
+  return rows.map((r) => ({
+    tmdbId: r.tmdbId,
+    mediaType: "movie",
+    title: r.title,
+    overview: r.overview ?? undefined,
+    posterPath: r.posterPath ?? undefined,
+    backdropPath: r.backdropPath ?? undefined,
+    posterBlurDataUrl: r.posterBlurDataUrl ?? undefined,
+    releaseDate: r.releaseDate ?? undefined,
+  }));
+}
+// upcoming movies: releaseDate ≥ today, earliest first
+export async function getUpcomingMovieSummaries(
+  limit = 10,
+): Promise<DiscoverItem[]> {
+  const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+  const rows = await db
+    .select({
+      tmdbId: movieSummaries.tmdbId,
+      title: movieSummaries.title,
+      posterPath: movieSummaries.posterPath,
+      backdropPath: movieSummaries.backdropPath,
+      posterBlurUrl: movieSummaries.posterBlurDataUrl,
+      overview: movieSummaries.overview,
+    })
+    .from(movieSummaries)
+    .where(gte(movieSummaries.releaseDate, today))
+    .orderBy(asc(movieSummaries.releaseDate))
+    .limit(limit);
+
+  return rows.map((r) => ({
+    tmdbId: r.tmdbId,
+    title: r.title,
+    posterPath: r.posterPath ?? undefined,
+    backdropPath: r.backdropPath ?? undefined,
+    posterBlurUrl: r.posterBlurUrl,
+    overview: r.overview,
+  }));
+}
+
+export async function getPopularSeries(limit = 10): Promise<DiscoverItem[]> {
+  // build a sub-query of all the trending IDs
+  const trendingIdsQ = db
+    .select({ id: listEntries.tmdbId })
+    .from(listEntries)
+    .where(eq(listEntries.listName, "trending_tv"));
+
+  const rows = await db
+    .select({
+      tmdbId: tvSummaries.tmdbId,
+      title: tvSummaries.name,
+      overview: tvSummaries.overview,
+      posterPath: tvSummaries.posterPath,
+      backdropPath: tvSummaries.backdropPath,
+      posterBlurUrl: tvSummaries.posterBlurDataUrl,
+      popularity: tvSummaries.popularity,
+      voteAverage: tvSummaries.voteAverage,
+      voteCount: tvSummaries.voteCount,
+    })
+    .from(tvSummaries)
+    .innerJoin(
+      listEntries,
+      and(
+        eq(listEntries.listName, "popular_tv"),
+        eq(listEntries.tmdbId, tvSummaries.tmdbId),
+      ),
+    )
+    .where(not(inArray(tvSummaries.tmdbId, trendingIdsQ))) // prevent duplicates from trending series
+    // .orderBy(asc(listEntries.position))
+    // .orderBy()
+    .limit(limit);
+
+  return rows.map((r) => ({
+    tmdbId: r.tmdbId,
+    title: r.title,
+    overview: r.overview ?? undefined,
+    posterPath: r.posterPath ?? undefined,
+    backdropPath: r.backdropPath ?? undefined,
+    posterBlurUrl: r.posterBlurUrl,
+    popularity: r.popularity ?? undefined,
+    voteAverage: r.voteAverage ?? undefined,
+    voteCount: r.voteCount ?? undefined,
+  }));
+}
+
+export async function getPopularMovies(limit = 10): Promise<DiscoverItem[]> {
+  // build a sub-query of all the trending IDs
+  const trendingIdsQ = db
+    .select({ id: listEntries.tmdbId })
+    .from(listEntries)
+    .where(eq(listEntries.listName, "trending_movies"));
+
+  const rows = await db
+    .select({
+      tmdbId: movieSummaries.tmdbId,
+      title: movieSummaries.title,
+      overview: movieSummaries.overview,
+      posterPath: movieSummaries.posterPath,
+      backdropPath: movieSummaries.backdropPath,
+      posterBlurUrl: movieSummaries.posterBlurDataUrl,
+      popularity: movieSummaries.popularity,
+      voteAverage: movieSummaries.voteAverage,
+      voteCount: movieSummaries.voteCount,
+    })
+    .from(movieSummaries)
+    .innerJoin(
+      listEntries,
+      and(
+        eq(listEntries.listName, "popular_movies"),
+        eq(listEntries.tmdbId, movieSummaries.tmdbId),
+      ),
+    )
+    .where(not(inArray(movieSummaries.tmdbId, trendingIdsQ))) // prevent dupliactes from trending series
+    .orderBy(asc(listEntries.position))
+    .limit(limit);
+
+  return rows.map((r) => ({
+    tmdbId: r.tmdbId,
+    title: r.title,
+    overview: r.overview ?? undefined,
+    posterPath: r.posterPath ?? undefined,
+    backdropPath: r.backdropPath ?? undefined,
+    posterBlurUrl: r.posterBlurUrl ?? undefined,
+    popularity: r.popularity ?? undefined,
+    voteAverage: r.voteAverage ?? undefined,
+    voteCount: r.voteCount ?? undefined,
+  }));
+}
+
+export async function getAllTv(): Promise<DiscoverItem[]> {
+  const rows = await db
+    .select({
+      tmdbId: tvSummaries.tmdbId,
+      title: tvSummaries.name,
+    })
+    .from(tvSummaries)
+    .leftJoin(
+      tvDetails,
+      eq(tvDetails.summaryId, tvSummaries.id),
+    )
+
+  return rows.map((r) => ({
+    tmdbId: r.tmdbId,
+    mediaType: "tv",
+    title: r.title,
+  }));
+}
+
+export async function getAllMovies(): Promise<DiscoverItem[]> {
+  const rows = await db
+    .select({
+      tmdbId: movieSummaries.tmdbId,
+      title: movieSummaries.title,
+    })
+    .from(movieSummaries)
+    .leftJoin(
+      movieDetails,
+      eq(movieDetails.summaryId, movieSummaries.id),
+    )
+
+  return rows.map((r) => ({
+    tmdbId: r.tmdbId,
+    mediaType: "movie",
+    title: r.title,
+  }));
 }
 
 export async function isRateLimited(ip: string, route: string) {

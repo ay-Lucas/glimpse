@@ -1,5 +1,4 @@
 import {
-  DiscoverItem,
   fetchTmdbMovieLists,
   fetchTmdbTvLists,
 } from "@/app/discover/actions";
@@ -14,6 +13,7 @@ import { MovieResult, TvResult } from "@/types/request-types-camelcase";
 import { getBlurData } from "@/lib/blur-data-generator";
 import CarouselToggle from "@/app/(media)/_components/carousel-toggle";
 import { DiscoverSearch } from "./_components/discover-search";
+import { DiscoverItem } from "@/types/camel-index";
 
 export const revalidate = 43200; // 12 hours
 

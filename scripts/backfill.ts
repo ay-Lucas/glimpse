@@ -25,13 +25,12 @@ import {
   getTrendingPages,
   getPopular,
   getUpcomingMovies,
-  getAllTv,
-  getAllMovies,
 } from "@/app/discover/actions.ts";
 import { eq, inArray, not } from "drizzle-orm";
-import { fetchMovieDetails, fetchTvDetails } from "@/app/(media)/actions.ts";
+import { fetchMovieDetails, fetchTvDetails } from "@/app/(media)/actions";
 import { Vibrant } from "node-vibrant/node";
 import { getBaseUrl, uniqueBy } from "@/lib/utils.tsx";
+import { getAllMovies, getAllTv } from "@/lib/actions";
 
 dotenv.config({ path: join(__dirname, "../.env.local") });
 
