@@ -19,7 +19,9 @@ import {
   Person,
   PersonCombinedCreditsResponse,
   PersonTaggedImagesResponse,
-  PersonImagesResponse
+  PersonImagesResponse,
+  PersonTvCreditsResponse,
+  PersonMovieCreditsResponse
 } from "./request-types-camelcase";
 
 export interface CardTypes {
@@ -182,4 +184,6 @@ export interface FullPerson extends Person {
   combinedCredits: PersonCombinedCreditsResponse
   images: PersonImagesResponse
   taggedImages: PersonTaggedImagesResponse
+  tvCredits: PersonTvCreditsResponse
+  movieCredits: PersonMovieCreditsResponse
 };

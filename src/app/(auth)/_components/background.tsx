@@ -1,4 +1,5 @@
 "use client";
+import { BASE_ORIGINAL_IMAGE_URL } from "@/lib/constants";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 
@@ -20,10 +21,10 @@ export default function Background({
   return (
     <div className="absolute top-0 left-0 w-full h-full duration-300 ease-in overflow-hidden bg-gradient-to-t bg-blend-overlay from-gray-200 to-gray-950">
       <div className="absolute top-0 left-0 w-full h-full opacity-50">
-        {images.map((url, i) => (
+        {images.map((backdropPath, i) => (
           <Image
             fill
-            src={`${url}`}
+            src={`${BASE_ORIGINAL_IMAGE_URL}${backdropPath}`}
             alt={`Background image ${i + 1}`}
             key={i}
             quality={75}

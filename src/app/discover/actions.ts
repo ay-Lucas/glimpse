@@ -10,7 +10,7 @@ import {
 } from "@/types/request-types-snakecase";
 
 import camelcaseKeys from "camelcase-keys";
-import { MovieResult, TvResult, UpcomingMoviesResponse } from "@/types/request-types-camelcase";
+import { Cast, MovieResult, PersonResult, TvResult, UpcomingMoviesResponse } from "@/types/request-types-camelcase";
 
 export const getTrending = async (
   request: TrendingRequest,
@@ -46,7 +46,7 @@ export const getTrendingPages = async (
   const arrays = array.flatMap((page) => page.results);
 
   if (camelcase) {
-    return camelcaseKeys(arrays as any, { deep: true }) as MovieResult[] | TvResult[];
+    return camelcaseKeys(arrays as any, { deep: true }) as MovieResult[] | TvResult[] | PersonResult[];
   }
   return arrays;
 }
@@ -220,7 +220,7 @@ export async function fetchAllTv(reqOptions?: RequestInit) {
     ...lists.trendingTvWeekly,
     ...lists.trendingTvDaily
   ];
-
+  console.log(lists)
   // Dedupe (weekly and daily trending)
   const seen = new Set<number>();
   return combined.filter((m) => {
@@ -230,4 +230,16 @@ export async function fetchAllTv(reqOptions?: RequestInit) {
   });
 }
 
+export async function fetchDiscoverTitles(reqOptions?: RequestInit) {
+  const movies = await fetchAllMovies(reqOptions);
+  const tvShows = await fetchAllTv(reqOptions);
+  return [...movies, ...tvShows];
+}
+
+// export async function getDiscoverCast(reqOptions?: RequestInit) {
+//   const discoverTitles = await fetchDiscoverTitles(reqOptions);
+//   // const cast = discoverTitles.map(item => item.credits?.cast).filter((item): item is Cast[] => item != null)
+//   return cast;
+// }
+//
 // export const fetchTmdbListsCached = unstable_cache(fetchTmdbLists, [], { revalidate: 43200 }) // 12 hours

@@ -11,7 +11,7 @@ export function Card({
 }: {
   title?: string;
   overview?: string;
-  imagePath: string;
+  imagePath?: string;
   blurDataURL?: string;
   loading?: "lazy" | "eager";
   className?: string;
@@ -21,16 +21,18 @@ export function Card({
       className={`w-[238px] h-[357px] group relative overflow-hidden rounded-2xl shadow-lg transform transition-transform duration-200 ease-out group-hover:scale-105 will-change-transform ${className}`}
     >
       <div className="relative w-full h-0 pb-[150%]">
-        <Image
-          src={imagePath}
-          alt={title ?? "untitled"}
-          fill
-          className="object-cover"
-          placeholder={blurDataURL ? "blur" : undefined}
-          blurDataURL={blurDataURL ?? DEFAULT_BLUR_DATA_URL}
-          loading={loading}
-          sizes="(max-width: 768px) 100vw, 200px"
-        />
+        {imagePath &&
+          <Image
+            src={imagePath}
+            alt={title ?? "untitled"}
+            fill
+            className="object-cover"
+            placeholder={blurDataURL ? "blur" : undefined}
+            blurDataURL={blurDataURL ?? DEFAULT_BLUR_DATA_URL}
+            loading={loading}
+            sizes="(max-width: 768px) 100vw, 200px"
+          />
+        }
         <div className="absolute inset-0 opacity-0 transition-opacity duration-200 ease-out group-hover:opacity-100 bg-[linear-gradient(to_top,rgba(0,0,0,0.9)_35%,transparent)] pointer-events-none" />
       </div>
 

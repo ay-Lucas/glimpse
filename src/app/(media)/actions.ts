@@ -1,12 +1,15 @@
 "server only";
 // import { getWatchlistsAndItems } from "@/lib/actions";
-import { BASE_API_URL, options } from "@/lib/constants";
+import { BASE_API_URL, NUM_OF_POPULAR_PEOPLE_PAGES, options } from "@/lib/constants";
 import { FullMovie, FullPerson, FullTv } from "@/types/camel-index";
 import {
   MovieContentRatingResponse,
   MovieResponseAppended,
   MovieResultsResponse,
   MovieReviewsResponse,
+  PersonPopularResponse,
+  PersonResult,
+  SearchRequest,
   ShowContentRatingResponse,
   ShowResponseAppended,
   TvResultsResponse,
@@ -16,6 +19,7 @@ import {
 import {
   MovieResult,
   TvResult,
+  SearchPersonResponse,
 } from "@/types/request-types-camelcase";
 import camelcaseKeys from "camelcase-keys";
 import { unstable_cache } from "next/cache";
@@ -25,7 +29,7 @@ export const fetchPersonDetails = unstable_cache(async (
   id: number,
   resOptions: RequestInit = options,
 ): Promise<FullPerson> => {
-  const res = await fetch(`${BASE_API_URL}/person/${id}?append_to_response=combined_credits,images,tagged_images`, resOptions);
+  const res = await fetch(`${BASE_API_URL}/person/${id}?append_to_response=combined_credits,movie_credits,tv_credits,images,tagged_images`, resOptions);
   const data = await res.json();
   const camel = camelcaseKeys(data, {
     deep: true,
@@ -166,6 +170,21 @@ export async function getSeasonData(
   return res.json();
 }
 
+
+export async function fetchSearchPerson(request: SearchRequest, reqOptions: RequestInit = options) {
+  try {
+    const res = await fetch(
+      `${BASE_API_URL}/search/person?query=${request.query}&include_adult=true&language=en-US&page=${request.page}`,
+      reqOptions,
+    );
+    const data = await res.json();
+    const camel = camelcaseKeys(data, { deep: true })
+    return camel as Promise<SearchPersonResponse>;
+  } catch (error) {
+    console.error("Error fetching content ratings");
+  }
+}
+
 // export async function getWatchlistsWithItem(
 //   watchlistItem: ShowResponseAppended | MovieResponseAppended,
 //   userId: string,
@@ -215,4 +234,39 @@ export async function fetchDiscoverTvIds() {
   return getIds([trendingTvDaily, trendingTvWeekly, popularTv]);
   ;
 }
+export const getPersonPopularityStats = unstable_cache(
+  async (pages = NUM_OF_POPULAR_PEOPLE_PAGES): Promise<{ sortedScores: number[] }> => {
+    const requests: Promise<PersonPopularResponse>[] = Array.from({ length: pages }, (_, i) =>
+      fetch(`${BASE_API_URL}/person/popular?page=${i + 1}`, options).then(r => r.json())
+    );
+    const results = (await Promise.all(requests))
+      .flatMap((page) => page.results ?? []);
+    const sortedScores = results
+      .map(p => p?.popularity)
+      .sort((a, b) => a - b);
+    return { sortedScores };
+  },
+  [], // no args
+  { revalidate: 60 * 60 * 12 } // cache for 12h
+);
 
+export async function getPersonRank(targetPopularity: number) {
+  const { sortedScores } = await getPersonPopularityStats();
+  // make a copy sorted from high→low
+  const sortedDesc = [...sortedScores].sort((a, b) => b - a);
+  // find your position: first entry that’s ≤ your score
+  const idx = sortedDesc.findIndex((s) => s <= targetPopularity);
+  if (idx === -1) return null; // not in top list
+  // +1 because index 0 → rank #1
+  return idx + 1;
+}
+
+export async function getPersonPercentile(targetPopularity: number) {
+  const { sortedScores } = await getPersonPopularityStats();
+  const sortedDesc = [...sortedScores].sort((a, b) => b - a);
+  const idx = sortedDesc.findIndex((s) => s <= targetPopularity);
+  if (idx === -1) return null; // not in top list
+  const total = sortedDesc.length;
+  // idx 0 → top: 100%, idx = total-1 → bottom: 0%
+  return Math.round((1 - idx / (total - 1)) * 100);
+}

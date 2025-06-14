@@ -613,7 +613,7 @@ export interface TrendingRequest extends RequestParams {
 }
 
 export interface TrendingResponse extends PaginatedResponse {
-  results: Array<MovieResult | TvResult>;
+  results: Array<MovieResult | TvResult | PersonResult>;
 }
 
 export interface MovieResponse extends Response {
@@ -1401,9 +1401,11 @@ export interface PersonPopularResponse extends PaginatedResponse {
     profile_path?: string;
     adult?: boolean;
     id?: number;
-    known_for?: MovieResult | TvResult;
+    known_for?: Array<MovieResult | TvResult>;
+    known_for_department?: string
+    gender?: number;
     name?: string;
-    popularity?: number;
+    popularity: number;
   }>;
 }
 

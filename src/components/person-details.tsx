@@ -1,6 +1,9 @@
+import { ExpandableText } from "@/app/(media)/_components/expandable-overview";
 import PersonBio from "./person-bio";
+import { NUM_OF_POPULAR_PEOPLE_PAGES, TMDB_GENDERS } from "@/lib/constants";
+import { getPersonPercentile, getPersonPopularityStats, getPersonRank } from "@/app/(media)/actions";
 
-export function PersonDetails({
+export async function PersonDetails({
   name,
   biography,
   birthDate,
@@ -9,6 +12,8 @@ export function PersonDetails({
   knownForDept,
   placeOfBirth,
   paramsId,
+  gender,
+  knownCredits
 }: {
   name?: string;
   biography?: string;
@@ -18,6 +23,8 @@ export function PersonDetails({
   knownForDept?: string | null;
   placeOfBirth?: string | null;
   paramsId?: number;
+  gender: string;
+  knownCredits: number;
 }) {
   let birthYear, deathYear, formattedDeathDate, age;
   const formattedBirthDate = new Intl.DateTimeFormat("us", {
@@ -43,34 +50,53 @@ export function PersonDetails({
     age = years.toString().split(".")[0];
   }
 
-  const role = new Map([["Acting", "Actor"]]);
-
   return (
-    <div className="flex flex-col justify-between space-y-1 items-center md:items-start">
-      <h2 className="text-3xl md:text-5xl font-medium text-center md:text-start pb-2">
-        {deathDay !== null ? `${name} (${birthYear} - ${deathYear})` : name}
-      </h2>
-      <div className="flex flex-col text-lg items-start justify-center md:justify-start">
-        {knownForDept && <span>{role.get(knownForDept)}</span>}
-        {birthDate && (
+    <section className="flex flex-col space-y-6">
+      <div className="grid grid-cols-3 md:grid-cols-3 gap-y-6 gap-x-3 text-left">
+        {formattedBirthDate && (
           <div>
-            <span>Born: {formattedBirthDate} </span>
-            <>{placeOfBirth && <span>in {placeOfBirth}</span>}</>
+            <div className="text-xs font-bold text-gray-400 uppercase">
+              Born
+            </div>
+            <time dateTime={formattedBirthDate} className="mt-1 block">
+              {formattedBirthDate}
+            </time>
           </div>
         )}
-        {deathDay && <span>Died: {formattedDeathDate}</span>}
-        {age && <span>Age: {age}</span>}
-        <div className="inline-flex items-center">
-          <span className="mr-2">
-            Popularity: {Math.round(popularity ?? 0)}
-          </span>
-          <>{/* <span>•</span> */}</>
+        <div>
+          <div className="text-xs font-bold text-gray-400 uppercase">
+            Age
+          </div>
+          <div>{age}</div>
+        </div>
+        <div>
+          <div className="text-xs font-bold text-gray-400 uppercase">
+            Gender
+          </div>
+          <div>{gender}</div>
+        </div>
+        <div>
+          <div className="text-xs font-bold text-gray-400 uppercase">
+            Place Of Birth
+          </div>
+          <div>{placeOfBirth ?? "unknown"}</div>
+        </div>
+        <div>
+          <div className="text-xs font-bold text-gray-400 uppercase">
+            Known For
+          </div>
+          <div>{knownForDept}</div>
+        </div>
+        <div>
+          <div className="text-xs font-bold text-gray-400 uppercase">
+            Known Credits
+          </div>
+          <div>{knownCredits}</div>
         </div>
       </div>
-      <br />
-      <div className="">
-        <PersonBio bio={biography ?? ""} />
-      </div>
-    </div>
-  );
+      {biography &&
+        <div><div className="text-xs font-bold text-gray-400 uppercase">Biography</div>
+          <ExpandableText text={biography} /></div>
+      }
+    </section>)
 }

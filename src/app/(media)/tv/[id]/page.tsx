@@ -1,6 +1,6 @@
 import { fetchDiscoverTvIds, fetchTvDetails, getRecommendations } from "@/app/(media)/actions";
 import Link from "next/link";
-import { ShowResponseAppended, TvResultsResponse, Video } from "@/types/request-types-snakecase";
+import { Video } from "@/types/request-types-snakecase";
 import Image from "next/image";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";

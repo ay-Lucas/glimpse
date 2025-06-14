@@ -1,8 +1,7 @@
 import { ReactNode, Suspense } from "react";
 import Image from "next/image";
 import { fetchTvDetails } from "@/app/(media)/actions";
-import { BASE_ORIGINAL_IMAGE_URL, BASE_BLUR_IMAGE_URL } from "@/lib/constants";
-import { getBlurData } from "@/lib/blur-data-generator";
+import { BASE_ORIGINAL_IMAGE_URL, BASE_BLUR_IMAGE_URL, DEFAULT_BLUR_DATA_URL } from "@/lib/constants";
 import PrefetchBannerColor from "../../_components/prefetch-banner-color";
 
 export const revalidate = 43200; // 12 hours
@@ -16,7 +15,8 @@ export default async function TvLayout({
 }) {
   const tmdbId = params.id;
   const tv = await fetchTvDetails(tmdbId);
-  const blurDataUrl = tv.backdropBlurDataUrl ?? (await getBlurData(`${BASE_BLUR_IMAGE_URL}${tv.backdropPath}`))
+  // const blurDataUrl = tv.backdropBlurDataUrl ?? (await getBlurData(`${BASE_BLUR_IMAGE_URL}${tv.backdropPath}`))
+  const blurDataUrl = DEFAULT_BLUR_DATA_URL;
   // console.log(`TV layout rendered ${tv.name}`)
   return (
 

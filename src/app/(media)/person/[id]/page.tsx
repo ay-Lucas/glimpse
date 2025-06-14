@@ -1,71 +1,152 @@
-import { getPersonDetails } from "@/app/(media)/actions";
-import { auth } from "@/auth";
-import { getWatchlists } from "@/lib/actions";
-import { getBlurData } from "@/lib/blur-data-generator";
+import { fetchPersonDetails } from "@/app/(media)/actions";
 import {
-  BASE_ORIGINAL_IMAGE_URL,
   BASE_POSTER_IMAGE_URL,
   DEFAULT_BLUR_DATA_URL,
+  options,
+  TMDB_GENDERS,
 } from "@/lib/constants";
 import { PersonDetails } from "@/components/person-details";
 import Image from "next/image";
+import Link from "next/link";
+import { getTrendingPages } from "@/app/discover/actions";
+import { PersonCombinedCreditsResponse, PersonResult, TvResult, MovieResult } from "@/types/request-types-camelcase";
+import ImageCarousel from "@/components/image-carousel";
+import { Card } from "@/components/card";
+import { getPersonPopularityStats, getPersonRank } from "@/app/(media)/actions";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { HiQuestionMarkCircle } from "react-icons/hi";
 
 export const revalidate = 43200; // 12 hours
+
+//TODO: SSG all actors on discover page
+export async function generateStaticParams() {
+  const trendingPeople = await getTrendingPages({ media_type: "person", time_window: "day", page: 1 },
+    6, true, options
+  ) as PersonResult[];
+  const trendingPeopleIds = trendingPeople.map(item => ({ id: String(item.id) }))
+  return trendingPeopleIds;
+  // const blurData = discoverCas
+  // const posterBlurData = person.profilePath
+  //   ? await getBlurData(`${BASE_ORIGINAL_IMAGE_URL}${person.profilePath}`)
+  //   : null;
+}
+function getTopPopularCredits(limit: number, credits: PersonCombinedCreditsResponse) {
+  const prominent = credits.cast?.filter(c => {
+    if (c.mediaType === 'movie') {
+      // order is TMDB’s cast index: 0 is the lead, 1–7 are your co-stars, 8+ tends to be day players & cameos
+      return (typeof c.order === 'number' && c.order < 5);
+    }
+
+    if (c.mediaType === 'tv') {
+      return (
+        (typeof c.order === 'number' && c.order < 5)
+        || (typeof (c as any).episodeCount === 'number' && (c as any).episodeCount >= 10)
+      );
+    }
+
+    return false;
+  });
+  const sorted = prominent?.sort((a, b) => {
+    // primary: billing order (lower = more starred)
+    const oa = typeof a.order === 'number' ? a.order : Infinity;
+    const ob = typeof b.order === 'number' ? b.order : Infinity;
+    if (oa !== ob) return oa - ob;
+    // secondary: popularity (higher first)
+    return (b.popularity ?? 0) - (a.popularity ?? 0);
+  });
+
+  return sorted?.slice(0, limit);
+}
+
 
 export default async function PersonPage({
   params,
 }: {
   params: { type: "person"; id: number };
 }) {
-  const person = await getPersonDetails(params.id);
+  const person = await fetchPersonDetails(params.id);
 
-  const session = await auth();
-  let userWatchlists;
-  if (session) {
-    userWatchlists = await getWatchlists(session.user.id);
-  }
-
-  const posterBlurData = person.profile_path
-    ? await getBlurData(`${BASE_ORIGINAL_IMAGE_URL}${person.profile_path}`)
-    : null;
-
+  const gender = TMDB_GENDERS.get(person.gender ?? 0)
+  const mixedCombinedCredits = [...person.combinedCredits.cast ?? [], ...person.combinedCredits.crew ?? []]
+  const uniqueCombinedCredits = new Set(mixedCombinedCredits.map(item => item.id).filter((id): id is number => (id ?? 0) > 0))
+  const uniqueCombinedCreditsCount = uniqueCombinedCredits.size;
+  const top10PopularCredits = getTopPopularCredits(10, person.combinedCredits)
+  const rank = await getPersonRank(person.popularity ?? 0);
+  const total = (await getPersonPopularityStats()).sortedScores.length;
   return (
     <main>
-      <div className="h-full w-full overflow-x-hidden">
-        <div className="absolute top-0 left-0 mb-10 w-screen h-screen">
-          <div className="absolute z-0 top-0 left-0 h-full w-full items-center justify-center bg-gradient-to-b from-background to-background/50 via-gray-900" />
-        </div>
-
-        <div className="h-[6vh] md:h-[25vh]"></div>
+      <div className="h-full w-full overflow-x-hidden pb-20">
+        <div className="fixed z-0 top-0 left-0 h-full w-full items-center justify-center bg-gradient-to-t from-background to-gray-800 via-background" />
+        <div className="h-[6vh] md:h-[10vh]"></div>
         <div className="relative px-3 md:container items-end pt-16">
           <div className="items-end pb-5 md:pt-0 px-0 lg:px-40 space-y-5">
-            <div>
-              <div className="flex flex-col md:flex-row h-full md:h-3/4 z-10 md:items-center md:space-x-5 pb-3">
-                {person.profile_path && (
-                  <Image
-                    quality={60}
-                    width={190}
-                    height={285}
-                    src={`${BASE_POSTER_IMAGE_URL}${person.profile_path}`}
-                    className={`object-cover rounded-xl md:rounded-l-xl mx-auto w-[238px] h-[357px]`}
-                    priority
-                    placeholder="blur"
-                    blurDataURL={posterBlurData ?? DEFAULT_BLUR_DATA_URL}
-                    loading="eager"
-                    alt="poster image"
-                  />
+
+            <section className="bg-background/40 backdrop-blur-xl rounded-lg p-4 md:p-6">
+              <div className="grid grid-cols-1 md:grid-cols-[238px,1fr] gap-5 items-start">
+                {person.profilePath && (
+                  <figure className="w-full">
+                    <Image
+                      quality={60}
+                      width={238}
+                      height={357}
+                      src={`${BASE_POSTER_IMAGE_URL}${person.profilePath}`}
+                      className="object-cover rounded-lg w-full h-full"
+                      priority
+                      placeholder="blur"
+                      blurDataURL={DEFAULT_BLUR_DATA_URL}
+                      alt={`${person.name} poster`}
+                      loading="eager"
+                    />
+                  </figure>
                 )}
-                <PersonDetails
-                  name={person.name}
-                  biography={person.biography}
-                  birthDate={person.birthday}
-                  deathDay={person.deathday}
-                  popularity={person.popularity}
-                  placeOfBirth={person.place_of_birth}
-                  knownForDept={person.known_for_department}
-                />
+
+                <div className="space-y-4">
+                  <div>
+                    <h1 className="text-3xl md:text-5xl font-bold text-center md:text-left">
+                      {person.name}
+                    </h1>
+                  </div>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <div className="flex space-x-3 items-center">
+                        <div className="text-lg font-bold text-gray-400 flex space-x-1 items-center">
+                          <HiQuestionMarkCircle size={17} />
+                          <p className="pr-2">Rank</p>
+                          <p className="text-white">
+                            {rank && rank <= total ? `#${rank} of ${total}` : `> ${total}`}
+                          </p>
+                        </div>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent><p>{rank ? `Out of the ${total} most popular actors, ${person.name} ranks ${rank}` : `${person.name} does not rank within the top ${total}`}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                  <PersonDetails
+                    name={person.name}
+                    biography={person.biography}
+                    birthDate={person.birthday}
+                    deathDay={person.deathday}
+                    popularity={person.popularity}
+                    placeOfBirth={person.placeOfBirth}
+                    knownForDept={person.knownForDepartment}
+                    gender={gender ?? "unknown"}
+                    knownCredits={uniqueCombinedCreditsCount}
+                  />
+                </div>
               </div>
-            </div>
+            </section>
+            <ImageCarousel
+              breakpoints="page"
+              title={<h2 className={`text-2xl font-bold`}>Known For</h2>}
+              loading="lazy"
+              items={top10PopularCredits?.map((item, index): JSX.Element => (
+                <Link href={`/${item.mediaType}/${item.id}`} key={item.id}>
+                  <Card
+                    imagePath={`${BASE_POSTER_IMAGE_URL}${item.posterPath}`}
+                    title={(item as MovieResult).title ?? (item as TvResult).name}
+                    overview={item.overview} />
+                </Link>
+              ))!} />
           </div>
         </div>
       </div>

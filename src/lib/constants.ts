@@ -84,3 +84,7 @@ export const genres = new Map([
   ["War", 1075],
   ["Western", 37],
 ]);
+
+export const TMDB_GENDERS = new Map([[0, "Not Specified"], [1, "Female"], [2, "Male"], [3, "Non-binary"]]);
+
+export const NUM_OF_POPULAR_PEOPLE_PAGES = 25;
