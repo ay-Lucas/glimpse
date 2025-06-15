@@ -1,8 +1,7 @@
-import { fetchPersonDetails } from "@/app/(media)/actions";
+import { fetchTopPeopleIds, fetchPersonDetails } from "@/app/(media)/actions";
 import {
   BASE_POSTER_IMAGE_URL,
   DEFAULT_BLUR_DATA_URL,
-  options,
   TMDB_GENDERS,
 } from "@/lib/constants";
 import { PersonDetails } from "@/components/person-details";
@@ -20,16 +19,12 @@ export const revalidate = 43200; // 12 hours
 
 //TODO: SSG all actors on discover page
 export async function generateStaticParams() {
-  const trendingPeople = await getTrendingPages({ media_type: "person", time_window: "day", page: 1 },
-    6, true, options
-  ) as PersonResult[];
-  const trendingPeopleIds = trendingPeople.map(item => ({ id: String(item.id) }))
-  return trendingPeopleIds;
-  // const blurData = discoverCas
-  // const posterBlurData = person.profilePath
-  //   ? await getBlurData(`${BASE_ORIGINAL_IMAGE_URL}${person.profilePath}`)
-  //   : null;
+  if (process.env.IS_LOCALHOST === "true") {
+    return []
+  }
+  return await fetchTopPeopleIds()
 }
+
 function getTopPopularCredits(limit: number, credits: PersonCombinedCreditsResponse) {
   const prominent = credits.cast?.filter(c => {
     if (c.mediaType === 'movie') {
