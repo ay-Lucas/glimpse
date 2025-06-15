@@ -23,7 +23,7 @@ import {
 } from "@/types/request-types-camelcase";
 import camelcaseKeys from "camelcase-keys";
 import { unstable_cache } from "next/cache";
-import { fetchTmdbMovieLists, fetchTmdbTvLists } from "@/app/discover/actions";
+import { fetchTmdbMovieLists, fetchTmdbTvLists, getTrendingPages } from "@/app/discover/actions";
 
 export const fetchPersonDetails = unstable_cache(async (
   id: number,
@@ -203,11 +203,11 @@ export async function fetchSearchPerson(request: SearchRequest, reqOptions: Requ
 // }
 
 
-export async function fetchDiscoverMovieIds() {
+export async function fetchDiscoverMovieIds(reqOptions: RequestInit = options) {
   const [
     { trendingMoviesDaily, trendingMoviesWeekly, popularMovies, upcomingMovies },
   ] = await Promise.all([
-    fetchTmdbMovieLists(),
+    fetchTmdbMovieLists(reqOptions),
   ]);
 
   function getIds(discoverItemArrays: Array<MovieResult[]>) {
@@ -216,14 +216,13 @@ export async function fetchDiscoverMovieIds() {
   }
 
   return getIds([trendingMoviesDaily, trendingMoviesWeekly, popularMovies, upcomingMovies]);
-  ;
 }
 
-export async function fetchDiscoverTvIds() {
+export async function fetchDiscoverTvIds(reqOptions: RequestInit = options) {
   const [
     { trendingTvDaily, trendingTvWeekly, popularTv },
   ] = await Promise.all([
-    fetchTmdbTvLists(),
+    fetchTmdbTvLists(reqOptions),
   ]);
 
   function getIds(discoverItemArrays: Array<TvResult[]>) {
@@ -232,8 +231,18 @@ export async function fetchDiscoverTvIds() {
   }
 
   return getIds([trendingTvDaily, trendingTvWeekly, popularTv]);
-  ;
 }
+
+export async function fetchTopPeopleIds(reqOptions: RequestInit = options) {
+  const trendingPeople = await getTrendingPages({ media_type: "person", time_window: "day", page: 1 },
+    6, true, reqOptions
+  ) as PersonResult[];
+
+  const trendingPeopleIds = trendingPeople.map(item => ({ id: String(item.id) }))
+
+  return trendingPeopleIds;
+}
+
 export const getPersonPopularityStats = unstable_cache(
   async (pages = NUM_OF_POPULAR_PEOPLE_PAGES): Promise<{ sortedScores: number[] }> => {
     const requests: Promise<PersonPopularResponse>[] = Array.from({ length: pages }, (_, i) =>

@@ -1,14 +1,14 @@
-import { fetchTmdbMovieLists, fetchTmdbTvLists } from "@/app/discover/actions";
 import { getBaseUrl } from "@/lib/utils";
-import { MovieResult, TvResult } from "@/types/request-types-camelcase";
 import { fileURLToPath } from "url";
+import { join, dirname } from "path";
+import dotenv from "dotenv";
+import pLimit from "p-limit";
+import { fetchDiscoverMovieIds, fetchDiscoverTvIds, fetchTopPeopleIds } from "@/app/(media)/actions";
 
 // __dirname shim for ESM
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-
-import dotenv from "dotenv";
-import { join, dirname } from "path";
+const STATIC_PATHS = ["/", "/discover"]
 
 dotenv.config({ path: join(__dirname, "../.env.local") });
 
@@ -20,39 +20,47 @@ const options = {
   },
 } as const;
 
-export async function revalidate() {
-  const { trendingMoviesDaily, trendingMoviesWeekly, popularMovies, upcomingMovies } = await fetchTmdbMovieLists(options);
-  const { trendingTvWeekly, trendingTvDaily, popularTv } = await fetchTmdbTvLists(options);
 
-  const tvShows = [...trendingTvWeekly, ...trendingTvDaily, ...popularTv]
-  const movies = [...trendingMoviesDaily, ...trendingMoviesWeekly, ...popularMovies, ...upcomingMovies]
-  await revalidatePaths(movies, tvShows);
+export async function revalidate() {
+  const baseUrl = getBaseUrl();
+
+  const tvPaths = (await fetchDiscoverTvIds(options)).map(item => `/tv/${item.id}`);
+  const tvSeasonPaths = tvPaths.map(tvPath => `${tvPath}/seasons`)
+  const moviePaths = (await fetchDiscoverMovieIds(options)).map(item => `/movie/${item.id}`)
+  const personPaths = (await fetchTopPeopleIds(options)).map(item => `/person/${item.id}`)
+
+  // Prevent duplicates with Set
+  const allPaths = Array.from(new Set([
+    ...personPaths,
+    ...tvPaths,
+    ...tvSeasonPaths,
+    ...moviePaths,
+    ...STATIC_PATHS
+  ]))
+
+  await revalidatePaths(allPaths, baseUrl);
+  await warmCache(baseUrl, allPaths);
 }
 
-async function revalidatePaths(movies: MovieResult[], tvShows: TvResult[]) {
+async function revalidatePaths(paths: string[], baseUrl: string) {
   try {
     console.log("Revalidating paths...")
 
-    const tvPaths = tvShows.map(item => `/tv/${item.id}`)
-    const tvSeasonPaths = tvPaths.map(tvPath => `${tvPath}/seasons`)
-    const moviePaths = movies.map(item => `/movie/${item.id}`)
-    const allPaths = [...tvPaths, ...tvSeasonPaths, ...moviePaths, "/discover", "/"];
-    const baseUrl = getBaseUrl();
     const response = await fetch(`${baseUrl}/api/revalidate`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           secret: process.env.REVALIDATE_SECRET,
-          paths: allPaths,
+          paths: paths,
         }),
       }
     );
 
-    const json: { revalidated: string[] } | undefined = await response.json();
-    if (!json) throw new Error("revalidatePaths failed, 0 paths revalidated")
+    if (!response.ok) throw new Error(await response.text());
 
-    let tvPathsNum = 0, tvSeasonPathsNum = 0, moviePathsNum = 0;
+    const json: { revalidated: string[] } = await response.json();
+    let tvPathsNum = 0, tvSeasonPathsNum = 0, moviePathsNum = 0, personPathsNum = 0;
     let unmatchedPaths: string[] = [];
 
     json?.revalidated.forEach(path => {
@@ -62,15 +70,41 @@ async function revalidatePaths(movies: MovieResult[], tvShows: TvResult[]) {
         tvSeasonPathsNum++;
       else if (isMoviePath(path))
         moviePathsNum++;
+      else if (isPersonPath(path))
+        personPathsNum++;
       else
         unmatchedPaths.push(path)
     })
 
     console.log("Revalidate response:\n" + JSON.stringify(json, null, 2));
-    console.log(`Revalidated: \n${tvPathsNum} TV Paths\n${tvSeasonPathsNum} TV Season Paths\n${moviePathsNum} Movie Paths\n${unmatchedPaths.length} Unmatched Paths`)
-    console.log(`\nRevalidated ${unmatchedPaths.length} Unmatched Paths: \n` + JSON.stringify(unmatchedPaths, null, 2));
+    console.log(`Revalidated: \n${tvPathsNum} TV Paths\n${tvSeasonPathsNum} TV Season Paths\n${moviePathsNum} Movie Paths\n${personPathsNum} Person Paths\n${unmatchedPaths.length} Unmatched Paths`)
+    console.log(`Unmatched Paths (${unmatchedPaths.length}):\n` + JSON.stringify(unmatchedPaths, null, 2));
   } catch (error) {
     console.error("Backfill + revalidate failed: ", error)
+  }
+}
+
+async function warmCache(baseUrl: string, paths: string[]) {
+  const failures: string[] = [];
+  const limit = pLimit(5); // 10 concurrent
+  const tasks = paths.map((p) =>
+    limit(async () => {
+      try {
+        const res = await fetch(`${baseUrl}${p}`);
+        if (!res.ok) throw new Error(`status ${res.status}`);
+      } catch (err) {
+        console.error(`Warm cache error for ${p}:`, err);
+        failures.push(p);
+      }
+    })
+  )
+
+  await Promise.all(tasks);
+
+  if (failures.length) {
+    console.warn(`Warm cache had ${failures.length} failures:`, failures);
+  } else {
+    console.log(`Successfully warmed cache for ${paths.length} paths`)
   }
 }
 
@@ -84,6 +118,10 @@ function isTvSeasonPath(str: string) {
 
 function isMoviePath(str: string) {
   return str.startsWith("/movie")
+}
+
+function isPersonPath(str: string) {
+  return str.startsWith("/person")
 }
 
 revalidate().then(res => console.log(`Script completed`)).catch(error => console.error(error))
