@@ -1,4 +1,4 @@
-import { fetchDiscoverTvIds, fetchTvDetails, getRecommendations } from "@/app/(media)/actions";
+import { fetchDirectOffers, fetchDiscoverTvIds, fetchTvDetails, getRecommendations } from "@/app/(media)/actions";
 import Link from "next/link";
 import { Video } from "@/types/request-types-snakecase";
 import Image from "next/image";
@@ -17,9 +17,10 @@ import { TvDetails } from "../../_components/tv-details";
 import { ScoreCircle } from "../../_components/score-circle";
 import MediaActions from "../../_components/media-actions";
 import { ChevronRight } from "lucide-react";
-import { countryCodeToEnglishName, languageCodeToEnglishName } from "@/lib/utils";
+import { countryCodeToEnglishName, languageCodeToEnglishName, stripJustWatchTracking } from "@/lib/utils";
 import ImageCarousel from "@/components/image-carousel";
 import VideoPlayer from "../../_components/video-player";
+import ProviderList from "../../_components/provider-list";
 
 function getTrailer(videoArray: Array<Video>) {
   const trailer: Array<Video> = videoArray.filter(
@@ -76,9 +77,8 @@ export default async function TvPage({ params }: { params: { id: number } }) {
     tv.firstAirDate !== undefined &&
     tv.firstAirDate !== null &&
     new Date(tv.firstAirDate).valueOf() < Date.now();
-
+  const justWatchData = await fetchDirectOffers(tv.name, "show", tv.firstAirDate)
   // console.log(`Tv page rendered! ${tv.name}`)
-
   return (
     <main>
       {tv && (
@@ -86,7 +86,7 @@ export default async function TvPage({ params }: { params: { id: number } }) {
           <div className="h-full w-full overflow-x-hidden pb-20">
             <div className="h-[6vh] md:h-[10vh]"></div>
             <div className="relative px-3 md:container items-end pt-16">
-              <div className="items-end pb-5 md:pt-0 px-0 lg:px-40 space-y-5">
+              <div className="items-end pb-5 md:pt-0 px-0 lg:px-24 space-y-5">
 
                 <section className="bg-background/20 backdrop-blur-sm rounded-lg p-4 md:p-6">
                   <div className="grid grid-cols-1 md:grid-cols-[238px,1fr] gap-5 items-start">
@@ -225,25 +225,29 @@ export default async function TvPage({ params }: { params: { id: number } }) {
                               </Link>
                             </span>
                           </h2>
-                          <div className="flex flex-wrap gap-2">
-                            {tv.watchProviders?.results?.US?.flatrate?.map(
-                              (item, index) => (
-                                <a
-                                  href={tv.watchProviders?.results?.US?.link!}
-                                  key={index}
-                                  className="w-[55px] h-[55px] flex-shrink-0 transform transition-transform  duration-200  hover:scale-105  hover:shadow-xl"
-                                >
-                                  <Image
-                                    src={`https://image.tmdb.org/t/p/original/${item.logoPath}`}
-                                    alt={`${item.providerName} logo`}
-                                    width={55}
-                                    height={55}
-                                    className="rounded-lg object-cover"
-                                  />
-                                </a>
-                              ),
-                            )}
-                          </div>
+                          {justWatchData ? (
+                            <ProviderList info={justWatchData} />
+                          ) : (
+                            <div className="flex flex-wrap gap-2">{
+                              tv.watchProviders?.results?.US?.flatrate?.map(
+                                (item, index) => (
+                                  <a
+                                    href={tv.watchProviders?.results?.US?.link!}
+                                    key={index}
+                                    className="w-[55px] h-[55px] flex-shrink-0 transform transition-transform  duration-200  hover:scale-105  hover:shadow-xl"
+                                  >
+                                    <Image
+                                      src={`https://image.tmdb.org/t/p/original/${item.logoPath}`}
+                                      alt={`${item.providerName} logo`}
+                                      width={55}
+                                      height={55}
+                                      className="rounded-lg object-cover"
+                                    />
+                                  </a>
+                                ),
+                              )}
+                            </div>
+                          )}
                         </div>
                       )}
                   </Suspense>
@@ -277,7 +281,7 @@ export default async function TvPage({ params }: { params: { id: number } }) {
                     </div>
                   </>
                 )}
-                {tv.credits?.cast && (
+                {tv.credits?.cast && tv.credits.cast.length > 0 && (
                   <Suspense
                     fallback={<Skeleton className="w-full h-[356px] rounded-xl" />}
                   >
@@ -310,13 +314,12 @@ export default async function TvPage({ params }: { params: { id: number } }) {
                     tmdbId={tmdbId}
                   />
                 </Suspense>
+                <Suspense
+                  fallback={<Skeleton className="w-full h-[194px] rounded-xl" />}>
+                  <ReviewSection id={tmdbId} type={"tv"} />
+                </Suspense>
               </div>
 
-              <Suspense
-                fallback={<Skeleton className="w-full h-[194px] rounded-xl" />}
-              >
-                <ReviewSection id={tmdbId} type={"tv"} />
-              </Suspense>
             </div>
           </div>
 

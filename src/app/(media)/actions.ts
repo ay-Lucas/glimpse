@@ -24,6 +24,7 @@ import {
 import camelcaseKeys from "camelcase-keys";
 import { unstable_cache } from "next/cache";
 import { fetchTmdbMovieLists, fetchTmdbTvLists, getTrendingPages } from "@/app/discover/actions";
+import JustWatch from 'justwatch-api-client';
 
 export const fetchPersonDetails = unstable_cache(async (
   id: number,
@@ -181,7 +182,7 @@ export async function fetchSearchPerson(request: SearchRequest, reqOptions: Requ
     const camel = camelcaseKeys(data, { deep: true })
     return camel as Promise<SearchPersonResponse>;
   } catch (error) {
-    console.error("Error fetching content ratings");
+    console.error("Error fetching search person");
   }
 }
 
@@ -279,3 +280,21 @@ export async function getPersonPercentile(targetPopularity: number) {
   // idx 0 → top: 100%, idx = total-1 → bottom: 0%
   return Math.round((1 - idx / (total - 1)) * 100);
 }
+
+
+export const fetchDirectOffers = unstable_cache(async (tmdbTitle: string, type: 'movie' | 'show', releaseDate?: Date | null,) => {
+  const releaseYear = releaseDate ? new Date(releaseDate).getFullYear() : null;
+  // 1) Search JustWatch for your title
+  const justwatch = new JustWatch(5000);
+  // Search for a movie/show (with optional country code, default is "IN")
+  const searchResults = await justwatch.searchByQuery(tmdbTitle, "US")
+  const matches = searchResults.filter(item => item.title?.toLowerCase() === tmdbTitle.toLowerCase()
+    && item.fullPath
+    && (releaseYear ? item.originalReleaseYear === releaseYear : true))
+  const firstMatch = matches[0];
+  // console.log(searchResults)
+  // console.log(firstMatch)
+  const data = firstMatch?.fullPath && await justwatch.getData(firstMatch.fullPath, "US")
+  console.log(data)
+  return data
+})

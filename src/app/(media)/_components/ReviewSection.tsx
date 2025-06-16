@@ -20,7 +20,7 @@ export default async function ReviewSection({
   const reviews = res.results;
   if (!reviews || (reviews && reviews?.length < 1)) return;
   return (
-    <div className="px-0 lg:px-40">
+    <div>
       <h2 className="text-2xl font-semibold pb-5 pr-3 inline-flex">Reviews</h2>
       <span className="text-2xl font-semibold">({reviews?.length ?? 0})</span>
       <div className="space-y-3">

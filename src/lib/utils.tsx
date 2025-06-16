@@ -241,3 +241,16 @@ export function getBaseUrl() {
 
   return `http://localhost:${process.env.PORT ?? 3000}`;
 }
+
+export function stripJustWatchTracking(raw: string): string {
+  try {
+    const url = new URL(raw)
+    console.log(raw)
+    // JustWatch’s redirect puts the real link in `r`
+    const target = url.searchParams.get('r')
+    // console.log(target ? decodeURIComponent(target) : raw)
+    return target ? decodeURIComponent(target) : raw
+  } catch {
+    return raw
+  }
+}

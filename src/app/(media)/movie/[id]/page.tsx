@@ -10,7 +10,7 @@ import {
 } from "@/lib/constants";
 import { RecommededSection } from "@/app/(media)/_components/recommendedSection";
 import ReviewSection from "@/app/(media)/_components/ReviewSection";
-import { fetchMovieDetails, fetchDiscoverMovieIds, getRecommendations } from "../../actions";
+import { fetchMovieDetails, fetchDiscoverMovieIds, getRecommendations, fetchDirectOffers } from "../../actions";
 import { countryCodeToEnglishName, getTrailer, languageCodeToEnglishName } from "@/lib/utils";
 import JustWatchLogo from "@/assets/justwatch-logo.svg";
 import CastCard from "@/components/cast-card";
@@ -19,6 +19,7 @@ import MediaActions from "../../_components/media-actions";
 import { ScoreCircle } from "../../_components/score-circle";
 import ImageCarousel from "@/components/image-carousel";
 import VideoPlayer from "../../_components/video-player";
+import ProviderList from "../../_components/provider-list";
 
 export const revalidate = 43200; // 12 hours
 
@@ -62,6 +63,8 @@ export default async function MoviePage({
     (movie?.releaseDate &&
       new Date(movie?.releaseDate!).valueOf() < Date.now()) ||
     false;
+  const justWatchData = await fetchDirectOffers(movie.title, "show", movie.releaseDate)
+  const flatrate = movie.watchProviders?.results?.US?.flatrate;
   // console.log(`Movie page rendered! ${movie.title}`)
   // console.log(movie.watchProviders?.results?.US?.flatrate)
   // console.log(movie.watchProviders?.results)
@@ -95,7 +98,7 @@ export default async function MoviePage({
 
             <div className="h-[6vh] md:h-[10vh]"></div>
             <div className="relative px-3 md:container items-end pt-16">
-              <div className="items-end pb-5 md:pt-0 px-0 lg:px-40 space-y-5 ">
+              <div className="items-end pb-5 md:pt-0 px-0 lg:px-24 space-y-5 ">
                 <section className="bg-background/20 backdrop-blur-sm rounded-lg p-4 md:p-6">
                   <div className="grid grid-cols-1 md:grid-cols-[238px,1fr] gap-5 items-start">
                     {movie?.posterPath && (
@@ -222,9 +225,9 @@ export default async function MoviePage({
                       <Skeleton className="w-full h-[356px] rounded-xl" />
                     }
                   >
-                    {movie.watchProviders?.results?.US?.flatrate &&
-                      movie.watchProviders?.results?.US?.flatrate?.length >
-                      0 && (
+                    {(flatrate !== null && flatrate !== undefined &&
+                      flatrate.length > 0) ||
+                      (justWatchData && justWatchData.Streams.length > 0) && (
                         <div className="w-full md:w-1/2 md:pl-3 pt-3 md:pt-0 pb-3 md:pb-0">
                           <h2 className="text-2xl font-bold pb-4">
                             Streaming
@@ -239,27 +242,31 @@ export default async function MoviePage({
                               </Link>
                             </span>
                           </h2>
-                          <div className="flex flex-wrap gap-2">
-                            {movie.watchProviders?.results?.US?.flatrate?.map(
-                              (item, index) => (
-                                <a
-                                  href={
-                                    movie.watchProviders?.results?.US?.link!
-                                  }
-                                  key={index}
-                                  className="w-[55px] h-[55px] flex-shrink-0 transform transition-transform  duration-200  hover:scale-105  hover:shadow-xl"
-                                >
-                                  <Image
-                                    src={`${BASE_ORIGINAL_IMAGE_URL}${item.logoPath}`}
-                                    alt={`${item.providerName} logo`}
-                                    width={55}
-                                    height={55}
-                                    className="rounded-lg object-cover"
-                                  />
-                                </a>
-                              ),
-                            )}
-                          </div>
+                          {justWatchData.Streams.length > 0 ? (
+                            <ProviderList info={justWatchData} />
+                          ) : (
+                            <div className="flex flex-wrap gap-2">{
+                              movie.watchProviders?.results?.US?.flatrate?.map(
+                                (item, index) => (
+                                  <a
+                                    href={
+                                      movie.watchProviders?.results?.US?.link!
+                                    }
+                                    key={index}
+                                    className="w-[55px] h-[55px] flex-shrink-0 transform transition-transform  duration-200  hover:scale-105  hover:shadow-xl"
+                                  >
+                                    <Image
+                                      src={`${BASE_ORIGINAL_IMAGE_URL}${item.logoPath}`}
+                                      alt={`${item.providerName} logo`}
+                                      width={55}
+                                      height={55}
+                                      className="rounded-lg object-cover"
+                                    />
+                                  </a>
+                                ),
+                              )}
+                            </div>
+                          )}
                         </div>
                       )}
                   </Suspense>
@@ -303,13 +310,13 @@ export default async function MoviePage({
                     rating={rating}
                   />
                 </Suspense>
+                <Suspense
+                  fallback={<Skeleton className="w-full h-[194px] rounded-xl" />}
+                >
+                  <ReviewSection id={tmdbId} type={"movie"} />
+                </Suspense>
               </div>
 
-              <Suspense
-                fallback={<Skeleton className="w-full h-[194px] rounded-xl" />}
-              >
-                <ReviewSection id={tmdbId} type={"movie"} />
-              </Suspense>
             </div>
           </div>
           {videoPath !== undefined && (
