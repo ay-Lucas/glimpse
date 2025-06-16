@@ -31,11 +31,11 @@ export async function revalidate() {
 
   // Prevent duplicates with Set
   const allPaths = Array.from(new Set([
-    ...personPaths,
+    ...STATIC_PATHS,
     ...tvPaths,
     ...tvSeasonPaths,
     ...moviePaths,
-    ...STATIC_PATHS
+    ...personPaths,
   ]))
 
   await revalidatePaths(allPaths, baseUrl);
@@ -49,7 +49,11 @@ async function revalidatePaths(paths: string[], baseUrl: string) {
     const response = await fetch(`${baseUrl}/api/revalidate`,
       {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-cache-warm-secret": process.env.REVALIDATE_SECRET!,
+          'user-agent': 'revalidater/1.0'
+        },
         body: JSON.stringify({
           secret: process.env.REVALIDATE_SECRET,
           paths: paths,
@@ -90,10 +94,15 @@ async function warmCache(baseUrl: string, paths: string[]) {
   const tasks = paths.map((p) =>
     limit(async () => {
       try {
-        const res = await fetch(`${baseUrl}${p}`);
+        const res = await fetch(`${baseUrl}${p}`, {
+          headers: {
+            "x-cache-warm-secret": process.env.REVALIDATE_SECRET!,
+            'user-agent': 'cache-warmer/1.0'
+          }
+        });
         if (!res.ok) throw new Error(`status ${res.status}`);
       } catch (err) {
-        console.error(`Warm cache error for ${p}:`, err);
+        console.error(`Warm cache error for ${baseUrl}${p}:`, err);
         failures.push(p);
       }
     })
@@ -102,7 +111,7 @@ async function warmCache(baseUrl: string, paths: string[]) {
   await Promise.all(tasks);
 
   if (failures.length) {
-    console.warn(`Warm cache had ${failures.length} failures:`, failures);
+    throw new Error(`Warm cache had ${failures.length} failures:\n${failures}`)
   } else {
     console.log(`Successfully warmed cache for ${paths.length} paths`)
   }
