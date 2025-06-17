@@ -37,11 +37,7 @@ export default auth(async (req) => {
 
   const isAuthenticated = !!req.auth;
   const isPublicRoute =
-    PUBLIC_ROUTES.includes(nextUrl.pathname) ||
-    pathname.startsWith("/tv") ||
-    pathname.startsWith("/movie") ||
-    pathname.startsWith("/person") ||
-    pathname.startsWith("/search");
+    PUBLIC_ROUTES.includes(nextUrl.pathname)
   if (
     (isAuthenticated && pathname.startsWith("/signin")) ||
     (isAuthenticated && pathname.startsWith("/signup")) ||
