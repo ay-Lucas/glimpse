@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, integer, foreignKey, uuid, boolean, unique, serial, doublePrecision, date, jsonb, bigint, primaryKey } from "drizzle-orm/pg-core"
+import { pgTable, text, timestamp, unique, foreignKey, uuid, boolean, integer, serial, doublePrecision, date, jsonb, bigint, primaryKey } from "drizzle-orm/pg-core"
   import { sql } from "drizzle-orm"
 
 
@@ -11,10 +11,18 @@ export const rateLimitLog = pgTable("rate_limit_log", {
 	createdAt: timestamp("created_at", { mode: 'string' }).defaultNow().notNull(),
 });
 
-export const rateLimitViolation = pgTable("rate_limit_violation", {
-	ip: text().primaryKey().notNull(),
-	count: integer().default(1).notNull(),
-	lastViolation: timestamp("last_violation", { mode: 'string' }).defaultNow().notNull(),
+export const user = pgTable("user", {
+	id: text().primaryKey().notNull(),
+	name: text(),
+	email: text(),
+	emailVerified: timestamp({ mode: 'string' }),
+	image: text(),
+	password: text(),
+},
+(table) => {
+	return {
+		userEmailUnique: unique("user_email_unique").on(table.email),
+	}
 });
 
 export const watchlist = pgTable("watchlist", {
@@ -34,6 +42,12 @@ export const watchlist = pgTable("watchlist", {
 	}
 });
 
+export const rateLimitViolation = pgTable("rate_limit_violation", {
+	ip: text().primaryKey().notNull(),
+	count: integer().default(1).notNull(),
+	lastViolation: timestamp("last_violation", { mode: 'string' }).defaultNow().notNull(),
+});
+
 export const session = pgTable("session", {
 	sessionToken: text().primaryKey().notNull(),
 	userId: text().notNull(),
@@ -46,20 +60,6 @@ export const session = pgTable("session", {
 			foreignColumns: [user.id],
 			name: "session_userId_user_id_fk"
 		}).onDelete("cascade"),
-	}
-});
-
-export const user = pgTable("user", {
-	id: text().primaryKey().notNull(),
-	name: text(),
-	email: text(),
-	emailVerified: timestamp({ mode: 'string' }),
-	image: text(),
-	password: text(),
-},
-(table) => {
-	return {
-		userEmailUnique: unique("user_email_unique").on(table.email),
 	}
 });
 
@@ -150,25 +150,6 @@ export const tvSummaries = pgTable("tv_summaries", {
 	}
 });
 
-export const movieSummaries = pgTable("movie_summaries", {
-	id: serial().primaryKey().notNull(),
-	tmdbId: integer("tmdb_id").notNull(),
-	title: text().notNull(),
-	overview: text().notNull(),
-	posterPath: text("poster_path"),
-	backdropPath: text("backdrop_path"),
-	popularity: doublePrecision(),
-	voteAverage: doublePrecision("vote_average"),
-	voteCount: integer("vote_count"),
-	releaseDate: date("release_date"),
-	posterBlurDataUrl: text("poster_blur_data_url"),
-},
-(table) => {
-	return {
-		movieSummariesTmdbIdUnique: unique("movie_summaries_tmdb_id_unique").on(table.tmdbId),
-	}
-});
-
 export const movieDetails = pgTable("movie_details", {
 	summaryId: integer("summary_id").primaryKey().notNull(),
 	adult: boolean().default(true).notNull(),
@@ -209,16 +190,22 @@ export const movieDetails = pgTable("movie_details", {
 	}
 });
 
-export const personSummaries = pgTable("person_summaries", {
+export const movieSummaries = pgTable("movie_summaries", {
 	id: serial().primaryKey().notNull(),
 	tmdbId: integer("tmdb_id").notNull(),
-	name: text().notNull(),
-	profilePath: text("profile_path"),
-	blurDataUrl: text("blur_data_url"),
+	title: text().notNull(),
+	overview: text().notNull(),
+	posterPath: text("poster_path"),
+	backdropPath: text("backdrop_path"),
+	popularity: doublePrecision(),
+	voteAverage: doublePrecision("vote_average"),
+	voteCount: integer("vote_count"),
+	releaseDate: date("release_date"),
+	posterBlurDataUrl: text("poster_blur_data_url"),
 },
 (table) => {
 	return {
-		personSummariesTmdbIdUnique: unique("person_summaries_tmdb_id_unique").on(table.tmdbId),
+		movieSummariesTmdbIdUnique: unique("movie_summaries_tmdb_id_unique").on(table.tmdbId),
 	}
 });
 
@@ -236,6 +223,19 @@ export const personDetails = pgTable("person_details", {
 			foreignColumns: [personSummaries.id],
 			name: "person_details_summary_id_person_summaries_id_fk"
 		}).onDelete("cascade"),
+	}
+});
+
+export const personSummaries = pgTable("person_summaries", {
+	id: serial().primaryKey().notNull(),
+	tmdbId: integer("tmdb_id").notNull(),
+	name: text().notNull(),
+	profilePath: text("profile_path"),
+	blurDataUrl: text("blur_data_url"),
+},
+(table) => {
+	return {
+		personSummariesTmdbIdUnique: unique("person_summaries_tmdb_id_unique").on(table.tmdbId),
 	}
 });
 
