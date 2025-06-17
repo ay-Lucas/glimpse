@@ -7,8 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "backfill-summaries": "tsx -r tsconfig-paths/register scripts/backfillSummaries.ts",
-    "revalidate": "npx tsx -r tsconfig-paths/register scripts/revalidate.ts"
+    "backfill": "tsx -r dotenv/config -r tsconfig-paths/register scripts/backfill.ts",
+    "revalidate": "tsx -r dotenv/config -r tsconfig-paths/register scripts/revalidate.ts"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.7.0",

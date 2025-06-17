@@ -1,16 +1,8 @@
 import { getBaseUrl } from "@/lib/utils";
-import { fileURLToPath } from "url";
-import { join, dirname } from "path";
-import dotenv from "dotenv";
 import pLimit from "p-limit";
 import { fetchDiscoverMovieIds, fetchDiscoverTvIds, fetchTopPeopleIds } from "@/app/(media)/actions";
 
-// __dirname shim for ESM
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 const STATIC_PATHS = ["/", "/discover"]
-
-dotenv.config({ path: join(__dirname, "../.env.local") });
 
 const options = {
   method: "GET",
