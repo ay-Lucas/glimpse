@@ -36,7 +36,7 @@ export const options: RequestInit = {
     Authorization: `Bearer ${process.env.TMDB_ACCESS_TOKEN}`,
   },
   // cache: "force-cache",
-  next: { revalidate: 43200 },
+  // next: { revalidate: 43200 },
 };
 
 export const DISCOVER_LIMIT = 20 as const;
@@ -88,3 +88,4 @@ export const genres = new Map([
 export const TMDB_GENDERS = new Map([[0, "Not Specified"], [1, "Female"], [2, "Male"], [3, "Non-binary"]]);
 
 export const NUM_OF_POPULAR_PEOPLE_PAGES = 25;
+export const NUM_TMDB_PAGES = 2;

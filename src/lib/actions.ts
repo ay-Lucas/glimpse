@@ -766,42 +766,56 @@ export async function getPopularMovies(limit = 10): Promise<DiscoverItem[]> {
   }));
 }
 
-export async function getAllTv(): Promise<DiscoverItem[]> {
-  const rows = await db
-    .select({
-      tmdbId: tvSummaries.tmdbId,
-      title: tvSummaries.name,
-    })
-    .from(tvSummaries)
-    .leftJoin(
-      tvDetails,
-      eq(tvDetails.summaryId, tvSummaries.id),
-    )
+export async function getAllTv(): Promise<DiscoverItem[] | undefined> {
+  try {
+    const rows = await db
+      .select({
+        tmdbId: tvSummaries.tmdbId,
+        title: tvSummaries.name,
+        posterBlurDataUrl: tvSummaries.posterBlurDataUrl
+      })
+      .from(tvSummaries)
 
-  return rows.map((r) => ({
-    tmdbId: r.tmdbId,
-    mediaType: "tv",
-    title: r.title,
-  }));
+    return rows.map((r) => ({
+      tmdbId: r.tmdbId,
+      mediaType: "tv",
+      title: r.title,
+      posterBlurDataUrl: r.posterBlurDataUrl ?? undefined
+    }));
+  }
+  catch (err) {
+    console.error("Error fetching backfilled TV Shows from DB")
+  }
 }
 
-export async function getAllMovies(): Promise<DiscoverItem[]> {
-  const rows = await db
-    .select({
-      tmdbId: movieSummaries.tmdbId,
-      title: movieSummaries.title,
-    })
-    .from(movieSummaries)
-    .leftJoin(
-      movieDetails,
-      eq(movieDetails.summaryId, movieSummaries.id),
-    )
+export async function getAllMovies(): Promise<DiscoverItem[] | undefined> {
+  try {
+    const rows = await db
+      .select({
+        tmdbId: movieSummaries.tmdbId,
+        title: movieSummaries.title,
+        posterBlurDataUrl: movieSummaries.posterBlurDataUrl,
+        backdropPath: movieSummaries.backdropPath
+      })
+      .from(movieSummaries)
 
-  return rows.map((r) => ({
-    tmdbId: r.tmdbId,
-    mediaType: "movie",
-    title: r.title,
-  }));
+    return rows.map((r) => ({
+      tmdbId: r.tmdbId,
+      mediaType: "movie",
+      title: r.title,
+      posterBlurDataUrl: r.posterBlurDataUrl ?? undefined,
+      backdropPath: r.backdropPath ?? undefined
+    }));
+  }
+  catch (err) {
+    console.error("Error fetching backfilled Movies from DB")
+  }
+}
+
+export async function getAllTitles(): Promise<DiscoverItem[]> {
+  const backfilledMovies = await getAllMovies();
+  const backfilledTvShows = await getAllTv();
+  return [...backfilledMovies ?? [], ...backfilledTvShows ?? []]
 }
 
 export async function isRateLimited(ip: string, route: string) {

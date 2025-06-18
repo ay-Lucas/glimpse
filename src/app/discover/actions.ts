@@ -1,6 +1,6 @@
 "server only";
 
-import { BASE_API_URL, options } from "@/lib/constants";
+import { BASE_API_URL, NUM_TMDB_PAGES, options } from "@/lib/constants";
 import {
   DiscoverMovieRequest,
   DiscoverTvRequest,
@@ -116,30 +116,12 @@ export async function fetchTmdbMovieLists(
   reqOptions: RequestInit = options,
 ) {
   const NUM_PAGES = 2;
-  const [trendingMoviesDailyRes, trendingMoviesWeeklyRes, popularMoviesRes, upcomingMoviesRes] =
+  const [{ trendingMoviesDaily, trendingMoviesWeekly }, popularMoviesRes, upcomingMoviesRes] =
     await Promise.all([
-      getTrendingPages(
-        { media_type: "movie", time_window: "day", page: 1 },
-        NUM_PAGES, true, reqOptions
-      ) as Promise<MovieResult[]>,
-      getTrendingPages(
-        { media_type: "movie", time_window: "week", page: 1 },
-        NUM_PAGES, true, reqOptions
-      ) as Promise<MovieResult[]>,
+      fetchTrendingMovies(),
       getPopularPages({ "vote_average.gte": 6 }, "movie", NUM_PAGES, true, reqOptions) as Promise<MovieResult[]>,
       getUpcomingMovies({ page: 1 }, true, reqOptions) as Promise<UpcomingMoviesResponse>,
     ]);
-
-  const trendingMoviesWeekly = trendingMoviesWeeklyRes.filter(
-    (item) =>
-      item.originalLanguage?.toUpperCase() === "EN" &&
-      new Date(item.releaseDate ?? Date.now()).valueOf() < new Date().valueOf(),
-  );
-  const trendingMoviesDaily = trendingMoviesDailyRes.filter(
-    (item) =>
-      item.originalLanguage?.toUpperCase() === "EN" &&
-      new Date(item.releaseDate ?? Date.now()).valueOf() < new Date().valueOf(),
-  );
 
   const upcomingMovies = upcomingMoviesRes.results?.filter(item => item.originalLanguage?.toUpperCase() === "EN") ?? []
 
@@ -156,24 +138,36 @@ export async function fetchTmdbMovieLists(
 export async function fetchTmdbTvLists(
   reqOptions: RequestInit = options,
 ) {
-  const NUM_PAGES = 2;
+  const [{ trendingTvDaily, trendingTvWeekly }, popularTvRes] =
+    await Promise.all([
+      fetchTrendingTv(),
+      getPopularPages({ "vote_average.gte": 6 }, "tv", NUM_TMDB_PAGES, true, reqOptions) as Promise<TvResult[]>,
+    ]);
 
+  const trendingTvIds = new Set([...trendingTvDaily.map(item => item.id), ...trendingTvWeekly.map(item => item.id)])
+
+  // Dedupe popular from trending
+  const popularTv = popularTvRes?.filter(item => !trendingTvIds.has(item.id)) ?? []
+
+  return { trendingTvDaily, trendingTvWeekly, popularTv }
+}
+
+export async function fetchTrendingTv() {
   function isAnime(item: TvResult) {
     return item.originalLanguage?.toUpperCase() === "JA" && item.originCountry?.some(country => country.toUpperCase() === "JP")
   }
 
-  const [trendingTvDailyRes, trendingTvWeeklyRes, popularTvRes] =
+  const [trendingTvDailyRes, trendingTvWeeklyRes] =
     await Promise.all([
       getTrendingPages(
         { media_type: "tv", time_window: "day", page: 1 },
-        NUM_PAGES, true, reqOptions
+        NUM_TMDB_PAGES, true
       ) as Promise<TvResult[]>,
       getTrendingPages(
         { media_type: "tv", time_window: "week", page: 1 },
-        NUM_PAGES, true, reqOptions
+        NUM_TMDB_PAGES, true
       ) as Promise<TvResult[]>,
-      getPopularPages({ "vote_average.gte": 6 }, "tv", NUM_PAGES, true, reqOptions) as Promise<TvResult[]>,
-    ]);
+    ])
 
   const trendingTvWeekly = trendingTvWeeklyRes.filter(
     (item) =>
@@ -186,13 +180,36 @@ export async function fetchTmdbTvLists(
       (isAnime(item) || item.originalLanguage?.toUpperCase() === "EN") &&
       new Date(item.firstAirDate ?? Date.now()).valueOf() < new Date().valueOf(),
   );
+  return { trendingTvDaily, trendingTvWeekly }
+}
 
-  const trendingTvIds = new Set([...trendingTvDaily.map(item => item.id), ...trendingTvWeekly.map(item => item.id)])
+export async function fetchTrendingMovies(
+  reqOptions: RequestInit = options,
+) {
+  const [trendingMoviesDailyRes, trendingMoviesWeeklyRes] =
+    await Promise.all([
+      getTrendingPages(
+        { media_type: "movie", time_window: "day", page: 1 },
+        NUM_TMDB_PAGES, true, reqOptions
+      ) as Promise<MovieResult[]>,
+      getTrendingPages(
+        { media_type: "movie", time_window: "week", page: 1 },
+        NUM_TMDB_PAGES, true, reqOptions
+      ) as Promise<MovieResult[]>,
+    ]);
 
-  // Dedupe popular from trending
-  const popularTv = popularTvRes?.filter(item => !trendingTvIds.has(item.id)) ?? []
+  const trendingMoviesWeekly = trendingMoviesWeeklyRes.filter(
+    (item) =>
+      item.originalLanguage?.toUpperCase() === "EN" &&
+      new Date(item.releaseDate ?? Date.now()).valueOf() < new Date().valueOf(),
+  );
+  const trendingMoviesDaily = trendingMoviesDailyRes.filter(
+    (item) =>
+      item.originalLanguage?.toUpperCase() === "EN" &&
+      new Date(item.releaseDate ?? Date.now()).valueOf() < new Date().valueOf(),
+  );
 
-  return { trendingTvDaily, trendingTvWeekly, popularTv }
+  return { trendingMoviesDaily, trendingMoviesWeekly }
 }
 
 export async function fetchAllMovies(reqOptions?: RequestInit) {
@@ -220,7 +237,7 @@ export async function fetchAllTv(reqOptions?: RequestInit) {
     ...lists.trendingTvWeekly,
     ...lists.trendingTvDaily
   ];
-  console.log(lists)
+  // console.log(lists)
   // Dedupe (weekly and daily trending)
   const seen = new Set<number>();
   return combined.filter((m) => {
