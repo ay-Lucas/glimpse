@@ -1,5 +1,5 @@
 export const dynamic = 'force-dynamic';
-import { BaseImageUrl } from "@/lib/constants.ts";
+import { BaseImageUrl, DEFAULT_BLUR_DATA_URL } from "@/lib/constants.ts";
 import { getBlurData } from "@/lib/blur-data-generator.ts";
 import {
   MovieResult,
@@ -17,28 +17,37 @@ import { inArray } from "drizzle-orm";
 import { getAllMovies, getAllTv } from "@/lib/actions";
 import { db } from "@/db/index"
 import { DiscoverItem } from "@/types/camel-index";
+import { redis } from "@/services/cache";
 
 // Main
 export async function backfill() {
   try {
+    // directly from TMDB
     const newMovies = await fetchAllMovies();
     const newTvShows = await fetchAllTv();
+
+    // Supabase Entries
     const currentTvShows = await getAllTv();
     const currentMovies = await getAllMovies();
-    const { addedMovies, removedMovies, addedTvShows, removedTvShows } = await computeChanges(currentMovies, currentTvShows, newMovies, newTvShows)
-    logChanges(addedMovies, removedMovies, addedTvShows, removedTvShows);
-    await backfillSummaries(addedMovies, addedTvShows);
-    const removedMovieIds = removedMovies.map(item => item.tmdbId);
-    const removedTvShowIds = removedTvShows.map(item => item.tmdbId);
-    await removeEntries(removedMovieIds, removedTvShowIds);
-    console.log("Backfill complete.");
 
+    // Compare lists
+    const { addedMovies, removedMovies, addedTvShows, removedTvShows } = await computeChanges(currentMovies ?? [], currentTvShows ?? [], newMovies, newTvShows)
+    logChanges(addedMovies, removedMovies, addedTvShows, removedTvShows);
+    await insertLQIP(addedMovies, addedTvShows);
+    await removeLQIPKeys(removedMovies, removedTvShows);
+    console.log("Redis LQIP backfill complete.");
+
+    // Supabase Entries
+    await insertSummaries(addedMovies, addedTvShows);
+    await removeSummaries(removedMovies.map(item => item.tmdbId), removedTvShows.map(item => item.tmdbId));
+
+    console.log("Database backfill complete.");
   } catch (error) {
     console.error("There was an error completing the backfill " + error);
   }
 }
 
-async function backfillSummaries(movies: MovieResult[], tvShows: TvResult[]) {
+async function insertSummaries(movies: MovieResult[], tvShows: TvResult[]) {
   try {
     if (movies.length > 0) {
       console.log(`Backfilling ${movies.length} movie summaries...`);
@@ -62,7 +71,7 @@ async function backfillSummaries(movies: MovieResult[], tvShows: TvResult[]) {
             voteAverage: m.voteAverage,
             voteCount: m.voteCount,
             releaseDate: releaseDate,
-            posterBlurDataUrl: posterBlurUrl,
+            // posterBlurDataUrl: posterBlurUrl,
           })
           .onConflictDoUpdate({
             target: movieSummaries.tmdbId,
@@ -75,7 +84,7 @@ async function backfillSummaries(movies: MovieResult[], tvShows: TvResult[]) {
               voteAverage: m.voteAverage,
               voteCount: m.voteCount,
               releaseDate: releaseDate,
-              posterBlurDataUrl: posterBlurUrl,
+              // posterBlurDataUrl: posterBlurUrl,
             },
           });
       }
@@ -86,9 +95,9 @@ async function backfillSummaries(movies: MovieResult[], tvShows: TvResult[]) {
     if (tvShows.length > 0) {
       console.log(`Backfilling ${tvShows.length} TV show summaries...`);
       for (const t of tvShows) {
-        const posterBlurUrl = t.posterPath
-          ? await getBlurData(`${BaseImageUrl.BLUR}${t.posterPath}`)
-          : null;
+        // const posterBlurUrl = t.posterPath
+        //   ? await getBlurData(`${BaseImageUrl.BLUR}${t.posterPath}`)
+        //   : null;
         await pause(50)
 
         const firstAirDate = t.firstAirDate?.trim() || undefined;
@@ -105,7 +114,7 @@ async function backfillSummaries(movies: MovieResult[], tvShows: TvResult[]) {
             voteAverage: t.voteAverage,
             voteCount: t.voteCount,
             firstAirDate: firstAirDate,
-            posterBlurDataUrl: posterBlurUrl,
+            // posterBlurDataUrl: posterBlurUrl,
           })
           .onConflictDoUpdate({
             target: tvSummaries.tmdbId,
@@ -118,7 +127,7 @@ async function backfillSummaries(movies: MovieResult[], tvShows: TvResult[]) {
               voteAverage: t.voteAverage,
               voteCount: t.voteCount,
               firstAirDate: firstAirDate,
-              posterBlurDataUrl: posterBlurUrl,
+              // posterBlurDataUrl: posterBlurUrl,
             },
           });
       }
@@ -131,7 +140,7 @@ async function backfillSummaries(movies: MovieResult[], tvShows: TvResult[]) {
   }
 }
 
-async function removeEntries(movieIds: number[], tvShowIds: number[]) {
+async function removeSummaries(movieIds: number[], tvShowIds: number[]) {
   if (movieIds.length > 0) {
     console.log(`Removing ${movieIds.length} Movie summaries`)
     await db
@@ -200,6 +209,91 @@ function logChanges(
 
   if (!(removedTvShows.length || addedMovies.length || addedTvShows.length || removedTvShows.length)) {
     console.log("No changes in TMDB lists")
+  }
+}
+
+async function writeLQIPKey(
+  media: "movie" | "tv",
+  tmdbId: number,
+  title: string,
+  posterPath: string | null,
+  backdropPath: string | null
+) {
+
+  try {
+    const posterUrl = posterPath ? `${BaseImageUrl.POSTER}${posterPath}` : null;
+    const backdropUrl = backdropPath ? `${BaseImageUrl.ORIGINAL}${backdropPath}` : null;
+
+    const posterPromise = posterUrl ? getBlurData(posterUrl) : Promise.resolve(DEFAULT_BLUR_DATA_URL);
+    const backdropPromise = backdropUrl ? getBlurData(backdropUrl) : Promise.resolve(DEFAULT_BLUR_DATA_URL);
+
+    const [posterBlur, backdropBlur] = await Promise.all([posterPromise, backdropPromise]);
+
+    const key = `lqip:${media}:${tmdbId}`;
+    const payload = JSON.stringify({ posterBlur, backdropBlur });
+
+    // store in Redis, no TTL so it lives until you explicitly delete or override
+    await redis.set(key, payload);
+  } catch (err) {
+    console.error(`⚠️  Failed to write LQIP for ${media} "${title}" (ID ${tmdbId}):`, err);
+  }
+}
+
+async function removeLQIPKeys(
+  removedMovies: DiscoverItem[],
+  removedTvShows: DiscoverItem[],
+) {
+  try {
+    const total = removedMovies.length + removedTvShows.length;
+    if (total === 0) {
+      console.log("No old LQIP keys to remove");
+      return;
+    }
+
+    const deleteTasks = await Promise.allSettled([
+      ...removedMovies.map(m => redis.del(`lqip:movie:${m.tmdbId}`)),
+      ...removedTvShows.map(t => redis.del(`lqip:tv:${t.tmdbId}`)),
+    ]);
+
+    deleteTasks.forEach((r, i) => {
+      if (r.status === "rejected") {
+        console.error(`Failed to delete LQIP key #${i}:`, r.reason);
+      }
+    });
+
+    const fulfilledLength = deleteTasks.filter(item => item.status === "fulfilled").length
+    console.log(`${fulfilledLength} Removed from Redis`)
+  } catch (err) {
+    console.error(`⚠️ Error removing LQIP keys`, err);
+  }
+}
+
+async function insertLQIP(
+  addedMovies: MovieResult[],
+  addedTvShows: TvResult[]
+) {
+  try {
+    const total = addedMovies.length + addedTvShows.length;
+    if (total === 0) {
+      console.log("No new LQIP keys to insert");
+      return;
+    }
+
+    const writeTasks = await Promise.allSettled([
+      ...addedMovies.map(m => writeLQIPKey("movie", m.id, m.title, m.posterPath ?? null, m.backdropPath ?? null)),
+      ...addedTvShows.map(t => writeLQIPKey("tv", t.id, t.name, t.posterPath ?? null, t.backdropPath ?? null)),
+    ]);
+
+    writeTasks.forEach((r, i) => {
+      if (r.status === 'rejected') {
+        console.error(`Failed to write LQIP key #${i}:`, r.reason);
+      }
+    })
+
+    const fulfilledLength = writeTasks.filter(item => item.status === "fulfilled").length
+    console.log(`${fulfilledLength} Added to Redis`)
+  } catch (err) {
+    console.error(`⚠️ Error inserting LQIP keys`, err);
   }
 }
 
