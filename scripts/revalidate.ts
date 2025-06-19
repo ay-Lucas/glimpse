@@ -88,6 +88,7 @@ async function warmCache(baseUrl: string, paths: string[]) {
       try {
         const res = await fetch(`${baseUrl}${p}`, {
           headers: {
+            method: 'HEAD',
             "x-cache-warm-secret": process.env.REVALIDATE_SECRET!,
             'user-agent': 'cache-warmer/1.0'
           }

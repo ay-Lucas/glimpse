@@ -295,6 +295,5 @@ export const fetchDirectOffers = unstable_cache(async (tmdbTitle: string, type: 
   // console.log(searchResults)
   // console.log(firstMatch)
   const data = firstMatch?.fullPath && await justwatch.getData(firstMatch.fullPath, "US")
-  console.log(data)
   return data
 })

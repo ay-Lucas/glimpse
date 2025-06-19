@@ -78,6 +78,7 @@ export type DiscoverItem = {
   backdropPath?: string;
   posterBlurDataUrl?: string;
   overview?: string;
+  mediaType: "tv" | "movie"
 };
 
 export type FullMovie = {

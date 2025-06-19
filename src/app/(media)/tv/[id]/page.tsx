@@ -7,6 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import {
   BASE_CAST_IMAGE_URL,
   BASE_POSTER_IMAGE_URL,
+  BaseImageUrl,
   DEFAULT_BLUR_DATA_URL,
 } from "@/lib/constants";
 import { RecommededSection } from "@/app/(media)/_components/recommendedSection";
@@ -21,6 +22,7 @@ import { countryCodeToEnglishName, languageCodeToEnglishName, stripJustWatchTrac
 import ImageCarousel from "@/components/image-carousel";
 import VideoPlayer from "../../_components/video-player";
 import ProviderList from "../../_components/provider-list";
+import { getRedisBlurValue } from "@/services/cache";
 
 function getTrailer(videoArray: Array<Video>) {
   const trailer: Array<Video> = videoArray.filter(
@@ -78,7 +80,9 @@ export default async function TvPage({ params }: { params: { id: number } }) {
     tv.firstAirDate !== null &&
     new Date(tv.firstAirDate).valueOf() < Date.now();
   const justWatchData = await fetchDirectOffers(tv.name, "show", tv.firstAirDate)
-  // console.log(`Tv page rendered! ${tv.name}`)
+  // console.log(justWatchData);
+  const blurData = await getRedisBlurValue("tv", params.id);
+  console.log(`Tv page rendered! ${tv.name}`)
   return (
     <main>
       {tv && (
@@ -100,9 +104,7 @@ export default async function TvPage({ params }: { params: { id: number } }) {
                           className="object-cover rounded-lg w-full h-full"
                           priority
                           placeholder="blur"
-                          blurDataURL={
-                            tv?.posterBlurData ?? DEFAULT_BLUR_DATA_URL
-                          }
+                          blurDataURL={blurData?.posterBlur ?? DEFAULT_BLUR_DATA_URL}
                           alt={`${tv.name} poster`}
                           loading="eager"
                         />

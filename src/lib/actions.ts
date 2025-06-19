@@ -30,6 +30,8 @@ import { Genre } from "@/types/types";
 import { listEntries, movieDetails, movieSummaries, tvDetails } from "@/db/schema";
 import { tvSummaries } from "@/db/schema";
 import { DiscoverItem } from "@/types/camel-index";
+import { unstable_cache } from "next/cache";
+import { cache } from "react";
 
 
 const LIMIT = 10;
@@ -674,6 +676,7 @@ export async function getUpcomingMovieSummaries(
     backdropPath: r.backdropPath ?? undefined,
     posterBlurUrl: r.posterBlurUrl,
     overview: r.overview,
+    mediaType: "movie"
   }));
 }
 
@@ -719,6 +722,7 @@ export async function getPopularSeries(limit = 10): Promise<DiscoverItem[]> {
     popularity: r.popularity ?? undefined,
     voteAverage: r.voteAverage ?? undefined,
     voteCount: r.voteCount ?? undefined,
+    mediaType: "tv"
   }));
 }
 
@@ -763,6 +767,7 @@ export async function getPopularMovies(limit = 10): Promise<DiscoverItem[]> {
     popularity: r.popularity ?? undefined,
     voteAverage: r.voteAverage ?? undefined,
     voteCount: r.voteCount ?? undefined,
+    mediaType: "movie"
   }));
 }
 
@@ -772,7 +777,7 @@ export async function getAllTv(): Promise<DiscoverItem[] | undefined> {
       .select({
         tmdbId: tvSummaries.tmdbId,
         title: tvSummaries.name,
-        posterBlurDataUrl: tvSummaries.posterBlurDataUrl
+        posterBlurDataUrl: tvSummaries.posterBlurDataUrl,
       })
       .from(tvSummaries)
 
@@ -780,7 +785,7 @@ export async function getAllTv(): Promise<DiscoverItem[] | undefined> {
       tmdbId: r.tmdbId,
       mediaType: "tv",
       title: r.title,
-      posterBlurDataUrl: r.posterBlurDataUrl ?? undefined
+      posterBlurDataUrl: r.posterBlurDataUrl ?? undefined,
     }));
   }
   catch (err) {
@@ -812,7 +817,7 @@ export async function getAllMovies(): Promise<DiscoverItem[] | undefined> {
   }
 }
 
-export async function getAllTitles(): Promise<DiscoverItem[]> {
+export const getAllTitles = async () => {
   const backfilledMovies = await getAllMovies();
   const backfilledTvShows = await getAllTv();
   return [...backfilledMovies ?? [], ...backfilledTvShows ?? []]

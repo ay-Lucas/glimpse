@@ -20,6 +20,7 @@ import { ScoreCircle } from "../../_components/score-circle";
 import ImageCarousel from "@/components/image-carousel";
 import VideoPlayer from "../../_components/video-player";
 import ProviderList from "../../_components/provider-list";
+import { getRedisBlurValue } from "@/services/cache";
 
 export const revalidate = 43200; // 12 hours
 
@@ -65,9 +66,11 @@ export default async function MoviePage({
     false;
   const justWatchData = await fetchDirectOffers(movie.title, "show", movie.releaseDate)
   const flatrate = movie.watchProviders?.results?.US?.flatrate;
+  const blurData = await getRedisBlurValue("movie", params.id);
   // console.log(`Movie page rendered! ${movie.title}`)
   // console.log(movie.watchProviders?.results?.US?.flatrate)
   // console.log(movie.watchProviders?.results)
+  // console.log(`Movie page rendered! ${movie.title}`)
   // TODO: Add all watch providers
   return (
     <main>
@@ -86,9 +89,7 @@ export default async function MoviePage({
                     className={`object-cover -z-10`}
                     sizes="100vw"
                     placeholder="blur"
-                    blurDataURL={
-                      movie?.backdropBlurData ?? DEFAULT_BLUR_DATA_URL
-                    }
+                    blurDataURL={blurData?.backdropBlur ?? DEFAULT_BLUR_DATA_URL}
                   />
                 </div>
               ) : (
@@ -111,9 +112,7 @@ export default async function MoviePage({
                           className="object-cover rounded-lg w-full h-full"
                           priority
                           placeholder="blur"
-                          blurDataURL={
-                            movie?.posterBlurData ?? DEFAULT_BLUR_DATA_URL
-                          }
+                          blurDataURL={blurData?.posterBlur ?? DEFAULT_BLUR_DATA_URL}
                           alt={`${movie.title} poster`}
                           loading="eager"
                         />

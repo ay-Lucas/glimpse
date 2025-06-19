@@ -3,6 +3,7 @@ import Image from "next/image";
 import { fetchTvDetails } from "@/app/(media)/actions";
 import { BASE_ORIGINAL_IMAGE_URL, BASE_BLUR_IMAGE_URL, DEFAULT_BLUR_DATA_URL } from "@/lib/constants";
 import PrefetchBannerColor from "../../_components/prefetch-banner-color";
+import { getRedisBlurValue } from "@/services/cache";
 
 export const revalidate = 43200; // 12 hours
 
@@ -15,8 +16,7 @@ export default async function TvLayout({
 }) {
   const tmdbId = params.id;
   const tv = await fetchTvDetails(tmdbId);
-  // const blurDataUrl = tv.backdropBlurDataUrl ?? (await getBlurData(`${BASE_BLUR_IMAGE_URL}${tv.backdropPath}`))
-  const blurDataUrl = DEFAULT_BLUR_DATA_URL;
+  const blurData = await getRedisBlurValue("tv", params.id);
   // console.log(`TV layout rendered ${tv.name}`)
   return (
 
@@ -35,7 +35,7 @@ export default async function TvLayout({
               sizes="100vw"
               placeholder="blur"
               priority
-              blurDataURL={blurDataUrl}
+              blurDataURL={blurData?.backdropBlur ?? DEFAULT_BLUR_DATA_URL}
             />
           </div>
         ) : (

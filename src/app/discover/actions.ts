@@ -115,11 +115,10 @@ export const getUpcomingMovies = async (
 export async function fetchTmdbMovieLists(
   reqOptions: RequestInit = options,
 ) {
-  const NUM_PAGES = 2;
   const [{ trendingMoviesDaily, trendingMoviesWeekly }, popularMoviesRes, upcomingMoviesRes] =
     await Promise.all([
       fetchTrendingMovies(),
-      getPopularPages({ "vote_average.gte": 6 }, "movie", NUM_PAGES, true, reqOptions) as Promise<MovieResult[]>,
+      getPopularPages({ "vote_average.gte": 6 }, "movie", NUM_TMDB_PAGES, true, reqOptions) as Promise<MovieResult[]>,
       getUpcomingMovies({ page: 1 }, true, reqOptions) as Promise<UpcomingMoviesResponse>,
     ]);
 
