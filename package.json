@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuild": "if [ \"$VERCEL_ENV\" = \"production\" ] && [ \"$VERCEL_URL\" = \"glimpse.lucasanderson.dev\" ]; then npm run backfill; else echo \"Skipping prebuild (not prod)\"; fi",
+    "prebuild": "if [ \"$VERCEL_ENV\" = \"production\" ]; then npm run backfill; else echo \"Skipping prebuild (not prod)\"; fi",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
