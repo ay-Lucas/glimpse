@@ -21,6 +21,8 @@ import ImageCarousel from "@/components/image-carousel";
 import VideoPlayer from "../../_components/video-player";
 import ProviderList from "../../_components/provider-list";
 import { getRedisBlurValue } from "@/services/cache";
+import TmdbProviderList from "../../_components/tmdb-provider-list";
+import JustWatchProviderList from "../../_components/provider-list";
 
 export const revalidate = 43200; // 12 hours
 
@@ -65,10 +67,7 @@ export default async function MoviePage({
       new Date(movie?.releaseDate!).valueOf() < Date.now()) ||
     false;
   const justWatchData = await fetchDirectOffers(movie.title, "show", movie.releaseDate)
-  const flatrate = movie.watchProviders?.results?.US?.flatrate;
   const blurData = await getRedisBlurValue("movie", params.id);
-  // console.log(`Movie page rendered! ${movie.title}`)
-  // console.log(movie.watchProviders?.results?.US?.flatrate)
   // console.log(movie.watchProviders?.results)
   // console.log(`Movie page rendered! ${movie.title}`)
   // TODO: Add all watch providers
@@ -224,50 +223,28 @@ export default async function MoviePage({
                       <Skeleton className="w-full h-[356px] rounded-xl" />
                     }
                   >
-                    {(flatrate !== null && flatrate !== undefined &&
-                      flatrate.length > 0) ||
-                      (justWatchData && justWatchData.Streams.length > 0) && (
-                        <div className="w-full md:w-1/2 md:pl-3 pt-3 md:pt-0 pb-3 md:pb-0">
-                          <h2 className="text-2xl font-bold pb-4">
-                            Streaming
-                            <span className="inline-flex items-center ml-4">
-                              <Link href="https://justwatch.com">
-                                <JustWatchLogo
-                                  alt={`JustWatch Logo`}
-                                  width={100}
-                                  height={15}
-                                  className="flex"
-                                />
-                              </Link>
-                            </span>
-                          </h2>
-                          {justWatchData.Streams.length > 0 ? (
-                            <ProviderList info={justWatchData} />
-                          ) : (
-                            <div className="flex flex-wrap gap-2">{
-                              movie.watchProviders?.results?.US?.flatrate?.map(
-                                (item, index) => (
-                                  <a
-                                    href={
-                                      movie.watchProviders?.results?.US?.link!
-                                    }
-                                    key={index}
-                                    className="w-[55px] h-[55px] flex-shrink-0 transform transition-transform  duration-200  hover:scale-105  hover:shadow-xl"
-                                  >
-                                    <Image
-                                      src={`${BASE_ORIGINAL_IMAGE_URL}${item.logoPath}`}
-                                      alt={`${item.providerName} logo`}
-                                      width={55}
-                                      height={55}
-                                      className="rounded-lg object-cover"
-                                    />
-                                  </a>
-                                ),
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      )}
+                    {((movie.watchProviders?.results?.US?.flatrate || (justWatchData && justWatchData.Streams.length > 0)) && (
+                      <div className="w-full md:w-1/2 md:pl-3 pt-3 md:pt-0 pb-3 md:pb-0">
+                        <h2 className="text-2xl font-bold pb-4">
+                          Streaming
+                          <span className="inline-flex items-center ml-4">
+                            <Link href="https://justwatch.com">
+                              <JustWatchLogo
+                                alt={`JustWatch Logo`}
+                                width={100}
+                                height={15}
+                                className="flex"
+                              />
+                            </Link>
+                          </span>
+                        </h2>
+                        {justWatchData && justWatchData.Streams.length > 0 ? (
+                          <JustWatchProviderList info={justWatchData} />
+                        ) : (
+                          <TmdbProviderList watchProviders={movie.watchProviders!} />
+                        )}
+                      </div>
+                    ))}
                   </Suspense>
                 </div>
                 {movie.credits?.cast && movie.credits.cast.length > 0 && (

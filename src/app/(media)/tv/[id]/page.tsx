@@ -21,7 +21,7 @@ import { ChevronRight } from "lucide-react";
 import { countryCodeToEnglishName, languageCodeToEnglishName, stripJustWatchTracking } from "@/lib/utils";
 import ImageCarousel from "@/components/image-carousel";
 import VideoPlayer from "../../_components/video-player";
-import ProviderList from "../../_components/provider-list";
+import JustWatchProviderList from "../../_components/provider-list";
 import { getRedisBlurValue } from "@/services/cache";
 
 function getTrailer(videoArray: Array<Video>) {
@@ -80,9 +80,8 @@ export default async function TvPage({ params }: { params: { id: number } }) {
     tv.firstAirDate !== null &&
     new Date(tv.firstAirDate).valueOf() < Date.now();
   const justWatchData = await fetchDirectOffers(tv.name, "show", tv.firstAirDate)
-  // console.log(justWatchData);
   const blurData = await getRedisBlurValue("tv", params.id);
-  console.log(`Tv page rendered! ${tv.name}`)
+  // console.log(`Tv page rendered! ${tv.name}`)
   return (
     <main>
       {tv && (
@@ -211,47 +210,46 @@ export default async function TvPage({ params }: { params: { id: number } }) {
                   <Suspense
                     fallback={<Skeleton className="w-full h-[356px] rounded-xl" />}
                   >
-                    {tv.watchProviders?.results?.US?.flatrate &&
-                      tv.watchProviders?.results?.US?.flatrate?.length > 0 && (
-                        <div className="w-full md:w-1/2 md:pl-3 pt-3 md:pt-0 pb-3 md:pb-0">
-                          <h2 className="text-2xl font-bold pb-4">
-                            Streaming
-                            <span className="inline-flex items-center ml-4">
-                              <Link href="https://justwatch.com">
-                                <JustWatchLogo
-                                  alt={`JustWatch Logo`}
-                                  width={100}
-                                  height={15}
-                                  className="flex"
-                                />
-                              </Link>
-                            </span>
-                          </h2>
-                          {justWatchData ? (
-                            <ProviderList info={justWatchData} />
-                          ) : (
-                            <div className="flex flex-wrap gap-2">{
-                              tv.watchProviders?.results?.US?.flatrate?.map(
-                                (item, index) => (
-                                  <a
-                                    href={tv.watchProviders?.results?.US?.link!}
-                                    key={index}
-                                    className="w-[55px] h-[55px] flex-shrink-0 transform transition-transform  duration-200  hover:scale-105  hover:shadow-xl"
-                                  >
-                                    <Image
-                                      src={`https://image.tmdb.org/t/p/original/${item.logoPath}`}
-                                      alt={`${item.providerName} logo`}
-                                      width={55}
-                                      height={55}
-                                      className="rounded-lg object-cover"
-                                    />
-                                  </a>
-                                ),
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      )}
+                    {(tv.watchProviders?.results?.US?.flatrate || (justWatchData && justWatchData.Streams.length > 0)) && (
+                      <div className="w-full md:w-1/2 md:pl-3 pt-3 md:pt-0 pb-3 md:pb-0">
+                        <h2 className="text-2xl font-bold pb-4">
+                          Streaming
+                          <span className="inline-flex items-center ml-4">
+                            <Link href="https://justwatch.com">
+                              <JustWatchLogo
+                                alt={`JustWatch Logo`}
+                                width={100}
+                                height={15}
+                                className="flex"
+                              />
+                            </Link>
+                          </span>
+                        </h2>
+                        {justWatchData ? (
+                          <JustWatchProviderList info={justWatchData} />
+                        ) : (
+                          <div className="flex flex-wrap gap-2">{
+                            tv.watchProviders?.results?.US?.flatrate?.map(
+                              (item, index) => (
+                                <a
+                                  href={tv.watchProviders?.results?.US?.link!}
+                                  key={index}
+                                  className="w-[55px] h-[55px] flex-shrink-0 transform transition-transform  duration-200  hover:scale-105  hover:shadow-xl"
+                                >
+                                  <Image
+                                    src={`https://image.tmdb.org/t/p/original/${item.logoPath}`}
+                                    alt={`${item.providerName} logo`}
+                                    width={55}
+                                    height={55}
+                                    className="rounded-lg object-cover"
+                                  />
+                                </a>
+                              ),
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </Suspense>
                 </div>
                 {tv.numberOfSeasons && tv.numberOfSeasons > 0 && (
@@ -261,25 +259,6 @@ export default async function TvPage({ params }: { params: { id: number } }) {
                         <h2 className={`text-2xl font-bold`}>Seasons </h2>
                         <ChevronRight size={30} />
                       </Link>
-                      {/* <Suspense */}
-                      {/*   fallback={ */}
-                      {/*     <div className="space-y-2"> */}
-                      {/*       {Array.from({ */}
-                      {/*         length: tv.numberOfSeasons ?? 1, */}
-                      {/*       }).map((_, index) => ( */}
-                      {/*         <Skeleton */}
-                      {/*           key={index} */}
-                      {/*           className={`w-full h-[${SEASON_COMPONENT_HEIGHT}px] rounded-xl`} */}
-                      {/*         /> */}
-                      {/*       ))} */}
-                      {/*     </div> */}
-                      {/*   } */}
-                      {/* > */}
-                      {/*   <Seasons */}
-                      {/*     id={params.id} */}
-                      {/*     numberOfSeasons={tv.numberOfSeasons} */}
-                      {/*   /> */}
-                      {/* </Suspense> */}
                     </div>
                   </>
                 )}

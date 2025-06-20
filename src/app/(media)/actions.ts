@@ -25,6 +25,7 @@ import camelcaseKeys from "camelcase-keys";
 import { unstable_cache } from "next/cache";
 import { fetchTmdbMovieLists, fetchTmdbTvLists, getTrendingPages } from "@/app/discover/actions";
 import JustWatch from 'justwatch-api-client';
+import { cache } from "react";
 
 export const fetchPersonDetails = unstable_cache(async (
   id: number,
@@ -35,7 +36,6 @@ export const fetchPersonDetails = unstable_cache(async (
   const camel = camelcaseKeys(data, {
     deep: true,
   }) as FullPerson;
-  console.log(camel)
   return camel;
 })
 
@@ -282,7 +282,7 @@ export async function getPersonPercentile(targetPopularity: number) {
 }
 
 
-export const fetchDirectOffers = unstable_cache(async (tmdbTitle: string, type: 'movie' | 'show', releaseDate?: Date | null,) => {
+export const fetchDirectOffers = cache(async (tmdbTitle: string, type: 'movie' | 'show', releaseDate?: Date | null,) => {
   const releaseYear = releaseDate ? new Date(releaseDate).getFullYear() : null;
   // 1) Search JustWatch for your title
   const justwatch = new JustWatch(5000);
