@@ -41,11 +41,10 @@ function getTrailer(videoArray: Array<Video>) {
 // Generate all TV pages featured on Discover page (and their recommendations) at build
 export async function generateStaticParams() {
   const tvIds = await fetchDiscoverTvIds();
-
-  const baseParams = tvIds.map((item) => ({ id: item.id }));
+  const rawTvIds = tvIds.map(item => item.id);
 
   if (process.env.IS_LOCALHOST === "true") {
-    return baseParams;
+    return tvIds;
   }
 
   const recResponses = await Promise.all(
@@ -56,7 +55,7 @@ export async function generateStaticParams() {
     res?.results?.map((m) => m.id) ?? []
   );
 
-  const uniqueIds = Array.from(new Set([...tvIds, ...recIds]));
+  const uniqueIds = Array.from(new Set([...rawTvIds, ...recIds]));
 
   return uniqueIds.map((id) => ({ id: id.toString() }));
 }

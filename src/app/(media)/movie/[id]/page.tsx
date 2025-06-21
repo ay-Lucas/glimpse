@@ -29,11 +29,10 @@ export const revalidate = 43200; // 12 hours
 // Generate all Movie pages featured on Discover page (and their recommendations) at build
 export async function generateStaticParams() {
   const movieIds = await fetchDiscoverMovieIds();
-
-  const baseParams = movieIds.map((item) => ({ id: String(item.id) }));
+  const rawMovieIds = movieIds.map(item => item.id);
 
   if (process.env.IS_LOCALHOST === "true") {
-    return baseParams;
+    return movieIds;
   }
 
   const recResponses = await Promise.all(
@@ -44,7 +43,7 @@ export async function generateStaticParams() {
     res?.results?.map((m) => m.id) ?? []
   );
 
-  const uniqueIds = Array.from(new Set([...movieIds, ...recIds]));
+  const uniqueIds = Array.from(new Set([...rawMovieIds, ...recIds]));
 
   return uniqueIds.map((id) => ({ id: id.toString() }));
 }
