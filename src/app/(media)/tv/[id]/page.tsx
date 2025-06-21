@@ -1,4 +1,4 @@
-import { fetchDirectOffers, fetchDiscoverTvIds, fetchTvDetails, getRecommendations } from "@/app/(media)/actions";
+import { fetchDiscoverTvIds, fetchTvDetails, getRecommendations, getJustWatchProviders } from "@/app/(media)/actions";
 import Link from "next/link";
 import { Video } from "@/types/request-types-snakecase";
 import Image from "next/image";
@@ -7,7 +7,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import {
   BASE_CAST_IMAGE_URL,
   BASE_POSTER_IMAGE_URL,
-  BaseImageUrl,
   DEFAULT_BLUR_DATA_URL,
 } from "@/lib/constants";
 import { RecommededSection } from "@/app/(media)/_components/recommendedSection";
@@ -18,7 +17,7 @@ import { TvDetails } from "../../_components/tv-details";
 import { ScoreCircle } from "../../_components/score-circle";
 import MediaActions from "../../_components/media-actions";
 import { ChevronRight } from "lucide-react";
-import { countryCodeToEnglishName, languageCodeToEnglishName, stripJustWatchTracking } from "@/lib/utils";
+import { countryCodeToEnglishName, languageCodeToEnglishName } from "@/lib/utils";
 import ImageCarousel from "@/components/image-carousel";
 import VideoPlayer from "../../_components/video-player";
 import JustWatchProviderList from "../../_components/provider-list";
@@ -64,7 +63,8 @@ export default async function TvPage({ params }: { params: { id: number } }) {
   const tmdbId = Number(params.id);
   const tv = await fetchTvDetails(tmdbId);
 
-  if (!tv) return;
+  if (!tv)
+    throw new Error("fetchTvDetails returned undefined");
 
   let videoPath;
   if (tv.videos !== undefined && tv.videos.results)
@@ -78,7 +78,7 @@ export default async function TvPage({ params }: { params: { id: number } }) {
     tv.firstAirDate !== undefined &&
     tv.firstAirDate !== null &&
     new Date(tv.firstAirDate).valueOf() < Date.now();
-  const justWatchData = await fetchDirectOffers(tv.name, "show", tv.firstAirDate)
+  const justWatchProviders = await getJustWatchProviders(tv.name, "tv", tmdbId, tv.firstAirDate)
   const blurData = await getRedisBlurValue("tv", params.id);
   // console.log(`Tv page rendered! ${tv.name}`)
   return (
@@ -209,7 +209,7 @@ export default async function TvPage({ params }: { params: { id: number } }) {
                   <Suspense
                     fallback={<Skeleton className="w-full h-[356px] rounded-xl" />}
                   >
-                    {(tv.watchProviders?.results?.US?.flatrate || (justWatchData && justWatchData.Streams.length > 0)) && (
+                    {(tv.watchProviders?.results?.US?.flatrate || (justWatchProviders && justWatchProviders.length > 0)) && (
                       <div className="w-full md:w-1/2 md:pl-3 pt-3 md:pt-0 pb-3 md:pb-0">
                         <h2 className="text-2xl font-bold pb-4">
                           Streaming
@@ -224,8 +224,8 @@ export default async function TvPage({ params }: { params: { id: number } }) {
                             </Link>
                           </span>
                         </h2>
-                        {justWatchData ? (
-                          <JustWatchProviderList info={justWatchData} />
+                        {justWatchProviders ? (
+                          <JustWatchProviderList info={justWatchProviders} />
                         ) : (
                           <div className="flex flex-wrap gap-2">{
                             tv.watchProviders?.results?.US?.flatrate?.map(

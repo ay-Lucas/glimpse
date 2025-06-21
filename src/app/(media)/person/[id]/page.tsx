@@ -61,6 +61,9 @@ export default async function PersonPage({
 }) {
   const person = await fetchPersonDetails(params.id);
 
+  if (!person)
+    throw new Error("fetchPersonDetails returned undefined");
+
   const gender = TMDB_GENDERS.get(person.gender ?? 0)
   const mixedCombinedCredits = [...person.combinedCredits.cast ?? [], ...person.combinedCredits.crew ?? []]
   const uniqueCombinedCredits = new Set(mixedCombinedCredits.map(item => item.id).filter((id): id is number => (id ?? 0) > 0))

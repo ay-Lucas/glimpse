@@ -24,8 +24,9 @@ import {
 import camelcaseKeys from "camelcase-keys";
 import { unstable_cache } from "next/cache";
 import { fetchTmdbMovieLists, fetchTmdbTvLists, getTrendingPages } from "@/app/discover/actions";
-import JustWatch from 'justwatch-api-client';
-import { cache } from "react";
+import JustWatch, { StreamProvider } from 'justwatch-api-client';
+import { scrubByMaxRes } from "@/lib/scrub-streams";
+// Don't import React cache: /scripts/revalidate.ts throws error
 
 export const fetchPersonDetails = unstable_cache(async (
   id: number,
@@ -281,19 +282,129 @@ export async function getPersonPercentile(targetPopularity: number) {
   return Math.round((1 - idx / (total - 1)) * 100);
 }
 
+// Called by /scripts/revalidate.ts: Don't wrap with React cache or unstable_cache
+export const fetchJustWatchData = async (tmdbTitle: string, type: 'movie' | 'tv', id: number, releaseDate?: Date | null) => {
+  try {
+    const releaseYear = releaseDate ? new Date(releaseDate).getFullYear() : null;
+    // 1) Search JustWatch for your title
+    const justwatch = new JustWatch(5000);
+    // Search for a movie/show (with optional country code, default is "IN")
+    const searchResults = await justwatch.searchByQuery(tmdbTitle, "US")
+    const matches = searchResults.filter(item => item.title?.toLowerCase() === tmdbTitle.toLowerCase()
+      && item.fullPath
+      && (releaseYear ? item.originalReleaseYear === releaseYear : true))
+    const firstMatch = matches[0];
+    // console.log(searchResults)
+    // console.log(firstMatch)
+    const data = firstMatch?.fullPath && await justwatch.getData(firstMatch.fullPath, "US")
+    console.log(JSON.stringify(data, null, 2))
+    // console.log(data)
+    return data;
 
-export const fetchDirectOffers = cache(async (tmdbTitle: string, type: 'movie' | 'show', releaseDate?: Date | null,) => {
-  const releaseYear = releaseDate ? new Date(releaseDate).getFullYear() : null;
-  // 1) Search JustWatch for your title
-  const justwatch = new JustWatch(5000);
-  // Search for a movie/show (with optional country code, default is "IN")
-  const searchResults = await justwatch.searchByQuery(tmdbTitle, "US")
-  const matches = searchResults.filter(item => item.title?.toLowerCase() === tmdbTitle.toLowerCase()
-    && item.fullPath
-    && (releaseYear ? item.originalReleaseYear === releaseYear : true))
-  const firstMatch = matches[0];
-  // console.log(searchResults)
-  // console.log(firstMatch)
-  const data = firstMatch?.fullPath && await justwatch.getData(firstMatch.fullPath, "US")
-  return data
-})
+  } catch (err) {
+    console.error(`Error fetching JustWatch ${tmdbTitle}: ${type}/${id} (${releaseDate})`)
+  }
+}
+
+export const getJustWatchProviders = async (tmdbTitle: string, type: 'movie' | 'tv', id: number, releaseDate?: Date | null) => {
+  const justWatchResponse = await fetchJustWatchData(tmdbTitle, type, id, releaseDate)
+  if (!justWatchResponse)
+    return null;
+
+  const raw = justWatchResponse.Streams;
+  const cleaned = scrubByMaxRes(raw);
+  return groupStreams(cleaned)
+}
+
+export interface GroupedProvider {
+  provider: string;                   // “Amazon Prime Video”
+  name: string;                   // same as provider, or display name
+  link: string;                   // watch URL
+  icon: string;                   // logo URL
+  types: string[];                 // e.g. ["FLATRATE","ADS"]
+  priceByType: Record<string, string>;    // e.g. { FLATRATE: "", ADS: "" }
+  resolutionsByType: Record<string, string[]>;// e.g. { FLATRATE: ["SD","HD","_4K"], ADS: ["SD","HD"] }
+  audioByType?: Record<string, string[]>;  // if you want per‐type audio lists
+  subtitleByType?: Record<string, string[]>;  // likewise for subtitles
+}
+
+export function groupStreams(
+  streams: StreamProvider[]
+): GroupedProvider[] {
+  const map = new Map<string, {
+    provider: string;
+    name: string;
+    link: string;
+    icon: string;
+    types: Set<string>;
+    priceByType: Map<string, string>;
+    resolutionsByType: Map<string, Set<string>>;
+    audioByType: Map<string, Set<string>>;
+    subtitleByType: Map<string, Set<string>>;
+  }>();
+
+  for (const s of streams) {
+    let e = map.get(s.Provider);
+    if (!e) {
+      e = {
+        provider: s.Provider,
+        name: s.Name,
+        link: s.Link,
+        icon: s.Icon,
+        types: new Set(),
+        priceByType: new Map(),
+        resolutionsByType: new Map(),
+        audioByType: new Map(),
+        subtitleByType: new Map(),
+      };
+      map.set(s.Provider, e);
+    }
+
+    // 1) record this type
+    e.types.add(s.Type);
+    // 2) price
+    e.priceByType.set(s.Type, s.Price);
+    // 3) resolution
+    if (!e.resolutionsByType.has(s.Type)) e.resolutionsByType.set(s.Type, new Set());
+    e.resolutionsByType.get(s.Type)!.add(s.Resolution);
+    // 4) audio
+    if (!e.audioByType.has(s.Type)) e.audioByType.set(s.Type, new Set());
+    s.Audio.forEach(a => e.audioByType.get(s.Type)!.add(a));
+    // 5) subtitle
+    if (!e.subtitleByType.has(s.Type)) e.subtitleByType.set(s.Type, new Set());
+    s.Subtitle.forEach(t => e.subtitleByType.get(s.Type)!.add(t));
+  }
+
+  // flatten
+  return Array.from(map.values()).map((e) => {
+    const types = Array.from(e.types);
+    const priceByType: Record<string, string> = {};
+    types.forEach((t) => {
+      priceByType[t] = e.priceByType.get(t) || "";
+    });
+    const resolutionsByType: Record<string, string[]> = {};
+    types.forEach((t) => {
+      resolutionsByType[t] = Array.from(e.resolutionsByType.get(t) || []);
+    });
+    const audioByType: Record<string, string[]> = {};
+    types.forEach((t) => {
+      audioByType[t] = Array.from(e.audioByType.get(t) || []);
+    });
+    const subtitleByType: Record<string, string[]> = {};
+    types.forEach((t) => {
+      subtitleByType[t] = Array.from(e.subtitleByType.get(t) || []);
+    });
+
+    return {
+      provider: e.provider,
+      name: e.name,
+      link: e.link,
+      icon: e.icon,
+      types,
+      priceByType,
+      resolutionsByType,
+      audioByType,
+      subtitleByType,
+    };
+  });
+}

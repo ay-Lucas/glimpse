@@ -89,3 +89,10 @@ export const TMDB_GENDERS = new Map([[0, "Not Specified"], [1, "Female"], [2, "M
 
 export const NUM_OF_POPULAR_PEOPLE_PAGES = 25;
 export const NUM_TMDB_PAGES = 2;
+
+export const MAX_RES_BY_PROVIDER: Record<string, "_4K" | "HD" | "SD"> = {
+  // exact match on the JustWatch `Provider` field:
+  "Netflix Standard with Ads": "HD",
+  "Netflix Basic with Ads": "HD",
+  // add more overrides here...
+};

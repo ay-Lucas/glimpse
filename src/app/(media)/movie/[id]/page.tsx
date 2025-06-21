@@ -10,7 +10,7 @@ import {
 } from "@/lib/constants";
 import { RecommededSection } from "@/app/(media)/_components/recommendedSection";
 import ReviewSection from "@/app/(media)/_components/ReviewSection";
-import { fetchMovieDetails, fetchDiscoverMovieIds, getRecommendations, fetchDirectOffers } from "../../actions";
+import { fetchMovieDetails, fetchDiscoverMovieIds, getRecommendations, getJustWatchProviders } from "../../actions";
 import { countryCodeToEnglishName, getTrailer, languageCodeToEnglishName } from "@/lib/utils";
 import JustWatchLogo from "@/assets/justwatch-logo.svg";
 import CastCard from "@/components/cast-card";
@@ -19,7 +19,6 @@ import MediaActions from "../../_components/media-actions";
 import { ScoreCircle } from "../../_components/score-circle";
 import ImageCarousel from "@/components/image-carousel";
 import VideoPlayer from "../../_components/video-player";
-import ProviderList from "../../_components/provider-list";
 import { getRedisBlurValue } from "@/services/cache";
 import TmdbProviderList from "../../_components/tmdb-provider-list";
 import JustWatchProviderList from "../../_components/provider-list";
@@ -56,6 +55,9 @@ export default async function MoviePage({
   const tmdbId = Number(params.id);
   const movie = await fetchMovieDetails(tmdbId);
 
+  if (!movie)
+    throw new Error("fetchMovieDetails returned undefined");
+
   const videoPath = getTrailer(movie?.videos?.results || [])?.key;
   const rating =
     movie?.releases?.countries?.find(
@@ -65,7 +67,8 @@ export default async function MoviePage({
     (movie?.releaseDate &&
       new Date(movie?.releaseDate!).valueOf() < Date.now()) ||
     false;
-  const justWatchData = await fetchDirectOffers(movie.title, "show", movie.releaseDate)
+
+  const justWatchProviders = await getJustWatchProviders(movie.title, "movie", tmdbId, movie.releaseDate)
   const blurData = await getRedisBlurValue("movie", params.id);
   // console.log(movie.watchProviders?.results)
   // console.log(`Movie page rendered! ${movie.title}`)
@@ -222,7 +225,7 @@ export default async function MoviePage({
                       <Skeleton className="w-full h-[356px] rounded-xl" />
                     }
                   >
-                    {((movie.watchProviders?.results?.US?.flatrate || (justWatchData && justWatchData.Streams.length > 0)) && (
+                    {((movie.watchProviders?.results?.US?.flatrate || (justWatchProviders && justWatchProviders.length > 0)) && (
                       <div className="w-full md:w-1/2 md:pl-3 pt-3 md:pt-0 pb-3 md:pb-0">
                         <h2 className="text-2xl font-bold pb-4">
                           Streaming
@@ -237,8 +240,8 @@ export default async function MoviePage({
                             </Link>
                           </span>
                         </h2>
-                        {justWatchData && justWatchData.Streams.length > 0 ? (
-                          <JustWatchProviderList info={justWatchData} />
+                        {justWatchProviders ? (
+                          <JustWatchProviderList info={justWatchProviders} />
                         ) : (
                           <TmdbProviderList watchProviders={movie.watchProviders!} />
                         )}

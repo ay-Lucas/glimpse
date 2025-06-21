@@ -1,8 +1,8 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { languageCodeToEnglishName } from "@/lib/utils";
-import { StreamingInfo, StreamProvider } from "justwatch-api-client";
+import { StreamProvider } from "justwatch-api-client";
 import {
   Dialog,
   DialogTrigger,
@@ -12,29 +12,22 @@ import {
 } from "@/components/ui/dialog"; // adjust path if needed
 import Image from "next/image";
 import { BsBadge4K, BsBadgeHd, BsBadgeSd } from "react-icons/bs";
+import { GroupedProvider } from "../actions";
+import { sortLanguages } from "@/lib/lang-utils";
+import { GiHeadphones } from "react-icons/gi";
+import { BsCcSquare } from "react-icons/bs";
 
-export default function JustWatchProviderList({ info }: { info: StreamingInfo }) {
+export default function JustWatchProviderList({ info: providers }: { info: GroupedProvider[] }) {
   const MAX_INLINE = 4;
   const [open, setOpen] = useState(false);
-  const resolutions = new Map<string, string[]>();
-  const providerMap = info.Streams.reduce<Record<string, typeof info.Streams[0]>>((map, s) => {
-    if (s.Provider.toLowerCase().includes("channel"))
-      return map
-    if (!map[s.Provider]) map[s.Provider] = s;
+  const flatStreams: StreamProvider[] = providers.flatMap(item => ungroupProvider(item, true));
+  const inlineProviders = flatStreams.slice(0, MAX_INLINE);
 
-    const resArray = resolutions.get(s.Provider) ?? [];
-    resArray.push(s.Resolution)
-    resolutions.set(s.Provider, resArray)
-    return map;
-  }, {});
-  const providers = Object.values(providerMap);
-  const inlineProviders = providers.slice(0, MAX_INLINE);
-  console.log()
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <ul className="space-y-1 w-full">
         {inlineProviders.map((p) => (
-          <ProviderCard provider={p} resolutions={resolutions.get(p.Provider) ?? []} key={p.Provider} />
+          <ProviderCard provider={p} key={p.Provider} />
         ))}
       </ul>
       {providers.length > MAX_INLINE && (
@@ -47,8 +40,8 @@ export default function JustWatchProviderList({ info }: { info: StreamingInfo })
       <DialogContent className="max-w-[95vw] sm:max-w-[90vw] lg:max-w-5xl max-h-[90vh] overflow-y-auto">
         <DialogTitle>All Providers</DialogTitle>
         <ul className="space-y-0">
-          {providers.map((p) => (
-            <ModalProviderCard provider={p} resolutions={resolutions.get(p.Provider) ?? []} key={p.Provider} />
+          {flatStreams.map((p) => (
+            <ModalProviderCard provider={p} key={p.Provider} />
           ))}
         </ul>
         <div className="mt-4 text-right">
@@ -61,35 +54,37 @@ export default function JustWatchProviderList({ info }: { info: StreamingInfo })
   );
 }
 
-function ModalProviderCard({ provider, resolutions }: { provider: StreamProvider, resolutions: string[] }) {
+function ModalProviderCard({ provider }: { provider: StreamProvider }) {
   const {
-    Provider: providerName,
-    Icon: iconUrl,
-    Name,
-    Link: url,
+    Resolution,
     Type,
-    Audio = [],
     Price,
+    Provider: providerName,
+    Link: url,
+    Name,
+    Audio = [],
+    Subtitle = [],
+    Icon: iconUrl
   } = provider;
 
-  const highestRes = useMemo(
-    () => getHighestProviderResolution(resolutions),
-    [resolutions]
-  );
 
   const typeLabel = capitalizeFirst(
     Type === "FLATRATE" ? "subscription" : Type.toLowerCase()
   );
 
   const audioList = Audio.length
-    ? Audio.map(languageCodeToEnglishName).join(", ")
+    ? sortLanguages(Audio.map(languageCodeToEnglishName)).join(", ")
+    : null;
+  const subtitleList = Subtitle.length
+    ? sortLanguages(Subtitle.map(languageCodeToEnglishName)).join(", ")
     : null;
 
   const isCinemaType = Type === "CINEMA";
   const ctaLabel = isCinemaType ? "Buy Tickets" : "Watch Now";
+  const resolution = Resolution === "4K" || Resolution === "HD" || Resolution === "SD" ? Resolution : null
 
   return (
-    <li key={providerName} className="hover:bg-muted/70 duration-200 bg-transparent border-b" >
+    <li key={providerName} className="hover:bg-muted/70 duration-200 bg-transparent border" >
       <a
         href={url}
         target="_blank"
@@ -106,16 +101,29 @@ function ModalProviderCard({ provider, resolutions }: { provider: StreamProvider
             className="rounded object-cover"
           />
 
-          {(highestRes || audioList) && (
-            <div className="flex flex-col text-sm">
-              {highestRes && <span>{getResolutionIcon(highestRes, 25)}</span>}
+          {(Resolution || audioList || subtitleList) && (
+            <div className="flex flex-col space-y-1 text-sm">
+              {resolution && <span>{getResolutionIcon(resolution, 20, "text-amber-300")}</span>}
               {audioList && (
-                <span className="text-xs text-gray-400">{audioList}</span>
+                <div className="flex space-x-2">
+                  <div>
+                    <GiHeadphones size={20} />
+                  </div>
+                  <span className="text-xs text-gray-400">{audioList}</span>
+                </div>
+              )}
+              {subtitleList && (
+                <div className="flex space-x-2">
+                  <div>
+                    <BsCcSquare size={20} />
+                  </div>
+                  <span className="text-xs text-gray-400">{subtitleList}</span>
+                </div>
               )}
             </div>
           )}
 
-          <div className="flex flex-col text-sm">
+          <div className={`flex flex-col text-sm ${isCinemaType ?? "col-start-2 row-start-1"}`}>
             <span className="font-medium">{typeLabel}</span>
             {Price && <span className="text-xs text-muted-foreground">{Price}</span>}
           </div>
@@ -130,33 +138,34 @@ function ModalProviderCard({ provider, resolutions }: { provider: StreamProvider
   );
 }
 
-
-
-function ProviderCard({ provider, resolutions, }: { provider: StreamProvider, resolutions: string[] }) {
+function ProviderCard({ provider }: { provider: StreamProvider }) {
   const {
-    Provider: providerName,
-    Icon: iconUrl,
-    Name,
-    Link: url,
+    Resolution,
     Type,
-    Audio = [],
     Price,
+    Provider,
+    Link: url,
+    Name,
+    Audio = [],
+    Subtitle = [],
+    Icon: iconUrl
   } = provider;
 
-  const highestRes = useMemo(
-    () => getHighestProviderResolution(resolutions),
-    [resolutions]
-  );
+  // const highestRes = useMemo(
+  //   () => getHighestProviderResolution(Resolution),
+  //   [Resolution]
+  // );
+  const resolution = Resolution === "4K" || Resolution === "HD" || Resolution === "SD" ? Resolution : null
 
   const typeLabel =
     capitalizeFirst(Type === "FLATRATE" ? "subscription" : Type);
 
   const audioList = Audio.length
-    ? Audio.map(languageCodeToEnglishName).join(", ")
+    ? sortLanguages(Audio.map(languageCodeToEnglishName)).join(", ")
     : null;
 
   const isCinemaType = Type === "CINEMA";
-
+  console.log(Resolution)
   return (
     <li className={`grid grid-cols-[1fr_103px] gap-5 px-2 py-2 items-center rounded-xl text-sm hover:bg-muted/70 duration-200`}>
       <DialogTrigger asChild>
@@ -168,17 +177,20 @@ function ProviderCard({ provider, resolutions, }: { provider: StreamProvider, re
             height={32}
             className="rounded object-cover"
           />
-          {(highestRes || audioList) && (
+          {((resolution || audioList) && (
             <div className="flex flex-col text-sm truncate">
-              {highestRes && <span>{getResolutionIcon(highestRes, 22)}</span>}
+              {resolution && <span>{getResolutionIcon(resolution, 22)}</span>}
               {audioList && (
-                <span className="truncate text-left text-gray-400 text-xs">{audioList}</span>
+                <div className="flex space-x-2">
+                  <GiHeadphones />
+                  <span className="truncate text-left text-gray-400 text-xs">{audioList}</span>
+                </div>
               )}
             </div>
-          )}
+          ))}
           <div className="flex flex-col items-start whitespace-nowrap">
             <span className="">{typeLabel}</span>
-            {Price && <span className="text-xs">{Price}</span>}
+            {Price && <span className="text-xs text-gray-400">{Price}</span>}
           </div>
         </button>
       </DialogTrigger>
@@ -208,10 +220,58 @@ function getHighestProviderResolution(resolutions: string[]) {
     return null;
 }
 
-function getResolutionIcon(resolution: "4K" | "HD" | "SD", size: number) {
+function getResolutionIcon(resolution: "4K" | "HD" | "SD", size: number, className?: string) {
   switch (resolution) {
-    case "4K": return <BsBadge4K size={size} />
-    case "HD": return <BsBadgeHd size={size} />
-    case "SD": return <BsBadgeSd size={size} />
+    case "4K": return <BsBadge4K size={size} className={className ?? ""} />
+    case "HD": return <BsBadgeHd size={size} className={className ?? ""} />
+    case "SD": return <BsBadgeSd size={size} className={className ?? ""} />
   }
+}
+
+export function ungroupProvider(g: GroupedProvider, highestResOnly: boolean): StreamProvider[] {
+  const {
+    provider: Provider,
+    name: Name,
+    link: Link,
+    icon: Icon,
+    types,
+    priceByType,
+    resolutionsByType,
+    audioByType = {},
+    subtitleByType = {},
+  } = g;
+
+  return types.flatMap((Type) => {
+    const Price = priceByType[Type] || "";
+    const ResList = resolutionsByType[Type] || [];
+    const highestRes = getHighestProviderResolution(ResList);
+    const Audio = audioByType[Type] || [];
+    const Subtitle = subtitleByType[Type] || [];
+
+    if (highestResOnly && highestRes) {
+      return {
+        Resolution: highestRes,
+        Type,
+        Price,
+        Provider,
+        Link,
+        Name,
+        Audio,
+        Subtitle,
+        Icon,
+      }
+    }
+
+    return ResList.map<StreamProvider>((Resolution) => ({
+      Resolution,
+      Type,
+      Price,
+      Provider,
+      Link,
+      Name,
+      Audio,
+      Subtitle,
+      Icon,
+    }));
+  });
 }
