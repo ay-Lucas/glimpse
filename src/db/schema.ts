@@ -130,6 +130,7 @@ export const movieSummaries = pgTable("movie_summaries", {
   voteCount: integer("vote_count"),
   releaseDate: date("release_date"),
   posterBlurDataUrl: text("poster_blur_data_url"),
+  justWatchInfo: jsonb("justwatch_info")
 });
 
 export const movieDetails = pgTable("movie_details", {
@@ -186,6 +187,7 @@ export const tvSummaries = pgTable("tv_summaries", {
   voteCount: integer("vote_count"),
   firstAirDate: date("first_air_date"),
   posterBlurDataUrl: text("poster_blur_data_url"),
+  justWatchInfo: jsonb("justwatch_info")
 });
 
 export const tvDetails = pgTable(
