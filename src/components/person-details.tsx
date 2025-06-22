@@ -49,7 +49,6 @@ export async function PersonDetails({
     let years = miliseconds / 1000 / 60 / 60 / 24 / 365;
     age = years.toString().split(".")[0];
   }
-  console.log(formattedDeathDate)
 
   return (
     <section className="flex flex-col space-y-6">

@@ -1,3 +1,4 @@
+import { int } from "drizzle-orm/mysql-core";
 import {
   AggregateCreditsResponse,
   Cast,
@@ -70,6 +71,37 @@ export interface WatchlistItemI {
   backdropPath: string | null;
   summary: string;
 }
+
+export interface GroupedProvider {
+  provider: string;                   // “Amazon Prime Video”
+  name: string;                   // same as provider, or display name
+  link: string;                   // watch URL
+  icon: string;                   // logo URL
+  types: string[];                 // e.g. ["FLATRATE","ADS"]
+  priceByType: Record<string, string>;    // e.g. { FLATRATE: "", ADS: "" }
+  resolutionsByType: Record<string, string[]>;// e.g. { FLATRATE: ["SD","HD","_4K"], ADS: ["SD","HD"] }
+  audioByType?: Record<string, string[]>;  // if you want per‐type audio lists
+  subtitleByType?: Record<string, string[]>;  // likewise for subtitles
+}
+
+export interface JustWatchInfo {
+  id: string;
+  originalTitle?: string;
+  isReleased?: boolean;
+  releastyear?: string;
+  genres?: string[];
+  imdbScore?: string | Number;
+  imdbCount?: string | Number;
+  tmdbRating?: string | Number;
+  tomatoMeter?: string | Number;
+  productionCountries?: string[];
+  shortDescription?: string;
+  streams: GroupedProvider[];
+}
+
+export interface MediaTitle extends DiscoverItem {
+  justWatchInfo: JustWatchInfo
+};
 
 export type DiscoverItem = {
   tmdbId: number;

@@ -3,7 +3,7 @@ import {
   fetchTmdbTvLists,
 } from "@/app/discover/actions";
 import { DiscoverSearch } from "./_components/discover-search";
-import { getAllTitles } from "@/lib/actions";
+import { getAllDiscoverTitles } from "@/lib/actions";
 import { PopularMoviesAndSeriesCarousel, TrendingMoviesCarousel, TrendingSeriesCarousel, UpcomingMoviesCarousel } from "./_components/discover-carousels";
 import { getBlurDataMap } from "./_components/discover-utils";
 
@@ -15,7 +15,7 @@ export const metadata = {
 };
 
 export default async function DiscoverPage() {
-  const titles = await getAllTitles(); // From supabase DB, entries backfilled from backfill.ts script
+  const titles = await getAllDiscoverTitles(); // From supabase DB, entries backfilled from backfill.ts script
   const blurMap = await getBlurDataMap(titles); // Fetch LQIP blur data from redis and make into map
 
 

@@ -18,6 +18,7 @@ import { getAllMovies, getAllTv } from "@/lib/actions";
 import { db } from "@/db/index"
 import { DiscoverItem } from "@/types/camel-index";
 import { redis } from "@/services/cache";
+import { getJustWatchInfo } from "@/app/(media)/actions";
 
 // Main
 export async function backfill() {
@@ -48,17 +49,18 @@ export async function backfill() {
 }
 
 async function insertSummaries(movies: MovieResult[], tvShows: TvResult[]) {
-  try {
-    if (movies.length > 0) {
-      console.log(`Backfilling ${movies.length} movie summaries...`);
-      for (const m of movies) {
-        const posterBlurUrl = m.posterPath
-          ? await getBlurData(`${BaseImageUrl.BLUR}${m.posterPath}`)
-          : null;
-        await pause(50)
+  if (movies.length > 0) {
+    console.log(`Backfilling ${movies.length} movie summaries...`);
+    for (const m of movies) {
+      try {
+        // const posterBlurUrl = m.posterPath
+        //   ? await getBlurData(`${BaseImageUrl.BLUR}${m.posterPath}`)
+        //   : null;
+        const releaseDateStr = m.releaseDate?.trim() || undefined;
+        const releaseDate = releaseDateStr ? new Date(releaseDateStr) : null
+        const justWatchInfo = await getJustWatchInfo(m.title, "movie", m.id, releaseDate)
 
         // Movie Summaries
-        const releaseDate = m.releaseDate?.trim() || undefined;
         await db
           .insert(movieSummaries)
           .values({
@@ -70,7 +72,8 @@ async function insertSummaries(movies: MovieResult[], tvShows: TvResult[]) {
             popularity: m.popularity,
             voteAverage: m.voteAverage,
             voteCount: m.voteCount,
-            releaseDate: releaseDate,
+            releaseDate: releaseDateStr,
+            justWatchInfo: justWatchInfo
             // posterBlurDataUrl: posterBlurUrl,
           })
           .onConflictDoUpdate({
@@ -83,24 +86,32 @@ async function insertSummaries(movies: MovieResult[], tvShows: TvResult[]) {
               popularity: m.popularity,
               voteAverage: m.voteAverage,
               voteCount: m.voteCount,
-              releaseDate: releaseDate,
+              releaseDate: releaseDateStr,
+              justWatchInfo: justWatchInfo
               // posterBlurDataUrl: posterBlurUrl,
             },
           });
+        await pause(100)
       }
-
-      console.log(`${movies.length} Movies added to DB: `, movies.map(item => item.id))
+      catch (err) {
+        console.error(`⚠️  Error inserting Movie Summary for "${m.title}" (ID ${m.id}):`, err);
+      }
     }
 
-    if (tvShows.length > 0) {
-      console.log(`Backfilling ${tvShows.length} TV show summaries...`);
-      for (const t of tvShows) {
+    console.log(`${movies.length} Movies added to DB: `, movies.map(item => item.id))
+  }
+
+  if (tvShows.length > 0) {
+    console.log(`Backfilling ${tvShows.length} TV show summaries...`);
+    for (const t of tvShows) {
+      try {
         // const posterBlurUrl = t.posterPath
         //   ? await getBlurData(`${BaseImageUrl.BLUR}${t.posterPath}`)
         //   : null;
-        await pause(50)
+        const firstAirDateStr = t.firstAirDate?.trim() || undefined;
+        const firstAirDate = firstAirDateStr ? new Date(firstAirDateStr) : null
+        const justWatchInfo = await getJustWatchInfo(t.name, "tv", t.id, firstAirDate)
 
-        const firstAirDate = t.firstAirDate?.trim() || undefined;
 
         await db
           .insert(tvSummaries)
@@ -113,7 +124,8 @@ async function insertSummaries(movies: MovieResult[], tvShows: TvResult[]) {
             popularity: t.popularity,
             voteAverage: t.voteAverage,
             voteCount: t.voteCount,
-            firstAirDate: firstAirDate,
+            firstAirDate: firstAirDateStr,
+            justWatchInfo: justWatchInfo
             // posterBlurDataUrl: posterBlurUrl,
           })
           .onConflictDoUpdate({
@@ -126,17 +138,19 @@ async function insertSummaries(movies: MovieResult[], tvShows: TvResult[]) {
               popularity: t.popularity,
               voteAverage: t.voteAverage,
               voteCount: t.voteCount,
-              firstAirDate: firstAirDate,
+              firstAirDate: firstAirDateStr,
+              justWatchInfo: justWatchInfo
               // posterBlurDataUrl: posterBlurUrl,
             },
           });
+        await pause(100)
       }
-
-      console.log(`${tvShows.length} TV Shows added to DB:\n`, tvShows.map(item => item.id))
+      catch (err) {
+        console.error(`⚠️  Error inserting TV Summary for "${t.name}" (ID ${t.id}):`, err);
+      }
     }
-  }
-  catch (err) {
-    console.error("Error backfilling TV Shows and Movies" + err);
+
+    console.log(`${tvShows.length} TV Shows added to DB:\n`, tvShows.map(item => item.id))
   }
 }
 

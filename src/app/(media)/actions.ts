@@ -1,7 +1,7 @@
 "server only";
 // import { getWatchlistsAndItems } from "@/lib/actions";
 import { BASE_API_URL, NUM_OF_POPULAR_PEOPLE_PAGES, options } from "@/lib/constants";
-import { FullMovie, FullPerson, FullTv } from "@/types/camel-index";
+import { FullMovie, FullPerson, FullTv, GroupedProvider } from "@/types/camel-index";
 import {
   MovieContentRatingResponse,
   MovieResponseAppended,
@@ -24,8 +24,9 @@ import {
 import camelcaseKeys from "camelcase-keys";
 import { unstable_cache } from "next/cache";
 import { fetchTmdbMovieLists, fetchTmdbTvLists, getTrendingPages } from "@/app/discover/actions";
-import JustWatch, { StreamProvider } from 'justwatch-api-client';
+import JustWatch, { StreamingInfo, StreamProvider } from 'justwatch-api-client';
 import { scrubByMaxRes } from "@/lib/scrub-streams";
+import { getJustWatchInfoFromDb } from "@/lib/actions";
 // Don't import React cache: /scripts/revalidate.ts throws error
 
 export const fetchPersonDetails = unstable_cache(async (
@@ -283,7 +284,7 @@ export async function getPersonPercentile(targetPopularity: number) {
 }
 
 // Called by /scripts/revalidate.ts: Don't wrap with React cache or unstable_cache
-export const fetchJustWatchData = async (tmdbTitle: string, type: 'movie' | 'tv', id: number, releaseDate?: Date | null) => {
+export const fetchJustWatchData = async (tmdbTitle: string, type: 'movie' | 'tv', tmdbId: number, releaseDate?: Date | null): Promise<StreamingInfo | undefined> => {
   try {
     const releaseYear = releaseDate ? new Date(releaseDate).getFullYear() : null;
     // 1) Search JustWatch for your title
@@ -297,35 +298,46 @@ export const fetchJustWatchData = async (tmdbTitle: string, type: 'movie' | 'tv'
     // console.log(searchResults)
     // console.log(firstMatch)
     const data = firstMatch?.fullPath && await justwatch.getData(firstMatch.fullPath, "US")
-    console.log(JSON.stringify(data, null, 2))
-    // console.log(data)
-    return data;
+    // console.log(JSON.stringify(data, null, 2))
+    return data ? data : undefined;
 
   } catch (err) {
-    console.error(`Error fetching JustWatch ${tmdbTitle}: ${type}/${id} (${releaseDate})`)
+    console.error(`Error fetching JustWatch ${tmdbTitle}: ${type}/${tmdbId} (${releaseDate})`)
   }
 }
 
-export const getJustWatchProviders = async (tmdbTitle: string, type: 'movie' | 'tv', id: number, releaseDate?: Date | null) => {
-  const justWatchResponse = await fetchJustWatchData(tmdbTitle, type, id, releaseDate)
-  if (!justWatchResponse)
+export const getJustWatchInfo = async (tmdbTitle: string, type: 'movie' | 'tv', tmdbId: number, releaseDate?: Date | null) => {
+  const justWatchResponse = await fetchJustWatchData(tmdbTitle, type, tmdbId, releaseDate)
+
+  if (!justWatchResponse || !justWatchResponse.Streams?.length)
     return null;
 
-  const raw = justWatchResponse.Streams;
-  const cleaned = scrubByMaxRes(raw);
-  return groupStreams(cleaned)
+  const cleaned = scrubByMaxRes(justWatchResponse.Streams);
+  const providers = groupStreams(cleaned)
+
+  return {
+    ID: justWatchResponse.ID,
+    originalTitle: justWatchResponse.originalTitle,
+    isReleased: justWatchResponse.isReleased,
+    releastyear: justWatchResponse.releastyear,
+    genres: justWatchResponse.genres,
+    imdbScore: justWatchResponse.imdbScore,
+    imdbCount: justWatchResponse.imdbCount,
+    tmdbRating: justWatchResponse.tmdbRating,
+    tomatoMeter: justWatchResponse.tomatoMeter,
+    productionCountries: justWatchResponse.productionCountries,
+    shortDescription: justWatchResponse.shortDescription,
+    streams: providers
+  }
 }
 
-export interface GroupedProvider {
-  provider: string;                   // “Amazon Prime Video”
-  name: string;                   // same as provider, or display name
-  link: string;                   // watch URL
-  icon: string;                   // logo URL
-  types: string[];                 // e.g. ["FLATRATE","ADS"]
-  priceByType: Record<string, string>;    // e.g. { FLATRATE: "", ADS: "" }
-  resolutionsByType: Record<string, string[]>;// e.g. { FLATRATE: ["SD","HD","_4K"], ADS: ["SD","HD"] }
-  audioByType?: Record<string, string[]>;  // if you want per‐type audio lists
-  subtitleByType?: Record<string, string[]>;  // likewise for subtitles
+export const getCachedJustWatch = async (tmdbTitle: string, type: 'movie' | 'tv', tmdbId: number, releaseDate?: Date | null) => {
+  const info = await getJustWatchInfoFromDb(Number(tmdbId), type)
+  if (info && info.streams)
+    return info;
+
+  const res = await getJustWatchInfo(tmdbTitle, type, tmdbId, releaseDate)
+  return res;
 }
 
 export function groupStreams(

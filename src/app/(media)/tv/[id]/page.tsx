@@ -1,4 +1,4 @@
-import { fetchDiscoverTvIds, fetchTvDetails, getRecommendations, getJustWatchProviders } from "@/app/(media)/actions";
+import { fetchDiscoverTvIds, fetchTvDetails, getRecommendations, getCachedJustWatch } from "@/app/(media)/actions";
 import Link from "next/link";
 import { Video } from "@/types/request-types-snakecase";
 import Image from "next/image";
@@ -78,7 +78,7 @@ export default async function TvPage({ params }: { params: { id: number } }) {
     tv.firstAirDate !== undefined &&
     tv.firstAirDate !== null &&
     new Date(tv.firstAirDate).valueOf() < Date.now();
-  const justWatchProviders = await getJustWatchProviders(tv.name, "tv", tmdbId, tv.firstAirDate)
+  const justWatchInfo = await getCachedJustWatch(tv.name, "tv", tmdbId, tv.firstAirDate)
   const blurData = await getRedisBlurValue("tv", params.id);
   // console.log(`Tv page rendered! ${tv.name}`)
   return (
@@ -209,7 +209,7 @@ export default async function TvPage({ params }: { params: { id: number } }) {
                   <Suspense
                     fallback={<Skeleton className="w-full h-[356px] rounded-xl" />}
                   >
-                    {(tv.watchProviders?.results?.US?.flatrate || (justWatchProviders && justWatchProviders.length > 0)) && (
+                    {(tv.watchProviders?.results?.US?.flatrate || (justWatchInfo && justWatchInfo.streams.length > 0)) && (
                       <div className="w-full md:w-1/2 md:pl-3 pt-3 md:pt-0 pb-3 md:pb-0">
                         <h2 className="text-2xl font-bold pb-4">
                           Streaming
@@ -224,8 +224,8 @@ export default async function TvPage({ params }: { params: { id: number } }) {
                             </Link>
                           </span>
                         </h2>
-                        {justWatchProviders ? (
-                          <JustWatchProviderList info={justWatchProviders} />
+                        {justWatchInfo?.streams ? (
+                          <JustWatchProviderList info={justWatchInfo.streams} />
                         ) : (
                           <div className="flex flex-wrap gap-2">{
                             tv.watchProviders?.results?.US?.flatrate?.map(

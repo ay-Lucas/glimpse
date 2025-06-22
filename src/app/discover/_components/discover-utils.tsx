@@ -11,13 +11,13 @@ export const convertToDiscoverItems = (async (
   array: MovieResult[] | TvResult[],
   blurMap: BlurMap
 ): Promise<DiscoverItem[]> => {
-
+  const erroredItems: string[] = [];
   const promises = array.map(async (item) => {
     const title = (item as MovieResult).title || (item as TvResult).name;
     const backfilledBlurData = blurMap.get(item.id);
 
     if (!backfilledBlurData?.posterBlur)
-      console.warn(`Poster blur data not found!" ${title} ${item.id}`)
+      erroredItems.push(`(${item.id}): ${title} `)
 
     // const posterBlurDataUrl = backfilledBlurData?.posterBlur
     //   ? backfilledBlurData.posterBlur : await getBlurData(`${BaseImageUrl.BLUR}${item.posterPath}`)
@@ -33,6 +33,8 @@ export const convertToDiscoverItems = (async (
       mediaType: item.mediaType
     };
   });
+  if (erroredItems.length)
+    console.warn(`\nPoster blur data not found for: \n${erroredItems.join("\n")}`)
 
   return await Promise.all(promises);
 })

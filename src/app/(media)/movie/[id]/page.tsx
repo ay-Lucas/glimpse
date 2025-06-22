@@ -10,7 +10,7 @@ import {
 } from "@/lib/constants";
 import { RecommededSection } from "@/app/(media)/_components/recommendedSection";
 import ReviewSection from "@/app/(media)/_components/ReviewSection";
-import { fetchMovieDetails, fetchDiscoverMovieIds, getRecommendations, getJustWatchProviders } from "../../actions";
+import { fetchMovieDetails, fetchDiscoverMovieIds, getRecommendations, getCachedJustWatch } from "../../actions";
 import { countryCodeToEnglishName, getTrailer, languageCodeToEnglishName } from "@/lib/utils";
 import JustWatchLogo from "@/assets/justwatch-logo.svg";
 import CastCard from "@/components/cast-card";
@@ -68,7 +68,7 @@ export default async function MoviePage({
       new Date(movie?.releaseDate!).valueOf() < Date.now()) ||
     false;
 
-  const justWatchProviders = await getJustWatchProviders(movie.title, "movie", tmdbId, movie.releaseDate)
+  const justWatchProviders = await getCachedJustWatch(movie.title, "movie", tmdbId, movie.releaseDate)
   const blurData = await getRedisBlurValue("movie", params.id);
   // console.log(movie.watchProviders?.results)
   // console.log(`Movie page rendered! ${movie.title}`)
@@ -225,7 +225,7 @@ export default async function MoviePage({
                       <Skeleton className="w-full h-[356px] rounded-xl" />
                     }
                   >
-                    {((movie.watchProviders?.results?.US?.flatrate || (justWatchProviders && justWatchProviders.length > 0)) && (
+                    {((movie.watchProviders?.results?.US?.flatrate || (justWatchProviders && justWatchProviders.streams.length > 0)) && (
                       <div className="w-full md:w-1/2 md:pl-3 pt-3 md:pt-0 pb-3 md:pb-0">
                         <h2 className="text-2xl font-bold pb-4">
                           Streaming
@@ -240,8 +240,8 @@ export default async function MoviePage({
                             </Link>
                           </span>
                         </h2>
-                        {justWatchProviders ? (
-                          <JustWatchProviderList info={justWatchProviders} />
+                        {justWatchProviders?.streams ? (
+                          <JustWatchProviderList info={justWatchProviders.streams} />
                         ) : (
                           <TmdbProviderList watchProviders={movie.watchProviders!} />
                         )}
