@@ -9,75 +9,29 @@ import {
   serial,
   uuid,
   doublePrecision,
-  numeric,
   date,
   jsonb,
   unique,
   bigint,
 } from "drizzle-orm/pg-core";
 
-export const users = pgTable("user", {
-  id: text("id")
-    .primaryKey()
-    .$defaultFn(() => crypto.randomUUID()),
-  name: text("name"),
-  email: text("email").unique(),
-  emailVerified: timestamp("emailVerified", { mode: "date" }),
-  image: text("image"),
-  password: text("password"),
-});
-
-export const accounts = pgTable(
-  "account",
-  {
-    userId: text("userId")
-      .notNull()
-      .references(() => users.id, { onDelete: "cascade" }),
-    type: text("type").$type().notNull(),
-    provider: text("provider").notNull(),
-    providerAccountId: text("providerAccountId").notNull(),
-    refresh_token: text("refresh_token"),
-    access_token: text("access_token"),
-    expires_at: integer("expires_at"),
-    token_type: text("token_type"),
-    scope: text("scope"),
-    id_token: text("id_token"),
-    session_state: text("session_state"),
-  },
-  (account) => ({
-    compoundKey: primaryKey({
-      columns: [account.provider, account.providerAccountId],
-    }),
-  }),
-);
-
-export const sessions = pgTable("session", {
-  sessionToken: text("sessionToken").primaryKey(),
-  userId: text("userId")
+export const profiles = pgTable("profiles", {
+  id: uuid("id")
     .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-  expires: timestamp("expires", { mode: "date" }).notNull(),
-});
-
-export const verificationTokens = pgTable(
-  "verificationToken",
-  {
-    identifier: text("identifier").notNull(),
-    token: text("token").notNull(),
-    expires: timestamp("expires", { mode: "date" }).notNull(),
-  },
-  (verificationToken) => ({
-    compositePk: primaryKey({
-      columns: [verificationToken.identifier, verificationToken.token],
-    }),
-  }),
+    .primaryKey(),
+  name: text("name").notNull(),
+  avatarUrl: text("avatar_url"),
+  createdAt: timestamp("created_at", { mode: "string" })
+    .notNull()
+    .default(sql`now()`),
+},
 );
 
-export const watchlistItems = pgTable("watchlistItems", {
+export const watchlistItems = pgTable("watchlist_items", {
   id: serial("id").primaryKey(),
-  watchlistId: uuid("watchlistId").references(() => watchlist.id),
-  itemId: uuid("itemId").default(sql`gen_random_uuid()`), // ID of the item being watched
-  tmdbId: integer("tmdbId").notNull(),
+  watchlistId: uuid("watchlist_id").references(() => watchlist.id, { onDelete: "cascade" }),
+  itemId: uuid("item_id").default(sql`gen_random_uuid()`), // ID of the item being watched
+  tmdbId: integer("tmdb_id").notNull(),
   title: text("title").notNull(),
   itemType: text({ enum: ["tv", "movie"] }).notNull(),
   genres: text("genres").array().notNull(),
@@ -85,23 +39,23 @@ export const watchlistItems = pgTable("watchlistItems", {
   rating: text("rating"),
   popularity: integer("popularity"),
   language: text("language"),
-  numberOfSeasons: integer("numberOfSeasons"),
-  numberOfEpisodes: integer("numberOfEpisodes"),
+  numberOfSeasons: integer("number_of_seasons"),
+  numberOfEpisodes: integer("number_of_episodes"),
   summary: text("summary"),
-  posterPath: text("posterPath"),
-  backdropPath: text("backdropPath"),
+  posterPath: text("poster_path"),
+  backdropPath: text("backdrop_path"),
 });
 
 export const watchlist = pgTable("watchlist", {
-  id: uuid("id")
-    .default(sql`gen_random_uuid()`)
-    .primaryKey(), // Auto-generate UUID
-  userId: text("userId").references(() => users.id),
-  watchlistName: text("watchlistName").notNull(),
-  createdAt: timestamp("createdAt", { mode: "string" })
+  id: uuid("id").default(sql`gen_random_uuid()`).primaryKey(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => profiles.id, { onDelete: "cascade" }),
+  watchlistName: text("watchlist_name").notNull(),
+  createdAt: timestamp("created_at", { mode: "string" })
     .notNull()
     .default(sql`now()`),
-  default: boolean("default").notNull().default(false), // Indicates if this is the default watchlist
+  isDefault: boolean("is_default").notNull().default(false), // Indicates if this is the default watchlist
 });
 
 export const rateLimitLog = pgTable("rate_limit_log", {
@@ -194,7 +148,6 @@ export const tvDetails = pgTable(
   {
     summaryId: integer("summary_id")
       .primaryKey()
-      .unique()
       .references(() => tvSummaries.id, { onDelete: "cascade" }),
     // basic flags & identifiers
     adult: boolean("adult").notNull().default(true),
@@ -229,10 +182,6 @@ export const tvDetails = pgTable(
     productionCountries: jsonb("production_countries"),
     spokenLanguages: jsonb("spoken_languages"),
   },
-  (t) => ({
-    // unique constraint to ensure one details row per summary
-    summaryUk: unique("tv_details_summary_uk").on(t.summaryId),
-  }),
 );
 
 export const episodeDetails = pgTable(
@@ -304,26 +253,3 @@ export const listEntries = pgTable(
     ),
   }),
 );
-// Causes Drizzle to crash when pushing with `npx drizzle-kit push` (Known Issue)
-
-//
-// export const authenticators = pgTable(
-//   "authenticator",
-//   {
-//     credentialID: text("credentialID").notNull().unique(),
-//     userId: text("userId")
-//       .notNull()
-//       .references(() => users.id, { onDelete: "cascade" }),
-//     providerAccountId: text("providerAccountId").notNull(),
-//     credentialPublicKey: text("credentialPublicKey").notNull(),
-//     counter: integer("counter").notNull(),
-//     credentialDeviceType: text("credentialDeviceType").notNull(),
-//     credentialBackedUp: boolean("credentialBackedUp").notNull(),
-//     transports: text("transports"),
-//   },
-//   (authenticator) => ({
-//     compositePK: primaryKey({
-//       columns: [authenticator.userId, authenticator.credentialID],
-//     }),
-//   }),
-// );
