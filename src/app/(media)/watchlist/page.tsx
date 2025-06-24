@@ -2,8 +2,6 @@
 import { Button } from "@/components/ui/button";
 import { Watchlist } from "@/components/watchlist";
 import { useWatchlist } from "@/context/watchlist";
-import { createWatchlist } from "@/lib/actions";
-import { useSession } from "next-auth/react";
 
 function CreateWatchlistButton({ handleClick }: { handleClick: () => void }) {
   return (
@@ -14,7 +12,6 @@ function CreateWatchlistButton({ handleClick }: { handleClick: () => void }) {
 }
 
 export default function WatchlistPage() {
-  const { data: session } = useSession();
   const { watchlists, addWatchlist } = useWatchlist();
   console.log(watchlists)
   return (

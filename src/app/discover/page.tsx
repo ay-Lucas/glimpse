@@ -6,6 +6,8 @@ import { DiscoverSearch } from "./_components/discover-search";
 import { getAllDiscoverTitles } from "@/lib/actions";
 import { PopularMoviesAndSeriesCarousel, TrendingMoviesCarousel, TrendingSeriesCarousel, UpcomingMoviesCarousel } from "./_components/discover-carousels";
 import { getBlurDataMap } from "./_components/discover-utils";
+import { ToastListener } from "./_components/discover-toast-listener";
+import { Suspense } from "react";
 
 export const revalidate = 43200; // 12 hours
 
@@ -22,6 +24,9 @@ export default async function DiscoverPage() {
   const [{ trendingTvDaily, trendingTvWeekly, popularTv }, { trendingMoviesDaily, trendingMoviesWeekly, popularMovies, upcomingMovies }] = await Promise.all([fetchTmdbTvLists(), fetchTmdbMovieLists()])
   return (
     <main className="w-screen max-w-[1920px] mx-auto">
+      <Suspense>
+        <ToastListener />
+      </Suspense>
       <div className="px-2 md:px-5 lg:px-10 space-y-3 py-6 overflow-hidden">
         <div className="flex flex-col w-full pb-8 mx-auto space-y-3 px-1">
           <h1 className="text-xl sm:text-2xl text-center font-semibold">Discover Movies &amp; TV Shows</h1>

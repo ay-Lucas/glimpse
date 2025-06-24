@@ -15,7 +15,7 @@ import {
   getWatchlistsAndItems,
 } from "@/lib/actions";
 import { FullMovie, FullTv, WatchlistI } from "@/types/camel-index";
-import { useSession } from "next-auth/react";
+import { useSupabase } from "./supabase";
 
 interface WatchlistContextType {
   watchlists: WatchlistI[];
@@ -40,7 +40,7 @@ const WatchlistContext = createContext<WatchlistContextType | undefined>(
 );
 
 export const WatchlistProvider = ({ children }: { children: ReactNode }) => {
-  const { data: session, status } = useSession();
+  const { session } = useSupabase();
   const [watchlists, setWatchlists] = useState<WatchlistI[]>([]);
 
   const fetchWatchlists = async () => {

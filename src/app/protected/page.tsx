@@ -1,10 +1,11 @@
-import { auth } from "@/auth";
+import { getServerSupabase } from "@/services/supabase/server";
 import { redirect } from "next/navigation";
 
 export default async function Page() {
-  const session = await auth();
+  const session = await getServerSupabase();
+  const user = await session.auth.getUser();
   if (!session) {
     redirect("/signin");
   }
-  return <div>{session.user.name}</div>;
+  return <div>{user.data.user?.email}</div>;
 }

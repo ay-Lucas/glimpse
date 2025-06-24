@@ -1,28 +1,20 @@
 "use client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { signin } from "@/lib/actions";
-import { redirect, usePathname } from "next/navigation";
-import { useState } from "react";
+import { login } from "../actions.ts"
+import { useSearchParams } from "next/navigation";
 
 export function SignInForm() {
-  const [error, setError] = useState(false);
-  const pathname = usePathname();
-
-  async function signInAndRedirect(formData: FormData) {
-    const res = await signin("credentials", formData);
-    if (!res?.errors) {
-      redirect("/discover");
-    } else {
-      setError(true);
-    }
-  }
-
+  const searchParams = useSearchParams()
+  const emailError = searchParams.get("email");
+  const passwordError = searchParams.get("password");
+  const error = searchParams.get("error")
   return (
-    <form action={signInAndRedirect} className="flex flex-col space-y-3">
+    <form action={login} className="flex flex-col space-y-3">
       <span className="font-bold text-2xl">
-        {pathname === "/signin" ? "Sign in" : "Sign up"}
+        Sign in
       </span>
+
       <Input
         required
         name="email"
@@ -37,10 +29,12 @@ export function SignInForm() {
         placeholder="Password"
         className="bg-gray-600 border-gray-500"
       />
-      {error && (
-        <p className="text-red-400 text-sm">
-          The email and/or password you specified are not correct.
-        </p>
+      {(emailError || passwordError || error) && (
+        <ul className="text-red-400 text-sm space-y-2">
+          {emailError && (<li className="list-item">{emailError}</li>)}
+          {passwordError && (<li>{passwordError}</li>)}
+          {error && (<li>{error}</li>)}
+        </ul>
       )}
       <Button type="submit" variant="secondary">
         Sign In

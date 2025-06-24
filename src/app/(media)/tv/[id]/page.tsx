@@ -141,7 +141,7 @@ export default async function TvPage({ params }: { params: { id: number } }) {
                         rating={rating}
                         firstAirDate={tv.firstAirDate?.toString() ?? undefined}
                         overview={tv.overview!}
-                        status={tv.status ?? undefined}
+                        status={tv?.status ?? undefined}
                       />
                       <MediaActions
                         data={tv}

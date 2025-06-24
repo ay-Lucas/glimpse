@@ -1,8 +1,7 @@
-import NextAuth from "next-auth";
-import { authConfig } from "@/auth.config";
 import { PUBLIC_ROUTES, ROOT } from "@/lib/routes";
 import { NextResponse } from "next/server";
-import { isRateLimitedEdge } from "./lib/rateLimit";
+import { type NextRequest } from 'next/server'
+import { createServerClient } from "@supabase/ssr";
 
 const blockedUserAgents = [
   "AhrefsBot",
@@ -16,60 +15,89 @@ const blockedUserAgents = [
 ];
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
-};
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * Feel free to modify this pattern to include more paths.
+     */
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+  ],
+}
 
-const { auth } = NextAuth(authConfig);
 
-export default auth(async (req) => {
-  // Bypass non-prod environments
-  const { hostname, pathname } = req.nextUrl;
+export async function middleware(request: NextRequest) {
 
+  let response = NextResponse.next({
+    request,
+  })
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll()
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value))
+          response = NextResponse.next({
+            request,
+          })
+          cookiesToSet.forEach(({ name, value, options }) =>
+            response.cookies.set(name, value, options)
+          )
+        },
+      },
+    }
+  )
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  const { pathname, hostname } = request.nextUrl;
+
+  // 3) In dev, just skip everything
   if (
     process.env.NODE_ENV !== "production" ||
     hostname === "localhost" ||
     hostname === "127.0.0.1"
   ) {
-    return NextResponse.next();
+    return response;
   }
 
-  const nextUrl = req.nextUrl;
+  // 4) Public‐route test
+  const isAuth = !!session;
+  const isExact = PUBLIC_ROUTES.includes(pathname);   // e.g. "/discover","/search"
+  const isPrefixed =
+    pathname.startsWith("/movie/") ||
+    pathname.startsWith("/tv/") ||
+    pathname.startsWith("/person/");                      // any movie/tv/person pages
+  const isPublic = isExact || isPrefixed;
 
-  const isAuthenticated = !!req.auth;
-  const isPublicRoute =
-    PUBLIC_ROUTES.includes(nextUrl.pathname)
+  // 5a) Signed‐in users should never see the “landing” or “signin” pages
   if (
-    (isAuthenticated && pathname.startsWith("/signin")) ||
-    (isAuthenticated && pathname.startsWith("/signup")) ||
-    (isAuthenticated && pathname === "/")
+    isAuth &&
+    (pathname === "/" ||
+      pathname === "/signin" ||
+      pathname === "/signup")
   ) {
-    return NextResponse.redirect(new URL(ROOT, nextUrl));
-  }
-  if (!isAuthenticated && !isPublicRoute) {
-    return NextResponse.redirect(new URL(ROOT, nextUrl));
-  }
-
-  const forwarded = req.headers.get("x-forwarded-for") ?? "";
-  const ip =
-    forwarded.split(",")[0]?.trim() ||
-    req.headers.get("x-real-ip") ||
-    "unknown";
-  const ua = req.headers.get("user-agent") || "";
-
-  // Block known abusive bots
-  if (blockedUserAgents.some((bot) => ua.includes(bot))) {
-    console.warn(`Blocked bot: ${ua} from ${ip}`);
-    return new NextResponse("Blocked bot", { status: 403 });
+    const url = request.nextUrl.clone();
+    url.pathname = ROOT;
+    return NextResponse.redirect(url);
   }
 
-  const route = pathname.split("/")[1] ?? "/";
-
-  // Check if client is rate limited
-  if (await isRateLimitedEdge(ip, route)) {
-    const url = req.nextUrl.clone();
-    url.pathname = "/429";
-    return NextResponse.rewrite(url, { status: 429 });
+  // 5b) Unauthenticated users get sent to landing if they hit a protected page
+  if (!isAuth && !isPublic) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/signin";
+    return NextResponse.redirect(url);
   }
 
-  return NextResponse.next();
-});
+  // 6) (optional) Bot‐block and rate‐limit here…
+
+  return response;
+}

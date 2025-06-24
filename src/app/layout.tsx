@@ -5,7 +5,8 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { TopNav } from "@/components/top-nav";
 import { Footer } from "@/components/footer";
 import { Analytics } from "@vercel/analytics/react";
-import SessionProvider from "@/components/session-provider";
+import { SupabaseProvider } from "@/context/supabase";
+import { Toaster } from "sonner";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -30,7 +31,7 @@ export default async function RootLayout({
           fontSans.variable,
         )}
       >
-        <SessionProvider>
+        <SupabaseProvider>
           <ThemeProvider
             attribute="class"
             defaultTheme="dark"
@@ -39,10 +40,11 @@ export default async function RootLayout({
           >
             <TopNav />
             {children}
+            <Toaster />
             <Analytics />
             <Footer />
           </ThemeProvider>
-        </SessionProvider>
+        </SupabaseProvider>
       </body>
     </html>
   );

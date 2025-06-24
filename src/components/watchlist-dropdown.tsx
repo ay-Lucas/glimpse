@@ -6,8 +6,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useWatchlist } from "@/context/watchlist";
+import { Session } from "@supabase/supabase-js";
 import { EllipsisVertical } from "lucide-react";
-import { Session } from "next-auth";
 
 export function WatchlistDropdown({
   watchlistItemId,

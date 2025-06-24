@@ -5,13 +5,13 @@ import { WatchlistDropdown } from "./watchlist-dropdown";
 import Image from "next/image";
 import { ChangeEvent, useEffect, useState } from "react";
 import { setWatchlistName } from "@/lib/actions";
-import { useSession } from "next-auth/react";
-import { Session } from "next-auth";
 import { watchlistNameSchema } from "@/types/schema";
 import { Edit2Icon, X } from "lucide-react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { useWatchlist } from "@/context/watchlist";
+import { Session } from "@supabase/supabase-js";
+import { useSupabase } from "@/context/supabase";
 
 export function EditableWatchlistTitle({
   initialTitle,
@@ -123,7 +123,7 @@ function WatchlistDeleteConfirmation({
 }
 
 export function Watchlist({ watchlist }: { watchlist: WatchlistI }) {
-  const { data: session } = useSession();
+  const { session } = useSupabase();
   const { onDeleteWatchlist } = useWatchlist();
   return (
     <div className="p-3 bg-background border-secondary border rounded-2xl backdrop-blur-3xl">

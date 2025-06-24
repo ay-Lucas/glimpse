@@ -4,9 +4,10 @@ import { getWatchlists } from "@/lib/actions";
 import Link from "next/link";
 import { Play } from "lucide-react";
 import { FullMovie, FullTv, WatchlistSchemaI } from "@/types/camel-index";
-import { useSession } from "next-auth/react";
 import AddToWatchlistDropdown from "@/components/add-to-watchlist-button";
 import { useEffect, useState } from "react";
+import { getBrowserSupabase } from "@/services/supabase/client";
+import { User } from "@supabase/supabase-js";
 
 export default function MediaActions({
   tmdbId,
@@ -19,12 +20,13 @@ export default function MediaActions({
   rating: string;
   videoPath?: string;
 }) {
-  const { data: session, status } = useSession({ required: false });
+  const session = getBrowserSupabase();
   const [watchlists, setWatchlists] = useState<WatchlistSchemaI[] | null>(null);
+  const [user, setUser] = useState<User | null>()
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    if (!session?.user?.id) {
+    if (!user) {
       setWatchlists(null);
       setLoading(false);
       return;
@@ -34,8 +36,12 @@ export default function MediaActions({
 
     (async () => {
       try {
-        const lists = await getWatchlists(session.user.id);
-        setWatchlists(lists);
+        const userRes = await session.auth.getUser()
+        setUser(userRes.data.user);
+        if (user?.id) {
+          const lists = await getWatchlists(user?.id);
+          setWatchlists(lists);
+        }
       } catch (error) {
         console.error("Failed to fetch watchlists:", error);
         setWatchlists([]);
@@ -45,11 +51,9 @@ export default function MediaActions({
     })();
   }, [session]);
 
-  if (status === "loading") {
-    return <div>Checking authentication…</div>;
-  }
-
-  const isLoggedIn = Boolean(session?.user?.id);
+  // if (status === "loading") {
+  //   return <div>Checking authentication…</div>;
+  // }
 
   return (
     <div className="flex justify-center md:justify-start space-x-3">
@@ -61,14 +65,14 @@ export default function MediaActions({
           </Button>
         </Link>
       )}
-      {isLoggedIn ? (
+      {user ? (
         loading ? (
           <Button variant="secondary" disabled>
             Loading…
           </Button>
         ) : watchlists && watchlists.length > 0 ? (
           <AddToWatchlistDropdown
-            userId={session?.user.id!}
+            userId={user.id}
             item={data}
             rating={rating ?? ""}
             mediaType="movie"

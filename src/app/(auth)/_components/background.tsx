@@ -19,7 +19,7 @@ export default function Background({
   }, [images]);
 
   return (
-    <div className="absolute top-0 left-0 w-full h-full duration-300 ease-in overflow-hidden bg-gradient-to-t bg-blend-overlay from-gray-200 to-gray-950">
+    <div className="absolute top-0 left-0 w-full h-full duration-300 ease-in overflow-hidden bg-gradient-to-t bg-blend-overlay from-gray-200 to-gray-950 -z-10">
       <div className="absolute top-0 left-0 w-full h-full opacity-50">
         {images.map((backdropPath, i) => (
           <Image

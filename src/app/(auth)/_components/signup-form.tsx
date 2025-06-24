@@ -1,34 +1,18 @@
 "use client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { signup } from "@/lib/actions";
-import { useState } from "react";
-import { redirect } from "next/navigation";
+import { signup } from "../actions.ts"
+import { useSearchParams } from "next/navigation";
 
-export function ErrorMessage({ data }: { data: FormData }) {
-  return <div>{data.entries().toArray().toString()}</div>;
-}
-
-interface FieldErrors {
-  email?: string[] | undefined;
-  password?: string[] | undefined;
-}
 export function SignUpForm() {
-  const [errorMessage, setErrorMessage] = useState<String[]>();
-  async function signUpAndRedirect(formData: FormData) {
-    const res = await signup("credentials", formData); // Calls signin if successful
-    if (!res?.errors) {
-      redirect("/discover");
-    } else {
-      setErrorMessage([
-        res.errors.email?.toString() ?? "",
-        res.errors.password?.toString() ?? "",
-      ]);
-    }
-  }
-
+  const searchParams = useSearchParams()
+  const emailError = searchParams.get("email");
+  const passwordError = searchParams.get("password");
+  const error = searchParams.get("error")
+  console.log(emailError)
+  console.log(passwordError)
   return (
-    <form action={signUpAndRedirect} className="flex flex-col space-y-3">
+    <form action={signup} className="flex flex-col space-y-3">
       <span className="font-bold text-2xl">Sign Up</span>
       <Input
         name="email"
@@ -42,12 +26,12 @@ export function SignUpForm() {
         placeholder="Password"
         className="bg-gray-600 border-gray-500"
       />
-      {errorMessage && (
-        <div className="text-red-400 text-sm">
-          {errorMessage.map((item, index) => (
-            <p key={index}>{item}</p>
-          ))}
-        </div>
+      {(emailError || passwordError || error) && (
+        <ul className="text-red-400 text-sm space-y-2">
+          {emailError && (<li className="list-item">{emailError}</li>)}
+          {passwordError && (<li>{passwordError}</li>)}
+          {error && (<li>{error}</li>)}
+        </ul>
       )}
       <Button type="submit" variant="secondary">
         Sign Up

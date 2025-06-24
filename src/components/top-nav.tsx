@@ -5,10 +5,10 @@ import { Button } from "@/components/ui/button";
 import { AvatarDropdown } from "./avatar-dropdown";
 import { Search } from "./search";
 import { LucideList, LucideTv } from "lucide-react";
-import { useSession } from "next-auth/react";
+import { useSupabase } from "@/context/supabase";
 
 export function TopNav() {
-  const { data: session, status } = useSession();
+  const { session, client } = useSupabase()
 
   return (
     <div className="sticky top-0 left-0 border-b border-transparent/10 z-10 backdrop-blur-sm bg-background/80">
@@ -34,15 +34,15 @@ export function TopNav() {
           </Link>
         </div>
         <section className="grid justify-end space-x-4 items-center">
-          {status === "loading" ? (
-            <div>Checking…</div>
-          ) : session ? (
-            <AvatarDropdown />
-          ) : (
+          {/* {status === "loading" ? ( */}
+          {/* <div>Checking…</div> */}
+          {session?.user ?
+            <AvatarDropdown /> :
             <Button asChild size="sm">
               <Link href="/signin">Sign in</Link>
             </Button>
-          )}
+          }
+          {/* )} */}
         </section>
       </nav>
     </div>

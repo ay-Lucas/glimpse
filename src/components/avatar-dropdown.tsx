@@ -9,12 +9,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
-import { signout } from "@/lib/actions";
 import Link from "next/link";
-import { useSession } from "next-auth/react";
+import { useSupabase } from "@/context/supabase";
+import { SignOutButton } from "./sign-out-button";
 
 export function AvatarDropdown() {
-  const { data: session } = useSession();
+  const { session } = useSupabase();
 
   return (
     <DropdownMenu>
@@ -78,15 +78,7 @@ export function AvatarDropdown() {
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem>
-          <form action={signout} className="w-full h-full">
-            <button
-              type="submit"
-              className="flex px-2 py-1.5 w-full focus:bg-accent"
-            >
-              <LogOut className="mr-2 h-4 w-4" />
-              Sign Out
-            </button>
-          </form>
+          <SignOutButton />
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
