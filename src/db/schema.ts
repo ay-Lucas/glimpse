@@ -24,8 +24,8 @@ export const profiles = pgTable("profiles", {
   createdAt: timestamp("created_at", { mode: "string" })
     .notNull()
     .default(sql`now()`),
-},
-);
+  emailConfirmationSentAt: timestamp("email_confirmation_sent_at", { mode: "string" }),
+});
 
 export const watchlistItems = pgTable("watchlist_items", {
   id: serial("id").primaryKey(),
