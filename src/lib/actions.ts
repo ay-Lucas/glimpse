@@ -5,7 +5,7 @@ import { db } from "@/db/index";
 import { and, asc, eq, gt, sql } from "drizzle-orm";
 import {
   rateLimitViolation,
-  users,
+  profiles,
   watchlist,
   watchlistItems,
 } from "@/db/schema";
@@ -93,15 +93,6 @@ export async function addTvToWatchlist(
   return result;
 }
 
-async function getUserIdByEmail(email: string): Promise<string | null> {
-  const [user] = await db
-    .select({ id: users.id })
-    .from(users)
-    .where(eq(users.email, email))
-    .limit(1);
-
-  return user ? user.id : null; // Returns the userId or null if not found
-}
 export async function createWatchlist(userId: string, watchlistName: string) {
   const result = await db
     .insert(watchlist)
@@ -183,7 +174,7 @@ export async function getDefaultWatchlist(userId: string) {
   const [defaultWatchlist] = await db
     .select()
     .from(watchlist)
-    .where(and(eq(watchlist.userId, userId), eq(watchlist.default, true)))
+    .where(and(eq(watchlist.userId, userId), eq(watchlist.isDefault, true)))
     .limit(1); // Limit to 1 to ensure a single result
 
   return defaultWatchlist || null; // Return the watchlist or null if not found
@@ -269,19 +260,12 @@ export async function setWatchlistName(
   }
 }
 
-export async function getUserFromDbUUID(UUID: string) {
-  const user = await db.query.users.findFirst({
-    where: eq(users.email, UUID),
-  });
-  return user;
-}
-
 async function setFirstWatchlistAsDefault(userId: string): Promise<void> {
   // Step 1: Check if the user already has a default watchlist
   const [existingDefault] = await db
     .select()
     .from(watchlist)
-    .where(and(eq(watchlist.userId, userId), eq(watchlist.default, true)))
+    .where(and(eq(watchlist.userId, userId), eq(watchlist.isDefault, true)))
     .limit(1);
 
   // If a default watchlist exists, no action is needed
@@ -298,7 +282,7 @@ async function setFirstWatchlistAsDefault(userId: string): Promise<void> {
   if (firstWatchlist) {
     await db
       .update(watchlist)
-      .set({ default: true })
+      .set({ isDefault: true })
       .where(eq(watchlist.id, firstWatchlist.id));
   }
 }
@@ -372,7 +356,7 @@ export async function getWatchlist(
       watchlistName: watchlist.watchlistName,
       userid: watchlist.userId,
       createdAt: watchlist.createdAt,
-      default: watchlist.default,
+      default: watchlist.isDefault,
     })
     .from(watchlist)
     .where(and(eq(watchlist.userId, userId), eq(watchlist.id, watchlistId)))
@@ -389,7 +373,7 @@ export async function getWatchlists(
       watchlistName: watchlist.watchlistName,
       userid: watchlist.userId,
       createdAt: watchlist.createdAt,
-      default: watchlist.default,
+      default: watchlist.isDefault,
     })
     .from(watchlist)
     .where(eq(watchlist.userId, userId));
