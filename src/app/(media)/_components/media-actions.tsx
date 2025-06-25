@@ -14,11 +14,13 @@ export default function MediaActions({
   data,
   rating,
   videoPath,
+  mediaType
 }: {
   tmdbId: number;
   data: FullMovie | FullTv;
   rating: string;
   videoPath?: string;
+  mediaType: "tv" | "movie";
 }) {
   const session = getBrowserSupabase();
   const [watchlists, setWatchlists] = useState<WatchlistSchemaI[] | null>(null);
@@ -58,7 +60,7 @@ export default function MediaActions({
   return (
     <div className="flex justify-center md:justify-start space-x-3">
       {videoPath !== undefined && videoPath.trim() && (
-        <Link href={`/movie/${tmdbId}?show=true`}>
+        <Link href={`${tmdbId}?show=true`}>
           <Button variant="outline" className="flex items-center space-x-2">
             <Play size={20} />
             <span>Play Trailer</span>

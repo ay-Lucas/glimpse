@@ -13,7 +13,6 @@ import { RecommededSection } from "@/app/(media)/_components/recommendedSection"
 import ReviewSection from "@/app/(media)/_components/ReviewSection";
 import JustWatchLogo from "@/assets/justwatch-logo.svg";
 import CastCard from "@/components/cast-card";
-import { TvDetails } from "../../_components/tv-details";
 import { ScoreCircle } from "../../_components/score-circle";
 import MediaActions from "../../_components/media-actions";
 import { ChevronRight } from "lucide-react";
@@ -22,6 +21,7 @@ import ImageCarousel from "@/components/image-carousel";
 import VideoPlayer from "../../_components/video-player";
 import JustWatchProviderList from "../../_components/provider-list";
 import { getRedisBlurValue } from "@/services/cache";
+import { MediaHeader } from "../../_components/media-header";
 
 function getTrailer(videoArray: Array<Video>) {
   const trailer: Array<Video> = videoArray.filter(
@@ -91,66 +91,24 @@ export default async function TvPage({ params }: { params: { id: number } }) {
               <div className="items-end pb-5 md:pt-0 px-0 lg:px-24 space-y-5">
 
                 <section className="bg-background/20 backdrop-blur-sm rounded-lg p-4 md:p-6">
-                  <div className="grid grid-cols-1 md:grid-cols-[238px,1fr] gap-5 items-start">
-                    {tv?.posterPath && (
-                      <figure className="w-full">
-                        <Image
-                          quality={60}
-                          width={238}
-                          height={357}
-                          src={`${BASE_POSTER_IMAGE_URL}${tv.posterPath}`}
-                          className="object-cover rounded-lg w-full h-full"
-                          priority
-                          placeholder="blur"
-                          blurDataURL={blurData?.posterBlur ?? DEFAULT_BLUR_DATA_URL}
-                          alt={`${tv.name} poster`}
-                          loading="eager"
-                        />
-                      </figure>
-                    )}
-
-                    <div className="space-y-6">
-                      <h1 className="text-3xl md:text-5xl font-bold text-center md:text-left">
-                        {tv.name}
-                      </h1>
-                      <div className="flex flex-wrap items-center gap-4 mb-4">
-                        {isReleased && tv.voteAverage != null && (
-                          <div className="flex flex-col items-center">
-                            <ScoreCircle
-                              size={54}
-                              strokeWidth={3}
-                              percentage={Math.round(tv.voteAverage * 10)}
-                            />
-                            <span className="sr-only">{tv.voteAverage}</span>
-                          </div>
-                        )}
-                        {tv.genres && tv.genres.length > 0 && (
-                          <>
-                            {tv.genres.map((g) => (
-                              <span
-                                key={g.id}
-                                className="text-sm bg-gray-700/60 px-2 py-0.5 rounded-full hover:bg-gray-700 transition ring-1 ring-gray-400"
-                              >
-                                {g.name}
-                              </span>
-                            ))}
-                          </>
-                        )}
-                      </div>
-                      <TvDetails
-                        rating={rating}
-                        firstAirDate={tv.firstAirDate?.toString() ?? undefined}
-                        overview={tv.overview!}
-                        status={tv?.status ?? undefined}
-                      />
-                      <MediaActions
-                        data={tv}
-                        videoPath={videoPath}
-                        tmdbId={params.id}
-                        rating={rating}
-                      />
-                    </div>
-                  </div>
+                  <MediaHeader
+                    rating={rating}
+                    dateValue={tv.firstAirDate?.toString()}
+                    dateLabel={"First Aired"}
+                    isReleased={isReleased}
+                    overview={tv.overview}
+                    status={tv.status ?? undefined}
+                    posterPath={tv.posterPath ?? null}
+                    posterBlur={blurData?.posterBlur ?? null}
+                    title={tv.name}
+                    genres={tv.genres ?? null}
+                    tmdbId={params.id}
+                    tmdbVoteAverage={tv.voteAverage ?? null}
+                    trailerPath={videoPath}
+                    data={tv}
+                    typeLabel="Series"
+                    mediaType="tv"
+                  />
                 </section>
                 <div className="pt-3 flex flex-col md:flex-row w-full md:space-y-0 space-y-4 backdrop-blur-sm bg-background/20 rounded-lg p-2">
                   <div className="w-full md:w-1/2">
