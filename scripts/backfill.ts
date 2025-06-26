@@ -19,6 +19,20 @@ import { db } from "@/db/index"
 import { DiscoverItem } from "@/types/camel-index";
 import { redis } from "@/services/cache";
 import { getJustWatchInfo } from "@/app/(media)/actions";
+import { revalidate } from "./revalidate";
+
+async function backfillAndRevalidate() {
+  const backfillSuccessful = await backfill();
+
+  if (!backfillSuccessful)
+    console.log("exiting...")
+
+  console.log("revalidating..")
+  const revalidateSuccessful = await revalidate();
+
+  if (!revalidateSuccessful)
+    console.log("revalidate failed")
+}
 
 // Main
 export async function backfill() {
@@ -41,8 +55,9 @@ export async function backfill() {
     // Supabase Entries
     await insertSummaries(addedMovies, addedTvShows);
     await removeSummaries(removedMovies.map(item => item.tmdbId), removedTvShows.map(item => item.tmdbId));
-
     console.log("Database backfill complete.");
+
+    return true;
   } catch (error) {
     console.error("There was an error completing the backfill " + error);
   }
@@ -315,7 +330,7 @@ function pause(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-backfill().then(() => {
-  console.log("Script finished")
+backfillAndRevalidate().then(() => {
+  console.log("Backfill and revalidate complete")
   process.exit()
 }).catch(err => console.error(err))

@@ -32,11 +32,13 @@ export async function revalidate() {
 
   await revalidatePaths(allPaths, baseUrl);
   await warmCache(baseUrl, allPaths);
+  return true;
 }
 
 async function revalidatePaths(paths: string[], baseUrl: string) {
   try {
     console.log("Revalidating paths...")
+    console.log(`${baseUrl}/api/revalidate`)
 
     const response = await fetch(`${baseUrl}/api/revalidate`,
       {
@@ -126,4 +128,4 @@ function isPersonPath(str: string) {
   return str.startsWith("/person")
 }
 
-revalidate().then(res => console.log(`Script completed`)).catch(error => console.error(error))
+// revalidate().then(res => console.log(`Script completed`)).catch(error => console.error(error))
