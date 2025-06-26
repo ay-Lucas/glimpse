@@ -96,3 +96,64 @@ export const MAX_RES_BY_PROVIDER: Record<string, "_4K" | "HD" | "SD"> = {
   "Netflix Basic with Ads": "HD",
   // add more overrides here...
 };
+
+// Mostly AI Bots
+export const BLOCKED_BOT_UA = new RegExp(
+  [
+    "AI2Bot",
+    "Ai2Bot\\-Dolma",
+    "Amazonbot",
+    "anthropic\\-ai",
+    "Applebot",
+    "Applebot\\-Extended",
+    "Brightbot 1\\.0",
+    "Bytespider",
+    "CCBot",
+    "Claude\\-Web",
+    "ClaudeBot",
+    "cohere\\-ai",
+    "cohere\\-training\\-data\\-crawler",
+    "Crawlspace",
+    "Diffbot",
+    "DuckAssistBot",
+    "FacebookBot",
+    "FriendlyCrawler",
+    "GPTBot",
+    "iaskspider\\/2\\.0",
+    "ICC\\-Crawler",
+    "ImagesiftBot",
+    "img2dataset",
+    "ISSCyberRiskCrawler",
+    "Kangaroo Bot",
+    "Meta\\-ExternalAgent",
+    "Meta\\-ExternalFetcher",
+    "OAI\\-SearchBot",
+    "omgili",
+    "omgilibot",
+    "PanguBot",
+    "PerplexityBot",
+    "PetalBot",
+    "Scrapy",
+    "SemrushBot\\-OCOB",
+    "SemrushBot\\-SWA",
+    "Sidetrade indexer bot",
+    "Timpibot",
+    "VelenPublicWebCrawler",
+    "Webzio\\-Extended",
+    "YouBot",
+    "DigitalOceanGenAICrawler\\/1\\.0"
+  ].join("|"),
+  "i"
+);
+
+export const ALLOWED_BOT_UA = new RegExp(
+  [
+    "ChatGPT\\-User",
+    "Google\\-Extended",
+    "GoogleOther",
+    "GoogleOther\\-Image",
+    "GoogleOther\\-Video",
+    "Googlebot\\-Image",
+  ].join("|"),
+  "i"
+);
