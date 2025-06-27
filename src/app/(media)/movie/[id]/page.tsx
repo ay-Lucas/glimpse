@@ -5,23 +5,21 @@ import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   BASE_ORIGINAL_IMAGE_URL,
-  BASE_POSTER_IMAGE_URL,
   DEFAULT_BLUR_DATA_URL,
 } from "@/lib/constants";
 import { RecommededSection } from "@/app/(media)/_components/recommendedSection";
 import ReviewSection from "@/app/(media)/_components/ReviewSection";
-import { fetchMovieDetails, fetchDiscoverMovieIds, getRecommendations, getCachedJustWatch } from "../../actions";
-import { countryCodeToEnglishName, getTrailer, languageCodeToEnglishName } from "@/lib/utils";
-import JustWatchLogo from "@/assets/justwatch-logo.svg";
+import { fetchMovieDetails, fetchDiscoverMovieIds, getRecommendations } from "../../actions";
+import { getTrailer } from "@/lib/utils";
 import CastCard from "@/components/cast-card";
-import MediaActions from "../../_components/media-actions";
-import { ScoreCircle } from "../../_components/score-circle";
 import ImageCarousel from "@/components/image-carousel";
 import VideoPlayer from "../../_components/video-player";
 import { getRedisBlurValue } from "@/services/cache";
-import TmdbProviderList from "../../_components/tmdb-provider-list";
-import JustWatchProviderList from "../../_components/provider-list";
 import { MediaHeader } from "../../_components/media-header";
+import MediaProviders from "../../_components/media-providers";
+import { MediaDetails } from "../../_components/media-details";
+import { buildMovieDetailItems } from "./utils";
+import { Credits } from "../../_components/media-credits";
 
 export const revalidate = 43200; // 12 hours
 
@@ -68,8 +66,9 @@ export default async function MoviePage({
       new Date(movie?.releaseDate!).valueOf() < Date.now()) ||
     false;
 
-  const justWatchProviders = await getCachedJustWatch(movie.title, "movie", tmdbId, movie.releaseDate)
+  const detailItems = buildMovieDetailItems(movie)
   const blurData = await getRedisBlurValue("movie", params.id);
+
   // console.log(movie.watchProviders?.results)
   // console.log(`Movie page rendered! ${movie.title}`)
   // TODO: Add all watch providers
@@ -101,7 +100,7 @@ export default async function MoviePage({
             <div className="h-[6vh] md:h-[10vh]"></div>
             <div className="relative px-3 md:container items-end pt-16">
               <div className="items-end pb-5 md:pt-0 px-0 lg:px-24 space-y-5 ">
-                <section className="bg-background/20 backdrop-blur-sm rounded-lg p-4 md:p-6">
+                <section className="bg-background/40 backdrop-blur-sm rounded-lg p-4 md:p-6">
                   <MediaHeader
                     rating={rating}
                     dateValue={movie.releaseDate?.toString()}
@@ -116,123 +115,49 @@ export default async function MoviePage({
                     tmdbId={params.id}
                     tmdbVoteAverage={movie.voteAverage ?? null}
                     trailerPath={videoPath}
+                    tagline={movie.tagline ?? null}
+                    homepage={movie.homepage ?? null}
                     data={movie}
-                    typeLabel="Series"
+                    runtime={movie.runtime ?? null}
+                    typeLabel="Movie"
                     mediaType="movie"
                   />
                 </section>
-                <div className="pt-3 flex flex-col md:flex-row w-full md:space-y-0 space-y-4 backdrop-blur-sm bg-background/20 rounded-lg p-2">
-                  <div className="w-full md:w-1/2">
-                    <h2 className="text-2xl font-bold pb-4">Details</h2>
-                    <ul className="grid p-3 -ml-1 space-y-1">
-                      <li className="grid grid-cols-2 border-b">
-                        <div className="items-center">Directors</div>
-                        <div>
-                          {movie.credits?.crew
-                            ?.filter((item) => item.job === "Director")
-                            .map((item, index) => (
-                              <Link
-                                href={`/person/${item.id}`}
-                                className="hover:underline"
-                                key={index}
-                              >
-                                {index === 0 ? "" : ", "}
-                                {item.name}
-                              </Link>
-                            ))}
-                        </div>
-                      </li>
-                      {movie.revenue !== null && movie.revenue !== 0 && (
-                        <li className="grid grid-cols-2 border-b">
-                          <span>Revenue</span>
-                          <span>${movie.revenue?.toLocaleString()}</span>
-                        </li>
-                      )}
-                      {movie.budget !== null && movie.budget !== 0 && (
-                        <li className="grid grid-cols-2 border-b">
-                          <div>Budget</div>
-                          <span>${movie.budget?.toLocaleString()}</span>
-                        </li>
-                      )}
-                      {movie.voteAverage &&
-                        <li className="grid grid-cols-2 border-b">
-                          <div>Vote Average</div>
-                          <span>{movie.voteAverage.toFixed(1)}</span>
-                        </li>
-                      }
-                      <li className="grid grid-cols-2 border-b">
-                        <div>Vote Count</div>
-                        <span>{movie?.voteCount}</span>
-                      </li>
-                      <li className="grid grid-cols-2 border-b">
-                        <div>Popularity</div>
-                        <span>{Math.round(movie.popularity ?? 0)}</span>
-                      </li>
-                      <li className="grid grid-cols-2 border-b">
-                        <div>Language</div>
-                        <div>{languageCodeToEnglishName(movie.originalLanguage!)}</div>
-                      </li>
-                      <li className="grid grid-cols-2">
-                        <div>Origin Country</div>
-                        <span>{movie.originCountry?.map(code => countryCodeToEnglishName(code))?.join(", ")}</span>
-                      </li>
-                      <span className="mr-32"></span>
-                    </ul>
+                <section className="grid grid-cols-1 md:grid-cols-2 rounded-lg gap-4">
+                  <div className="backdrop-blur-sm bg-background/40 rounded-lg p-4">
+                    <MediaDetails items={detailItems} />
                   </div>
-                  <Suspense
-                    fallback={
-                      <Skeleton className="w-full h-[356px] rounded-xl" />
-                    }
-                  >
-                    {((movie.watchProviders?.results?.US?.flatrate || (justWatchProviders && justWatchProviders.streams.length > 0)) && (
-                      <div className="w-full md:w-1/2 md:pl-3 pt-3 md:pt-0 pb-3 md:pb-0">
-                        <h2 className="text-2xl font-bold pb-4">
-                          Streaming
-                          <span className="inline-flex items-center ml-4">
-                            <Link href="https://justwatch.com">
-                              <JustWatchLogo
-                                alt={`JustWatch Logo`}
-                                width={100}
-                                height={15}
-                                className="flex"
-                              />
-                            </Link>
-                          </span>
-                        </h2>
-                        {justWatchProviders?.streams ? (
-                          <JustWatchProviderList info={justWatchProviders.streams} />
-                        ) : (
-                          <TmdbProviderList watchProviders={movie.watchProviders!} />
-                        )}
-                      </div>
-                    ))}
+                  <Suspense fallback={<Skeleton className="w-full h-[356px] rounded-xl" />}>
+                    <MediaProviders tmdbWatchProviders={movie.watchProviders} mediaType="movie" releaseDate={movie.releaseDate ?? null} title={movie.title} tmdbId={movie.id} />
                   </Suspense>
-                </div>
+                </section>
                 {movie.credits?.cast && movie.credits.cast.length > 0 && (
                   <Suspense
                     fallback={
                       <Skeleton className="w-full h-[356px] rounded-xl" />
                     }
                   >
-                    <ImageCarousel
-                      title={
-                        <h2 className={`text-2xl font-bold`}>Cast</h2>
-                      }
-                      items={movie.credits.cast.map(
-                        (item: Cast, index: number) => (
-                          <Link href={`/person/${item.id}`} key={index}>
-                            <CastCard
-                              name={item.name}
-                              character={item.character}
-                              imagePath={item.profilePath ?? undefined}
-                              index={index}
-                              blurDataURL={DEFAULT_BLUR_DATA_URL}
-                            />
-                          </Link>
-                        ),
-                      )}
-                      breakpoints="cast"
-                    />
+
+                    <Credits cast={movie.credits?.cast ?? []} crew={movie.credits?.crew ?? []} />
+                    {/* <ImageCarousel */}
+                    {/*   title={ */}
+                    {/*     <h2 className={`text-2xl font-bold`}>Cast</h2> */}
+                    {/*   } */}
+                    {/*   items={movie.credits.cast.map( */}
+                    {/*     (item: Cast, index: number) => ( */}
+                    {/*       <Link href={`/person/${item.id}`} key={index}> */}
+                    {/*         <CastCard */}
+                    {/*           name={item.name} */}
+                    {/*           character={item.character} */}
+                    {/*           imagePath={item.profilePath ?? undefined} */}
+                    {/*           index={index} */}
+                    {/*           blurDataURL={DEFAULT_BLUR_DATA_URL} */}
+                    {/*         /> */}
+                    {/*       </Link> */}
+                    {/*     ), */}
+                    {/*   )} */}
+                    {/*   breakpoints="cast" */}
+                    {/* /> */}
                   </Suspense>
                 )}
                 <Suspense

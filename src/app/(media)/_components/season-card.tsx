@@ -84,7 +84,7 @@ export default function SeasonCard({ seasonNumber, name, airDate, overview, post
               </div>
 
               {/* <p className="md:text-md">{overview}</p> */}
-              <ExpandableText text={overview || ""} />
+              <ExpandableText>{overview || ""} </ExpandableText>
             </section>
           </div>
         </div >

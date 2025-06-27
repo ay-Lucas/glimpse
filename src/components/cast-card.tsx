@@ -37,7 +37,7 @@ export default function CastCard({
           // blurDataURL="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=="
           blurDataURL={blurDataURL}
           sizes="150px"
-          className="rounded-[50%] object-cover w-[150px] h-[150px]"
+          className="rounded-md object-cover"
         />
       ) : (
         <div className="w-[150px] h-[150px] rounded-[50%] bg-gray-200" />

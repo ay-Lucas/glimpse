@@ -4,12 +4,15 @@ import { BASE_POSTER_IMAGE_URL, DEFAULT_BLUR_DATA_URL } from "@/lib/constants";
 import { ScoreCircle } from "./score-circle";
 import { Genre } from "@/types/types";
 import { FullMovie, FullTv } from "@/types/camel-index";
+import { ExpandableText } from "./expandable-overview";
 
 export interface MediaHeaderProps {
   title: string
   overview: string;
   dateLabel: string;         // e.g. "First Aired" or "Release"
+  dateLabel2?: string;         // e.g. "First Aired" or "Release"
   dateValue: string | undefined;        // ISO date string
+  dateValue2?: string;        // ISO date string
   isReleased: boolean,
   rating: string | null;           // e.g. "PG-13"
   posterPath: string | null;
@@ -20,6 +23,9 @@ export interface MediaHeaderProps {
   trailerPath: string | undefined;
   tmdbId: number;
   status: string | undefined;           // e.g. "Ended" or "Released"
+  tagline: string | null
+  homepage: string | null
+  runtime: number | null;
   typeLabel: string;         // e.g. "Series" or "Movie"
   mediaType: "tv" | "movie"
 }
@@ -29,6 +35,8 @@ export function MediaHeader({
   overview,
   dateLabel,
   dateValue,
+  dateLabel2,
+  dateValue2,
   isReleased,
   rating,
   status,
@@ -39,16 +47,44 @@ export function MediaHeader({
   data,
   trailerPath,
   tmdbId,
+  tagline,
+  homepage,
+  runtime,
   typeLabel,
   mediaType
 }: MediaHeaderProps) {
-  const formattedDate = dateValue
+
+  const formattedDate1 = dateValue
     ? new Intl.DateTimeFormat("en-US", {
       month: "short",
       day: "numeric",
       year: "numeric",
     }).format(new Date(dateValue))
     : null;
+
+  const formattedDate2 = dateValue2
+    ? new Intl.DateTimeFormat("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    }).format(new Date(dateValue2))
+    : null;
+
+  function formatRuntime(totalMinutes: number | undefined | null) {
+    if (typeof totalMinutes !== "number" || totalMinutes <= 0)
+      return null;
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = Math.ceil(totalMinutes % 60);
+    const label = [];
+    if (hours > 0)
+      label.push(`${hours}h`)
+    if (minutes > 0) {
+      label.push(`${minutes}m`)
+    }
+    return label.join(" ")
+  }
+
+  const runtimeLabel = formatRuntime(runtime)
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-[238px,1fr] gap-5 items-start">
@@ -69,10 +105,17 @@ export function MediaHeader({
         </figure>
       )}
 
-      <div className="space-y-6">
-        <h1 className="text-3xl md:text-5xl font-bold text-center md:text-left">
-          {title}
-        </h1>
+      <div className="space-y-3">
+        <div>
+          <h1 className="text-3xl md:text-5xl font-bold text-center md:text-left">
+            {title}
+          </h1>
+          {tagline && (
+            <p className="italic text-gray-300 text-md pt-1">
+              “{tagline}”
+            </p>
+          )}
+        </div>
         <div className="flex flex-wrap items-center gap-4 mb-4">
           {isReleased && tmdbVoteAverage != null && (
             <div className="flex flex-col items-center">
@@ -99,13 +142,24 @@ export function MediaHeader({
         </div>
         <section className="flex flex-col space-y-4">
           <div className="grid grid-cols-4 md:grid-cols-5 gap-6 text-center md:text-left">
-            {formattedDate && (
+            {formattedDate1 && (
               <div>
                 <div className="text-xs font-medium text-gray-400 uppercase">
                   {dateLabel}
                 </div>
                 <time dateTime={dateValue} className="mt-1 block">
-                  {formattedDate}
+                  {formattedDate1}
+                </time>
+              </div>
+            )}
+
+            {formattedDate2 && (
+              <div>
+                <div className="text-xs font-medium text-gray-400 uppercase">
+                  {dateLabel2}
+                </div>
+                <time dateTime={dateValue2} className="mt-1 block">
+                  {formattedDate2}
                 </time>
               </div>
             )}
@@ -128,6 +182,17 @@ export function MediaHeader({
               </div>
             )}
 
+            {runtimeLabel && (
+              <div>
+                <div className="text-xs font-medium text-gray-400 uppercase">
+                  Runtime
+                </div>
+                <div className="mt-1 inline-block border px-1 text-sm">
+                  {runtimeLabel}
+                </div>
+              </div>
+            )}
+
             <div>
               <div className="text-xs font-medium text-gray-400 uppercase">
                 Type
@@ -136,7 +201,17 @@ export function MediaHeader({
             </div>
           </div>
 
-          <p className="md:text-md">{overview}</p>
+
+          <div>
+            <div className="text-xs font-medium text-gray-400 uppercase">
+              Overview
+            </div>
+            <div>
+              <ExpandableText buttonClassname="mt-1 md:text-md">
+                {overview}
+              </ExpandableText>
+            </div>
+          </div>
         </section>
         <MediaActions
           data={data}

@@ -195,7 +195,7 @@ export type FullTv = {
 
   genres?: Genre[];
   createdBy?: SimplePerson[];
-  episodeRunTime?: number[];
+  runtime?: number;
   languages?: string[];
   networks?: Network[];
   seasons?: SimpleSeason[];

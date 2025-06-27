@@ -81,7 +81,7 @@ export default async function PersonPage({
 
             <section className="bg-background/40 backdrop-blur-xl rounded-lg p-4 md:p-6">
               <div className="grid grid-cols-1 md:grid-cols-[238px,1fr] gap-5 items-start">
-                {person.profilePath && (
+                {person.profilePath ? (
                   <figure className="w-full">
                     <Image
                       quality={60}
@@ -96,7 +96,7 @@ export default async function PersonPage({
                       loading="eager"
                     />
                   </figure>
-                )}
+                ) : <div className="w-[238px] h-[357px]"></div>}
 
                 <div className="space-y-4">
                   <div>

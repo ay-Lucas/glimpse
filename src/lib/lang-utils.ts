@@ -1,6 +1,6 @@
 import { languageCodeToEnglishName } from "@/lib/utils";
 
-const PRIORITY: string[] = ["en", "es"];
+const PRIORITY: string[] = ["en", "es", "fr", "de", "zh", "ja"];
 
 export function sortLanguages(codes: string[]): string[] {
   // Dedupe just in case

@@ -1,27 +1,18 @@
-import { fetchDiscoverTvIds, fetchTvDetails, getRecommendations, getCachedJustWatch } from "@/app/(media)/actions";
+import { fetchDiscoverTvIds, fetchTvDetails, getRecommendations } from "@/app/(media)/actions";
 import Link from "next/link";
 import { Video } from "@/types/request-types-snakecase";
-import Image from "next/image";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  BASE_CAST_IMAGE_URL,
-  BASE_POSTER_IMAGE_URL,
-  DEFAULT_BLUR_DATA_URL,
-} from "@/lib/constants";
 import { RecommededSection } from "@/app/(media)/_components/recommendedSection";
 import ReviewSection from "@/app/(media)/_components/ReviewSection";
-import JustWatchLogo from "@/assets/justwatch-logo.svg";
-import CastCard from "@/components/cast-card";
-import { ScoreCircle } from "../../_components/score-circle";
-import MediaActions from "../../_components/media-actions";
 import { ChevronRight } from "lucide-react";
-import { countryCodeToEnglishName, languageCodeToEnglishName } from "@/lib/utils";
-import ImageCarousel from "@/components/image-carousel";
 import VideoPlayer from "../../_components/video-player";
-import JustWatchProviderList from "../../_components/provider-list";
 import { getRedisBlurValue } from "@/services/cache";
 import { MediaHeader } from "../../_components/media-header";
+import { MediaDetails } from "../../_components/media-details";
+import MediaProviders from "../../_components/media-providers";
+import { Credits } from "../../_components/media-credits";
+import { buildTvDetailItems } from "./utils";
 
 function getTrailer(videoArray: Array<Video>) {
   const trailer: Array<Video> = videoArray.filter(
@@ -78,8 +69,10 @@ export default async function TvPage({ params }: { params: { id: number } }) {
     tv.firstAirDate !== undefined &&
     tv.firstAirDate !== null &&
     new Date(tv.firstAirDate).valueOf() < Date.now();
-  const justWatchInfo = await getCachedJustWatch(tv.name, "tv", tmdbId, tv.firstAirDate)
   const blurData = await getRedisBlurValue("tv", params.id);
+
+  // console.log(tv)
+  const detailItems = buildTvDetailItems(tv);
   // console.log(`Tv page rendered! ${tv.name}`)
   return (
     <main>
@@ -90,11 +83,13 @@ export default async function TvPage({ params }: { params: { id: number } }) {
             <div className="relative px-3 md:container items-end pt-16">
               <div className="items-end pb-5 md:pt-0 px-0 lg:px-24 space-y-5">
 
-                <section className="bg-background/20 backdrop-blur-sm rounded-lg p-4 md:p-6">
+                <section className="bg-background/40 backdrop-blur-sm rounded-lg p-4 md:p-6">
                   <MediaHeader
                     rating={rating}
                     dateValue={tv.firstAirDate?.toString()}
                     dateLabel={"First Aired"}
+                    dateValue2={tv.lastAirDate?.toString()}
+                    dateLabel2={"Last Aired"}
                     isReleased={isReleased}
                     overview={tv.overview}
                     status={tv.status ?? undefined}
@@ -105,115 +100,27 @@ export default async function TvPage({ params }: { params: { id: number } }) {
                     tmdbId={params.id}
                     tmdbVoteAverage={tv.voteAverage ?? null}
                     trailerPath={videoPath}
+                    tagline={tv.tagline ?? null}
+                    homepage={tv.homepage ?? null}
                     data={tv}
+                    runtime={tv.runtime ?? null}
                     typeLabel="Series"
                     mediaType="tv"
                   />
                 </section>
-                <div className="pt-3 flex flex-col md:flex-row w-full md:space-y-0 space-y-4 backdrop-blur-sm bg-background/20 rounded-lg p-2">
-                  <div className="w-full md:w-1/2">
-                    <h2 className="text-2xl font-bold pb-4">Details</h2>
-                    <ul className="grid p-3 -ml-1 space-y-1">
-                      <li className="grid grid-cols-2 border-b items-center">
-                        <div>Creators</div>
-                        <div>
-                          {tv.createdBy?.map((item, index) => (
-                            <Link
-                              href={`/person/${item.id}`}
-                              className="hover:underline"
-                              key={index}
-                            >
-                              {index === 0 ? "" : ", "}
-                              {item.name}
-                            </Link>
-                          ))}
-                        </div>
-                      </li>
-                      <li className="grid grid-cols-2 border-b">
-                        <div>Networks</div>
-                        <div>
-                          {tv.networks?.map((item, index) => (
-                            <span key={index}>
-                              {index === 0 ? "" : ", "}
-                              {item.name}
-                            </span>
-                          ))}
-                        </div>
-                      </li>
-                      {tv.voteAverage &&
-                        <li className="grid grid-cols-2 border-b">
-                          <div>Vote Average</div>
-                          <span>{tv.voteAverage.toFixed(1)}</span>
-                        </li>
-                      }
-                      <li className="grid grid-cols-2 border-b">
-                        <div>Vote Count</div>
-                        <span>{tv.voteCount}</span>
-                      </li>
-                      <li className="grid grid-cols-2 border-b">
-                        <div>Popularity</div>
-                        <span>{Math.round(tv.popularity!)}</span>
-                      </li>
-                      <li className="grid grid-cols-2 border-b">
-                        <div>Language</div>
-                        <div>{languageCodeToEnglishName(tv.originalLanguage!)}</div>
-                      </li>
-                      <li className="grid grid-cols-2">
-                        <div>Origin Country</div>
-                        <span>{tv.originCountry?.map(code => countryCodeToEnglishName(code))?.join(", ")}</span>
-                      </li>
-                    </ul>
+                <section className="grid grid-cols-1 md:grid-cols-2 rounded-lg gap-4">
+                  <div className="backdrop-blur-sm bg-background/40 rounded-lg p-4">
+                    <MediaDetails items={detailItems} />
                   </div>
-                  <Suspense
-                    fallback={<Skeleton className="w-full h-[356px] rounded-xl" />}
-                  >
-                    {(tv.watchProviders?.results?.US?.flatrate || (justWatchInfo && justWatchInfo.streams.length > 0)) && (
-                      <div className="w-full md:w-1/2 md:pl-3 pt-3 md:pt-0 pb-3 md:pb-0">
-                        <h2 className="text-2xl font-bold pb-4">
-                          Streaming
-                          <span className="inline-flex items-center ml-4">
-                            <Link href="https://justwatch.com">
-                              <JustWatchLogo
-                                alt={`JustWatch Logo`}
-                                width={100}
-                                height={15}
-                                className="flex"
-                              />
-                            </Link>
-                          </span>
-                        </h2>
-                        {justWatchInfo?.streams ? (
-                          <JustWatchProviderList info={justWatchInfo.streams} />
-                        ) : (
-                          <div className="flex flex-wrap gap-2">{
-                            tv.watchProviders?.results?.US?.flatrate?.map(
-                              (item, index) => (
-                                <a
-                                  href={tv.watchProviders?.results?.US?.link!}
-                                  key={index}
-                                  className="w-[55px] h-[55px] flex-shrink-0 transform transition-transform  duration-200  hover:scale-105  hover:shadow-xl"
-                                >
-                                  <Image
-                                    src={`https://image.tmdb.org/t/p/original/${item.logoPath}`}
-                                    alt={`${item.providerName} logo`}
-                                    width={55}
-                                    height={55}
-                                    className="rounded-lg object-cover"
-                                  />
-                                </a>
-                              ),
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    )}
+                  <Suspense fallback={<Skeleton className="w-full h-[356px] rounded-xl" />}>
+                    <MediaProviders tmdbWatchProviders={tv.watchProviders} mediaType="tv" releaseDate={tv.firstAirDate ?? null} title={tv.name} tmdbId={tv.id} />
                   </Suspense>
-                </div>
+                </section>
                 {tv.numberOfSeasons && tv.numberOfSeasons > 0 && (
                   <>
                     <div className="pb-5 space-y-2 flex">
                       <Link href={`/tv/${params.id}/seasons`} className="pb-4 pt-3 flex items-end hover:text-gray-400">
-                        <h2 className={`text-2xl font-bold`}>Seasons </h2>
+                        <h2 className={`text-2xl font-bold`}>({tv.numberOfSeasons}) Season{tv.numberOfSeasons > 1 && "s"}</h2>
                         <ChevronRight size={30} />
                       </Link>
                     </div>
@@ -223,23 +130,7 @@ export default async function TvPage({ params }: { params: { id: number } }) {
                   <Suspense
                     fallback={<Skeleton className="w-full h-[356px] rounded-xl" />}
                   >
-                    <ImageCarousel
-                      title={
-                        <h2 className={`text-2xl font-bold`}>Cast</h2>
-                      }
-                      items={tv.credits?.cast?.map((item, index: number) => (
-                        <Link href={`/person/${item.id}`} key={index}>
-                          <CastCard
-                            name={item.name}
-                            character={item.character}
-                            imagePath={`${BASE_CAST_IMAGE_URL}${item.profilePath}`}
-                            index={index}
-                            blurDataURL={DEFAULT_BLUR_DATA_URL}
-                          />
-                        </Link>
-                      ))}
-                      breakpoints="cast"
-                    />
+                    <Credits cast={tv.credits?.cast ?? []} crew={tv.credits?.crew ?? []} />
                   </Suspense>
                 )}
                 <Suspense

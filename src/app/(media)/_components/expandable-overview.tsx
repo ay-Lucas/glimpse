@@ -1,14 +1,16 @@
 "use client"
-import { useState, useRef, useLayoutEffect } from "react"
+import { useState, useRef, useLayoutEffect, ReactNode } from "react"
 
 interface ExpandableOverviewProps {
-  text: string
+  children: ReactNode
   lineHeight?: number
+  buttonClassname?: string
 }
 
 export function ExpandableText({
-  text,
+  children,
   lineHeight = 24,
+  buttonClassname
 }: ExpandableOverviewProps) {
   const [expanded, setExpanded] = useState(false)
   const [canExpand, setCanExpand] = useState(false)
@@ -36,16 +38,16 @@ export function ExpandableText({
         }}
       >
         <p className="whitespace-pre-wrap">
-          {text}
+          {children}
         </p>
       </div>
 
       {canExpand && (
         <button
           onClick={() => setExpanded((v) => !v)}
-          className="mt-2 text-sm font-medium text-blue-600 hover:underline"
+          className={`text-sm font-medium text-blue-600 hover:underline ${buttonClassname ?? ""}`}
         >
-          {expanded ? "Show less" : "Read more"}
+          {expanded ? "Show less" : "Show more"}
         </button>
       )}
     </div>

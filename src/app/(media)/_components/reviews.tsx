@@ -23,7 +23,7 @@ export function Review({ data }: { data: ReviewI }) {
           </span>
         )}
       </div>
-      <ExpandableText text={data.content ?? ""} />
+      <ExpandableText>{data.content}</ExpandableText>
     </div>
   );
 }
