@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
+  BASE_CAST_IMAGE_URL,
   BASE_ORIGINAL_IMAGE_URL,
   DEFAULT_BLUR_DATA_URL,
 } from "@/lib/constants";
@@ -20,6 +21,7 @@ import MediaProviders from "../../_components/media-providers";
 import { MediaDetails } from "../../_components/media-details";
 import { buildMovieDetailItems } from "./utils";
 import { Credits } from "../../_components/media-credits";
+import { ChevronRight } from "lucide-react";
 
 export const revalidate = 43200; // 12 hours
 
@@ -132,33 +134,30 @@ export default async function MoviePage({
                   </Suspense>
                 </section>
                 {movie.credits?.cast && movie.credits.cast.length > 0 && (
-                  <Suspense
-                    fallback={
-                      <Skeleton className="w-full h-[356px] rounded-xl" />
-                    }
-                  >
-
-                    <Credits cast={movie.credits?.cast ?? []} crew={movie.credits?.crew ?? []} />
-                    {/* <ImageCarousel */}
-                    {/*   title={ */}
-                    {/*     <h2 className={`text-2xl font-bold`}>Cast</h2> */}
-                    {/*   } */}
-                    {/*   items={movie.credits.cast.map( */}
-                    {/*     (item: Cast, index: number) => ( */}
-                    {/*       <Link href={`/person/${item.id}`} key={index}> */}
-                    {/*         <CastCard */}
-                    {/*           name={item.name} */}
-                    {/*           character={item.character} */}
-                    {/*           imagePath={item.profilePath ?? undefined} */}
-                    {/*           index={index} */}
-                    {/*           blurDataURL={DEFAULT_BLUR_DATA_URL} */}
-                    {/*         /> */}
-                    {/*       </Link> */}
-                    {/*     ), */}
-                    {/*   )} */}
-                    {/*   breakpoints="cast" */}
-                    {/* /> */}
-                  </Suspense>
+                  <>
+                    <Suspense fallback={<Skeleton className="w-full h-[356px] rounded-xl" />}>
+                      <ImageCarousel
+                        title={<h2 className={`text-2xl font-bold`}>Top Cast</h2>}
+                        items={movie.credits.cast?.splice(0, 10).map((item, index: number) => (
+                          <Link href={`/person/${item.id}`} key={index}>
+                            <CastCard
+                              name={item.name}
+                              character={item.character}
+                              imagePath={`${BASE_CAST_IMAGE_URL}${item.profilePath}`}
+                              index={index}
+                              blurDataURL={DEFAULT_BLUR_DATA_URL}
+                              className="pt-2"
+                            />
+                          </Link>
+                        ))}
+                        breakpoints="cast"
+                      />
+                    </Suspense>
+                    <Link href={`/movie/${params.id}/credits`} className="pb-4 pt-3 flex items-end hover:text-gray-400">
+                      <h2 className={`text-2xl font-bold`}>All Cast and Crew</h2>
+                      <ChevronRight size={30} />
+                    </Link>
+                  </>
                 )}
                 <Suspense
                   fallback={

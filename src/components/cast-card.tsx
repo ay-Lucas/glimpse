@@ -43,9 +43,9 @@ export default function CastCard({
         <div className="w-[150px] h-[150px] rounded-[50%] bg-gray-200" />
       )}
 
-      <div className="mt-2 text-center">
+      <div className="mt-2 text-start">
         <p className="font-semibold text-sm line-clamp-1">{name}</p>
-        <p className="text-sm text-gray-500 line-clamp-1">{character}</p>
+        <p className="text-sm text-gray-500 line-clamp-1">as {character}</p>
       </div>
     </div>
   );

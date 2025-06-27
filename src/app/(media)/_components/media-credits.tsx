@@ -16,6 +16,7 @@ import Link from "next/link"
 import { Fragment, useMemo, useState } from "react"
 import { ChevronRight } from "lucide-react"
 import Image from "next/image"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 interface CreditsProps {
   cast: Cast[]
@@ -84,69 +85,78 @@ export function Credits({ cast, crew }: CreditsProps) {
           </div>
         </DialogTrigger>
         <DialogContent className="max-w-[95vw] sm:max-w-[90vw] lg:max-w-5xl max-h-[90vh] overflow-y-auto">
-          <DialogTitle>All Cast</DialogTitle>
-          <div>
-            <div>
-              <h2 className="text-2xl font-bold mb-4">Cast</h2>
-              <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
-                {sortedCast.map((c) => (
-                  <li key={c.id} className="space-y-2">
-                    {c.profilePath ? (
-                      <Image
-                        src={`https://image.tmdb.org/t/p/w185${c.profilePath}`}
-                        alt={c.name}
-                        width={185}
-                        height={278}
-                        unoptimized
-                        className="rounded-md object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-[278px] bg-gray-700 rounded-md" />
-                    )}
-                    <p className="font-semibold truncate">{c.name}</p>
-                    <p className="text-sm text-gray-400 truncate">
-                      as {c.character}
-                    </p>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <h2 className="text-2xl font-bold mb-4">Crew</h2>
-            {Object.entries(crewByDept).map(([dept, members]) => (
-              <Fragment key={dept}>
-                <h3 className="text-xl font-semibold mt-6 mb-2">{dept}</h3>
-                <table className="w-full table-fixed mb-6">
-                  <colgroup>
-                    <col className="w-1/2" />
-                    <col className="w-1/2" />
-                  </colgroup>
-                  <thead>
-                    <tr className="text-left text-gray-400 uppercase text-xs">
-                      <th className="py-2">Name</th>
-                      <th className="py-2">Role</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {members.map((m) => (
-                      <tr key={m.id} className="border-t hover:bg-muted/50">
-                        <td className="py-2 text-blue-400 ">
-                          <Link href={`/person/${m.id}`} key={m.id} className="hover:underline">
-                            {m.name}
-                          </Link>
-                        </td>
-                        <td className="py-2">{m.job}</td>
+          <Tabs defaultValue="cast">
+            <TabsList>
+              <TabsTrigger value="cast">Cast</TabsTrigger>
+              <TabsTrigger value="crew">Crew</TabsTrigger>
+            </TabsList>
+            <TabsContent value="cast">
+              <DialogTitle>All Cast</DialogTitle>
+              <div>
+                <h2 className="text-2xl font-bold mb-4">Cast</h2>
+                <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
+                  {sortedCast.map((c) => (
+                    <li key={c.id} className="space-y-2">
+                      {c.profilePath ? (
+                        <Image
+                          src={`https://image.tmdb.org/t/p/w185${c.profilePath}`}
+                          alt={c.name}
+                          width={185}
+                          height={278}
+                          unoptimized
+                          className="rounded-md object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-[278px] bg-gray-700 rounded-md" />
+                      )}
+                      <p className="font-semibold truncate">{c.name}</p>
+                      <p className="text-sm text-gray-400 truncate">
+                        as {c.character}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <h2 className="text-2xl font-bold mb-4">Crew</h2>
+            </TabsContent>
+            <TabsContent value="crew">
+
+              {Object.entries(crewByDept).map(([dept, members]) => (
+                <Fragment key={dept}>
+                  <h3 className="text-xl font-semibold mt-6 mb-2">{dept}</h3>
+                  <table className="w-full table-fixed mb-6">
+                    <colgroup>
+                      <col className="w-1/2" />
+                      <col className="w-1/2" />
+                    </colgroup>
+                    <thead>
+                      <tr className="text-left text-gray-400 uppercase text-xs">
+                        <th className="py-2">Name</th>
+                        <th className="py-2">Role</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </Fragment>
-            ))}
-          </div>
-          <div className="mt-4 text-right">
-            <DialogClose asChild>
-              <Button size="sm">Close</Button>
-            </DialogClose>
-          </div>
+                    </thead>
+                    <tbody>
+                      {members.map((m) => (
+                        <tr key={m.id} className="border-t hover:bg-muted/50">
+                          <td className="py-2 text-blue-400 ">
+                            <Link href={`/person/${m.id}`} key={m.id} className="hover:underline">
+                              {m.name}
+                            </Link>
+                          </td>
+                          <td className="py-2">{m.job}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </Fragment>
+              ))}
+              <div className="mt-4 text-right">
+                <DialogClose asChild>
+                  <Button size="sm">Close</Button>
+                </DialogClose>
+              </div>
+            </TabsContent>
+          </Tabs>
         </DialogContent>
       </Dialog>
     </section>

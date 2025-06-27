@@ -13,6 +13,9 @@ import { MediaDetails } from "../../_components/media-details";
 import MediaProviders from "../../_components/media-providers";
 import { Credits } from "../../_components/media-credits";
 import { buildTvDetailItems } from "./utils";
+import ImageCarousel from "@/components/image-carousel";
+import CastCard from "@/components/cast-card";
+import { BASE_CAST_IMAGE_URL, DEFAULT_BLUR_DATA_URL } from "@/lib/constants";
 
 function getTrailer(videoArray: Array<Video>) {
   const trailer: Array<Video> = videoArray.filter(
@@ -127,11 +130,30 @@ export default async function TvPage({ params }: { params: { id: number } }) {
                   </>
                 )}
                 {tv.credits?.cast && tv.credits.cast.length > 0 && (
-                  <Suspense
-                    fallback={<Skeleton className="w-full h-[356px] rounded-xl" />}
-                  >
-                    <Credits cast={tv.credits?.cast ?? []} crew={tv.credits?.crew ?? []} />
-                  </Suspense>
+                  <>
+                    <Suspense fallback={<Skeleton className="w-full h-[356px] rounded-xl" />}>
+                      <ImageCarousel
+                        title={<h2 className={`text-2xl font-bold`}>Top Cast</h2>}
+                        items={tv.credits.cast?.splice(0, 10).map((item, index: number) => (
+                          <Link href={`/person/${item.id}`} key={index}>
+                            <CastCard
+                              name={item.name}
+                              character={item.character}
+                              imagePath={`${BASE_CAST_IMAGE_URL}${item.profilePath}`}
+                              index={index}
+                              blurDataURL={DEFAULT_BLUR_DATA_URL}
+                              className="pt-2"
+                            />
+                          </Link>
+                        ))}
+                        breakpoints="cast"
+                      />
+                    </Suspense>
+                    <Link href={`/tv/${params.id}/credits`} className="pb-4 pt-3 flex items-end hover:text-gray-400">
+                      <h2 className={`text-2xl font-bold`}>All Cast and Crew</h2>
+                      <ChevronRight size={30} />
+                    </Link>
+                  </>
                 )}
                 <Suspense
                   fallback={<Skeleton className="w-full h-[356px] rounded-xl" />}

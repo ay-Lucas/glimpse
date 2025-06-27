@@ -173,6 +173,18 @@ export async function getSeasonData(
   return res.json();
 }
 
+export async function fetchNetworkDetails(id: number) {
+  const res = await fetch(`${BASE_API_URL}/network/${id}`);
+  if (!res.ok) throw new Error('Failed to fetch network');
+  return res.json(); // has .homepage
+}
+
+export async function fetchCompanyDetails(id: number) {
+  const res = await fetch(`${BASE_API_URL}/company/${id}`);
+  if (!res.ok) throw new Error('Failed to fetch company');
+  return res.json(); // has .homepage
+}
+
 
 export async function fetchSearchPerson(request: SearchRequest, reqOptions: RequestInit = options) {
   try {
@@ -331,14 +343,14 @@ export const getJustWatchInfo = async (tmdbTitle: string, type: 'movie' | 'tv', 
   }
 }
 
-export const getCachedJustWatch = async (tmdbTitle: string, type: 'movie' | 'tv', tmdbId: number, releaseDate?: Date | null) => {
+export const getCachedJustWatch = unstable_cache(async (tmdbTitle: string, type: 'movie' | 'tv', tmdbId: number, releaseDate?: Date | null) => {
   const info = await getJustWatchInfoFromDb(Number(tmdbId), type)
   if (info && info.streams)
     return info;
 
   const res = await getJustWatchInfo(tmdbTitle, type, tmdbId, releaseDate)
   return res;
-}
+}, [], { revalidate: 60 * 60 * 12 })
 
 export function groupStreams(
   streams: StreamProvider[]

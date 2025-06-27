@@ -1,4 +1,4 @@
-import SeasonBanner from "@/app/(media)/_components/season-banner";
+import MediaBanner from "@/app/(media)/_components/media-banner";
 import SeasonCard from "@/app/(media)/_components/season-card";
 import { fetchDiscoverTvIds, fetchTvDetails } from "@/app/(media)/actions";
 import { bannerColor } from "@/lib/bannerColor";
@@ -25,7 +25,7 @@ export default async function Seasons({ params }: { params: { id: number } }) {
 
   return (
     <main className="pt-3">
-      <SeasonBanner name={tv.name} firstAirDate={tv.firstAirDate ?? null} id={tv.tmdbId} color={color} />
+      <MediaBanner name={tv.name} firstAirDate={tv.firstAirDate ?? null} id={tv.tmdbId} color={color} mediaType="tv" />
       <ul className="container mt-6 space-y-3">
         {tv.seasons && (
           tv.seasons?.map((s, index) => (

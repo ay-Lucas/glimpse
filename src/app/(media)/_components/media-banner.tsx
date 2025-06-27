@@ -1,7 +1,7 @@
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
 
-export default function SeasonBanner({ name, id, firstAirDate, color }: { name: string, id: number, firstAirDate: Date | null, color: string }) {
+export default function MediaBanner({ name, id, firstAirDate, color, mediaType }: { name: string, id: number, firstAirDate: Date | null, color: string, mediaType: "tv" | "movie" }) {
   const formattedFirstAirDate = firstAirDate
     ? new Intl.DateTimeFormat("en-US", {
       year: "numeric",
@@ -14,7 +14,7 @@ export default function SeasonBanner({ name, id, firstAirDate, color }: { name: 
     >
       <div className="">
         <h1 className="text-3xl font-semibold text-white">{name} ({formattedFirstAirDate})</h1>
-        <Link className="flex items-center hover:text-gray-400  -ml-1 w-fit" href={`/tv/${id}`}><ChevronLeft size={24} /><h2 className="text-lg font-semibold">Back to main</h2></Link>
+        <Link className="flex items-center hover:text-gray-400  -ml-1 w-fit" href={`/${mediaType}/${id}`}><ChevronLeft size={24} /><h2 className="text-lg font-semibold">Back to main</h2></Link>
       </div>
     </div>
   );
