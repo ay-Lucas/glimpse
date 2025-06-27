@@ -24,7 +24,12 @@ export const profiles = pgTable("profiles", {
   createdAt: timestamp("created_at", { mode: "string" })
     .notNull()
     .default(sql`now()`),
-  emailConfirmationSentAt: timestamp("email_confirmation_sent_at", { mode: "string" }),
+  email: text("email").notNull().unique(),
+  emailVerificationToken: text("email_verification_token"),
+  email_confirmation_sent_at: timestamp("email_confirmation_sent_at", {
+    mode: "string",
+    withTimezone: true,
+  })
 });
 
 export const watchlistItems = pgTable("watchlist_items", {
