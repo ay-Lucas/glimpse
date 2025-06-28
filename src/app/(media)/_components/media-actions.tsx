@@ -1,83 +1,53 @@
-"use client"
+"use client";
+
 import { Button } from "@/components/ui/button";
-import { getWatchlists } from "@/lib/actions";
 import Link from "next/link";
 import { Play } from "lucide-react";
-import { FullMovie, FullTv, WatchlistSchemaI } from "@/types/camel-index";
+import { FullMovie, FullTv } from "@/types/camel-index";
 import AddToWatchlistDropdown from "@/components/add-to-watchlist-button";
-import { useEffect, useState } from "react";
-import { getBrowserSupabase } from "@/services/supabase/client";
-import { User } from "@supabase/supabase-js";
+import { useSupabase } from "@/context/supabase";
+import { useWatchlist } from "@/context/watchlist";
+
+interface Props {
+  tmdbId: number;
+  data: FullMovie | FullTv;
+  rating: string;
+  videoPath?: string;
+  mediaType: "tv" | "movie";
+}
 
 export default function MediaActions({
   tmdbId,
   data,
   rating,
   videoPath,
-  mediaType
-}: {
-  tmdbId: number;
-  data: FullMovie | FullTv;
-  rating: string;
-  videoPath?: string;
-  mediaType: "tv" | "movie";
-}) {
-  const session = getBrowserSupabase();
-  const [watchlists, setWatchlists] = useState<WatchlistSchemaI[] | null>(null);
-  const [user, setUser] = useState<User | null>()
-  const [loading, setLoading] = useState<boolean>(false);
+  mediaType,
+}: Props) {
+  const { session } = useSupabase();
+  const user = session?.user;
+  const { watchlists } = useWatchlist();
 
-  useEffect(() => {
-    if (!user) {
-      setWatchlists(null);
-      setLoading(false);
-      return;
-    }
-
-    setLoading(true);
-
-    (async () => {
-      try {
-        const userRes = await session.auth.getUser()
-        setUser(userRes.data.user);
-        if (user?.id) {
-          const lists = await getWatchlists(user?.id);
-          setWatchlists(lists);
-        }
-      } catch (error) {
-        console.error("Failed to fetch watchlists:", error);
-        setWatchlists([]);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, [session]);
-
-  // if (status === "loading") {
-  //   return <div>Checking authentication…</div>;
-  // }
+  const canPlay = Boolean(videoPath?.trim());
+  const hasWatchlists = watchlists?.length > 0;
 
   return (
     <div className="flex justify-center md:justify-start space-x-3">
-      {videoPath !== undefined && videoPath.trim() && (
-        <Link href={`${tmdbId}?show=true`}>
+      {canPlay && (
+        <Link href={`${tmdbId}?show=true`} passHref>
           <Button variant="outline" className="flex items-center space-x-2">
             <Play size={20} />
             <span>Play Trailer</span>
           </Button>
         </Link>
       )}
+
       {user ? (
-        loading ? (
-          <Button variant="secondary" disabled>
-            Loading…
-          </Button>
-        ) : watchlists && watchlists.length > 0 ? (
+        hasWatchlists ? (
           <AddToWatchlistDropdown
             userId={user.id}
             item={data}
-            rating={rating ?? ""}
-            mediaType="movie"
+            rating={rating}
+            mediaType={mediaType}
           />
         ) : (
           <Link href="/watchlists/create">

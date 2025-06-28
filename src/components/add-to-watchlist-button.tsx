@@ -2,13 +2,9 @@
 import { Button } from "./ui/button";
 import { FullMovie, FullTv, WatchlistI } from "@/types/camel-index";
 import { useWatchlist } from "@/context/watchlist";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-} from "@radix-ui/react-dropdown-menu";
-import { DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuPortal, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { Checkbox } from "./ui/checkbox";
-import { useEffect, useState } from "react";
+import { MouseEvent, useEffect, useState } from "react";
 import { CheckedState } from "@radix-ui/react-checkbox";
 import { LucideListPlus } from "lucide-react";
 
@@ -91,22 +87,44 @@ export default function AddToWatchlistDropdown({
           Add to Watchlist
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="bg-black p-3">
-        {watchlists.map((watchlist, index) => (
-          <DropdownMenuItem key={index} className="w-40">
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                checked={checkboxStates[watchlist.id]}
-                onCheckedChange={(checked) =>
-                  handleCheckboxChange(checked, watchlist.id, mediaType)
-                }
-                onClick={(e) => e.stopPropagation()} // Prevent dropdown from closing
-              />
-              <span>{watchlist.watchlistName}</span>
-            </div>
-          </DropdownMenuItem>
-        ))}
-      </DropdownMenuContent>
+      <DropdownMenuPortal>
+        <DropdownMenuContent className="bg-black p-3">
+          {watchlists.map((watchlist, index) => {
+
+            const isChecked = Boolean(checkboxStates[watchlist.id])
+
+            return (
+              <>
+                <DropdownMenuItem key={index} className="p-2 flex items-center space-x-2 cursor-pointer "
+                  onSelect={(e) => {
+                    // Prevent the default “close the menu” behavior
+                    e.preventDefault()
+                    // toggle
+                    handleCheckboxChange(
+                      isChecked ? false : true,
+                      watchlist.id,
+                      mediaType
+                    )
+                  }}
+
+                >
+                  <Checkbox
+                    checked={checkboxStates[watchlist.id]}
+                    onCheckedChange={(checked) =>
+                      handleCheckboxChange(checked, watchlist.id, mediaType)
+                    }
+                    className="h-5 w-5"
+                    onClick={(e) => e.stopPropagation()} // Prevent dropdown from closing
+                  />
+                  <p>{watchlist.watchlistName}</p>
+                </DropdownMenuItem>
+                {index !== watchlists.length - 1 &&
+                  <DropdownMenuSeparator />}
+              </>
+            )
+          })}
+        </DropdownMenuContent>
+      </DropdownMenuPortal>
     </DropdownMenu>
   );
 }
