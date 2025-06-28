@@ -151,7 +151,9 @@ export async function fetchTmdbTvLists(
   return { trendingTvDaily, trendingTvWeekly, popularTv }
 }
 
-export async function fetchTrendingTv() {
+export async function fetchTrendingTv(
+  reqOptions: RequestInit = options,
+) {
   function isAnime(item: TvResult) {
     return item.originalLanguage?.toUpperCase() === "JA" && item.originCountry?.some(country => country.toUpperCase() === "JP")
   }
@@ -160,11 +162,11 @@ export async function fetchTrendingTv() {
     await Promise.all([
       getTrendingPages(
         { media_type: "tv", time_window: "day", page: 1 },
-        NUM_TMDB_PAGES, true
+        NUM_TMDB_PAGES, true, reqOptions
       ) as Promise<TvResult[]>,
       getTrendingPages(
         { media_type: "tv", time_window: "week", page: 1 },
-        NUM_TMDB_PAGES, true
+        NUM_TMDB_PAGES, true, reqOptions
       ) as Promise<TvResult[]>,
     ])
 

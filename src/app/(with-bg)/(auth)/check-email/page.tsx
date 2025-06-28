@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { getServerSupabase } from "@/services/supabase/server";
 import { redirect } from "next/navigation";
 import { resendConfirmation } from "../actions";

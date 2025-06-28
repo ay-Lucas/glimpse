@@ -3,7 +3,7 @@ import { BASE_ORIGINAL_IMAGE_URL } from "@/lib/constants";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 
-export default function Background({
+export default function Backdrops({
   images,
   firstBackdropBlurData,
 }: {
