@@ -36,7 +36,7 @@ export function SignInForm() {
           {error && (<li>{error}</li>)}
         </ul>
       )}
-      <Button type="submit" variant="secondary">
+      <Button type="submit" variant="default">
         Sign In
       </Button>
       <div className="border-b-gray-500 border-b" />
