@@ -113,14 +113,15 @@ export function buildTvDetailItems(tv: FullTv): DetailItem[] {
     })
   }
 
-  if (tv.networks) {
+  if (tv.networks?.length) {
     items.push({
       label: 'Networks',
       value: (
         <div className="flex flex-wrap items-center space-x-4 pt-1">
           {tv.networks.map(n => (
-            n.logoPath &&
-            <InvertibleLogo src={`${BASE_MEDIUM_LOGO_URL}/${n.logoPath}`} height={60} width={60} alt={n.name!} key={n.id} />
+            n.logoPath ?
+              <InvertibleLogo src={`${BASE_MEDIUM_LOGO_URL}/${n.logoPath}`} height={60} width={60} alt={n.name!} key={n.id} />
+              : n.name
           ))}
         </div>
       )
@@ -138,6 +139,5 @@ export function buildTvDetailItems(tv: FullTv): DetailItem[] {
   //     value: tv.numberOfSeasons
   //   })
   // }
-
   return items
 }
