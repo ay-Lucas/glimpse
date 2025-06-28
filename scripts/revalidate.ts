@@ -3,6 +3,7 @@ import pLimit from "p-limit";
 import { fetchDiscoverMovieIds, fetchDiscoverTvIds, fetchTopPeopleIds } from "@/app/(media)/actions";
 
 const STATIC_PATHS = ["/", "/discover"]
+const DYNAMIC_PATHS_WITH_ISR_FETCHES = ["/signin"] // caches TMDB fetch for backdrops in (auth) layout
 
 const options = {
   method: "GET",
@@ -18,15 +19,20 @@ export async function revalidate() {
 
   const tvPaths = (await fetchDiscoverTvIds(options)).map(item => `/tv/${item.id}`);
   const tvSeasonPaths = tvPaths.map(tvPath => `${tvPath}/seasons`)
+  const tvCreditsPaths = tvPaths.map(tvPath => `${tvPath}/credits`)
   const moviePaths = (await fetchDiscoverMovieIds(options)).map(item => `/movie/${item.id}`)
+  const movieCreditsPaths = moviePaths.map(moviePath => `${moviePath}/credits`)
   const personPaths = (await fetchTopPeopleIds(options)).map(item => `/person/${item.id}`)
 
   // Prevent duplicates with Set
   const allPaths = Array.from(new Set([
     ...STATIC_PATHS,
+    ...DYNAMIC_PATHS_WITH_ISR_FETCHES,
     ...tvPaths,
     ...tvSeasonPaths,
+    ...tvCreditsPaths,
     ...moviePaths,
+    ...movieCreditsPaths,
     ...personPaths,
   ]))
 
