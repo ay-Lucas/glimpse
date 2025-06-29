@@ -52,26 +52,6 @@ export function Credits({ cast, crew }: CreditsProps) {
   const [open, setOpen] = useState(false);
   return (
     <section className="space-y-12">
-      {/* ——— CAST GRID ——— */}
-
-      <ImageCarousel
-        title={
-          <h2 className={`text-2xl font-bold`}>Cast</h2>
-        }
-        items={cast?.map((item, index: number) => (
-          <Link href={`/person/${item.id}`} key={index}>
-            <CastCard
-              name={item.name}
-              character={item.character}
-              imagePath={`${BASE_CAST_IMAGE_URL}${item.profilePath}`}
-              index={index}
-              blurDataURL={DEFAULT_BLUR_DATA_URL}
-              className="pt-2"
-            />
-          </Link>
-        ))}
-        breakpoints="cast"
-      />
 
       {/* ——— CREW TABLES ——— */}
 

@@ -79,20 +79,6 @@ export function buildMovieDetailItems(movie: FullMovie): DetailItem[] {
     })
   }
 
-  // 5) Vote average & count
-  if (movie.voteAverage != null) {
-    items.push({
-      label: "Vote Average",
-      value: movie.voteAverage.toFixed(1),
-    })
-  }
-  if (movie.voteCount != null && movie.voteCount > 0) {
-    items.push({
-      label: "Vote Count",
-      value: movie.voteCount.toString(),
-    })
-  }
-
   // 6) Popularity
   if (movie.popularity != null && movie.popularity > 0) {
     items.push({

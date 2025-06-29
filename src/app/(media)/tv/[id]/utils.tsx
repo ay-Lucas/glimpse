@@ -29,20 +29,6 @@ export function buildTvDetailItems(tv: FullTv): DetailItem[] {
     })
   }
 
-  if (tv.voteAverage != null) {
-    items.push({
-      label: 'Vote Average',
-      value: tv.voteAverage.toFixed(1)
-    })
-  }
-
-  if (tv.voteCount != null) {
-    items.push({
-      label: 'Vote Count',
-      value: tv.voteCount.toString()
-    })
-  }
-
   if (tv.popularity != null) {
     items.push({
       label: 'Popularity',

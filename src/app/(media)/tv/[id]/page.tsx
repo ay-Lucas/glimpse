@@ -11,7 +11,6 @@ import { getRedisBlurValue } from "@/services/cache";
 import { MediaHeader } from "../../_components/media-header";
 import { MediaDetails } from "../../_components/media-details";
 import MediaProviders from "../../_components/media-providers";
-import { Credits } from "../../_components/media-credits";
 import { buildTvDetailItems } from "./utils";
 import ImageCarousel from "@/components/image-carousel";
 import CastCard from "@/components/cast-card";
@@ -100,8 +99,10 @@ export default async function TvPage({ params }: { params: { id: number } }) {
                     posterBlur={blurData?.posterBlur ?? null}
                     title={tv.name}
                     genres={tv.genres ?? null}
+                    imdbId={tv.externalIds?.imdbId ?? null}
                     tmdbId={params.id}
                     tmdbVoteAverage={tv.voteAverage ?? null}
+                    tmdbVoteCount={tv.voteCount ?? null}
                     trailerPath={videoPath}
                     tagline={tv.tagline ?? null}
                     homepage={tv.homepage ?? null}

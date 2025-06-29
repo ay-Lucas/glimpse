@@ -46,7 +46,6 @@ function useShouldInvert(src: string) {
 }
 
 export function InvertibleLogo({ src, alt, width = 92, height = 92 }: { src: string; alt: string, width: number, height: number }) {
-  console.log("network logo called")
   const invert = useShouldInvert(src);
   return (
     <Image

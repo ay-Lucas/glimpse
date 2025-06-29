@@ -1,10 +1,10 @@
 import Image from "next/image";
 import MediaActions from "./media-actions";
 import { BASE_POSTER_IMAGE_URL, DEFAULT_BLUR_DATA_URL } from "@/lib/constants";
-import { ScoreCircle } from "./score-circle";
 import { Genre } from "@/types/types";
 import { FullMovie, FullTv } from "@/types/camel-index";
 import { ExpandableText } from "./expandable-overview";
+import MediaRatings from "./media-ratings";
 
 export interface MediaHeaderProps {
   title: string
@@ -18,10 +18,12 @@ export interface MediaHeaderProps {
   posterPath: string | null;
   posterBlur: string | null;
   tmdbVoteAverage: number | null;
+  tmdbVoteCount: number | null;
   genres: Genre[] | null;
   data: FullTv | FullMovie
   trailerPath: string | undefined;
   tmdbId: number;
+  imdbId: string | null;
   status: string | undefined;           // e.g. "Ended" or "Released"
   tagline: string | null
   homepage: string | null
@@ -30,7 +32,7 @@ export interface MediaHeaderProps {
   mediaType: "tv" | "movie"
 }
 
-export function MediaHeader({
+export async function MediaHeader({
   title,
   overview,
   dateLabel,
@@ -43,10 +45,12 @@ export function MediaHeader({
   posterPath,
   posterBlur,
   tmdbVoteAverage,
+  tmdbVoteCount,
   genres,
   data,
   trailerPath,
   tmdbId,
+  imdbId,
   tagline,
   homepage,
   runtime,
@@ -85,7 +89,7 @@ export function MediaHeader({
   }
 
   const runtimeLabel = formatRuntime(runtime)
-
+  const dateValueDate = dateValue ? new Date(dateValue) : null;
   return (
     <div className="grid grid-cols-1 md:grid-cols-[238px,1fr] gap-5 items-start">
       {posterPath && (
@@ -116,17 +120,8 @@ export function MediaHeader({
             </p>
           )}
         </div>
+        <MediaRatings dateValue={dateValueDate} isReleased={isReleased} mediaType={mediaType} title={title} tmdbId={tmdbId} tmdbVoteAverage={tmdbVoteAverage} tmdbVoteCount={tmdbVoteCount} imdbId={imdbId} />
         <div className="flex flex-wrap items-center gap-4 mb-4">
-          {isReleased && tmdbVoteAverage != null && (
-            <div className="flex flex-col items-center">
-              <ScoreCircle
-                size={54}
-                strokeWidth={3}
-                percentage={Math.round(tmdbVoteAverage * 10)}
-              />
-              <span className="sr-only">{tmdbVoteAverage}</span>
-            </div>
-          )}
           {genres && genres.length > 0 && (
             <>
               {genres.map((g) => (
