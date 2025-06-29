@@ -4,7 +4,7 @@ import { FullMovie, FullTv, WatchlistI } from "@/types/camel-index";
 import { useWatchlist } from "@/context/watchlist";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuPortal, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { Checkbox } from "./ui/checkbox";
-import { MouseEvent, useEffect, useState } from "react";
+import { Fragment, MouseEvent, useEffect, useState } from "react";
 import { CheckedState } from "@radix-ui/react-checkbox";
 import { LucideListPlus } from "lucide-react";
 
@@ -94,8 +94,8 @@ export default function AddToWatchlistDropdown({
             const isChecked = Boolean(checkboxStates[watchlist.id])
 
             return (
-              <>
-                <DropdownMenuItem key={index} className="p-2 flex items-center space-x-2 cursor-pointer "
+              <Fragment key={index}>
+                <DropdownMenuItem className="p-2 flex items-center space-x-2 cursor-pointer "
                   onSelect={(e) => {
                     // Prevent the default “close the menu” behavior
                     e.preventDefault()
@@ -120,7 +120,7 @@ export default function AddToWatchlistDropdown({
                 </DropdownMenuItem>
                 {index !== watchlists.length - 1 &&
                   <DropdownMenuSeparator />}
-              </>
+              </Fragment>
             )
           })}
         </DropdownMenuContent>
