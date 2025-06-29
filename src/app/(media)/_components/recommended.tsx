@@ -16,7 +16,6 @@ export async function Recommended({
     BaseImageUrl.BLUR,
     posterPaths,
   )) as Array<MovieResult | TvResult>;
-
   return (
     <>
       {items?.length > 0 && (

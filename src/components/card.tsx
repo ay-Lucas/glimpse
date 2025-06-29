@@ -22,19 +22,20 @@ export function Card({
 
   return (
     <div
-      className={`w-[238px] h-[357px] group relative overflow-hidden rounded-2xl shadow-lg transform transition-transform duration-200 ease-out group-hover:scale-105 will-change-transform ${className}`}
+      className={`w-[228px] h-[342px] group relative overflow-hidden rounded-2xl shadow-lg transform transition-transform duration-200 ease-out group-hover:scale-105 will-change-transform ${className}`}
     >
       <div className="relative w-full h-0 pb-[150%]">
         {imagePath &&
           <Image
             src={url}
             alt={title ?? "untitled"}
+            quality={100}
             fill
             className="object-cover"
             placeholder={blurDataURL ? "blur" : undefined}
             blurDataURL={blurDataURL ?? DEFAULT_BLUR_DATA_URL}
             loading={loading}
-            sizes="(max-width: 768px) 100vw, 200px"
+            sizes="342px"
           />
         }
         <div className="absolute inset-0 opacity-0 transition-opacity duration-200 ease-out group-hover:opacity-100 bg-[linear-gradient(to_top,rgba(0,0,0,0.9)_35%,transparent)] pointer-events-none" />

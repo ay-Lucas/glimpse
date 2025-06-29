@@ -30,9 +30,9 @@ export default function CastCard({
           alt={`${name} as ${character}`}
           key={index}
           width={150}
-          height={150}
+          height={225}
           loading="lazy"
-          quality={60}
+          quality={75}
           placeholder="blur"
           // blurDataURL="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=="
           blurDataURL={blurDataURL}

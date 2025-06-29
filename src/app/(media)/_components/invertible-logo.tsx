@@ -56,7 +56,7 @@ export function InvertibleLogo({ src, alt, width = 92, height = 92 }: { src: str
       style={{
         filter: invert ? 'invert(1) contrast(1.5)' : undefined,
       }}
-      className="object-cover"
+      className="object-cover w-auto"
     />
   );
 }

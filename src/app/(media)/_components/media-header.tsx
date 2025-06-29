@@ -93,18 +93,18 @@ export async function MediaHeader({
   return (
     <div className="grid grid-cols-1 md:grid-cols-[238px,1fr] gap-5 items-start">
       {posterPath ? (
-        <figure className="w-full">
+        <figure className="relative w-[159px] h-[238px] md:w-[238px] md:h-[357px]">
           <Image
-            quality={60}
-            width={238}
-            height={357}
+            quality={70}
+            fill
             src={`${BASE_POSTER_IMAGE_URL}${posterPath}`}
-            className="object-cover rounded-lg w-full h-full"
+            className="object-cover rounded-lg"
             priority
             placeholder="blur"
             blurDataURL={posterBlur ?? DEFAULT_BLUR_DATA_URL}
             alt={`${title} poster`}
             loading="eager"
+            sizes="159px"
           />
         </figure>
       ) : <div className="w-[238px] h-[357px]" />}
