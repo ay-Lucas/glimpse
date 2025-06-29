@@ -730,3 +730,34 @@ export interface PersonTaggedImagesResponse extends PaginatedResponse {
 export interface SearchPersonResponse extends PaginatedResponse {
   results?: Array<PersonResult>;
 }
+
+export interface TvExternalIdsResponse extends Response {
+  imdbId?: string | null;
+  freebaseMid?: string | null;
+  freebaseId?: string | null;
+  tvdbId?: number | null;
+  tvrageId?: number | null;
+  facebookId?: string | null;
+  instagramId?: string | null;
+  twitterId?: string | null;
+  id?: number;
+}
+
+export interface MovieExternalIdsResponse extends Response {
+  imdbId?: string | null;
+  facebookId?: string | null;
+  instagramId?: string | null;
+  twitterId?: string | null;
+  id?: number;
+}
+
+export interface PersonExternalIdsResponse extends Response {
+  imdbId?: string | null;
+  facebookId?: string | null;
+  freebaseMid?: string | null;
+  freebaseId?: string | null;
+  tvrageId?: number | null;
+  twitterId?: string | null;
+  id: number;
+  instagramId?: string | null;
+}

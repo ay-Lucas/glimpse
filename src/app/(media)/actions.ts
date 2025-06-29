@@ -33,7 +33,7 @@ export const fetchPersonDetails = unstable_cache(async (
   id: number,
   resOptions: RequestInit = options,
 ): Promise<FullPerson> => {
-  const res = await fetch(`${BASE_API_URL}/person/${id}?append_to_response=combined_credits,movie_credits,tv_credits,images,tagged_images`, resOptions);
+  const res = await fetch(`${BASE_API_URL}/person/${id}?append_to_response=combined_credits,movie_credits,tv_credits,images,tagged_images,external_ids`, resOptions);
   const data = await res.json();
   const camel = camelcaseKeys(data, {
     deep: true,
@@ -47,7 +47,7 @@ export const fetchTvDetails = unstable_cache(async (
 ): Promise<FullTv> => {
   try {
     const res = await fetch(
-      `${BASE_API_URL}/tv/${id}?append_to_response=videos,releases,content_ratings,credits,aggregate_credits,episode_groups,watch/providers&language=en-US`,
+      `${BASE_API_URL}/tv/${id}?append_to_response=videos,releases,content_ratings,credits,aggregate_credits,episode_groups,watch/providers,external_ids&language=en-US`,
       resOptions,
     );
     const data = await res.json();
@@ -87,7 +87,7 @@ export const fetchMovieDetails = unstable_cache(async (
     const res = await fetch(
       `${BASE_API_URL}/movie/${id}` +
       `?append_to_response=videos,releases,content_ratings,credits,aggregate_credits,` +
-      `episode_groups,watch/providers&language=en-US`,
+      `episode_groups,watch/providers,external_ids&language=en-US`,
       resOptions,
     );
     const data = await res.json();

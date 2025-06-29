@@ -22,7 +22,10 @@ import {
   PersonTaggedImagesResponse,
   PersonImagesResponse,
   PersonTvCreditsResponse,
-  PersonMovieCreditsResponse
+  PersonMovieCreditsResponse,
+  TvExternalIdsResponse,
+  PersonExternalIdsResponse,
+  MovieExternalIdsResponse
 } from "./request-types-camelcase";
 
 export interface CardTypes {
@@ -85,7 +88,7 @@ export interface GroupedProvider {
 }
 
 export interface JustWatchInfo {
-  id: string;
+  ID: string;
   originalTitle?: string;
   isReleased?: boolean;
   releastyear?: string;
@@ -161,6 +164,7 @@ export type FullMovie = {
   videos: VideosResponse;
   credits?: CreditsResponse;
   watchProviders?: WatchProviderResponse;
+  externalIds?: MovieExternalIdsResponse
   // media_type: "tv"; // Not provided by api
 };
 
@@ -211,6 +215,7 @@ export type FullTv = {
   // e.g. { results: RatingResponse[] }
   spokenLanguages?: Array<SpokenLanguage>;
   contentRatings?: { results: RatingResponse[] };
+  externalIds?: TvExternalIdsResponse
 };
 
 export interface FullPerson extends Person {
@@ -219,4 +224,5 @@ export interface FullPerson extends Person {
   taggedImages: PersonTaggedImagesResponse
   tvCredits: PersonTvCreditsResponse
   movieCredits: PersonMovieCreditsResponse
+  externalIds?: PersonExternalIdsResponse
 };
