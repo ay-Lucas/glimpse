@@ -1,6 +1,6 @@
 import { Card } from "@/components/card";
 import { getBlurData } from "@/lib/blur-data-generator";
-import { BaseImageUrl } from "@/lib/constants";
+import { BASE_POSTER_IMAGE_URL, BaseImageUrl } from "@/lib/constants";
 import { getRedisBlurValues } from "@/services/cache";
 import { DiscoverItem } from "@/types/camel-index";
 import { BlurMap } from "@/types/redis";
@@ -45,7 +45,8 @@ export const mkCards = (items: DiscoverItem[], mediaType: "tv" | "movie"): JSX.E
       <Card
         title={item.title}
         overview={item.overview}
-        imagePath={`${BaseImageUrl.POSTER}${item.posterPath}`}
+        imagePath={item.posterPath}
+        baseUrl={BASE_POSTER_IMAGE_URL}
         blurDataURL={item.posterBlurDataUrl}
         loading="lazy"
       />

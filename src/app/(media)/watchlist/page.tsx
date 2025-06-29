@@ -13,7 +13,6 @@ function CreateWatchlistButton({ handleClick }: { handleClick: () => void }) {
 
 export default function WatchlistPage() {
   const { watchlists, addWatchlist } = useWatchlist();
-  console.log(watchlists)
   return (
     <main>
       <div className="md:container pt-10">

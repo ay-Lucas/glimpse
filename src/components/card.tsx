@@ -5,17 +5,21 @@ export function Card({
   title,
   overview,
   imagePath,
+  baseUrl,
   blurDataURL,
   loading = "lazy",
   className = "",
 }: {
   title?: string;
   overview?: string;
-  imagePath?: string;
+  imagePath?: string | null;
+  baseUrl: string;
   blurDataURL?: string;
   loading?: "lazy" | "eager";
   className?: string;
 }) {
+  const url = `${baseUrl}${imagePath}`
+
   return (
     <div
       className={`w-[238px] h-[357px] group relative overflow-hidden rounded-2xl shadow-lg transform transition-transform duration-200 ease-out group-hover:scale-105 will-change-transform ${className}`}
@@ -23,7 +27,7 @@ export function Card({
       <div className="relative w-full h-0 pb-[150%]">
         {imagePath &&
           <Image
-            src={imagePath}
+            src={url}
             alt={title ?? "untitled"}
             fill
             className="object-cover"

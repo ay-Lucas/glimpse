@@ -140,7 +140,7 @@ export default async function TvPage({ params }: { params: { id: number } }) {
                             <CastCard
                               name={item.name}
                               character={item.character}
-                              imagePath={`${BASE_CAST_IMAGE_URL}${item.profilePath}`}
+                              imagePath={item.profilePath}
                               index={index}
                               blurDataURL={DEFAULT_BLUR_DATA_URL}
                               className="pt-2"

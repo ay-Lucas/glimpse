@@ -4,7 +4,7 @@ import Image from "next/image";
 interface CastCardProps {
   name?: string;
   character?: string;
-  imagePath?: string;
+  imagePath: string | null | undefined;
   index: number;
   className?: string;
   blurDataURL: string;
@@ -40,7 +40,7 @@ export default function CastCard({
           className="rounded-md object-cover"
         />
       ) : (
-        <div className="w-[150px] h-[150px] rounded-[50%] bg-gray-200" />
+        <div className="w-[150px] h-[225px] bg-gray-200 rounded-md" />
       )}
 
       <div className="mt-2 text-start">

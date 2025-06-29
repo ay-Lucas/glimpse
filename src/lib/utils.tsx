@@ -9,7 +9,7 @@ import {
 import { twMerge } from "tailwind-merge";
 import camelcaseKeys from "camelcase-keys";
 import { Card } from "@/components/card";
-import { BaseImageUrl } from "./constants";
+import { BASE_POSTER_IMAGE_URL } from "./constants";
 import Link from "next/link";
 
 export function cn(...inputs: ClassValue[]) {
@@ -153,7 +153,8 @@ export async function makeCarouselCards(data: Array<TvResult | MovieResult>) {
             <Card
               title={item.name}
               overview={item.overview}
-              imagePath={`${BaseImageUrl.POSTER}${item.poster_path}`}
+              imagePath={item.poster_path}
+              baseUrl={BASE_POSTER_IMAGE_URL}
               // blurDataURL={(item as any).blurDataURL}
               loading="lazy"
             />
@@ -164,7 +165,8 @@ export async function makeCarouselCards(data: Array<TvResult | MovieResult>) {
             <Card
               title={item.title}
               overview={item.overview}
-              imagePath={`${BaseImageUrl.POSTER}${item.poster_path}`}
+              imagePath={item.poster_path}
+              baseUrl={BASE_POSTER_IMAGE_URL}
               // blurDataURL={(item as any).blurDataURL}
               loading="lazy"
             />
@@ -175,7 +177,8 @@ export async function makeCarouselCards(data: Array<TvResult | MovieResult>) {
             <Card
               title={item.name}
               overview=""
-              imagePath={`${BaseImageUrl.CAST}${item.profile_path}`}
+              imagePath={item.profile_path}
+              baseUrl={BASE_POSTER_IMAGE_URL}
               loading="lazy"
             />
           );

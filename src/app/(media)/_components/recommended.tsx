@@ -34,7 +34,8 @@ export async function Recommended({
                         <Card
                           title={item.title}
                           overview={item.overview}
-                          imagePath={`${BASE_POSTER_IMAGE_URL}${item.poster_path}`}
+                          imagePath={item.poster_path}
+                          baseUrl={BASE_POSTER_IMAGE_URL}
                           blurDataURL={(item as any).blurDataURL}
                         />
                       );
@@ -44,7 +45,8 @@ export async function Recommended({
                         <Card
                           title={item.name}
                           overview={item.overview}
-                          imagePath={`${BASE_POSTER_IMAGE_URL}${item.poster_path}`}
+                          imagePath={item.poster_path}
+                          baseUrl={BASE_POSTER_IMAGE_URL}
                           blurDataURL={(item as any).blurDataURL}
                         />
                       );

@@ -140,7 +140,8 @@ export default async function PersonPage({
               items={top10PopularCredits?.map((item, index): JSX.Element => (
                 <Link href={`/${item.mediaType}/${item.id}`} key={item.id}>
                   <Card
-                    imagePath={`${BASE_POSTER_IMAGE_URL}${item.posterPath}`}
+                    imagePath={item.posterPath ?? null}
+                    baseUrl={BASE_POSTER_IMAGE_URL}
                     title={(item as MovieResult).title ?? (item as TvResult).name}
                     overview={item.overview} />
                 </Link>
