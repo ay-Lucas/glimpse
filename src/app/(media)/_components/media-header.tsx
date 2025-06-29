@@ -92,7 +92,7 @@ export async function MediaHeader({
   const dateValueDate = dateValue ? new Date(dateValue) : null;
   return (
     <div className="grid grid-cols-1 md:grid-cols-[238px,1fr] gap-5 items-start">
-      {posterPath && (
+      {posterPath ? (
         <figure className="w-full">
           <Image
             quality={60}
@@ -107,7 +107,7 @@ export async function MediaHeader({
             loading="eager"
           />
         </figure>
-      )}
+      ) : <div className="w-[238px] h-[357px]" />}
 
       <div className="space-y-3">
         <div>

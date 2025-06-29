@@ -81,9 +81,11 @@ export function buildMovieDetailItems(movie: FullMovie): DetailItem[] {
 
   // 6) Popularity
   if (movie.popularity != null && movie.popularity > 0) {
+    const popularity = movie.popularity > 1 ? Math.round(movie.popularity) : movie.popularity.toFixed(3)
+
     items.push({
       label: "Popularity",
-      value: Math.round(movie.popularity).toString(),
+      value: popularity,
     })
   }
 
@@ -120,14 +122,14 @@ export function buildMovieDetailItems(movie: FullMovie): DetailItem[] {
     })
   }
 
-  if (movie.spokenLanguages) {
+  if (movie.spokenLanguages?.length) {
     items.push({
       label: "Spoken Languages",
       value: movie.spokenLanguages.map(item => languageCodeToEnglishName(item.iso6391 ?? ""))
     })
   }
 
-  if (movie.productionCountries) {
+  if (movie.productionCountries?.length) {
     items.push({
       label: "Production Countries",
       value: movie.productionCountries.map(item => countryCodeToEnglishName(item.iso31661 ?? "")).join(", ")
