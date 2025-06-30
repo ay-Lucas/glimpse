@@ -1,4 +1,4 @@
-import { ExpandableText } from "@/app/(media)/_components/expandable-overview";
+import { Expandable } from "@/app/(media)/_components/expandable";
 
 export async function PersonDetails({
   name,
@@ -96,7 +96,7 @@ export async function PersonDetails({
       </div>
       {biography &&
         <div><div className="text-xs font-bold text-gray-400 uppercase">Biography</div>
-          <ExpandableText>{biography}</ExpandableText></div>
+          <Expandable>{biography}</Expandable></div>
       }
     </section>)
 }

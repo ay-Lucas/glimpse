@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { DetailItem } from "../../_components/media-details"
-import { ExpandableText } from "../../_components/expandable-overview"
+import { Expandable } from "../../_components/expandable"
 import { FullMovie } from "@/types/camel-index"
 import { countryCodeToEnglishName, languageCodeToEnglishName } from "@/lib/utils"
 import { ExternalLink } from "lucide-react"
@@ -23,7 +23,7 @@ export function buildMovieDetailItems(movie: FullMovie): DetailItem[] {
     ))
     items.push({
       label: "Directors",
-      value: <ExpandableText lineHeight={17}>{directorTags}</ExpandableText>,
+      value: <Expandable lineHeight={17}>{directorTags}</Expandable>,
     })
   }
 
@@ -42,7 +42,7 @@ export function buildMovieDetailItems(movie: FullMovie): DetailItem[] {
     ))
     items.push({
       label: "Producers",
-      value: <ExpandableText lineHeight={17}>{producerTags}</ExpandableText>,
+      value: <Expandable lineHeight={17}>{producerTags}</Expandable>,
     })
   }
 
@@ -61,7 +61,7 @@ export function buildMovieDetailItems(movie: FullMovie): DetailItem[] {
     ))
     items.push({
       label: "Writers",
-      value: <ExpandableText lineHeight={17}>{writerTags}</ExpandableText>,
+      value: <Expandable lineHeight={17}>{writerTags}</Expandable>,
     })
   }
 

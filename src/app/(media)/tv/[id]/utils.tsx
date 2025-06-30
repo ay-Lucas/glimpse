@@ -1,6 +1,6 @@
 import { FullTv } from "@/types/camel-index"
 import { DetailItem } from "../../_components/media-details"
-import { ExpandableText } from "../../_components/expandable-overview"
+import { Expandable } from "../../_components/expandable"
 import Link from "next/link"
 import { countryCodeToEnglishName, languageCodeToEnglishName } from "@/lib/utils"
 import { ExternalLink } from "lucide-react"
@@ -14,7 +14,7 @@ export function buildTvDetailItems(tv: FullTv): DetailItem[] {
     items.push({
       label: 'Creators',
       value: (
-        <ExpandableText lineHeight={17}>
+        <Expandable lineHeight={17}>
           {tv.createdBy.map((c, i) => (
             <Link
               key={c.id}
@@ -24,7 +24,7 @@ export function buildTvDetailItems(tv: FullTv): DetailItem[] {
               {c.name}{i < tv.createdBy!.length - 1 ? ', ' : ''}
             </Link>
           ))}
-        </ExpandableText>
+        </Expandable>
       )
     })
   }
@@ -103,16 +103,32 @@ export function buildTvDetailItems(tv: FullTv): DetailItem[] {
     items.push({
       label: 'Networks',
       value: (
-        <div className="flex flex-wrap items-center space-x-4 pt-1">
-          {tv.networks.map(n => (
-            n.logoPath ?
-              <InvertibleLogo src={`${BASE_MEDIUM_LOGO_URL}${n.logoPath}`} height={60} width={60} alt={n.name!} key={n.id} />
-              : n.name
-          ))}
-        </div>
+        <Expandable lineHeight={26}>
+          <div className="flex flex-wrap items-center space-x-4 pt-1">
+            {tv.networks.map((n, i) => {
+              const isLast = i === tv.networks!.length - 1;
+              // always wrap in a React node, give it a key:
+              return n.logoPath ? (
+                <InvertibleLogo
+                  key={n.id}
+                  src={`${BASE_MEDIUM_LOGO_URL}${n.logoPath}`}
+                  height={60}
+                  width={60}
+                  alt={n.name!}
+                />
+              ) : (
+                <span key={`net-${n.id}`}>
+                  {n.name}
+                  {!isLast && ' • '}
+                </span>
+              );
+            })}
+          </div>
+        </Expandable>
       )
-    })
+    });
   }
+
   // if (tv.numberOfEpisodes) {
   //   items.push({
   //     label: "Number of Episodes",

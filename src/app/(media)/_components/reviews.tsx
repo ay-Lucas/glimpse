@@ -1,7 +1,7 @@
 import { Star } from "lucide-react";
 import Link from "next/link";
 import { ReviewI } from "@/types/request-types-snakecase";
-import { ExpandableText } from "./expandable-overview";
+import { Expandable } from "./expandable";
 
 export function Review({ data }: { data: ReviewI }) {
   return (
@@ -23,7 +23,7 @@ export function Review({ data }: { data: ReviewI }) {
           </span>
         )}
       </div>
-      <ExpandableText>{data.content}</ExpandableText>
+      <Expandable>{data.content}</Expandable>
     </div>
   );
 }

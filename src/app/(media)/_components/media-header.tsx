@@ -3,7 +3,7 @@ import MediaActions from "./media-actions";
 import { BASE_POSTER_IMAGE_URL, DEFAULT_BLUR_DATA_URL } from "@/lib/constants";
 import { Genre } from "@/types/types";
 import { FullMovie, FullTv } from "@/types/camel-index";
-import { ExpandableText } from "./expandable-overview";
+import { Expandable } from "./expandable";
 import MediaRatings from "./media-ratings";
 
 export interface MediaHeaderProps {
@@ -202,9 +202,9 @@ export async function MediaHeader({
               Overview
             </div>
             <div>
-              <ExpandableText buttonClassname="mt-1 md:text-md">
+              <Expandable buttonClassname="mt-1 md:text-md">
                 {overview}
-              </ExpandableText>
+              </Expandable>
             </div>
           </div>
         </section>

@@ -7,7 +7,7 @@ interface ExpandableOverviewProps {
   buttonClassname?: string
 }
 
-export function ExpandableText({
+export function Expandable({
   children,
   lineHeight = 24,
   buttonClassname
@@ -37,9 +37,9 @@ export function ExpandableText({
           maxHeight: expanded ? fullHeight : collapsedMaxH,
         }}
       >
-        <p className="whitespace-pre-wrap">
+        <div className="whitespace-pre-wrap">
           {children}
-        </p>
+        </div>
       </div>
 
       {canExpand && (
