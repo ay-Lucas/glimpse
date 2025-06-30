@@ -4,6 +4,7 @@ import ImdbLogo from "@/assets/IMDB_Logo_2016.svg";
 import CertifiedFreshTomato from "@/assets/Certified_Fresh_2018.svg"
 import FreshTomato from "@/assets/Rotten_Tomatoes.svg"
 import RottenTomato from "@/assets/Rotten_Tomatoes_rotten.svg"
+import Metric from "./metric";
 
 interface MediaRatingsProps {
   tmdbVoteAverage: number | null
@@ -64,32 +65,6 @@ export default async function MediaRatings({ tmdbVoteAverage, tmdbVoteCount, tmd
       )}
     </div>
   )
-}
-
-function OptionalLink({ href, children }: { href?: string; children: React.ReactNode }) {
-  if (!href) return <>{children}</>;
-  return (
-    <a href={href} target="_blank" rel="noopener noreferrer">
-      {children}
-    </a>
-  );
-}
-
-interface MetricProps {
-  href?: string;
-  Icon: JSX.Element;
-  value: React.ReactNode;
-  count?: number;
-}
-
-function Metric({ href, Icon, value, count }: MetricProps) {
-  return (
-    <div className="flex items-center space-x-1">
-      <OptionalLink href={href}>{Icon}</OptionalLink>
-      <span className="text-lg">{value}</span>
-      {count !== undefined && <span className="text-gray-400">({count})</span>}
-    </div>
-  );
 }
 
 /*
