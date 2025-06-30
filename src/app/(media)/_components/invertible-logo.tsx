@@ -26,10 +26,9 @@ function useShouldInvert(src: string) {
         }
 
         const [h, s, l] = swatch.hsl; // each in [0..1]
-
         // only invert if it's both very dark AND fairly gray (low saturation)
         const DARKNESS_THRESHOLD = 0.25;   // <25% lightness
-        const SATURATION_THRESHOLD = 0.2; // <20% saturation
+        const SATURATION_THRESHOLD = 0.3; // <20% saturation
 
         setInvert(l < DARKNESS_THRESHOLD && s < SATURATION_THRESHOLD);
       })
