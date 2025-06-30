@@ -22,7 +22,7 @@ export default async function TvLayout({
 
     <div className="relative h-full"
     >
-      <div className="absolute top-0 left-0 mb-10 w-screen h-screen -z-50">
+      <div className="absolute top-0 left-0 mb-10 w-full h-screen -z-50">
         {tv?.backdropPath ? (
           <div className="absolute h-full w-full bg-gradient-to-t from-background via-background/95 via-30% to-transparent">
             <div className="bg-background/40 absolute h-full w-full"></div>

@@ -11,7 +11,7 @@ export function TopNav() {
   const { session, client } = useSupabase()
 
   return (
-    <div className="sticky top-0 left-0 border-b border-transparent/10 z-10 backdrop-blur-sm bg-background/80">
+    <div className="sticky w-full top-0 left-0 border-b border-transparent/10 z-10 backdrop-blur-sm bg-background/80">
       <nav className="grid grid-cols-3 items-center p-1 px-4 text-md font-bold">
         <section className="flex z-10 items-center lg:space-x-5 ">
           <Link className="hidden lg:inline" href="/">

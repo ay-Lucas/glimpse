@@ -79,7 +79,7 @@ export default async function MoviePage({
       {movie && (
         <>
           <div className="h-full w-full overflow-x-hidden">
-            <div className="absolute top-0 left-0 mb-10 w-screen h-screen">
+            <div className="absolute top-0 left-0 mb-10 w-full h-screen">
               {movie?.backdropPath ? (
                 <div className="absolute h-full w-full bg-gradient-to-t from-background via-background/95 via-30% to-transparent">
                   <div className="bg-background/40 absolute h-full w-full"></div>
