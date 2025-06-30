@@ -32,7 +32,7 @@ export default function CastCard({
           width={150}
           height={225}
           loading="lazy"
-          quality={75}
+          quality={100}
           placeholder="blur"
           // blurDataURL="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=="
           blurDataURL={blurDataURL}
