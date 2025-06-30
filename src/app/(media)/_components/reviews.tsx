@@ -5,7 +5,8 @@ import { Expandable } from "./expandable";
 
 export function Review({ data }: { data: ReviewI }) {
   return (
-    <div className="rounded-md border px-4 py-2 text-md backdrop-blur">
+    // < div className="rounded-md border px-4 py-2 text-md backdrop-blur" >
+    <div className="media-card border-gray-300/30">
       <div className="">
         {data.url && (
           <Link href={data.url}>
@@ -24,6 +25,6 @@ export function Review({ data }: { data: ReviewI }) {
         )}
       </div>
       <Expandable>{data.content}</Expandable>
-    </div>
+    </div >
   );
 }

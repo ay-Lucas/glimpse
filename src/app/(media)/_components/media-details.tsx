@@ -7,7 +7,7 @@ export type DetailItem = {
 
 export function MediaDetails({ items }: { items: DetailItem[] }) {
   return (
-    <div>
+    <div className="media-card">
       <h2 className="text-2xl font-bold pb-4">Details</h2>
       <dl className="grid grid-cols-2 gap-x-4 gap-y-2">
         {items.map(({ label, value }) => (

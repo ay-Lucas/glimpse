@@ -79,73 +79,73 @@ export default async function PersonPage({
         <div className="relative px-3 md:container items-end pt-16">
           <div className="items-end pb-5 md:pt-0 px-0 lg:px-40 space-y-5">
 
-            <section className="bg-background/40 backdrop-blur-xl rounded-lg p-4 md:p-6">
-              <div className="grid grid-cols-1 md:grid-cols-[238px,1fr] gap-5 items-start">
-                {person.profilePath ? (
-                  <figure className="w-full">
-                    <Image
-                      quality={60}
-                      width={238}
-                      height={357}
-                      src={`${BASE_POSTER_IMAGE_URL}${person.profilePath}`}
-                      className="object-cover rounded-lg w-full h-full"
-                      priority
-                      placeholder="blur"
-                      blurDataURL={DEFAULT_BLUR_DATA_URL}
-                      alt={`${person.name} poster`}
-                      loading="eager"
-                    />
-                  </figure>
-                ) : <div className="w-[238px] h-[357px]"></div>}
-
-                <div className="space-y-4">
-                  <div>
-                    <h1 className="text-3xl md:text-5xl font-bold text-center md:text-left">
-                      {person.name}
-                    </h1>
-                  </div>
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <div className="flex space-x-3 items-center">
-                        <div className="text-lg font-bold text-gray-400 flex space-x-1 items-center">
-                          <HiQuestionMarkCircle size={17} />
-                          <p className="pr-2">Rank</p>
-                          <p className="text-white">
-                            {rank && rank <= total ? `#${rank} of ${total}` : `> ${total}`}
-                          </p>
-                        </div>
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent><p>{rank ? `Out of the ${total} most popular actors, ${person.name} ranks ${rank}` : `${person.name} does not rank within the top ${total}`}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                  <PersonDetails
-                    name={person.name}
-                    biography={person.biography}
-                    birthDate={person.birthday}
-                    deathDay={person.deathday}
-                    popularity={person.popularity}
-                    placeOfBirth={person.placeOfBirth}
-                    knownForDept={person.knownForDepartment}
-                    gender={gender ?? "unknown"}
-                    knownCredits={uniqueCombinedCreditsCount}
+            <section className="grid grid-cols-1 md:grid-cols-[238px,1fr] gap-5 items-start media-card">
+              {person.profilePath ? (
+                <figure className="w-full">
+                  <Image
+                    quality={60}
+                    width={238}
+                    height={357}
+                    src={`${BASE_POSTER_IMAGE_URL}${person.profilePath}`}
+                    className="object-cover rounded-lg w-full h-full"
+                    priority
+                    placeholder="blur"
+                    blurDataURL={DEFAULT_BLUR_DATA_URL}
+                    alt={`${person.name} poster`}
+                    loading="eager"
                   />
+                </figure>
+              ) : <div className="w-[238px] h-[357px]"></div>}
+
+              <div className="space-y-4">
+                <div>
+                  <h1 className="text-3xl md:text-5xl font-bold text-center md:text-left">
+                    {person.name}
+                  </h1>
                 </div>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <div className="flex space-x-3 items-center">
+                      <div className="text-lg font-bold text-gray-400 flex space-x-1 items-center">
+                        <HiQuestionMarkCircle size={17} />
+                        <p className="pr-2">Rank</p>
+                        <p className="text-white">
+                          {rank && rank <= total ? `#${rank} of ${total}` : `> ${total}`}
+                        </p>
+                      </div>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent><p>{rank ? `Out of the ${total} most popular actors, ${person.name} ranks ${rank}` : `${person.name} does not rank within the top ${total}`}</p>
+                  </TooltipContent>
+                </Tooltip>
+                <PersonDetails
+                  name={person.name}
+                  biography={person.biography}
+                  birthDate={person.birthday}
+                  deathDay={person.deathday}
+                  popularity={person.popularity}
+                  placeOfBirth={person.placeOfBirth}
+                  knownForDept={person.knownForDepartment}
+                  gender={gender ?? "unknown"}
+                  knownCredits={uniqueCombinedCreditsCount}
+                />
               </div>
             </section>
-            <ImageCarousel
-              breakpoints="page"
-              title={<h2 className={`text-2xl font-bold`}>Known For</h2>}
-              loading="lazy"
-              items={top10PopularCredits?.map((item, index): JSX.Element => (
-                <Link href={`/${item.mediaType}/${item.id}`} key={item.id}>
-                  <Card
-                    imagePath={item.posterPath ?? null}
-                    baseUrl={BASE_POSTER_IMAGE_URL}
-                    title={(item as MovieResult).title ?? (item as TvResult).name}
-                    overview={item.overview} />
-                </Link>
-              ))!} />
+            <div className="media-card">
+              <ImageCarousel
+                breakpoints="page"
+                title={<h2 className={`text-2xl font-bold`}>Known For</h2>}
+                loading="lazy"
+                items={top10PopularCredits?.map((item, index): JSX.Element => (
+                  <Link href={`/${item.mediaType}/${item.id}`} key={item.id}>
+                    <Card
+                      imagePath={item.posterPath ?? null}
+                      baseUrl={BASE_POSTER_IMAGE_URL}
+                      title={(item as MovieResult).title ?? (item as TvResult).name}
+                      overview={item.overview} />
+                  </Link>
+                ))!} />
+            </div>
           </div>
         </div>
       </div>

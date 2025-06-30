@@ -13,7 +13,7 @@ export default async function MediaProviders({ tmdbWatchProviders, title, tmdbId
   return (
     <>
       {(isTmdbValid || isJustWatchValid) && (
-        <div className="backdrop-blur-sm bg-background/40 rounded-lg p-4">
+        <div className="media-card">
           <h2 className="text-2xl font-bold pb-4">
             Streaming
             <span className="inline-flex items-center ml-4">

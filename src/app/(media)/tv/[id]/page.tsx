@@ -15,6 +15,7 @@ import { buildTvDetailItems } from "./utils";
 import ImageCarousel from "@/components/image-carousel";
 import CastCard from "@/components/cast-card";
 import { BASE_CAST_IMAGE_URL, DEFAULT_BLUR_DATA_URL } from "@/lib/constants";
+import { Separator } from "@radix-ui/react-dropdown-menu";
 
 function getTrailer(videoArray: Array<Video>) {
   const trailer: Array<Video> = videoArray.filter(
@@ -83,9 +84,8 @@ export default async function TvPage({ params }: { params: { id: number } }) {
           <div className="h-full w-full overflow-x-hidden pb-20">
             <div className="h-[6vh] md:h-[10vh]"></div>
             <div className="relative px-3 md:container items-end pt-16">
-              <div className="items-end pb-5 md:pt-0 px-0 lg:px-24 space-y-5">
-
-                <section className="bg-background/40 backdrop-blur-sm rounded-lg p-4 md:p-6">
+              <div className="items-end md:pt-0 px-0 lg:px-24 space-y-5">
+                <section>
                   <MediaHeader
                     rating={rating}
                     dateValue={tv.firstAirDate?.toString()}
@@ -113,63 +113,69 @@ export default async function TvPage({ params }: { params: { id: number } }) {
                   />
                 </section>
                 <section className="grid grid-cols-1 md:grid-cols-2 rounded-lg gap-4">
-                  <div className="backdrop-blur-sm bg-background/40 rounded-lg p-4">
-                    <MediaDetails items={detailItems} />
-                  </div>
+                  <MediaDetails items={detailItems} />
                   <Suspense fallback={<Skeleton className="w-full h-[356px] rounded-xl" />}>
                     <MediaProviders tmdbWatchProviders={tv.watchProviders} mediaType="tv" releaseDate={tv.firstAirDate ?? null} title={tv.name} tmdbId={tv.id} />
                   </Suspense>
                 </section>
-                {tv.numberOfSeasons && tv.numberOfSeasons > 0 && (
-                  <>
-                    <div className="pb-5 space-y-2 flex">
-                      <Link href={`/tv/${params.id}/seasons`} className="pb-4 pt-3 flex items-end hover:text-gray-400">
-                        <h2 className={`text-2xl font-bold`}>({tv.numberOfSeasons}) Season{tv.numberOfSeasons > 1 && "s"}</h2>
-                        <ChevronRight size={30} />
-                      </Link>
-                    </div>
-                  </>
-                )}
-                {tv.credits?.cast && tv.credits.cast.length > 0 && (
-                  <>
-                    <Suspense fallback={<Skeleton className="w-full h-[356px] rounded-xl" />}>
-                      <ImageCarousel
-                        title={<h2 className={`text-2xl font-bold`}>Top Cast</h2>}
-                        items={tv.credits.cast?.splice(0, 10).map((item, index: number) => (
-                          <Link href={`/person/${item.id}`} key={index}>
-                            <CastCard
-                              name={item.name}
-                              character={item.character}
-                              imagePath={item.profilePath}
-                              index={index}
-                              blurDataURL={DEFAULT_BLUR_DATA_URL}
-                              className="pt-2"
-                            />
-                          </Link>
-                        ))}
-                        breakpoints="cast"
-                      />
-                    </Suspense>
-                    <Link href={`/tv/${params.id}/credits`} className="pb-4 pt-3 flex items-end hover:text-gray-400">
-                      <h2 className={`text-2xl font-bold`}>All Cast and Crew</h2>
+                {/* <section> */}
+                <section className="space-y-10 media-card">
+                  {tv.numberOfSeasons && tv.numberOfSeasons > 0 && (
+                    <Link href={`/tv/${params.id}/seasons`} className="flex items-end hover:text-gray-400">
+                      <h2 className="text-2xl font-bold">Season{tv.numberOfSeasons > 1 && "s"} ({tv.numberOfSeasons})</h2>
                       <ChevronRight size={30} />
                     </Link>
+                  )}
+                </section>
+                {tv.credits?.cast && tv.credits.cast.length > 0 && (
+                  <>
+                    <section className="space-y-10 media-card">
+                      <Link href={`/tv/${params.id}/credits`} className="flex items-end hover:text-gray-400">
+                        <h2 className={`text-2xl font-bold`}>All Cast and Crew</h2>
+                        <ChevronRight size={30} />
+                      </Link>
+                    </section>
+                    <Suspense fallback={<Skeleton className="w-full h-[356px] rounded-xl" />}>
+                      <section className="media-card">
+                        <ImageCarousel
+                          title={<h2 className={`text-2xl font-bold`}>Top Cast</h2>}
+                          items={tv.credits.cast?.splice(0, 10).map((item, index: number) => (
+                            <Link href={`/person/${item.id}`} key={index}>
+                              <CastCard
+                                name={item.name}
+                                character={item.character}
+                                imagePath={item.profilePath}
+                                index={index}
+                                blurDataURL={DEFAULT_BLUR_DATA_URL}
+                                className="pt-2"
+                              />
+                            </Link>
+                          ))}
+                          breakpoints="cast"
+                        />
+                      </section>
+                    </Suspense>
                   </>
                 )}
                 <Suspense
                   fallback={<Skeleton className="w-full h-[356px] rounded-xl" />}
                 >
-                  <RecommededSection
-                    isReleased={isReleased}
-                    mediaType="tv"
-                    rating={rating}
-                    tmdbId={tmdbId}
-                  />
+                  <section className="media-card">
+                    <RecommededSection
+                      isReleased={isReleased}
+                      mediaType="tv"
+                      rating={rating}
+                      tmdbId={tmdbId}
+                    />
+                  </section>
                 </Suspense>
                 <Suspense
                   fallback={<Skeleton className="w-full h-[194px] rounded-xl" />}>
-                  <ReviewSection id={tmdbId} type={"tv"} />
+                  <section className="media-card">
+                    <ReviewSection id={tmdbId} type={"tv"} />
+                  </section>
                 </Suspense>
+
               </div>
 
             </div>

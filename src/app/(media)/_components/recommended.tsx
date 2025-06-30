@@ -19,50 +19,46 @@ export async function Recommended({
   return (
     <>
       {items?.length > 0 && (
-        <>
-          <div className="pt-2 pb-4">
-            <ImageCarousel
-              title={<h2 className={`text-2xl font-bold`}>Recommended</h2>}
-              items={items.map(
-                (item: MovieResult | TvResult, index: number) => {
-                  if (!item.poster_path) return;
-                  let card: React.ReactNode;
-                  switch (item.media_type) {
-                    case "movie":
-                      card = (
-                        <Card
-                          title={item.title}
-                          overview={item.overview}
-                          imagePath={item.poster_path}
-                          baseUrl={BASE_POSTER_IMAGE_URL}
-                          blurDataURL={(item as any).blurDataURL}
-                        />
-                      );
-                      break;
-                    case "tv":
-                      card = (
-                        <Card
-                          title={item.name}
-                          overview={item.overview}
-                          imagePath={item.poster_path}
-                          baseUrl={BASE_POSTER_IMAGE_URL}
-                          blurDataURL={(item as any).blurDataURL}
-                        />
-                      );
-                      break;
-                  }
-                  return (
-                    <Link href={`/${item.media_type}/${item.id}`} key={index}>
-                      {card}
-                    </Link>
+        <ImageCarousel
+          title={<h2 className={`text-2xl font-bold`}>Recommended</h2>}
+          items={items.map(
+            (item: MovieResult | TvResult, index: number) => {
+              if (!item.poster_path) return;
+              let card: React.ReactNode;
+              switch (item.media_type) {
+                case "movie":
+                  card = (
+                    <Card
+                      title={item.title}
+                      overview={item.overview}
+                      imagePath={item.poster_path}
+                      baseUrl={BASE_POSTER_IMAGE_URL}
+                      blurDataURL={(item as any).blurDataURL}
+                    />
                   );
-                },
-              )}
-              loading="lazy"
-              breakpoints="page"
-            />
-          </div>
-        </>
+                  break;
+                case "tv":
+                  card = (
+                    <Card
+                      title={item.name}
+                      overview={item.overview}
+                      imagePath={item.poster_path}
+                      baseUrl={BASE_POSTER_IMAGE_URL}
+                      blurDataURL={(item as any).blurDataURL}
+                    />
+                  );
+                  break;
+              }
+              return (
+                <Link href={`/${item.media_type}/${item.id}`} key={index}>
+                  {card}
+                </Link>
+              );
+            },
+          )}
+          loading="lazy"
+          breakpoints="page"
+        />
       )}
     </>
   );

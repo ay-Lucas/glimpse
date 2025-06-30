@@ -9,7 +9,7 @@ export default function MediaBanner({ name, id, firstAirDate, color, mediaType }
     : null;
   // console.log(tv.tmdbId)
   return (
-    <div className={`w-screen flex justify-center items-center py-2 shadow-md`}
+    <div className={`flex w-full justify-center items-center py-2 shadow-md`}
       style={{ backgroundColor: color }}
     >
       <div className="">

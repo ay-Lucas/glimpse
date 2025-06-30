@@ -102,7 +102,7 @@ export default async function MoviePage({
             <div className="h-[6vh] md:h-[10vh]"></div>
             <div className="relative px-3 md:container items-end pt-16">
               <div className="items-end pb-5 md:pt-0 px-0 lg:px-24 space-y-5 ">
-                <section className="bg-background/40 backdrop-blur-sm rounded-lg p-4 md:p-6">
+                <section>
                   <MediaHeader
                     rating={rating}
                     dateValue={movie.releaseDate?.toString()}
@@ -128,37 +128,39 @@ export default async function MoviePage({
                   />
                 </section>
                 <section className="grid grid-cols-1 md:grid-cols-2 rounded-lg gap-4">
-                  <div className="backdrop-blur-sm bg-background/40 rounded-lg p-4">
-                    <MediaDetails items={detailItems} />
-                  </div>
+                  <MediaDetails items={detailItems} />
                   <Suspense fallback={<Skeleton className="w-full h-[356px] rounded-xl" />}>
                     <MediaProviders tmdbWatchProviders={movie.watchProviders} mediaType="movie" releaseDate={movie.releaseDate ?? null} title={movie.title} tmdbId={movie.id} />
                   </Suspense>
                 </section>
                 {movie.credits?.cast && movie.credits.cast.length > 0 && (
                   <>
+                    <section className="space-y-10 media-card">
+                      <Link href={`/movie/${params.id}/credits`} className="flex items-end hover:text-gray-400">
+                        <h2 className={`text-2xl font-bold`}>All Cast and Crew</h2>
+                        <ChevronRight size={30} />
+                      </Link>
+                    </section>
                     <Suspense fallback={<Skeleton className="w-full h-[356px] rounded-xl" />}>
-                      <ImageCarousel
-                        title={<h2 className={`text-2xl font-bold`}>Top Cast</h2>}
-                        items={movie.credits.cast?.splice(0, 10).map((item, index: number) => (
-                          <Link href={`/person/${item.id}`} key={index}>
-                            <CastCard
-                              name={item.name}
-                              character={item.character}
-                              imagePath={item.profilePath}
-                              index={index}
-                              blurDataURL={DEFAULT_BLUR_DATA_URL}
-                              className="pt-2"
-                            />
-                          </Link>
-                        ))}
-                        breakpoints="cast"
-                      />
+                      <section className="space-y-10 media-card">
+                        <ImageCarousel
+                          title={<h2 className={`text-2xl font-bold`}>Top Cast</h2>}
+                          items={movie.credits.cast?.splice(0, 10).map((item, index: number) => (
+                            <Link href={`/person/${item.id}`} key={index}>
+                              <CastCard
+                                name={item.name}
+                                character={item.character}
+                                imagePath={item.profilePath}
+                                index={index}
+                                blurDataURL={DEFAULT_BLUR_DATA_URL}
+                                className="pt-2"
+                              />
+                            </Link>
+                          ))}
+                          breakpoints="cast"
+                        />
+                      </section>
                     </Suspense>
-                    <Link href={`/movie/${params.id}/credits`} className="pb-4 pt-3 flex items-end hover:text-gray-400">
-                      <h2 className={`text-2xl font-bold`}>All Cast and Crew</h2>
-                      <ChevronRight size={30} />
-                    </Link>
                   </>
                 )}
                 <Suspense
@@ -166,17 +168,21 @@ export default async function MoviePage({
                     <Skeleton className="w-full h-[356px] rounded-xl" />
                   }
                 >
-                  <RecommededSection
-                    isReleased={isReleased}
-                    tmdbId={tmdbId}
-                    mediaType="movie"
-                    rating={rating}
-                  />
+                  <section className="space-y-10 media-card">
+                    <RecommededSection
+                      isReleased={isReleased}
+                      tmdbId={tmdbId}
+                      mediaType="movie"
+                      rating={rating}
+                    />
+                  </section>
                 </Suspense>
                 <Suspense
                   fallback={<Skeleton className="w-full h-[194px] rounded-xl" />}
                 >
-                  <ReviewSection id={tmdbId} type={"movie"} />
+                  <section className="space-y-10 media-card">
+                    <ReviewSection id={tmdbId} type={"movie"} />
+                  </section>
                 </Suspense>
               </div>
 
@@ -188,7 +194,8 @@ export default async function MoviePage({
             </Suspense>
           )}
         </>
-      )}
-    </main>
+      )
+      }
+    </main >
   );
 }

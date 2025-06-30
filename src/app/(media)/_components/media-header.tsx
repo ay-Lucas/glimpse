@@ -91,9 +91,9 @@ export async function MediaHeader({
   const runtimeLabel = formatRuntime(runtime)
   const dateValueDate = dateValue ? new Date(dateValue) : null;
   return (
-    <div className="grid grid-cols-1 md:grid-cols-[238px,1fr] gap-5 items-start">
+    <div className="grid grid-cols-1 md:grid-cols-[238px,1fr] gap-5 items-start media-card">
       {posterPath ? (
-        <figure className="relative w-[159px] h-[238px] md:w-[238px] md:h-[357px]">
+        <figure className="relative w-[159px] h-[238px] md:w-[238px] md:h-[357px] mx-auto">
           <Image
             quality={70}
             fill
@@ -111,7 +111,7 @@ export async function MediaHeader({
 
       <div className="space-y-3">
         <div>
-          <h1 className="text-3xl md:text-5xl font-bold text-center md:text-left">
+          <h1 className="text-3xl md:text-5xl font-bold">
             {title}
           </h1>
           {tagline && (
@@ -136,7 +136,7 @@ export async function MediaHeader({
           )}
         </div>
         <section className="flex flex-col space-y-4">
-          <div className="grid grid-cols-4 md:grid-cols-5 gap-6 text-center md:text-left">
+          <div className="grid grid-cols-4 md:grid-cols-5 gap-6">
             {formattedDate1 && (
               <div>
                 <div className="text-xs font-medium text-gray-400 uppercase">

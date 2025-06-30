@@ -110,3 +110,24 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  .media-card2 {
+    @apply ring-gray-500
+           border-2
+           border-gray-800/70
+           bg-gray-950/60
+           backdrop-blur-xl
+           shadow-xl
+           rounded-lg
+           p-4;
+  }
+  .media-card {
+    @apply border-zinc-700
+           border-[0.5px]
+           bg-gray-950/40
+           backdrop-blur-xl
+           rounded-lg
+           p-4;
+  }
+}
