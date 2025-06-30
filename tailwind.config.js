@@ -57,6 +57,10 @@ export const theme = {
         foreground: "hsl(var(--card-foreground))",
       },
     },
+    screens: {
+      xs: '480px',
+      ...defaultTheme.screens,
+    },
     borderRadius: {
       lg: "var(--radius)",
       md: "calc(var(--radius) - 2px)",

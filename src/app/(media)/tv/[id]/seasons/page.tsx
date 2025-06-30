@@ -26,10 +26,10 @@ export default async function Seasons({ params }: { params: { id: number } }) {
   return (
     <main className="pt-3">
       <MediaBanner name={tv.name} firstAirDate={tv.firstAirDate ?? null} id={tv.tmdbId} color={color} mediaType="tv" />
-      <ul className="container mt-6 space-y-3">
+      <ul className="mt-6 space-y-3 grid place-content-center px-2">
         {tv.seasons && (
           tv.seasons?.map((s, index) => (
-            <li key={index}>
+            <li key={index} className="max-w-4xl">
               <SeasonCard episodeCount={s.episodeCount} id={s.id} name={s.name} overview={s.overview} posterPath={s.posterPath} seasonNumber={s.seasonNumber} airDate={s.airDate} key={s.id} voteAverage={s.voteAverage} />
             </li>
           ))

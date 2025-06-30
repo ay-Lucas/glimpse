@@ -1,7 +1,8 @@
 import { BASE_POSTER_IMAGE_URL, DEFAULT_BLUR_DATA_URL } from "@/lib/constants"
 import Image from "next/image"
-import { ScoreCircle } from "./score-circle";
 import { Expandable } from "./expandable";
+import TmdbLogo from "@/assets/tmdb-logo.svg";
+import Metric from "./metric";
 
 interface SeasonCardProps {
   seasonNumber?: number,
@@ -24,71 +25,75 @@ export default function SeasonCard({ seasonNumber, name, airDate, overview, post
     : null;
 
   return (
-    <div className="items-end px-40">
+    <section className="media-card">
+      <div className="grid grid-cols-[100px,1fr] gap-3 items-start">
+        {posterPath ? (
+          <figure className="w-full row-span-2">
+            <Image
+              quality={60}
+              width={100}
+              height={150}
+              src={`${BASE_POSTER_IMAGE_URL}${posterPath}`}
+              className="object-cover rounded-lg w-full h-full"
+              placeholder="blur"
+              blurDataURL={
+                DEFAULT_BLUR_DATA_URL
+              }
+              alt={`${name} poster`}
+              loading="lazy"
+            />
+          </figure>
+        ) : (<div></div>)}
 
-      <section className="border-gray-500 border-[0.5px] bg-gray-500/10 backdrop-blur-xl rounded-lg p-5">
-        <div className="grid grid-cols-1 md:grid-cols-[100px,1fr] gap-5 items-start">
-          {posterPath ? (
-            <figure className="w-full">
-              <Image
-                quality={60}
-                width={100}
-                height={150}
-                src={`${BASE_POSTER_IMAGE_URL}${posterPath}`}
-                className="object-cover rounded-lg w-full h-full"
-                placeholder="blur"
-                blurDataURL={
-                  DEFAULT_BLUR_DATA_URL
-                }
-                alt={`${name} poster`}
-                loading="lazy"
-              />
-            </figure>
-          ) : (<div></div>)}
-
-          <div className="space-y-2">
-            <h1 className="text-xl md:text-2xl font-bold text-center md:text-left">
-              {`${seasonNumber === 0 && name === "Specials" ? "Specials" : `Season ${seasonNumber}`}`}
-            </h1>
-            <section className="flex flex-col space-y-4">
-              <div className="grid grid-cols-4 md:grid-cols-5 gap-6 text-center md:text-left">
-                {formattedAirDate && (
-                  <div>
-                    <div className="text-sm font-medium text-gray-400 uppercase">
-                      Aired on
-                    </div>
-                    <time dateTime={formattedAirDate} className="mt-1 block">
-                      {formattedAirDate}
-                    </time>
-                  </div>
-                )}
+        <div className="space-y-2">
+          <h1 className="text-2xl font-bold text-left">
+            {`${seasonNumber === 0 && name === "Specials" ? "Specials" : `Season ${seasonNumber}`}`}
+          </h1>
+          <section className="flex flex-col space-y-4">
+            <div className="grid grid-cols-2 xs:grid-cols-3 gap-3 xs:gap-6 text-left">
+              {formattedAirDate && (
                 <div>
                   <div className="text-sm font-medium text-gray-400 uppercase">
-                    Episode Count
+                    Aired on
                   </div>
-                  <div className="mt-1">{episodeCount}</div>
+                  <time dateTime={formattedAirDate} className="mt-1 block">
+                    {formattedAirDate}
+                  </time>
                 </div>
-                {voteAverage !== 0 && voteAverage && (
-                  <div className="flex flex-wrap items-center gap-4 mb-4">
-                    <div className="flex flex-col items-center">
-                      <ScoreCircle
-                        size={54}
-                        strokeWidth={3}
-                        percentage={Math.round(voteAverage * 10)}
-                      />
-                      <span className="sr-only">{voteAverage}</span>
-                    </div>
-                  </div>
-                )}
-
+              )}
+              <div>
+                <div className="text-sm font-medium text-gray-400 uppercase">
+                  Episode Count
+                </div>
+                <div className="mt-1">{episodeCount}</div>
               </div>
-
-              {/* <p className="md:text-md">{overview}</p> */}
-              <Expandable>{overview || ""} </Expandable>
-            </section>
+              <div className="col-span-2 xs:col-span-1">
+                <div className="text-sm font-medium text-gray-400 uppercase">
+                  Vote Average
+                </div>
+                {(voteAverage != null && voteAverage != null) && (
+                  <Metric
+                    href={`https://www.themoviedb.org/tv/${id}`}
+                    Icon={
+                      <TmdbLogo
+                        alt="TMDB Logo"
+                        width={40}
+                        height={40}
+                        className="opacity-75 mr-2"
+                      />}
+                    value={`${Math.round(voteAverage * 10)}%`}
+                  />
+                )}
+              </div>
+            </div>
+          </section>
+        </div>
+        {overview &&
+          <div className="col-span-2 md:col-span-1 md:col-start-2">
+            <Expandable>{overview} </Expandable>
           </div>
-        </div >
-      </section >
-
-    </div >)
+        }
+      </div>
+    </section>
+  )
 }
