@@ -77,7 +77,7 @@ export function buildTvDetailItems(tv: FullTv): DetailItem[] {
   if (tv.spokenLanguages) {
     items.push({
       label: "Spoken Languages",
-      value: tv.spokenLanguages.map(item => languageCodeToEnglishName(item.iso6391 ?? ""))
+      value: tv.spokenLanguages.map(item => languageCodeToEnglishName(item.iso6391 ?? "")).join(', ')
     })
   }
 

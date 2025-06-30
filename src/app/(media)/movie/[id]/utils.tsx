@@ -125,7 +125,7 @@ export function buildMovieDetailItems(movie: FullMovie): DetailItem[] {
   if (movie.spokenLanguages?.length) {
     items.push({
       label: "Spoken Languages",
-      value: movie.spokenLanguages.map(item => languageCodeToEnglishName(item.iso6391 ?? ""))
+      value: movie.spokenLanguages.map(item => languageCodeToEnglishName(item.iso6391 ?? "")).join(', ')
     })
   }
 
