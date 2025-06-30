@@ -66,9 +66,10 @@ export default async function PersonPage({
 
   const gender = TMDB_GENDERS.get(person.gender ?? 0)
   const mixedCombinedCredits = [...person.combinedCredits.cast ?? [], ...person.combinedCredits.crew ?? []]
-  const uniqueCombinedCredits = new Set(mixedCombinedCredits.map(item => item.id).filter((id): id is number => (id ?? 0) > 0))
-  const uniqueCombinedCreditsCount = uniqueCombinedCredits.size;
+  const uniqueCombinedCredits = new Set(mixedCombinedCredits.filter(item => typeof item.id === "number" && item.id > 0));
   const top10PopularCredits = getTopPopularCredits(10, person.combinedCredits)
+  console.log(top10PopularCredits)
+  const knownForCredits = top10PopularCredits && top10PopularCredits.length > 3 ? top10PopularCredits : uniqueCombinedCredits.values().toArray();
   const rank = await getPersonRank(person.popularity ?? 0);
   const total = (await getPersonPopularityStats()).sortedScores.length;
   return (
@@ -127,7 +128,7 @@ export default async function PersonPage({
                   placeOfBirth={person.placeOfBirth}
                   knownForDept={person.knownForDepartment}
                   gender={gender ?? "unknown"}
-                  knownCredits={uniqueCombinedCreditsCount}
+                  knownCredits={uniqueCombinedCredits.size}
                 />
               </div>
             </section>
@@ -136,7 +137,7 @@ export default async function PersonPage({
                 breakpoints="page"
                 title={<h2 className={`text-2xl font-bold`}>Known For</h2>}
                 loading="lazy"
-                items={top10PopularCredits?.map((item, index): JSX.Element => (
+                items={knownForCredits.map((item, index): JSX.Element => (
                   <Link href={`/${item.mediaType}/${item.id}`} key={item.id}>
                     <Card
                       imagePath={item.posterPath ?? null}

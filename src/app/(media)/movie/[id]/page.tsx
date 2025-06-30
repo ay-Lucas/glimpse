@@ -127,7 +127,7 @@ export default async function MoviePage({
                     mediaType="movie"
                   />
                 </section>
-                <section className="grid grid-cols-1 md:grid-cols-2 rounded-lg gap-4">
+                <section className="grid gap-4 grid-cols-[repeat(auto-fit,_minmax(0,_1fr))]">
                   <MediaDetails items={detailItems} />
                   <Suspense fallback={<Skeleton className="w-full h-[356px] rounded-xl" />}>
                     <MediaProviders tmdbWatchProviders={movie.watchProviders} mediaType="movie" releaseDate={movie.releaseDate ?? null} title={movie.title} tmdbId={movie.id} />
@@ -168,21 +168,17 @@ export default async function MoviePage({
                     <Skeleton className="w-full h-[356px] rounded-xl" />
                   }
                 >
-                  <section className="space-y-10 media-card">
-                    <RecommededSection
-                      isReleased={isReleased}
-                      tmdbId={tmdbId}
-                      mediaType="movie"
-                      rating={rating}
-                    />
-                  </section>
+                  <RecommededSection
+                    isReleased={isReleased}
+                    tmdbId={tmdbId}
+                    mediaType="movie"
+                    rating={rating}
+                  />
                 </Suspense>
                 <Suspense
                   fallback={<Skeleton className="w-full h-[194px] rounded-xl" />}
                 >
-                  <section className="space-y-10 media-card">
-                    <ReviewSection id={tmdbId} type={"movie"} />
-                  </section>
+                  <ReviewSection id={tmdbId} type={"movie"} />
                 </Suspense>
               </div>
 

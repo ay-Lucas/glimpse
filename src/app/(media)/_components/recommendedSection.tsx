@@ -111,6 +111,8 @@ export async function RecommededSection({
   );
 
   return (
-    <Recommended recommendations={filteredRecommendations} />
+    <div className="media-card">
+      <Recommended recommendations={filteredRecommendations} />
+    </div>
   );
 }
