@@ -27,6 +27,7 @@ import { fetchTmdbMovieLists, fetchTmdbTvLists, getTrendingPages } from "@/app/d
 import JustWatch, { StreamingInfo, StreamProvider } from 'justwatch-api-client';
 import { scrubByMaxRes } from "@/lib/scrub-streams";
 import { getJustWatchInfoFromDb } from "@/lib/actions";
+import pLimit from "p-limit";
 // Don't import React cache: /scripts/revalidate.ts throws error
 
 export const fetchPersonDetails = unstable_cache(async (
@@ -259,15 +260,38 @@ export async function fetchTopPeopleIds(reqOptions: RequestInit = options) {
 }
 
 export const getPersonPopularityStats = unstable_cache(
-  async (pages = NUM_OF_POPULAR_PEOPLE_PAGES): Promise<{ sortedScores: number[] }> => {
-    const requests: Promise<PersonPopularResponse>[] = Array.from({ length: pages }, (_, i) =>
-      fetch(`${BASE_API_URL}/person/popular?page=${i + 1}`, options).then(r => r.json())
+  async (
+    pages = NUM_OF_POPULAR_PEOPLE_PAGES
+  ): Promise<{ sortedScores: number[] } | undefined> => {
+    const limit = pLimit(5); // ← at most 5 concurrent fetches
+    const safeFetch = async (pageNum: number) => {
+      try {
+        const res = await fetch(
+          `${BASE_API_URL}/person/popular?page=${pageNum}`,
+          options
+        );
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return (await res.json()) as PersonPopularResponse;
+      } catch {
+        return undefined;
+      }
+    };
+
+    // schedule each fetch through the limiter
+    const pagePromises = Array.from({ length: pages }, (_, i) =>
+      limit(() => safeFetch(i + 1))
     );
-    const results = (await Promise.all(requests))
-      .flatMap((page) => page.results ?? []);
-    const sortedScores = results
-      .map(p => p?.popularity)
+
+    // wait for all to finish, but never more than 5 at once
+    const pagesData = await Promise.all(pagePromises);
+
+    // flatten + sort
+    const allResults = pagesData.flatMap((p) => p?.results ?? []);
+    const sortedScores = allResults
+      .map((p) => p.popularity)
+      .filter((n): n is number => typeof n === "number")
       .sort((a, b) => a - b);
+
     return { sortedScores };
   },
   [], // no args
@@ -275,9 +299,11 @@ export const getPersonPopularityStats = unstable_cache(
 );
 
 export async function getPersonRank(targetPopularity: number) {
-  const { sortedScores } = await getPersonPopularityStats();
+  const scores = await getPersonPopularityStats();
+  if (!scores?.sortedScores)
+    return null;
   // make a copy sorted from high→low
-  const sortedDesc = [...sortedScores].sort((a, b) => b - a);
+  const sortedDesc = [...scores.sortedScores].sort((a, b) => b - a);
   // find your position: first entry that’s ≤ your score
   const idx = sortedDesc.findIndex((s) => s <= targetPopularity);
   if (idx === -1) return null; // not in top list
@@ -286,8 +312,11 @@ export async function getPersonRank(targetPopularity: number) {
 }
 
 export async function getPersonPercentile(targetPopularity: number) {
-  const { sortedScores } = await getPersonPopularityStats();
-  const sortedDesc = [...sortedScores].sort((a, b) => b - a);
+  const scores = await getPersonPopularityStats();
+  if (!scores?.sortedScores)
+    return null;
+
+  const sortedDesc = [...scores.sortedScores].sort((a, b) => b - a);
   const idx = sortedDesc.findIndex((s) => s <= targetPopularity);
   if (idx === -1) return null; // not in top list
   const total = sortedDesc.length;
