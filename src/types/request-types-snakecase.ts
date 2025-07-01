@@ -1364,6 +1364,9 @@ export interface PersonExternalIdsResponse extends Response {
   twitter_id?: null | string;
   id: number;
   instagram_id?: string | null;
+  tiktok_id?: string | null;
+  youtube_id?: string | null;
+  wikidata_id?: string | null;
 }
 
 export interface PersonImagesResponse extends Response {

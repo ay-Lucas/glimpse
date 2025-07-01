@@ -65,7 +65,7 @@ export interface Person {
   birthday?: string | null;
   knownForDepartment?: string;
   deathday?: string | null;
-  id?: number;
+  id: number;
   name?: string;
   alsoKnownAs?: string[];
   gender?: number;
@@ -753,11 +753,14 @@ export interface MovieExternalIdsResponse extends Response {
 
 export interface PersonExternalIdsResponse extends Response {
   imdbId?: string | null;
+  wikidataId?: string | null;
+  tiktokId?: string | null;
+  twitterId?: string | null;
+  instagramId?: string | null;
   facebookId?: string | null;
+  youtubeId?: string | null;
   freebaseMid?: string | null;
   freebaseId?: string | null;
   tvrageId?: number | null;
-  twitterId?: string | null;
   id: number;
-  instagramId?: string | null;
 }
