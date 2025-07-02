@@ -87,7 +87,7 @@ function buildLinkItems(entries: [string, string | number | null][]) {
         break;
       case "twitterId":
         href = `https://twitter.com/${v}`;
-        logo = <XLogo width={25} height={30} alt="X Logo" />;
+        logo = <XLogo width={25} height={22} alt="X Logo" />;
         break;
       case "youtubeId":
         href = `https://youtube.com/${v}`;
@@ -148,7 +148,7 @@ export default async function PersonLinks({
           <ul className="grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] items-center gap-5">
             {socialLinks.map((item) => (
               <li key={item.id}>
-                <div className="grid grid-cols-2 items-center">
+                <div className="grid grid-cols-[80px,50px] items-center space-x-4">
                   <strong>{item.label}</strong>
                   {item.logo}
                 </div>
@@ -178,7 +178,7 @@ export default async function PersonLinks({
           <ul className="grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] items-center gap-5">
             {dbLinks.map((item) => (
               <li key={item.id}>
-                <div className="grid grid-cols-2 items-center">
+                <div className="grid grid-cols-[80px,50px] items-center space-x-4">
                   <strong>{item.label}</strong>
                   {item.logo}
                 </div>
