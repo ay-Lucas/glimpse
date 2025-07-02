@@ -37,7 +37,7 @@ export default async function PersonPage({
 
   if (!person) throw new Error("fetchPersonDetails returned undefined");
 
-  const gender = TMDB_GENDERS.get(person.gender ?? 0);
+  const gender = person.gender ? TMDB_GENDERS.get(person.gender) : null;
   const mixedCombinedCredits = [
     ...(person.combinedCredits.cast ?? []),
     ...(person.combinedCredits.crew ?? []),
@@ -102,7 +102,7 @@ export default async function PersonPage({
                   popularity={person.popularity}
                   placeOfBirth={person.placeOfBirth}
                   knownForDept={person.knownForDepartment}
-                  gender={gender ?? "unknown"}
+                  gender={gender ?? null}
                   knownCredits={uniqueCombinedCredits.size}
                 />
               </div>
@@ -164,7 +164,7 @@ export default async function PersonPage({
                   breakpoints="page"
                   title={<h2 className={`text-2xl font-bold`}>Images</h2>}
                   loading="lazy"
-                  items={person.images.profiles?.map((item) => (
+                  items={person.images.profiles?.map((item, index) => (
                     <Image
                       src={`${BASE_PROFILE_IMAGE_URL}${item.filePath}`}
                       width={228}
@@ -172,6 +172,7 @@ export default async function PersonPage({
                       alt={`tagged image of ${person.name}`}
                       unoptimized
                       className="rounded-lg"
+                      key={index}
                     />
                   ))}
                 />
@@ -179,33 +180,35 @@ export default async function PersonPage({
             ) : (
               <div />
             )}
-            <div className="media-card">
-              <ImageCarousel
-                breakpoints="page"
-                title={<h2 className={`text-2xl font-bold`}>Known For</h2>}
-                loading="lazy"
-                items={
-                  knownForCredits.map(
-                    (item, index): JSX.Element => (
-                      <Link
-                        href={`/${item.mediaType}/${item.id}`}
-                        key={item.id}
-                      >
-                        <Card
-                          imagePath={item.posterPath ?? null}
-                          baseUrl={BASE_POSTER_IMAGE_URL}
-                          title={
-                            (item as MovieResult).title ??
-                            (item as TvResult).name
-                          }
-                          overview={item.overview}
-                        />
-                      </Link>
-                    )
-                  )!
-                }
-              />
-            </div>
+            {knownForCredits.length > 0 && (
+              <div className="media-card">
+                <ImageCarousel
+                  breakpoints="page"
+                  title={<h2 className={`text-2xl font-bold`}>Known For</h2>}
+                  loading="lazy"
+                  items={
+                    knownForCredits.map(
+                      (item): JSX.Element => (
+                        <Link
+                          href={`/${item.mediaType}/${item.id}`}
+                          key={item.id}
+                        >
+                          <Card
+                            imagePath={item.posterPath ?? null}
+                            baseUrl={BASE_POSTER_IMAGE_URL}
+                            title={
+                              (item as MovieResult).title ??
+                              (item as TvResult).name
+                            }
+                            overview={item.overview}
+                          />
+                        </Link>
+                      )
+                    )!
+                  }
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>

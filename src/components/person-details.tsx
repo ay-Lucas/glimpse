@@ -20,7 +20,7 @@ export async function PersonDetails({
   knownForDept?: string | null;
   placeOfBirth?: string | null;
   paramsId?: number;
-  gender: string;
+  gender: string | null;
   knownCredits: number;
 }) {
   function getFormattedDate(dateStr: string) {
@@ -67,7 +67,7 @@ export async function PersonDetails({
           <div className="text-xs font-bold uppercase text-gray-400">
             Gender
           </div>
-          <div>{gender}</div>
+          <div>{gender ?? "unknown"}</div>
         </div>
         <div>
           <div className="text-xs font-bold uppercase text-gray-400">
@@ -79,7 +79,7 @@ export async function PersonDetails({
           <div className="text-xs font-bold uppercase text-gray-400">
             Known For
           </div>
-          <div>{knownForDept}</div>
+          <div>{knownForDept ?? "unknown"}</div>
         </div>
         <div>
           <div className="text-xs font-bold uppercase text-gray-400">
