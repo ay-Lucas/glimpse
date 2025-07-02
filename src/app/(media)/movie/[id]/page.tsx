@@ -26,6 +26,7 @@ import { MediaDetails } from "../../_components/media-details";
 import { buildMovieDetailItems } from "./utils";
 import { Credits } from "../../_components/media-credits";
 import { ChevronRight } from "lucide-react";
+import MediaLinks from "../../_components/media-links";
 
 export const revalidate = 43200; // 12 hours
 
@@ -73,7 +74,7 @@ export default async function MoviePage({
 
   const detailItems = buildMovieDetailItems(movie);
   const blurData = await getRedisBlurValue("movie", params.id);
-
+  console.log(movie.externalIds);
   // console.log(movie.watchProviders?.results)
   // console.log(`Movie page rendered! ${movie.title}`)
   // TODO: Add all watch providers
@@ -190,6 +191,13 @@ export default async function MoviePage({
                       </section>
                     </Suspense>
                   </>
+                )}
+                {movie.externalIds && (
+                  <MediaLinks
+                    externalIds={movie.externalIds}
+                    tmdbId={movie.id}
+                    mediaType="movie"
+                  />
                 )}
                 <Suspense
                   fallback={

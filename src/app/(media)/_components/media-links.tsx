@@ -1,4 +1,8 @@
-import { PersonExternalIdsResponse } from "@/types/request-types-camelcase";
+import {
+  MovieExternalIdsResponse,
+  PersonExternalIdsResponse,
+  TvExternalIdsResponse,
+} from "@/types/request-types-camelcase";
 import TmdbLogo from "@/assets/tmdb-logo.svg";
 import ImdbLogo from "@/assets/IMDB_Logo_2016.svg";
 import InstagramLogo from "@/assets/Instagram_logo_2022.svg";
@@ -67,7 +71,10 @@ async function fetchWikiTitle(wikidataId: string): Promise<string | undefined> {
   return sl?.enwiki?.title; // e.g. “Jenna_Davis”
 }
 
-function buildLinkItems(entries: [string, string | number | null][]) {
+function buildLinkItems(
+  entries: [string, string | number | null][],
+  mediaType: "tv" | "movie" | "person"
+) {
   const linkItem = entries.map(([k, v]) => {
     const label = humanize(k);
     let href = "";
@@ -94,7 +101,7 @@ function buildLinkItems(entries: [string, string | number | null][]) {
         logo = <YouTubeLogo width={30} height={30} alt="YouTube Logo" />;
         break;
       case "imdbId":
-        href = `https://www.imdb.com/name/${v}`;
+        href = `https://www.imdb.com/${mediaType === "person" ? "name" : "title"}/${v}`;
         logo = <ImdbLogo width={40} height={30} alt="IMDb Logo" />;
         break;
       case "wikidataId":
@@ -106,7 +113,7 @@ function buildLinkItems(entries: [string, string | number | null][]) {
         logo = <WikipediaLogo width={30} height={30} alt="Wikipedia Logo" />;
         break;
       case "tmdbId":
-        href = `https://themoviedb.org/person/${v}`;
+        href = `https://themoviedb.org/${mediaType}/${v}`;
         logo = <TmdbLogo width={40} height={30} alt="TMDB Logo" />;
         break;
       default:
@@ -117,12 +124,17 @@ function buildLinkItems(entries: [string, string | number | null][]) {
   return linkItem;
 }
 
-export default async function PersonLinks({
+export default async function MediaLinks({
   externalIds,
   tmdbId,
+  mediaType,
 }: {
-  externalIds: PersonExternalIdsResponse;
+  externalIds:
+    | PersonExternalIdsResponse
+    | MovieExternalIdsResponse
+    | TvExternalIdsResponse;
   tmdbId: number;
+  mediaType: "tv" | "movie" | "person";
 }) {
   const wikidataId = externalIds.wikidataId;
   const wikiTitle = wikidataId ? await fetchWikiTitle(wikidataId) : null;
@@ -134,7 +146,7 @@ export default async function PersonLinks({
   const entries = Object.entries(ids).filter(
     ([k, v]) => v != null && v !== "" && !IGNORE_KEYS.includes(k)
   );
-  const items = buildLinkItems(entries);
+  const items = buildLinkItems(entries, mediaType);
   const socialLinks = items.filter((item) =>
     SOCIAL_KEYS.includes(item.idLabel)
   );
@@ -143,7 +155,7 @@ export default async function PersonLinks({
   return (
     <>
       {socialLinks.length > 0 && (
-        <div className="media-card space-y-2">
+        <div className="media-card space-y-4">
           <h2 className={`text-2xl font-bold`}>Social Links</h2>
           <ul className="grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] items-center gap-5">
             {socialLinks.map((item) => (
@@ -173,7 +185,7 @@ export default async function PersonLinks({
         </div>
       )}
       {dbLinks.length > 0 && (
-        <div className="media-card space-y-2">
+        <div className="media-card space-y-4">
           <h2 className={`text-2xl font-bold`}>Database Links</h2>
           <ul className="grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] items-center gap-5">
             {dbLinks.map((item) => (

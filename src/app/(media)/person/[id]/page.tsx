@@ -16,7 +16,7 @@ import { getTopPopularCredits } from "./utils";
 import PersonRank from "./_components/person-rank";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import PersonLinks from "./_components/person-links";
+import MediaLinks from "../../_components/media-links";
 
 export const revalidate = 43200; // 12 hours
 
@@ -108,9 +108,10 @@ export default async function PersonPage({
               </div>
             </section>
             {person.externalIds && person.id && (
-              <PersonLinks
+              <MediaLinks
                 externalIds={person.externalIds}
                 tmdbId={person.id}
+                mediaType="person"
               />
             )}
             {person.taggedImages.results?.length ? (

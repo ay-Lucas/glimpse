@@ -739,6 +739,7 @@ export interface TvExternalIdsResponse extends Response {
   facebookId?: string | null;
   instagramId?: string | null;
   twitterId?: string | null;
+  wikidataId?: string | null;
   id?: number;
 }
 
@@ -747,6 +748,7 @@ export interface MovieExternalIdsResponse extends Response {
   facebookId?: string | null;
   instagramId?: string | null;
   twitterId?: string | null;
+  wikidataId?: string | null;
   id?: number;
 }
 

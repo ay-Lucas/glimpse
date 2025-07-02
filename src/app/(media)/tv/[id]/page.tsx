@@ -20,6 +20,7 @@ import ImageCarousel from "@/components/image-carousel";
 import CastCard from "@/components/cast-card";
 import { BASE_CAST_IMAGE_URL, DEFAULT_BLUR_DATA_URL } from "@/lib/constants";
 import { Separator } from "@radix-ui/react-dropdown-menu";
+import MediaLinks from "../../_components/media-links";
 
 function getTrailer(videoArray: Array<Video>) {
   const trailer: Array<Video> = videoArray.filter(
@@ -188,6 +189,13 @@ export default async function TvPage({ params }: { params: { id: number } }) {
                       </section>
                     </Suspense>
                   </>
+                )}
+                {tv.externalIds && (
+                  <MediaLinks
+                    externalIds={tv.externalIds}
+                    tmdbId={tv.id}
+                    mediaType="tv"
+                  />
                 )}
                 <Suspense
                   fallback={
