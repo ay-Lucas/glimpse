@@ -51,7 +51,7 @@ export default async function PersonPage({
   const knownForCredits =
     top10PopularCredits && top10PopularCredits.length > 3
       ? top10PopularCredits
-      : uniqueCombinedCredits.values().toArray();
+      : Array.from(uniqueCombinedCredits.values());
   return (
     <main>
       <div className="h-full w-full overflow-x-hidden pb-20">
