@@ -31,3 +31,41 @@ export function getTopPopularCredits(
 
   return sorted?.slice(0, limit);
 }
+
+/**
+ * @param targetPopularity Popularity of person
+ * @param scores Array of popularity scores
+ * @param isDescending true if scores is in descending order
+ */
+export function getPersonRank(
+  targetPopularity: number,
+  scores: number[],
+  isDescending: boolean
+) {
+  const sortedDesc = isDescending ? scores : [...scores].sort((a, b) => b - a);
+
+  // find your position: first entry that’s ≤ your score
+  const idx = sortedDesc.findIndex((s) => s <= targetPopularity);
+  if (idx === -1) return null; // not in top list
+  // +1 because index 0 → rank #1
+  return idx + 1;
+}
+
+/**
+ * @param targetPopularity Popularity of person
+ * @param scores Array of popularity scores
+ * @param isDescending true if scores is in descending order
+ */
+export function getPersonPercentile(
+  targetPopularity: number,
+  scores: number[],
+  isDescending: boolean
+) {
+  const sortedDesc = isDescending ? scores : [...scores].sort((a, b) => b - a);
+
+  const idx = sortedDesc.findIndex((s) => s <= targetPopularity);
+  if (idx === -1) return null; // not in top list
+  const total = sortedDesc.length;
+  // idx 0 → top: 100%, idx = total-1 → bottom: 0%
+  return Math.round((1 - idx / (total - 1)) * 100);
+}

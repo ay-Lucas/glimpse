@@ -95,7 +95,7 @@ export const TMDB_GENDERS = new Map([
   [3, "Non-binary"],
 ]);
 
-export const NUM_OF_POPULAR_PEOPLE_PAGES = 25;
+export const NUM_OF_POPULAR_PEOPLE_PAGES = 1000;
 export const NUM_TMDB_PAGES = 2;
 
 export const MAX_RES_BY_PROVIDER: Record<string, "_4K" | "HD" | "SD"> = {

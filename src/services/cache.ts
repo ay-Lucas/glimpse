@@ -1,5 +1,6 @@
 import { BlurData } from "@/types/redis";
 import { Redis } from "@upstash/redis";
+import { unstable_cache } from "next/cache";
 
 export const redis = new Redis({
   url: process.env.KV_REST_API_URL,
@@ -34,3 +35,31 @@ export async function getRedisBlurValues(keys: string[]) {
     console.warn("Failed to retrieve Value from redis");
   }
 }
+
+export async function writePopularPeopleScores(sortedScores: number[]) {
+  try {
+    const key = `popular:people`;
+    const payload = JSON.stringify({ sortedScores });
+
+    // store in Redis, no TTL so it lives until you explicitly delete or override
+    await redis.set(key, payload);
+  } catch (err) {
+    console.error(`⚠️  Failed to write popular people key`, err);
+  }
+}
+
+export const getRedisPopularPeopleScores = unstable_cache(
+  async () => {
+    try {
+      console.log("getRedisPopularPeopleScores called");
+      const key = `popular:people`;
+      // store in Redis, no TTL so it lives until you explicitly delete or override
+      const value = await redis.get<{ sortedScores: number[] }>(key);
+      return value;
+    } catch (err) {
+      console.error(`⚠️  Failed to retrieve popular people value`, err);
+    }
+  },
+  [],
+  { revalidate: 60 * 60 * 12 }
+);

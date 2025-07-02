@@ -1,10 +1,11 @@
-import { getPersonPopularityStats, getPersonRank } from "@/app/(media)/actions";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { HiQuestionMarkCircle } from "react-icons/hi";
+import { getPersonRank } from "../utils";
+import { getRedisPopularPeopleScores } from "@/services/cache";
 
 interface PersonRankProps {
   popularity: number;
@@ -15,8 +16,10 @@ export default async function PersonRank({
   popularity,
   name,
 }: PersonRankProps) {
-  const rank = await getPersonRank(popularity ?? 0);
-  const total = (await getPersonPopularityStats())?.sortedScores.length;
+  const scores = await getRedisPopularPeopleScores();
+  if (!scores?.sortedScores) return;
+  const rank = getPersonRank(popularity, scores.sortedScores, true);
+  const total = scores.sortedScores.length;
 
   return (
     <Tooltip>
