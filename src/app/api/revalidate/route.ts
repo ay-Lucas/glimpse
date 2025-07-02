@@ -10,10 +10,7 @@ export async function POST(req: Request) {
   const { secret, paths } = await req.json();
 
   if (secret !== process.env.REVALIDATE_SECRET) {
-    return NextResponse.json(
-      { error: "Invalid token" },
-      { status: 401 }
-    );
+    return NextResponse.json({ error: "Invalid token" }, { status: 401 });
   }
 
   // `paths` should be an array of string URL paths, e.g. ["/tv/123", "/tv/123/seasons"]

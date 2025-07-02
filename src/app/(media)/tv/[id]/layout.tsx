@@ -1,7 +1,11 @@
 import { ReactNode, Suspense } from "react";
 import Image from "next/image";
 import { fetchTvDetails } from "@/app/(media)/actions";
-import { BASE_ORIGINAL_IMAGE_URL, BASE_BLUR_IMAGE_URL, DEFAULT_BLUR_DATA_URL } from "@/lib/constants";
+import {
+  BASE_ORIGINAL_IMAGE_URL,
+  BASE_BLUR_IMAGE_URL,
+  DEFAULT_BLUR_DATA_URL,
+} from "@/lib/constants";
 import PrefetchBannerColor from "../../_components/prefetch-banner-color";
 import { getRedisBlurValue } from "@/services/cache";
 
@@ -19,19 +23,17 @@ export default async function TvLayout({
   const blurData = await getRedisBlurValue("tv", params.id);
   // console.log(`TV layout rendered ${tv.name}`)
   return (
-
-    <div className="relative h-full"
-    >
-      <div className="absolute top-0 left-0 mb-10 w-full h-screen -z-50">
+    <div className="relative h-full">
+      <div className="absolute left-0 top-0 -z-50 mb-10 h-screen w-full">
         {tv?.backdropPath ? (
           <div className="absolute h-full w-full bg-gradient-to-t from-background via-background/95 via-30% to-transparent">
-            <div className="bg-background/40 absolute h-full w-full"></div>
+            <div className="absolute h-full w-full bg-background/40"></div>
             <Image
               fill
               src={`${BASE_ORIGINAL_IMAGE_URL}${tv.backdropPath}`}
               quality={70}
               alt="header image"
-              className={`object-cover -z-50`}
+              className={`-z-50 object-cover`}
               sizes="100vw"
               placeholder="blur"
               priority
@@ -39,7 +41,7 @@ export default async function TvLayout({
             />
           </div>
         ) : (
-          <div className="absolute z-0 top-0 left-0 h-full w-full items-center justify-center bg-gradient-to-b from-background to-background/50 via-gray-900" />
+          <div className="absolute left-0 top-0 z-0 h-full w-full items-center justify-center bg-gradient-to-b from-background via-gray-900 to-background/50" />
         )}
       </div>
       {/* <TvProvider tv={tv}> */}
@@ -52,5 +54,5 @@ export default async function TvLayout({
         />
       </Suspense>
     </div>
-  )
+  );
 }

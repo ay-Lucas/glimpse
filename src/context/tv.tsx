@@ -9,7 +9,13 @@ export const useTv = () => {
   return tv;
 };
 
-export function TvProvider({ tv, children }: { tv: FullTv; children: ReactNode }) {
-  console.log("tv provider called")
+export function TvProvider({
+  tv,
+  children,
+}: {
+  tv: FullTv;
+  children: ReactNode;
+}) {
+  console.log("tv provider called");
   return <TvContext.Provider value={tv}>{children}</TvContext.Provider>;
 }

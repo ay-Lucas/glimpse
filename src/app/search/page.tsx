@@ -1,4 +1,7 @@
-import { SearchMultiRequest, SearchMultiResponse } from "@/types/request-types-snakecase";
+import {
+  SearchMultiRequest,
+  SearchMultiResponse,
+} from "@/types/request-types-snakecase";
 import { BASE_API_URL, options } from "@/lib/constants";
 // import { makeCarouselCards } from "../discover/page";
 import { makeCarouselCards } from "@/lib/utils";
@@ -6,11 +9,11 @@ import { makeCarouselCards } from "@/lib/utils";
 const MAX_PAGES = 10;
 
 async function getMultiSearch(
-  request: SearchMultiRequest,
+  request: SearchMultiRequest
 ): Promise<SearchMultiResponse> {
   const res = await fetch(
     `${BASE_API_URL}/search/multi?query=${request.query}&include_adult=${request.include_adult}&language=${request.language}&page=${request.page}`,
-    options,
+    options
   );
   return res.json();
 }
@@ -18,7 +21,7 @@ async function getMultiSearch(
 async function getMultiSearchPages(
   request: SearchMultiRequest,
   response: SearchMultiResponse,
-  maxNumber: number,
+  maxNumber: number
 ) {
   const requests = [];
   for (
@@ -34,7 +37,7 @@ async function getMultiSearchPages(
         page: i + 1,
         language: "en-US",
         id: "",
-      }),
+      })
     );
   }
   const array = await Promise.all(requests);
@@ -59,14 +62,14 @@ export default async function SearchPage({
   const res = await getMultiSearch(params);
   const allRes = await getMultiSearchPages(params, res, MAX_PAGES);
   const filteredRes = allRes.filter(
-    (item: any) => item.poster_path || item.profile_path || item.backdrop_path,
+    (item: any) => item.poster_path || item.profile_path || item.backdrop_path
   );
   const items: any = filteredRes;
 
   return (
     <main>
-      <div className="md:container pt-10">
-        <div className="flex flex-wrap flex-shrink justify-center md:gap-8 gap-4">
+      <div className="pt-10 md:container">
+        <div className="flex flex-shrink flex-wrap justify-center gap-4 md:gap-8">
           {filteredRes && filteredRes.length > 0 ? (
             makeCarouselCards(items)
           ) : (

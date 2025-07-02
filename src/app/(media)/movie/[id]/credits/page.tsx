@@ -1,4 +1,4 @@
-import CreditsPage from "@/app/(media)/_components/credits-page"
+import CreditsPage from "@/app/(media)/_components/credits-page";
 import { fetchDiscoverMovieIds } from "@/app/(media)/actions";
 
 export const revalidate = 43200; // 12 hours

@@ -22,7 +22,7 @@ interface WatchlistContextType {
   deleteItem: (
     watchlistId: string,
     watchlistItemId: string | number,
-    userId: string,
+    userId: string
   ) => Promise<void>;
   fetchWatchlists: () => Promise<void>;
   addWatchlist: () => Promise<void>;
@@ -31,12 +31,12 @@ interface WatchlistContextType {
     watchlistId: string,
     watchlistItem: FullTv | FullMovie,
     rating: string,
-    mediaType: "tv" | "movie",
+    mediaType: "tv" | "movie"
   ) => Promise<boolean>;
 }
 
 const WatchlistContext = createContext<WatchlistContextType | undefined>(
-  undefined,
+  undefined
 );
 
 export const WatchlistProvider = ({ children }: { children: ReactNode }) => {
@@ -45,7 +45,7 @@ export const WatchlistProvider = ({ children }: { children: ReactNode }) => {
 
   const fetchWatchlists = async () => {
     const watchlist: WatchlistI[] = await getWatchlistsAndItems(
-      session?.user.id!,
+      session?.user.id!
     );
     setWatchlists([...watchlist]);
   };
@@ -58,7 +58,7 @@ export const WatchlistProvider = ({ children }: { children: ReactNode }) => {
    */
   const deleteItem = async (
     watchlistId: string,
-    watchlistItemId: string | number,
+    watchlistItemId: string | number
   ) => {
     await deleteWatchlistItem(watchlistId, watchlistItemId);
     await fetchWatchlists();
@@ -83,7 +83,7 @@ export const WatchlistProvider = ({ children }: { children: ReactNode }) => {
     const res = await deleteWatchlist(session!.user.id, watchlistId);
     if (res) {
       const updatedWatchlists = watchlists.filter(
-        (item) => item.id !== watchlistId,
+        (item) => item.id !== watchlistId
       );
       setWatchlists(updatedWatchlists);
     }
@@ -92,20 +92,20 @@ export const WatchlistProvider = ({ children }: { children: ReactNode }) => {
     watchlistId: string,
     watchlistItem: FullMovie | FullTv,
     rating: string,
-    mediaType: "tv" | "movie",
+    mediaType: "tv" | "movie"
   ) => {
     let res;
     if (mediaType == "tv")
       res = await addTvToWatchlist(
         watchlistId,
         watchlistItem as FullTv,
-        rating,
+        rating
       );
     else if (mediaType == "movie")
       res = await addMovieToWatchlist(
         watchlistId,
         watchlistItem as FullMovie,
-        rating,
+        rating
       );
     fetchWatchlists();
     return res !== undefined;

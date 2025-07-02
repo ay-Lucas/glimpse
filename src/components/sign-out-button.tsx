@@ -12,7 +12,7 @@ export function SignOutButton() {
     const { error } = await client.auth.signOut();
     if (error) {
       toast("Sign out failed", {
-        description: error.message
+        description: error.message,
       });
     } else {
       toast(`Sign out successful`);
@@ -24,7 +24,7 @@ export function SignOutButton() {
     <div>
       <button
         type="submit"
-        className="flex px-2 py-1.5 w-full focus:bg-accent"
+        className="flex w-full px-2 py-1.5 focus:bg-accent"
         onClick={onSignOut}
       >
         <LogOut className="mr-2 h-4 w-4" />

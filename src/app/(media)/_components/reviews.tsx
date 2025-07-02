@@ -14,8 +14,8 @@ export function Review({ data }: { data: ReviewI }) {
           </Link>
         )}
         {data.author_details?.rating && (
-          <span className="flex pt-1 text-md">
-            <div className="flex pr-1 items-center">
+          <span className="text-md flex pt-1">
+            <div className="flex items-center pr-1">
               <span className="pr-1">
                 <Star size={15} />
               </span>
@@ -25,6 +25,6 @@ export function Review({ data }: { data: ReviewI }) {
         )}
       </div>
       <Expandable>{data.content}</Expandable>
-    </div >
+    </div>
   );
 }

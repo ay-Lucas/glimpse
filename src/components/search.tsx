@@ -27,7 +27,7 @@ export function Search() {
         sideOffset={24}
       >
         <Input
-          className={`h-8 w-56 md:w-52 lg:w-64 md:bg-secondary/80 bg-secondary border-gray-500 border transition-opacity ease-in-out duration-300 "`}
+          className={`" h-8 w-56 border border-gray-500 bg-secondary transition-opacity duration-300 ease-in-out md:w-52 md:bg-secondary/80 lg:w-64`}
           onKeyDown={handleEnter}
           onChange={(e) => setValue(e.target.value)}
           placeholder="Search for a series or movie"

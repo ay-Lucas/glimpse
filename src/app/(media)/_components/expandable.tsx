@@ -1,32 +1,32 @@
-"use client"
-import { useState, useRef, useLayoutEffect, ReactNode } from "react"
+"use client";
+import { useState, useRef, useLayoutEffect, ReactNode } from "react";
 
 interface ExpandableOverviewProps {
-  children: ReactNode
-  lineHeight?: number
-  buttonClassname?: string
+  children: ReactNode;
+  lineHeight?: number;
+  buttonClassname?: string;
 }
 
 export function Expandable({
   children,
   lineHeight = 24,
-  buttonClassname
+  buttonClassname,
 }: ExpandableOverviewProps) {
-  const [expanded, setExpanded] = useState(false)
-  const [canExpand, setCanExpand] = useState(false)
-  const [fullHeight, setFullHeight] = useState(0)
-  const containerRef = useRef<HTMLDivElement>(null)
+  const [expanded, setExpanded] = useState(false);
+  const [canExpand, setCanExpand] = useState(false);
+  const [fullHeight, setFullHeight] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
-    const el = containerRef.current
-    if (!el) return
-    const h = el.scrollHeight
-    setFullHeight(h)
+    const el = containerRef.current;
+    if (!el) return;
+    const h = el.scrollHeight;
+    setFullHeight(h);
     // if more than 3 lines, allow expansion
-    if (h > lineHeight * 3 + 1) setCanExpand(true)
-  }, [lineHeight])
+    if (h > lineHeight * 3 + 1) setCanExpand(true);
+  }, [lineHeight]);
 
-  const collapsedMaxH = lineHeight * 3
+  const collapsedMaxH = lineHeight * 3;
 
   return (
     <div className="w-full">
@@ -37,9 +37,7 @@ export function Expandable({
           maxHeight: expanded ? fullHeight : collapsedMaxH,
         }}
       >
-        <div className="whitespace-pre-wrap">
-          {children}
-        </div>
+        <div className="whitespace-pre-wrap">{children}</div>
       </div>
 
       {canExpand && (
@@ -51,5 +49,5 @@ export function Expandable({
         </button>
       )}
     </div>
-  )
+  );
 }

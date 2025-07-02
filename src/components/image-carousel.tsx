@@ -20,21 +20,21 @@ export interface ImageCarouselProps {
 
 const carouselBreakpoints: {
   default: {
-    [width: number]: SwiperOptions
-    [ratio: string]: SwiperOptions
-  }
+    [width: number]: SwiperOptions;
+    [ratio: string]: SwiperOptions;
+  };
   page: {
-    [width: number]: SwiperOptions
-    [ratio: string]: SwiperOptions
-  }
+    [width: number]: SwiperOptions;
+    [ratio: string]: SwiperOptions;
+  };
   cast: {
-    [width: number]: SwiperOptions
-    [ratio: string]: SwiperOptions
-  }
+    [width: number]: SwiperOptions;
+    [ratio: string]: SwiperOptions;
+  };
   taggedImages: {
-    [width: number]: SwiperOptions
-    [ratio: string]: SwiperOptions
-  }
+    [width: number]: SwiperOptions;
+    [ratio: string]: SwiperOptions;
+  };
 } = {
   default: {
     // 300: {
@@ -149,12 +149,11 @@ const carouselBreakpoints: {
       cssMode: true,
     },
 
-
     1300: {
       slidesPerView: 3,
       slidesPerGroup: 3,
     },
-  }
+  },
 };
 
 export default function ImageCarousel({
@@ -185,9 +184,7 @@ export default function ImageCarousel({
     }
   }, []);
 
-  useEffect(() => {
-
-  })
+  useEffect(() => {});
 
   let breakpointsOption: {
     [width: number]: SwiperOptions;
@@ -202,7 +199,7 @@ export default function ImageCarousel({
       breakpointsOption = carouselBreakpoints.cast;
       break;
     case "taggedImages":
-      breakpointsOption = carouselBreakpoints.taggedImages
+      breakpointsOption = carouselBreakpoints.taggedImages;
       break;
     default:
       breakpointsOption = carouselBreakpoints.default;
@@ -210,21 +207,21 @@ export default function ImageCarousel({
   }
 
   const handleBreakpointChange = (event: SwiperCore) => {
-    if (event.currentBreakpoint <= 900)
-      swiperRef.current?.disable()
-    else if (event.currentBreakpoint > 900)
-      swiperRef.current?.enable()
-  }
+    if (event.currentBreakpoint <= 900) swiperRef.current?.disable();
+    else if (event.currentBreakpoint > 900) swiperRef.current?.enable();
+  };
 
   return (
     <div className={`${className ?? ""}`}>
-      <div className="space-x-2 flex justify-between ">
-        {title ? title :
-          <h2 className={`text-xl sm:text-2xl font-bold sm:pl-2 pr-2`}>
+      <div className="flex justify-between space-x-2">
+        {title ? (
+          title
+        ) : (
+          <h2 className={`pr-2 text-xl font-bold sm:pl-2 sm:text-2xl`}>
             {titleString}
           </h2>
-        }
-        <div className={`whitespace-nowrap lg:flex hidden pr-5`}>
+        )}
+        <div className={`hidden whitespace-nowrap pr-5 lg:flex`}>
           <Button
             size="icon"
             variant="ghost"
@@ -262,15 +259,11 @@ export default function ImageCarousel({
         breakpoints={breakpointsOption}
         lazyPreloadPrevNext={3}
         modules={[Navigation, FreeMode, Virtual]}
-        className="mySwiper min-w-[500px] sm:min-w-[768px] !pl-2 !-ml-2"
+        className="mySwiper !-ml-2 min-w-[500px] !pl-2 sm:min-w-[768px]"
         watchSlidesProgress={true}
       >
         {items.map((item: ReactNode, i: number) => (
-          <SwiperSlide
-            key={i}
-            className={`group py-2 px-0`}
-            virtualIndex={i}
-          >
+          <SwiperSlide key={i} className={`group px-0 py-2`} virtualIndex={i}>
             {item}
           </SwiperSlide>
         ))}

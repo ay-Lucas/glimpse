@@ -20,9 +20,7 @@ export default function CastCard({
 }: CastCardProps) {
   return (
     <div
-      className={`${className} 
-                  select-none rounded-full shadow-xl 
-                  transition-transform duration-150 group-hover:scale-110 justify-center w-fit`}
+      className={`${className} w-fit select-none justify-center rounded-full shadow-xl transition-transform duration-150 group-hover:scale-110`}
     >
       {imagePath ? (
         <Image
@@ -40,12 +38,12 @@ export default function CastCard({
           className="rounded-md object-cover"
         />
       ) : (
-        <div className="w-[150px] h-[225px] bg-gray-200 rounded-md" />
+        <div className="h-[225px] w-[150px] rounded-md bg-gray-200" />
       )}
 
       <div className="mt-2 text-start">
-        <p className="font-semibold text-sm line-clamp-1">{name}</p>
-        <p className="text-sm text-gray-500 line-clamp-1">as {character}</p>
+        <p className="line-clamp-1 text-sm font-semibold">{name}</p>
+        <p className="line-clamp-1 text-sm text-gray-500">as {character}</p>
       </div>
     </div>
   );

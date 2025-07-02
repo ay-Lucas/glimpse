@@ -58,7 +58,7 @@ export function ScoreCircle({
         y="53%"
         dominantBaseline="middle"
         textAnchor="middle"
-        className="text-md font-medium fill-gray-300"
+        className="text-md fill-gray-300 font-medium"
       >
         {percentage}%
       </text>

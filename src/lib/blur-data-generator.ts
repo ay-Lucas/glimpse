@@ -1,4 +1,9 @@
-import { MovieResult, TvResult, Cast, Episode } from "@/types/request-types-snakecase";
+import {
+  MovieResult,
+  TvResult,
+  Cast,
+  Episode,
+} from "@/types/request-types-snakecase";
 import { getPlaiceholder } from "plaiceholder";
 import { BaseImageUrl, DEFAULT_BLUR_DATA_URL, options } from "./constants";
 // import { cache } from "react";
@@ -22,14 +27,14 @@ export const getBlurData = async (src: string) => {
     }
     return DEFAULT_BLUR_DATA_URL;
   }
-}
+};
 
 // export const getBlurDataCached = cache(getBlurData);
 
 export const appendBlurDataToMediaArray = async (
   items: Array<MovieResult | TvResult | Cast | Episode>,
   baseImageUrl: BaseImageUrl,
-  imagePathArray: Array<String | undefined | null>,
+  imagePathArray: Array<String | undefined | null>
 ) => {
   const itemsWithBlur = await Promise.all(
     items.map(async (item, index) => {
@@ -50,8 +55,8 @@ export const appendBlurDataToMediaArray = async (
         ...item,
         blurDataURL: blurDataURL,
       };
-    }),
+    })
   );
 
   return itemsWithBlur;
-}
+};

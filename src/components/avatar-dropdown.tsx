@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { Github, LogOut, LucideList, Settings } from "lucide-react";
 import {
@@ -33,16 +33,16 @@ export function AvatarDropdown() {
         {session?.user && (
           <>
             <DropdownMenuItem>
-              <p className="w-full h-full px-2 py-1.5">{session.user.email}</p>
+              <p className="h-full w-full px-2 py-1.5">{session.user.email}</p>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
           </>
         )}
         <DropdownMenuItem>
-          <Link href={"/watchlist"} className="w-full h-full">
+          <Link href={"/watchlist"} className="h-full w-full">
             <button
               type="submit"
-              className="flex px-2 py-1.5 w-full focus:bg-accent"
+              className="flex w-full px-2 py-1.5 focus:bg-accent"
             >
               <LucideList className="mr-2 h-4 w-4" />
               Watchlist
@@ -51,10 +51,10 @@ export function AvatarDropdown() {
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem disabled>
-          <Link href="/settings" className="w-full h-full">
+          <Link href="/settings" className="h-full w-full">
             <button
               type="submit"
-              className="flex px-2 py-1.5 w-full focus:bg-accent"
+              className="flex w-full px-2 py-1.5 focus:bg-accent"
             >
               <Settings className="mr-2 h-4 w-4" />
               Settings
@@ -65,11 +65,11 @@ export function AvatarDropdown() {
         <DropdownMenuItem>
           <Link
             href={"https://github.com/ay-lucas/glimpse"}
-            className="w-full h-full"
+            className="h-full w-full"
           >
             <button
               type="submit"
-              className="flex px-2 py-1.5 w-full focus:bg-accent"
+              className="flex w-full px-2 py-1.5 focus:bg-accent"
             >
               <Github className="mr-2 h-4 w-4" />
               Github

@@ -8,6 +8,6 @@ export const PUBLIC_ROUTES = [
   "/signup",
   "/movie",
   "/tv",
-  "/person"
+  "/person",
 ];
 export const DEFAULT_REDIRECT = "/protected";

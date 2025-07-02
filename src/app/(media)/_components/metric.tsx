@@ -16,5 +16,3 @@ export default function Metric({ href, Icon, value, count }: MetricProps) {
     </div>
   );
 }
-
-

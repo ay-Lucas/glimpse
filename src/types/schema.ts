@@ -25,7 +25,7 @@ export const signupSchema = z.object({
   name: z
     .string()
     .trim()
-    .min(1, { message: "Name must have at least 1 character" })
+    .min(1, { message: "Name must have at least 1 character" }),
 });
 
 export const watchlistNameSchema = z.object({

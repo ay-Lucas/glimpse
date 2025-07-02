@@ -25,7 +25,7 @@ import {
   PersonMovieCreditsResponse,
   TvExternalIdsResponse,
   PersonExternalIdsResponse,
-  MovieExternalIdsResponse
+  MovieExternalIdsResponse,
 } from "./request-types-camelcase";
 
 export interface CardTypes {
@@ -76,15 +76,15 @@ export interface WatchlistItemI {
 }
 
 export interface GroupedProvider {
-  provider: string;                   // “Amazon Prime Video”
-  name: string;                   // same as provider, or display name
-  link: string;                   // watch URL
-  icon: string;                   // logo URL
-  types: string[];                 // e.g. ["FLATRATE","ADS"]
-  priceByType: Record<string, string>;    // e.g. { FLATRATE: "", ADS: "" }
-  resolutionsByType: Record<string, string[]>;// e.g. { FLATRATE: ["SD","HD","_4K"], ADS: ["SD","HD"] }
-  audioByType?: Record<string, string[]>;  // if you want per‐type audio lists
-  subtitleByType?: Record<string, string[]>;  // likewise for subtitles
+  provider: string; // “Amazon Prime Video”
+  name: string; // same as provider, or display name
+  link: string; // watch URL
+  icon: string; // logo URL
+  types: string[]; // e.g. ["FLATRATE","ADS"]
+  priceByType: Record<string, string>; // e.g. { FLATRATE: "", ADS: "" }
+  resolutionsByType: Record<string, string[]>; // e.g. { FLATRATE: ["SD","HD","_4K"], ADS: ["SD","HD"] }
+  audioByType?: Record<string, string[]>; // if you want per‐type audio lists
+  subtitleByType?: Record<string, string[]>; // likewise for subtitles
 }
 
 export interface JustWatchInfo {
@@ -103,8 +103,8 @@ export interface JustWatchInfo {
 }
 
 export interface MediaTitle extends DiscoverItem {
-  justWatchInfo: JustWatchInfo
-};
+  justWatchInfo: JustWatchInfo;
+}
 
 export type DiscoverItem = {
   tmdbId: number;
@@ -113,7 +113,7 @@ export type DiscoverItem = {
   backdropPath?: string;
   posterBlurDataUrl?: string;
   overview?: string;
-  mediaType: "tv" | "movie"
+  mediaType: "tv" | "movie";
 };
 
 export type FullMovie = {
@@ -143,12 +143,12 @@ export type FullMovie = {
   revenue?: number | null;
   runtime?: number | null;
   status?:
-  | "Rumored"
-  | "Planned"
-  | "In Production"
-  | "Post Production"
-  | "Released"
-  | "Canceled";
+    | "Rumored"
+    | "Planned"
+    | "In Production"
+    | "Post Production"
+    | "Released"
+    | "Canceled";
   tagline?: string | null;
   homepage?: string | null;
   genres?: Array<Genre>;
@@ -164,7 +164,7 @@ export type FullMovie = {
   videos: VideosResponse;
   credits?: CreditsResponse;
   watchProviders?: WatchProviderResponse;
-  externalIds?: MovieExternalIdsResponse
+  externalIds?: MovieExternalIdsResponse;
   // media_type: "tv"; // Not provided by api
 };
 
@@ -215,14 +215,14 @@ export type FullTv = {
   // e.g. { results: RatingResponse[] }
   spokenLanguages?: Array<SpokenLanguage>;
   contentRatings?: { results: RatingResponse[] };
-  externalIds?: TvExternalIdsResponse
+  externalIds?: TvExternalIdsResponse;
 };
 
 export interface FullPerson extends Person {
-  combinedCredits: PersonCombinedCreditsResponse
-  images: PersonImagesResponse
-  taggedImages: PersonTaggedImagesResponse
-  tvCredits: PersonTvCreditsResponse
-  movieCredits: PersonMovieCreditsResponse
-  externalIds?: PersonExternalIdsResponse
-};
+  combinedCredits: PersonCombinedCreditsResponse;
+  images: PersonImagesResponse;
+  taggedImages: PersonTaggedImagesResponse;
+  tvCredits: PersonTvCreditsResponse;
+  movieCredits: PersonMovieCreditsResponse;
+  externalIds?: PersonExternalIdsResponse;
+}

@@ -23,13 +23,12 @@ import { movieSummaries } from "@/db/schema";
 import { tvSummaries } from "@/db/schema";
 import { DiscoverItem } from "@/types/camel-index";
 
-
 const LIMIT = 10;
 const WINDOW = 60_000;
 
 export async function deleteItemFromWatchlist(
   watchlistId: string,
-  watchlistItemId: string,
+  watchlistItemId: string
 ) {
   await deleteWatchlistItem(watchlistId, watchlistItemId);
 }
@@ -37,7 +36,7 @@ export async function deleteItemFromWatchlist(
 export async function addMovieToWatchlist(
   watchlistId: string,
   data: FullMovie,
-  rating: string,
+  rating: string
 ) {
   const result = await db
     .insert(watchlistItems)
@@ -66,7 +65,7 @@ export async function addMovieToWatchlist(
 export async function addTvToWatchlist(
   watchlistId: string,
   data: FullTv,
-  rating: string,
+  rating: string
 ) {
   const result = await db
     .insert(watchlistItems)
@@ -110,7 +109,7 @@ export async function createWatchlist(userId: string, watchlistName: string) {
  */
 export async function deleteWatchlistItem(
   watchlistId: string,
-  watchlistItemId: string | number,
+  watchlistItemId: string | number
 ) {
   const result = await db
     .delete(watchlistItems)
@@ -119,8 +118,8 @@ export async function deleteWatchlistItem(
         eq(watchlistItems.watchlistId, watchlistId),
         typeof watchlistItemId === "string"
           ? eq(watchlistItems.itemId, watchlistItemId)
-          : eq(watchlistItems.tmdbId, watchlistItemId),
-      ),
+          : eq(watchlistItems.tmdbId, watchlistItemId)
+      )
     )
     .returning();
   return result;
@@ -128,15 +127,15 @@ export async function deleteWatchlistItem(
 
 export async function deleteWatchlistItemTmdbId(
   watchlistId: string,
-  tmdbId: number,
+  tmdbId: number
 ) {
   const result = await db
     .delete(watchlistItems)
     .where(
       and(
         eq(watchlistItems.watchlistId, watchlistId),
-        eq(watchlistItems.tmdbId, tmdbId),
-      ),
+        eq(watchlistItems.tmdbId, tmdbId)
+      )
     )
     .returning();
   return result;
@@ -184,7 +183,7 @@ export async function addToDefaultWatchlist(
   userId: string,
   data: FullTv | FullMovie,
   rating: string,
-  mediaType: "tv" | "movie",
+  mediaType: "tv" | "movie"
 ) {
   try {
     let defaultWatchlist;
@@ -196,7 +195,7 @@ export async function addToDefaultWatchlist(
     const existingItem = await getWatchlistItem(
       userId,
       defaultWatchlist?.id!,
-      data.id,
+      data.id
     );
     if (existingItem.length > 0) {
       console.log("Item already exists");
@@ -208,20 +207,20 @@ export async function addToDefaultWatchlist(
         result = await addMovieToWatchlist(
           defaultWatchlist?.id!,
           data as FullMovie,
-          rating,
+          rating
         );
         break;
       case "tv":
         result = await addTvToWatchlist(
           defaultWatchlist?.id!,
           data as FullTv,
-          rating,
+          rating
         );
         break;
       default:
         result = null;
         console.error(
-          `Failed to add ${(data as any).name || (data as any).title} to default watchlist`,
+          `Failed to add ${(data as any).name || (data as any).title} to default watchlist`
         );
     }
     return result;
@@ -233,7 +232,7 @@ export async function addToDefaultWatchlist(
 export async function setWatchlistName(
   userId: string,
   watchlistId: string,
-  newWatchlistName: string,
+  newWatchlistName: string
 ) {
   const validatedFields = watchlistNameSchema.safeParse({
     name: newWatchlistName,
@@ -317,7 +316,7 @@ async function getWatchlistItems(userId: string, watchlistId: string) {
 async function getWatchlistItem(
   userId: string,
   watchlistId: string,
-  tmdbId: number,
+  tmdbId: number
 ) {
   const items = await db
     .select({
@@ -341,14 +340,14 @@ async function getWatchlistItem(
     .from(watchlistItems)
     .leftJoin(watchlist, eq(watchlistItems.watchlistId, watchlistId)) // Corrected join syntax with eq
     .where(
-      and(eq(watchlist.userId, userId), eq(watchlistItems.tmdbId, tmdbId)),
+      and(eq(watchlist.userId, userId), eq(watchlistItems.tmdbId, tmdbId))
     ); // where expects a single condition argument
 
   return items;
 }
 export async function getWatchlist(
   userId: string,
-  watchlistId: string,
+  watchlistId: string
 ): Promise<WatchlistSchemaI[]> {
   const items = await db
     .select({
@@ -365,7 +364,7 @@ export async function getWatchlist(
 }
 
 export async function getWatchlists(
-  userId: string,
+  userId: string
 ): Promise<WatchlistSchemaI[]> {
   const items = await db
     .select({
@@ -381,7 +380,7 @@ export async function getWatchlists(
 }
 
 export async function getWatchlistsAndItems(
-  userId: string,
+  userId: string
 ): Promise<WatchlistI[]> {
   // Get the user's watchlists
   const watchlistsRes = await getWatchlists(userId);
@@ -449,7 +448,7 @@ export async function getAllTv(): Promise<DiscoverItem[] | undefined> {
         title: tvSummaries.name,
         posterBlurDataUrl: tvSummaries.posterBlurDataUrl,
       })
-      .from(tvSummaries)
+      .from(tvSummaries);
 
     return rows.map((r) => ({
       tmdbId: r.tmdbId,
@@ -457,9 +456,8 @@ export async function getAllTv(): Promise<DiscoverItem[] | undefined> {
       title: r.title,
       posterBlurDataUrl: r.posterBlurDataUrl ?? undefined,
     }));
-  }
-  catch (err) {
-    console.error("Error fetching backfilled TV Shows from DB")
+  } catch (err) {
+    console.error("Error fetching backfilled TV Shows from DB");
   }
 }
 
@@ -472,7 +470,7 @@ export async function getAllMovies(): Promise<DiscoverItem[] | undefined> {
         posterBlurDataUrl: movieSummaries.posterBlurDataUrl,
         backdropPath: movieSummaries.backdropPath,
       })
-      .from(movieSummaries)
+      .from(movieSummaries);
 
     return rows.map((r) => ({
       tmdbId: r.tmdbId,
@@ -481,46 +479,49 @@ export async function getAllMovies(): Promise<DiscoverItem[] | undefined> {
       posterBlurDataUrl: r.posterBlurDataUrl ?? undefined,
       backdropPath: r.backdropPath ?? undefined,
     }));
-  }
-  catch (err) {
-    console.error("Error fetching backfilled Movies from DB")
+  } catch (err) {
+    console.error("Error fetching backfilled Movies from DB");
   }
 }
 
 export const getAllDiscoverTitles = async () => {
   const [tvRows, movieRows] = await Promise.all([getAllMovies(), getAllTv()]);
-  return [...tvRows ?? [], ...movieRows ?? []]
-}
+  return [...(tvRows ?? []), ...(movieRows ?? [])];
+};
 
-export const getJustWatchInfoFromDb = async (tmdbId: number, mediaType: "tv" | "movie") => {
+export const getJustWatchInfoFromDb = async (
+  tmdbId: number,
+  mediaType: "tv" | "movie"
+) => {
   try {
     if (mediaType === "movie") {
       const rows = await db
         .select({
-          justWatchInfo: movieSummaries.justWatchInfo
+          justWatchInfo: movieSummaries.justWatchInfo,
         })
         .from(movieSummaries)
         .where(and(eq(movieSummaries.tmdbId, tmdbId)))
-        .limit(1)
+        .limit(1);
 
-      return rows[0] as JustWatchInfo | undefined
-
+      return rows[0] as JustWatchInfo | undefined;
     } else if (mediaType === "tv") {
       const rows = await db
         .select({
-          justWatchInfo: tvSummaries.justWatchInfo
+          justWatchInfo: tvSummaries.justWatchInfo,
         })
         .from(tvSummaries)
         .where(and(eq(tvSummaries.tmdbId, tmdbId)))
-        .limit(1)
+        .limit(1);
 
-      return rows[0] as JustWatchInfo | undefined
+      return rows[0] as JustWatchInfo | undefined;
     }
+  } catch (err) {
+    console.error(
+      `Error fetching backfilled JustWatchInfo from DB. ${mediaType}/${tmdbId}\n`,
+      err
+    );
   }
-  catch (err) {
-    console.error(`Error fetching backfilled JustWatchInfo from DB. ${mediaType}/${tmdbId}\n`, err)
-  }
-}
+};
 
 export async function isRateLimited(ip: string, route: string) {
   const now = Date.now();
@@ -537,7 +538,7 @@ export async function isRateLimited(ip: string, route: string) {
 
     if (now - last < lockoutTime) {
       console.warn(
-        `[RateLimit] IP ${ip} is currently locked out for ${lockoutTime / 1000}s (violation count: ${violation.count})`,
+        `[RateLimit] IP ${ip} is currently locked out for ${lockoutTime / 1000}s (violation count: ${violation.count})`
       );
       return false; // still locked out
     }
@@ -548,13 +549,13 @@ export async function isRateLimited(ip: string, route: string) {
     where: and(
       eq(rateLimitLog.ip, ip),
       eq(rateLimitLog.route, route),
-      gt(rateLimitLog.createdAt, cutoff),
+      gt(rateLimitLog.createdAt, cutoff)
     ),
   });
 
   if (recentRequests.length >= LIMIT) {
     console.warn(
-      `[RateLimit] IP ${ip} exceeded limit (${LIMIT} reqs in ${WINDOW / 1000}s) on route ${route}`,
+      `[RateLimit] IP ${ip} exceeded limit (${LIMIT} reqs in ${WINDOW / 1000}s) on route ${route}`
     );
 
     // Log or escalate violation

@@ -11,7 +11,7 @@ export default async function Layout({ children }: { children: ReactNode }) {
   return (
     <main className="min-h-screen">
       {/* <div className="-z-40 absolute flex left-0 top-0 h-full w-full items-center"> */}
-      <div className="min-h-screen w-full flex flex-col justify-center items-center text-center pb-20 px-4 bg-gradient-to-t from-background from-35% via-background/95 via-40% to-transparent">
+      <div className="flex min-h-screen w-full flex-col items-center justify-center bg-gradient-to-t from-background from-35% via-background/95 via-40% to-transparent px-4 pb-20 text-center">
         {backdropPaths && backdropPaths[0] && (
           <Backdrops
             images={backdropPaths}
@@ -19,7 +19,7 @@ export default async function Layout({ children }: { children: ReactNode }) {
           />
         )}
       </div>
-      <div className="absolute flex left-0 top-0 h-full w-full items-center justify-center">
+      <div className="absolute left-0 top-0 flex h-full w-full items-center justify-center">
         {children}
       </div>
     </main>

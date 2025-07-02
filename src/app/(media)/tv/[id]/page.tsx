@@ -1,4 +1,8 @@
-import { fetchDiscoverTvIds, fetchTvDetails, getRecommendations } from "@/app/(media)/actions";
+import {
+  fetchDiscoverTvIds,
+  fetchTvDetails,
+  getRecommendations,
+} from "@/app/(media)/actions";
 import Link from "next/link";
 import { Video } from "@/types/request-types-snakecase";
 import { Suspense } from "react";
@@ -19,13 +23,13 @@ import { Separator } from "@radix-ui/react-dropdown-menu";
 
 function getTrailer(videoArray: Array<Video>) {
   const trailer: Array<Video> = videoArray.filter(
-    (video) => video.type === "Trailer",
+    (video) => video.type === "Trailer"
   );
   if (trailer?.length !== 0) {
     return trailer[0];
   } else {
     const teaser: Array<Video> = videoArray.filter(
-      (video) => video.type === "Teaser",
+      (video) => video.type === "Teaser"
     );
     return teaser[0];
   }
@@ -34,7 +38,7 @@ function getTrailer(videoArray: Array<Video>) {
 // Generate all TV pages featured on Discover page (and their recommendations) at build
 export async function generateStaticParams() {
   const tvIds = await fetchDiscoverTvIds();
-  const rawTvIds = tvIds.map(item => item.id);
+  const rawTvIds = tvIds.map((item) => item.id);
 
   if (process.env.IS_LOCALHOST === "true") {
     return tvIds;
@@ -44,8 +48,8 @@ export async function generateStaticParams() {
     tvIds.map((item) => getRecommendations(Number(item.id), "tv"))
   );
 
-  const recIds = recResponses.flatMap((res) =>
-    res?.results?.map((m) => m.id) ?? []
+  const recIds = recResponses.flatMap(
+    (res) => res?.results?.map((m) => m.id) ?? []
   );
 
   const uniqueIds = Array.from(new Set([...rawTvIds, ...recIds]));
@@ -57,15 +61,14 @@ export default async function TvPage({ params }: { params: { id: number } }) {
   const tmdbId = Number(params.id);
   const tv = await fetchTvDetails(tmdbId);
 
-  if (!tv)
-    throw new Error("fetchTvDetails returned undefined");
+  if (!tv) throw new Error("fetchTvDetails returned undefined");
 
   let videoPath;
   if (tv.videos !== undefined && tv.videos.results)
     videoPath = getTrailer(tv.videos.results)?.key;
   const rating =
     tv.contentRatings?.results.filter(
-      (item) => item.iso31661 === "US" && item.rating !== "",
+      (item) => item.iso31661 === "US" && item.rating !== ""
     )[0]?.rating ?? "";
 
   const isReleased: boolean =
@@ -83,8 +86,8 @@ export default async function TvPage({ params }: { params: { id: number } }) {
         <>
           <div className="h-full w-full overflow-x-hidden pb-20">
             <div className="h-[6vh] md:h-[10vh]"></div>
-            <div className="relative px-3 md:container items-end pt-16">
-              <div className="items-end md:pt-0 px-0 lg:px-24 space-y-5">
+            <div className="relative items-end px-3 pt-16 md:container">
+              <div className="items-end space-y-5 px-0 md:pt-0 lg:px-24">
                 <section>
                   <MediaHeader
                     rating={rating}
@@ -112,45 +115,74 @@ export default async function TvPage({ params }: { params: { id: number } }) {
                     mediaType="tv"
                   />
                 </section>
-                <section className="grid gap-4 grid-cols-[repeat(auto-fit,_minmax(0,_1fr))]">
+                <section className="grid grid-cols-[repeat(auto-fit,_minmax(0,_1fr))] gap-4">
                   <MediaDetails items={detailItems} />
-                  <Suspense fallback={<Skeleton className="w-full h-[356px] rounded-xl" />}>
-                    <MediaProviders tmdbWatchProviders={tv.watchProviders} mediaType="tv" releaseDate={tv.firstAirDate ?? null} title={tv.name} tmdbId={tv.id} />
+                  <Suspense
+                    fallback={
+                      <Skeleton className="h-[356px] w-full rounded-xl" />
+                    }
+                  >
+                    <MediaProviders
+                      tmdbWatchProviders={tv.watchProviders}
+                      mediaType="tv"
+                      releaseDate={tv.firstAirDate ?? null}
+                      title={tv.name}
+                      tmdbId={tv.id}
+                    />
                   </Suspense>
                 </section>
                 {/* <section> */}
-                <section className="space-y-10 media-card">
+                <section className="media-card space-y-10">
                   {tv.numberOfSeasons && tv.numberOfSeasons > 0 && (
-                    <Link href={`/tv/${params.id}/seasons`} className="flex items-end hover:text-gray-400">
-                      <h2 className="text-2xl font-bold">Season{tv.numberOfSeasons > 1 && "s"} ({tv.numberOfSeasons})</h2>
+                    <Link
+                      href={`/tv/${params.id}/seasons`}
+                      className="flex items-end hover:text-gray-400"
+                    >
+                      <h2 className="text-2xl font-bold">
+                        Season{tv.numberOfSeasons > 1 && "s"} (
+                        {tv.numberOfSeasons})
+                      </h2>
                       <ChevronRight size={30} />
                     </Link>
                   )}
                 </section>
                 {tv.credits?.cast && tv.credits.cast.length > 0 && (
                   <>
-                    <section className="space-y-10 media-card">
-                      <Link href={`/tv/${params.id}/credits`} className="flex items-end hover:text-gray-400">
-                        <h2 className={`text-2xl font-bold`}>All Cast and Crew</h2>
+                    <section className="media-card space-y-10">
+                      <Link
+                        href={`/tv/${params.id}/credits`}
+                        className="flex items-end hover:text-gray-400"
+                      >
+                        <h2 className={`text-2xl font-bold`}>
+                          All Cast and Crew
+                        </h2>
                         <ChevronRight size={30} />
                       </Link>
                     </section>
-                    <Suspense fallback={<Skeleton className="w-full h-[356px] rounded-xl" />}>
+                    <Suspense
+                      fallback={
+                        <Skeleton className="h-[356px] w-full rounded-xl" />
+                      }
+                    >
                       <section className="media-card">
                         <ImageCarousel
-                          title={<h2 className={`text-2xl font-bold`}>Top Cast</h2>}
-                          items={tv.credits.cast?.splice(0, 10).map((item, index: number) => (
-                            <Link href={`/person/${item.id}`} key={index}>
-                              <CastCard
-                                name={item.name}
-                                character={item.character}
-                                imagePath={item.profilePath}
-                                index={index}
-                                blurDataURL={DEFAULT_BLUR_DATA_URL}
-                                className="pt-2"
-                              />
-                            </Link>
-                          ))}
+                          title={
+                            <h2 className={`text-2xl font-bold`}>Top Cast</h2>
+                          }
+                          items={tv.credits.cast
+                            ?.splice(0, 10)
+                            .map((item, index: number) => (
+                              <Link href={`/person/${item.id}`} key={index}>
+                                <CastCard
+                                  name={item.name}
+                                  character={item.character}
+                                  imagePath={item.profilePath}
+                                  index={index}
+                                  blurDataURL={DEFAULT_BLUR_DATA_URL}
+                                  className="pt-2"
+                                />
+                              </Link>
+                            ))}
                           breakpoints="cast"
                         />
                       </section>
@@ -158,7 +190,9 @@ export default async function TvPage({ params }: { params: { id: number } }) {
                   </>
                 )}
                 <Suspense
-                  fallback={<Skeleton className="w-full h-[356px] rounded-xl" />}
+                  fallback={
+                    <Skeleton className="h-[356px] w-full rounded-xl" />
+                  }
                 >
                   <RecommededSection
                     isReleased={isReleased}
@@ -168,12 +202,13 @@ export default async function TvPage({ params }: { params: { id: number } }) {
                   />
                 </Suspense>
                 <Suspense
-                  fallback={<Skeleton className="w-full h-[194px] rounded-xl" />}>
+                  fallback={
+                    <Skeleton className="h-[194px] w-full rounded-xl" />
+                  }
+                >
                   <ReviewSection id={tmdbId} type={"tv"} />
                 </Suspense>
-
               </div>
-
             </div>
           </div>
 

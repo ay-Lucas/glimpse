@@ -1,15 +1,18 @@
-import Link from "next/link"
-import { DetailItem } from "../../_components/media-details"
-import { Expandable } from "../../_components/expandable"
-import { FullMovie } from "@/types/camel-index"
-import { countryCodeToEnglishName, languageCodeToEnglishName } from "@/lib/utils"
-import { ExternalLink } from "lucide-react"
+import Link from "next/link";
+import { DetailItem } from "../../_components/media-details";
+import { Expandable } from "../../_components/expandable";
+import { FullMovie } from "@/types/camel-index";
+import {
+  countryCodeToEnglishName,
+  languageCodeToEnglishName,
+} from "@/lib/utils";
+import { ExternalLink } from "lucide-react";
 
 export function buildMovieDetailItems(movie: FullMovie): DetailItem[] {
-  const items: DetailItem[] = []
+  const items: DetailItem[] = [];
 
   // 1) Directors
-  const directors = movie.credits?.crew?.filter(c => c.job === "Director")
+  const directors = movie.credits?.crew?.filter((c) => c.job === "Director");
   if (directors && directors.length > 0) {
     const directorTags = directors.map((d, i) => (
       <Link
@@ -20,15 +23,15 @@ export function buildMovieDetailItems(movie: FullMovie): DetailItem[] {
         {d.name}
         {i < directors.length - 1 ? ", " : ""}
       </Link>
-    ))
+    ));
     items.push({
       label: "Directors",
       value: <Expandable lineHeight={17}>{directorTags}</Expandable>,
-    })
+    });
   }
 
   // 2) Producers
-  const producers = movie.credits?.crew?.filter(c => c.job === "Producer")
+  const producers = movie.credits?.crew?.filter((c) => c.job === "Producer");
   if (producers && producers.length > 0) {
     const producerTags = producers.map((p, i) => (
       <Link
@@ -39,15 +42,15 @@ export function buildMovieDetailItems(movie: FullMovie): DetailItem[] {
         {p.name}
         {i < producers.length - 1 ? ", " : ""}
       </Link>
-    ))
+    ));
     items.push({
       label: "Producers",
       value: <Expandable lineHeight={17}>{producerTags}</Expandable>,
-    })
+    });
   }
 
   // 3) Writers
-  const writers = movie.credits?.crew?.filter(c => c.job === "Writer")
+  const writers = movie.credits?.crew?.filter((c) => c.job === "Writer");
   if (writers && writers.length > 0) {
     const writerTags = writers.map((w, i) => (
       <Link
@@ -58,11 +61,11 @@ export function buildMovieDetailItems(movie: FullMovie): DetailItem[] {
         {w.name}
         {i < writers.length - 1 ? ", " : ""}
       </Link>
-    ))
+    ));
     items.push({
       label: "Writers",
       value: <Expandable lineHeight={17}>{writerTags}</Expandable>,
-    })
+    });
   }
 
   // 4) Revenue & Budget
@@ -70,23 +73,26 @@ export function buildMovieDetailItems(movie: FullMovie): DetailItem[] {
     items.push({
       label: "Revenue",
       value: `$${movie.revenue.toLocaleString()}`,
-    })
+    });
   }
   if (movie.budget && movie.budget > 0) {
     items.push({
       label: "Budget",
       value: `$${movie.budget.toLocaleString()}`,
-    })
+    });
   }
 
   // 6) Popularity
   if (movie.popularity != null && movie.popularity > 0) {
-    const popularity = movie.popularity > 1 ? Math.round(movie.popularity) : movie.popularity.toFixed(3)
+    const popularity =
+      movie.popularity > 1
+        ? Math.round(movie.popularity)
+        : movie.popularity.toFixed(3);
 
     items.push({
       label: "Popularity",
       value: popularity,
-    })
+    });
   }
 
   // 7) Language
@@ -94,7 +100,7 @@ export function buildMovieDetailItems(movie: FullMovie): DetailItem[] {
     items.push({
       label: "Language",
       value: languageCodeToEnglishName(movie.originalLanguage),
-    })
+    });
   }
 
   // 8) Origin country
@@ -105,47 +111,53 @@ export function buildMovieDetailItems(movie: FullMovie): DetailItem[] {
         .map(countryCodeToEnglishName)
         .filter(Boolean)
         .join(", "),
-    })
+    });
   }
   if (movie.homepage) {
     items.push({
       label: "Homepage",
-      value: <a
-        href={movie.homepage}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="inline-flex items-center text-sm font-medium text-blue-400 hover:text-blue-300 hover:underline"
-      >
-        Official Site
-        <ExternalLink className="ml-1 h-4 w-4" />
-      </a>
-    })
+      value: (
+        <a
+          href={movie.homepage}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center text-sm font-medium text-blue-400 hover:text-blue-300 hover:underline"
+        >
+          Official Site
+          <ExternalLink className="ml-1 h-4 w-4" />
+        </a>
+      ),
+    });
   }
 
   if (movie.spokenLanguages?.length) {
     items.push({
       label: "Spoken Languages",
-      value: movie.spokenLanguages.map(item => languageCodeToEnglishName(item.iso6391 ?? "")).join(', ')
-    })
+      value: movie.spokenLanguages
+        .map((item) => languageCodeToEnglishName(item.iso6391 ?? ""))
+        .join(", "),
+    });
   }
 
   if (movie.productionCountries?.length) {
     items.push({
       label: "Production Countries",
-      value: movie.productionCountries.map(item => countryCodeToEnglishName(item.iso31661 ?? "")).join(", ")
-    })
+      value: movie.productionCountries
+        .map((item) => countryCodeToEnglishName(item.iso31661 ?? ""))
+        .join(", "),
+    });
   }
 
   if (movie.productionCompanies?.length) {
     items.push({
-      label: 'Production Companies',
+      label: "Production Companies",
       value: (
         <div className="flex flex-wrap items-center space-x-4 pt-1">
-          {movie.productionCompanies.map(c => c.name).join((' • '))}
+          {movie.productionCompanies.map((c) => c.name).join(" • ")}
         </div>
-      )
-    })
+      ),
+    });
   }
 
-  return items
+  return items;
 }

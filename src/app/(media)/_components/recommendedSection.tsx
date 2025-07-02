@@ -8,7 +8,7 @@ function validateRecommended(
   type: "movie" | "tv",
   recommendedRating: string,
   rating: string,
-  item: MovieResult | TvResult | undefined,
+  item: MovieResult | TvResult | undefined
 ) {
   let isValid;
   const tvRatings = ["TV-Y", "TV-Y7", "TV-G", "TV-PG", "TV-14", "TV-MA"];
@@ -19,13 +19,13 @@ function validateRecommended(
   else if (type === "movie") {
     const ratingIndex = movieRatings.findIndex((element) => element === rating);
     const recommendedIndex = movieRatings.findIndex(
-      (element) => element === recommendedRating,
+      (element) => element === recommendedRating
     );
     isValid = Math.abs(ratingIndex - recommendedIndex) <= 1;
   } else if (type === "tv") {
     const ratingIndex = tvRatings.findIndex((element) => element === rating);
     const recommendedIndex = tvRatings.findIndex(
-      (element) => element === recommendedRating,
+      (element) => element === recommendedRating
     );
     isValid = Math.abs(ratingIndex - recommendedIndex) <= 1;
   }
@@ -40,7 +40,7 @@ function validateRecommended(
 async function getValidRecommendations(
   type: "movie" | "tv",
   rating: string,
-  itemArray: Array<TvResult | MovieResult>,
+  itemArray: Array<TvResult | MovieResult>
 ) {
   const result = [];
   for (let i = 0; i < itemArray.length; i++) {
@@ -74,7 +74,7 @@ export async function RecommededSection({
       if (!res) return;
       res.media_type = item.media_type;
       return res;
-    }),
+    })
   );
 
   if (
@@ -107,7 +107,7 @@ export async function RecommededSection({
   const filteredRecommendations = await getValidRecommendations(
     mediaType,
     rating,
-    recommendations,
+    recommendations
   );
 
   return (

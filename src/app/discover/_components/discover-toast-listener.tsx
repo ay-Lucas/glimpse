@@ -11,8 +11,7 @@ export function ToastListener() {
 
   useEffect(() => {
     if (justSignedIn) {
-      toast(
-        "Welcome back!", {
+      toast("Welcome back!", {
         description: "You’ve successfully signed in.",
       });
 

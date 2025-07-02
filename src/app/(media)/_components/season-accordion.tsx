@@ -24,7 +24,7 @@ export function SeasonAccordion({
     <Accordion
       type="single"
       collapsible
-      className="bg-secondary/40 rounded-2xl px-3"
+      className="rounded-2xl bg-secondary/40 px-3"
     >
       <AccordionItem value="item-1" className="text-lg">
         <AccordionTrigger>Season {number}</AccordionTrigger>
@@ -40,7 +40,7 @@ export function SeasonAccordion({
                     src={`${BASE_POSTER_IMAGE_URL}${item.still_path}`}
                     alt={`Item image`}
                     quality={75}
-                    className={`object-cover pb-2 rounded-xl`}
+                    className={`rounded-xl object-cover pb-2`}
                     blurDataURL={(item as any).blurDataURL}
                     loading="lazy"
                     placeholder="blur"

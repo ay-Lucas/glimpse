@@ -56,7 +56,7 @@ function DeleteWatchlistItem({
   return (
     <button
       onClick={handleDelete}
-      className="flex px-2 py-1.5 w-full focus:bg-accent"
+      className="flex w-full px-2 py-1.5 focus:bg-accent"
     >
       Delete
     </button>

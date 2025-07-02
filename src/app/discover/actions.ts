@@ -10,24 +10,30 @@ import {
 } from "@/types/request-types-snakecase";
 
 import camelcaseKeys from "camelcase-keys";
-import { Cast, MovieResult, PersonResult, TvResult, UpcomingMoviesResponse } from "@/types/request-types-camelcase";
+import {
+  Cast,
+  MovieResult,
+  PersonResult,
+  TvResult,
+  UpcomingMoviesResponse,
+} from "@/types/request-types-camelcase";
 
 export const getTrending = async (
   request: TrendingRequest,
-  reqOptions: RequestInit = options,
+  reqOptions: RequestInit = options
 ): Promise<TrendingResponse> => {
   const res = await fetch(
     `${BASE_API_URL}/trending/${request.media_type}/${request.time_window}?&page=${request.page}`,
-    reqOptions,
+    reqOptions
   );
   return res.json();
-}
+};
 
 export const getTrendingPages = async (
   request: TrendingRequest,
   numberOfPages: number,
   camelcase?: boolean,
-  reqOptions: RequestInit = options,
+  reqOptions: RequestInit = options
 ) => {
   const requests = [];
   for (let i = 0; i < numberOfPages; i++) {
@@ -38,179 +44,222 @@ export const getTrendingPages = async (
           time_window: request.time_window,
           page: i + 1,
         },
-        reqOptions,
-      ),
+        reqOptions
+      )
     );
   }
   const array = await Promise.all(requests);
   const arrays = array.flatMap((page) => page.results);
 
   if (camelcase) {
-    return camelcaseKeys(arrays as any, { deep: true }) as MovieResult[] | TvResult[] | PersonResult[];
+    return camelcaseKeys(arrays as any, { deep: true }) as
+      | MovieResult[]
+      | TvResult[]
+      | PersonResult[];
   }
   return arrays;
-}
+};
 
 export const getPopular = async (
   request: DiscoverMovieRequest | DiscoverTvRequest,
   mediaType: "movie" | "tv",
   camelcase?: boolean,
-  reqOptions: RequestInit = options,
+  reqOptions: RequestInit = options
 ) => {
   const res = await fetch(
     `${BASE_API_URL}/discover/${mediaType}?include_adult=false&language=en-US&region=US&page=${request.page}&sort_by=popularity.desc&vote_average.gte=${request["vote_average.gte"]}&with_original_language=en`,
-    reqOptions,
+    reqOptions
   );
   const data = await res.json();
 
   if (camelcase) {
-    return camelcaseKeys(data, { deep: true })
+    return camelcaseKeys(data, { deep: true });
   }
   return data;
-}
+};
 
 export const getPopularPages = async (
   request: DiscoverMovieRequest | DiscoverTvRequest,
   mediaType: "movie" | "tv",
   numberOfPages: number,
   camelcase?: boolean,
-  reqOptions: RequestInit = options,
+  reqOptions: RequestInit = options
 ) => {
   const requests = [];
   for (let i = 0; i < numberOfPages; i++) {
     requests.push(
-      getPopular({
-        page: i + 1,
-      }, mediaType, true, reqOptions)
+      getPopular(
+        {
+          page: i + 1,
+        },
+        mediaType,
+        true,
+        reqOptions
+      )
     );
   }
   const array = await Promise.all(requests);
   const arrays = array.flatMap((page) => page.results);
 
   if (camelcase) {
-    console.log("getPopularPages called")
-    return camelcaseKeys(arrays as any, { deep: true }) as MovieResult[] | TvResult[];
+    console.log("getPopularPages called");
+    return camelcaseKeys(arrays as any, { deep: true }) as
+      | MovieResult[]
+      | TvResult[];
   }
   return arrays;
-}
+};
 
 export const getUpcomingMovies = async (
   request: UpcomingMoviesRequest,
   camelcase?: boolean,
-  reqOptions: RequestInit = options,
+  reqOptions: RequestInit = options
 ) => {
   const today = new Date().toISOString().split("T")[0];
   const res = await fetch(
     `${BASE_API_URL}/discover/movie?include_adult=false&include_video=false&language=en-US&region=US&&page=${request.page}&primary_release_date.gte=${today}&release_date.gte=2024-06-26&sort_by=popularity.desc`,
-    reqOptions,
+    reqOptions
   );
   const data = await res.json();
 
-  if (camelcase)
-    return camelcaseKeys(data, { deep: true })
+  if (camelcase) return camelcaseKeys(data, { deep: true });
   // exclude: [/^[A-Z]{2}$/]
   return data;
-}
+};
 
-export async function fetchTmdbMovieLists(
-  reqOptions: RequestInit = options,
-) {
-  const [{ trendingMoviesDaily, trendingMoviesWeekly }, popularMoviesRes, upcomingMoviesRes] =
-    await Promise.all([
-      fetchTrendingMovies(),
-      getPopularPages({ "vote_average.gte": 6 }, "movie", NUM_TMDB_PAGES, true, reqOptions) as Promise<MovieResult[]>,
-      getUpcomingMovies({ page: 1 }, true, reqOptions) as Promise<UpcomingMoviesResponse>,
-    ]);
+export async function fetchTmdbMovieLists(reqOptions: RequestInit = options) {
+  const [
+    { trendingMoviesDaily, trendingMoviesWeekly },
+    popularMoviesRes,
+    upcomingMoviesRes,
+  ] = await Promise.all([
+    fetchTrendingMovies(),
+    getPopularPages(
+      { "vote_average.gte": 6 },
+      "movie",
+      NUM_TMDB_PAGES,
+      true,
+      reqOptions
+    ) as Promise<MovieResult[]>,
+    getUpcomingMovies(
+      { page: 1 },
+      true,
+      reqOptions
+    ) as Promise<UpcomingMoviesResponse>,
+  ]);
 
-  const upcomingMovies = upcomingMoviesRes.results?.filter(item => item.originalLanguage?.toUpperCase() === "EN") ?? []
+  const upcomingMovies =
+    upcomingMoviesRes.results?.filter(
+      (item) => item.originalLanguage?.toUpperCase() === "EN"
+    ) ?? [];
 
   const trendingMovieIds = new Set([
-    ...trendingMoviesDaily.map(item => item.id), ...trendingMoviesWeekly.map(item => item.id)
-  ])
+    ...trendingMoviesDaily.map((item) => item.id),
+    ...trendingMoviesWeekly.map((item) => item.id),
+  ]);
 
   // Dedupe popular from trending
-  const popularMovies = popularMoviesRes?.filter(item => !trendingMovieIds.has(item.id)) ?? []
+  const popularMovies =
+    popularMoviesRes?.filter((item) => !trendingMovieIds.has(item.id)) ?? [];
 
-  return { trendingMoviesDaily, trendingMoviesWeekly, popularMovies, upcomingMovies }
+  return {
+    trendingMoviesDaily,
+    trendingMoviesWeekly,
+    popularMovies,
+    upcomingMovies,
+  };
 }
 
-export async function fetchTmdbTvLists(
-  reqOptions: RequestInit = options,
-) {
+export async function fetchTmdbTvLists(reqOptions: RequestInit = options) {
   const [{ trendingTvDaily, trendingTvWeekly }, popularTvRes] =
     await Promise.all([
       fetchTrendingTv(),
-      getPopularPages({ "vote_average.gte": 6 }, "tv", NUM_TMDB_PAGES, true, reqOptions) as Promise<TvResult[]>,
+      getPopularPages(
+        { "vote_average.gte": 6 },
+        "tv",
+        NUM_TMDB_PAGES,
+        true,
+        reqOptions
+      ) as Promise<TvResult[]>,
     ]);
 
-  const trendingTvIds = new Set([...trendingTvDaily.map(item => item.id), ...trendingTvWeekly.map(item => item.id)])
+  const trendingTvIds = new Set([
+    ...trendingTvDaily.map((item) => item.id),
+    ...trendingTvWeekly.map((item) => item.id),
+  ]);
 
   // Dedupe popular from trending
-  const popularTv = popularTvRes?.filter(item => !trendingTvIds.has(item.id)) ?? []
+  const popularTv =
+    popularTvRes?.filter((item) => !trendingTvIds.has(item.id)) ?? [];
 
-  return { trendingTvDaily, trendingTvWeekly, popularTv }
+  return { trendingTvDaily, trendingTvWeekly, popularTv };
 }
 
-export async function fetchTrendingTv(
-  reqOptions: RequestInit = options,
-) {
+export async function fetchTrendingTv(reqOptions: RequestInit = options) {
   function isAnime(item: TvResult) {
-    return item.originalLanguage?.toUpperCase() === "JA" && item.originCountry?.some(country => country.toUpperCase() === "JP")
+    return (
+      item.originalLanguage?.toUpperCase() === "JA" &&
+      item.originCountry?.some((country) => country.toUpperCase() === "JP")
+    );
   }
 
-  const [trendingTvDailyRes, trendingTvWeeklyRes] =
-    await Promise.all([
-      getTrendingPages(
-        { media_type: "tv", time_window: "day", page: 1 },
-        NUM_TMDB_PAGES, true, reqOptions
-      ) as Promise<TvResult[]>,
-      getTrendingPages(
-        { media_type: "tv", time_window: "week", page: 1 },
-        NUM_TMDB_PAGES, true, reqOptions
-      ) as Promise<TvResult[]>,
-    ])
+  const [trendingTvDailyRes, trendingTvWeeklyRes] = await Promise.all([
+    getTrendingPages(
+      { media_type: "tv", time_window: "day", page: 1 },
+      NUM_TMDB_PAGES,
+      true,
+      reqOptions
+    ) as Promise<TvResult[]>,
+    getTrendingPages(
+      { media_type: "tv", time_window: "week", page: 1 },
+      NUM_TMDB_PAGES,
+      true,
+      reqOptions
+    ) as Promise<TvResult[]>,
+  ]);
 
   const trendingTvWeekly = trendingTvWeeklyRes.filter(
     (item) =>
       (isAnime(item) || item.originalLanguage?.toUpperCase() === "EN") &&
-      new Date(item.firstAirDate ?? Date.now()).valueOf() < new Date().valueOf(),
+      new Date(item.firstAirDate ?? Date.now()).valueOf() < new Date().valueOf()
   );
 
   const trendingTvDaily = trendingTvDailyRes.filter(
     (item) =>
       (isAnime(item) || item.originalLanguage?.toUpperCase() === "EN") &&
-      new Date(item.firstAirDate ?? Date.now()).valueOf() < new Date().valueOf(),
+      new Date(item.firstAirDate ?? Date.now()).valueOf() < new Date().valueOf()
   );
-  return { trendingTvDaily, trendingTvWeekly }
+  return { trendingTvDaily, trendingTvWeekly };
 }
 
-export async function fetchTrendingMovies(
-  reqOptions: RequestInit = options,
-) {
-  const [trendingMoviesDailyRes, trendingMoviesWeeklyRes] =
-    await Promise.all([
-      getTrendingPages(
-        { media_type: "movie", time_window: "day", page: 1 },
-        NUM_TMDB_PAGES, true, reqOptions
-      ) as Promise<MovieResult[]>,
-      getTrendingPages(
-        { media_type: "movie", time_window: "week", page: 1 },
-        NUM_TMDB_PAGES, true, reqOptions
-      ) as Promise<MovieResult[]>,
-    ]);
+export async function fetchTrendingMovies(reqOptions: RequestInit = options) {
+  const [trendingMoviesDailyRes, trendingMoviesWeeklyRes] = await Promise.all([
+    getTrendingPages(
+      { media_type: "movie", time_window: "day", page: 1 },
+      NUM_TMDB_PAGES,
+      true,
+      reqOptions
+    ) as Promise<MovieResult[]>,
+    getTrendingPages(
+      { media_type: "movie", time_window: "week", page: 1 },
+      NUM_TMDB_PAGES,
+      true,
+      reqOptions
+    ) as Promise<MovieResult[]>,
+  ]);
 
   const trendingMoviesWeekly = trendingMoviesWeeklyRes.filter(
     (item) =>
       item.originalLanguage?.toUpperCase() === "EN" &&
-      new Date(item.releaseDate ?? Date.now()).valueOf() < new Date().valueOf(),
+      new Date(item.releaseDate ?? Date.now()).valueOf() < new Date().valueOf()
   );
   const trendingMoviesDaily = trendingMoviesDailyRes.filter(
     (item) =>
       item.originalLanguage?.toUpperCase() === "EN" &&
-      new Date(item.releaseDate ?? Date.now()).valueOf() < new Date().valueOf(),
+      new Date(item.releaseDate ?? Date.now()).valueOf() < new Date().valueOf()
   );
 
-  return { trendingMoviesDaily, trendingMoviesWeekly }
+  return { trendingMoviesDaily, trendingMoviesWeekly };
 }
 
 export async function fetchAllMovies(reqOptions?: RequestInit) {
@@ -232,11 +281,11 @@ export async function fetchAllMovies(reqOptions?: RequestInit) {
 }
 
 export async function fetchAllTv(reqOptions?: RequestInit) {
-  const lists = await fetchTmdbTvLists(reqOptions)
+  const lists = await fetchTmdbTvLists(reqOptions);
   const combined = [
     ...lists.popularTv,
     ...lists.trendingTvWeekly,
-    ...lists.trendingTvDaily
+    ...lists.trendingTvDaily,
   ];
   // console.log(lists)
   // Dedupe (weekly and daily trending)

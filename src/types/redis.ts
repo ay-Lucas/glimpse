@@ -1,6 +1,6 @@
 export interface BlurData {
-  posterBlur: string
-  backdropBlur: string
+  posterBlur: string;
+  backdropBlur: string;
 }
 
-export type BlurMap = Map<number, BlurData>
+export type BlurMap = Map<number, BlurData>;

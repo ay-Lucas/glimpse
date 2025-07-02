@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -8,40 +8,41 @@ import { LucideList, LucideTv } from "lucide-react";
 import { useSupabase } from "@/context/supabase";
 
 export function TopNav() {
-  const { session, client } = useSupabase()
+  const { session, client } = useSupabase();
 
   return (
-    <div className="sticky w-full top-0 left-0 border-b border-transparent/10 z-10 backdrop-blur-sm bg-background/80">
-      <nav className="grid grid-cols-3 items-center p-1 px-4 text-md font-bold">
-        <section className="flex z-10 items-center lg:space-x-5 ">
+    <div className="sticky left-0 top-0 z-10 w-full border-b border-transparent/10 bg-background/80 backdrop-blur-sm">
+      <nav className="text-md grid grid-cols-3 items-center p-1 px-4 font-bold">
+        <section className="z-10 flex items-center lg:space-x-5">
           <Link className="hidden lg:inline" href="/">
             Glimpse
           </Link>
           <Search />
         </section>
-        <div className="flex flex-nowrap md:opacity-100 items-center justify-center">
+        <div className="flex flex-nowrap items-center justify-center md:opacity-100">
           <Link href="/discover" className="items-center">
-            <Button variant="ghost" className="sm:text-lg font-semibold">
-              <LucideTv className="sm:mr-2 p-0.5 mb-1" />
+            <Button variant="ghost" className="font-semibold sm:text-lg">
+              <LucideTv className="mb-1 p-0.5 sm:mr-2" />
               <span className="hidden sm:flex">Discover</span>
             </Button>
           </Link>
           <Link href={"/watchlist"} className="items-center">
-            <Button className="sm:text-lg font-semibold" variant="ghost">
+            <Button className="font-semibold sm:text-lg" variant="ghost">
               <LucideList className="sm:mr-2" />
               <span className="hidden sm:flex">Watchlist</span>
             </Button>
           </Link>
         </div>
-        <section className="grid justify-end space-x-4 items-center">
+        <section className="grid items-center justify-end space-x-4">
           {/* {status === "loading" ? ( */}
           {/* <div>Checking…</div> */}
-          {session?.user ?
-            <AvatarDropdown /> :
+          {session?.user ? (
+            <AvatarDropdown />
+          ) : (
             <Button asChild size="sm">
               <Link href="/signin">Sign in</Link>
             </Button>
-          }
+          )}
           {/* )} */}
         </section>
       </nav>

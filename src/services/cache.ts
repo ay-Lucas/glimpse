@@ -5,17 +5,22 @@ export const redis = new Redis({
   url: process.env.KV_REST_API_URL,
   token: process.env.KV_REST_API_TOKEN,
   enableTelemetry: false,
-  cache: "force-cache"
+  cache: "force-cache",
 });
 
-export const getRedisBlurValue = async (mediaType: "movie" | "tv", id: number) => {
+export const getRedisBlurValue = async (
+  mediaType: "movie" | "tv",
+  id: number
+) => {
   try {
-    const blurData: BlurData | null = await redis.get(`lqip:${mediaType}:${id}`);
+    const blurData: BlurData | null = await redis.get(
+      `lqip:${mediaType}:${id}`
+    );
     return blurData;
   } catch (err) {
-    console.error("Failed to retrieve Blur Data from Redis", err)
+    console.error("Failed to retrieve Blur Data from Redis", err);
   }
-}
+};
 
 export async function getRedisBlurValues(keys: string[]) {
   if (!keys.length) {
@@ -23,9 +28,9 @@ export async function getRedisBlurValues(keys: string[]) {
     return null;
   }
   try {
-    const value = await redis.mget<BlurData[]>(keys)
+    const value = await redis.mget<BlurData[]>(keys);
     return value;
   } catch (err) {
-    console.warn("Failed to retrieve Value from redis")
+    console.warn("Failed to retrieve Value from redis");
   }
 }

@@ -16,9 +16,7 @@ import {
 } from "drizzle-orm/pg-core";
 
 export const profiles = pgTable("profiles", {
-  id: uuid("id")
-    .notNull()
-    .primaryKey(),
+  id: uuid("id").notNull().primaryKey(),
   name: text("name").notNull(),
   avatarUrl: text("avatar_url"),
   createdAt: timestamp("created_at", { mode: "string" })
@@ -29,12 +27,14 @@ export const profiles = pgTable("profiles", {
   email_confirmation_sent_at: timestamp("email_confirmation_sent_at", {
     mode: "string",
     withTimezone: true,
-  })
+  }),
 });
 
 export const watchlistItems = pgTable("watchlist_items", {
   id: serial("id").primaryKey(),
-  watchlistId: uuid("watchlist_id").references(() => watchlist.id, { onDelete: "cascade" }),
+  watchlistId: uuid("watchlist_id").references(() => watchlist.id, {
+    onDelete: "cascade",
+  }),
   itemId: uuid("item_id").default(sql`gen_random_uuid()`), // ID of the item being watched
   tmdbId: integer("tmdb_id").notNull(),
   title: text("title").notNull(),
@@ -52,7 +52,9 @@ export const watchlistItems = pgTable("watchlist_items", {
 });
 
 export const watchlist = pgTable("watchlist", {
-  id: uuid("id").default(sql`gen_random_uuid()`).primaryKey(),
+  id: uuid("id")
+    .default(sql`gen_random_uuid()`)
+    .primaryKey(),
   userId: uuid("user_id")
     .notNull()
     .references(() => profiles.id, { onDelete: "cascade" }),
@@ -88,7 +90,7 @@ export const movieSummaries = pgTable("movie_summaries", {
   voteCount: integer("vote_count"),
   releaseDate: date("release_date"),
   posterBlurDataUrl: text("poster_blur_data_url"),
-  justWatchInfo: jsonb("justwatch_info")
+  justWatchInfo: jsonb("justwatch_info"),
 });
 
 export const movieDetails = pgTable("movie_details", {
@@ -145,49 +147,46 @@ export const tvSummaries = pgTable("tv_summaries", {
   voteCount: integer("vote_count"),
   firstAirDate: date("first_air_date"),
   posterBlurDataUrl: text("poster_blur_data_url"),
-  justWatchInfo: jsonb("justwatch_info")
+  justWatchInfo: jsonb("justwatch_info"),
 });
 
-export const tvDetails = pgTable(
-  "tv_details",
-  {
-    summaryId: integer("summary_id")
-      .primaryKey()
-      .references(() => tvSummaries.id, { onDelete: "cascade" }),
-    // basic flags & identifiers
-    adult: boolean("adult").notNull().default(true),
-    originalLanguage: text("original_language"),
-    originalName: text("original_name"),
-    originCountry: text("origin_country").array(),
-    homepage: text("homepage"),
-    status: text("status"),
-    tagline: text("tagline"),
-    type: text("type"),
-    backdropBlurDataUrl: text("backdrop_blur_data_url"),
-    darkVibrantBackdropHex: text("dark_vibrant_backdrop_hex"),
+export const tvDetails = pgTable("tv_details", {
+  summaryId: integer("summary_id")
+    .primaryKey()
+    .references(() => tvSummaries.id, { onDelete: "cascade" }),
+  // basic flags & identifiers
+  adult: boolean("adult").notNull().default(true),
+  originalLanguage: text("original_language"),
+  originalName: text("original_name"),
+  originCountry: text("origin_country").array(),
+  homepage: text("homepage"),
+  status: text("status"),
+  tagline: text("tagline"),
+  type: text("type"),
+  backdropBlurDataUrl: text("backdrop_blur_data_url"),
+  darkVibrantBackdropHex: text("dark_vibrant_backdrop_hex"),
 
-    // dates & counts
-    lastAirDate: date("last_air_date"),
-    numberOfSeasons: integer("number_of_seasons"),
-    numberOfEpisodes: integer("number_of_episodes"),
+  // dates & counts
+  lastAirDate: date("last_air_date"),
+  numberOfSeasons: integer("number_of_seasons"),
+  numberOfEpisodes: integer("number_of_episodes"),
 
-    // nested blobs
-    genres: jsonb("genres").notNull(),
-    createdBy: jsonb("created_by"), // array of creators
-    episodeRunTime: jsonb("episode_run_time"), // array of ints
-    languages: jsonb("languages"), // array of iso_ codes
-    networks: jsonb("networks"),
-    seasons: jsonb("seasons"),
-    videos: jsonb("videos"),
-    credits: jsonb("credits"),
-    aggregateCredits: jsonb("aggregate_credits"),
-    watchProviders: jsonb("watch_providers"),
-    contentRatings: jsonb("content_ratings"),
-    productionCompanies: jsonb("production_companies"),
-    productionCountries: jsonb("production_countries"),
-    spokenLanguages: jsonb("spoken_languages"),
-  },
-);
+  // nested blobs
+  genres: jsonb("genres").notNull(),
+  createdBy: jsonb("created_by"), // array of creators
+  episodeRunTime: jsonb("episode_run_time"), // array of ints
+  languages: jsonb("languages"), // array of iso_ codes
+  networks: jsonb("networks"),
+  seasons: jsonb("seasons"),
+  videos: jsonb("videos"),
+  credits: jsonb("credits"),
+  aggregateCredits: jsonb("aggregate_credits"),
+  watchProviders: jsonb("watch_providers"),
+  contentRatings: jsonb("content_ratings"),
+  productionCompanies: jsonb("production_companies"),
+  productionCountries: jsonb("production_countries"),
+  spokenLanguages: jsonb("spoken_languages"),
+});
 
 export const episodeDetails = pgTable(
   "episode_details",
@@ -217,7 +216,7 @@ export const episodeDetails = pgTable(
     pk: primaryKey({
       columns: [t.summaryId, t.seasonNumber, t.episodeNumber],
     }),
-  }),
+  })
 );
 
 export const personSummaries = pgTable("person_summaries", {
@@ -254,7 +253,7 @@ export const listEntries = pgTable(
     // and if you still want to unique‐enforce (list_name, position):
     listPositionUnique: unique("list_entries_position_unique").on(
       t.listName,
-      t.position,
+      t.position
     ),
-  }),
+  })
 );

@@ -56,35 +56,35 @@ export function bubbleSort(arr: Array<MovieResult | TvResult>, n: number) {
 
 export function sortPopular(
   array: Array<MovieResult | TvResult>,
-  minPopularity: number,
+  minPopularity: number
 ) {
   if (typeof array === undefined || array.length == 0)
     throw new Error("Could not sort array: array is undefined or empty");
   bubbleSort(array, array.length);
   if (minPopularity > -1)
     return array.filter(
-      (item) => item.popularity && item.popularity >= minPopularity,
+      (item) => item.popularity && item.popularity >= minPopularity
     );
   else return [];
 }
 
 export function filterList(
   array: Array<MovieResult | TvResult>,
-  minPopularity: number,
+  minPopularity: number
 ) {
   if (typeof array === undefined || array.length == 0)
     throw new Error("Could not sort array: array is undefined or empty");
   bubbleSort(array, array.length);
   if (minPopularity > -1)
     return array.filter(
-      (item) => item.popularity && item.popularity >= minPopularity,
+      (item) => item.popularity && item.popularity >= minPopularity
     );
   else return [];
 }
 
 export function isUnique(
   item: MovieResult | TvResult,
-  array: Array<MovieResult | TvResult>,
+  array: Array<MovieResult | TvResult>
 ) {
   let unique = false;
   array.forEach((trendingItem) => {
@@ -106,13 +106,13 @@ export function isUsRating(item: RatingResponse) {
 
 export function getTrailer(videoArray: Array<Video>) {
   const trailer: Array<Video> = videoArray.filter(
-    (video) => video.type === "Trailer",
+    (video) => video.type === "Trailer"
   );
   if (trailer?.length !== 0) {
     return trailer[0];
   } else {
     const teaser: Array<Video> = videoArray.filter(
-      (video) => video.type === "Teaser",
+      (video) => video.type === "Teaser"
     );
     return teaser[0];
   }
@@ -143,7 +143,6 @@ export function tmdbToCamel<T extends AnyObject>(raw: AnyObject): T {
 }
 
 export async function makeCarouselCards(data: Array<TvResult | MovieResult>) {
-
   return data.map(
     (item: MovieResult | TvResult | PersonResult, index: number) => {
       let card: React.ReactNode;
@@ -189,7 +188,7 @@ export async function makeCarouselCards(data: Array<TvResult | MovieResult>) {
           {card}
         </Link>
       );
-    },
+    }
   );
 }
 export function languageCodeToEnglishName(code: string): string {
@@ -222,7 +221,6 @@ export function countryCodeToEnglishName(code: string): string {
   }
 }
 
-
 // Utility to dedupe by tmdbId
 export function uniqueBy<T extends { id: number }>(arr: T[]): T[] {
   const seen = new Set<number>();
@@ -247,14 +245,14 @@ export function getBaseUrl() {
 
 export function stripJustWatchTracking(raw: string): string {
   try {
-    const url = new URL(raw)
-    console.log(raw)
+    const url = new URL(raw);
+    console.log(raw);
     // JustWatch’s redirect puts the real link in `r`
-    const target = url.searchParams.get('r')
+    const target = url.searchParams.get("r");
     // console.log(target ? decodeURIComponent(target) : raw)
-    return target ? decodeURIComponent(target) : raw
+    return target ? decodeURIComponent(target) : raw;
   } catch {
-    return raw
+    return raw;
   }
 }
 

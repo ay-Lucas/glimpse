@@ -14,48 +14,46 @@ export async function Recommended({
   const items = (await appendBlurDataToMediaArray(
     recommendations,
     BaseImageUrl.BLUR,
-    posterPaths,
+    posterPaths
   )) as Array<MovieResult | TvResult>;
   return (
     <>
       {items?.length > 0 && (
         <ImageCarousel
           title={<h2 className={`text-2xl font-bold`}>Recommended</h2>}
-          items={items.map(
-            (item: MovieResult | TvResult, index: number) => {
-              if (!item.poster_path) return;
-              let card: React.ReactNode;
-              switch (item.media_type) {
-                case "movie":
-                  card = (
-                    <Card
-                      title={item.title}
-                      overview={item.overview}
-                      imagePath={item.poster_path}
-                      baseUrl={BASE_POSTER_IMAGE_URL}
-                      blurDataURL={(item as any).blurDataURL}
-                    />
-                  );
-                  break;
-                case "tv":
-                  card = (
-                    <Card
-                      title={item.name}
-                      overview={item.overview}
-                      imagePath={item.poster_path}
-                      baseUrl={BASE_POSTER_IMAGE_URL}
-                      blurDataURL={(item as any).blurDataURL}
-                    />
-                  );
-                  break;
-              }
-              return (
-                <Link href={`/${item.media_type}/${item.id}`} key={index}>
-                  {card}
-                </Link>
-              );
-            },
-          )}
+          items={items.map((item: MovieResult | TvResult, index: number) => {
+            if (!item.poster_path) return;
+            let card: React.ReactNode;
+            switch (item.media_type) {
+              case "movie":
+                card = (
+                  <Card
+                    title={item.title}
+                    overview={item.overview}
+                    imagePath={item.poster_path}
+                    baseUrl={BASE_POSTER_IMAGE_URL}
+                    blurDataURL={(item as any).blurDataURL}
+                  />
+                );
+                break;
+              case "tv":
+                card = (
+                  <Card
+                    title={item.name}
+                    overview={item.overview}
+                    imagePath={item.poster_path}
+                    baseUrl={BASE_POSTER_IMAGE_URL}
+                    blurDataURL={(item as any).blurDataURL}
+                  />
+                );
+                break;
+            }
+            return (
+              <Link href={`/${item.media_type}/${item.id}`} key={index}>
+                {card}
+              </Link>
+            );
+          })}
           loading="lazy"
           breakpoints="page"
         />

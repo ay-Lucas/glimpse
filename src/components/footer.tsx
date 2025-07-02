@@ -4,39 +4,39 @@ import TmdbLogo from "@/assets/tmdb-logo.svg";
 
 export function Footer() {
   return (
-    <footer className="border-t ring-gray-700 z-10 backdrop-blur-sm text-gray-300 py-5">
-      <div className="max-w-4xl mx-auto flex flex-col md:flex-row justify-between items-center px-4">
+    <footer className="z-10 border-t py-5 text-gray-300 ring-gray-700 backdrop-blur-sm">
+      <div className="mx-auto flex max-w-4xl flex-col items-center justify-between px-4 md:flex-row">
         <p className="text-sm">
           Built by{" "}
           <a
             href="https://lucasanderson.dev"
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-white underline"
+            className="underline hover:text-white"
           >
             Lucas Anderson
           </a>
         </p>
-        <div className="flex space-x-6 mt-4 md:mt-0">
-          <Link href="/" className="hover:text-white text-sm">
+        <div className="mt-4 flex space-x-6 md:mt-0">
+          <Link href="/" className="text-sm hover:text-white">
             Home
           </Link>
-          <Link href="/discover" className="hover:text-white text-sm">
+          <Link href="/discover" className="text-sm hover:text-white">
             Discover
           </Link>
           <Link
             href="https://github.com/your-username/glimpse"
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-white text-sm"
+            className="text-sm hover:text-white"
           >
             GitHub
           </Link>
         </div>
       </div>
       {/* TMDB Attribution Section */}
-      <div className="mt-6 border-t ring-gray-700 pt-4 max-w-4xl mx-auto text-center">
-        <div className="flex justify-center items-center space-x-2 text-xs">
+      <div className="mx-auto mt-6 max-w-4xl border-t pt-4 text-center ring-gray-700">
+        <div className="flex items-center justify-center space-x-2 text-xs">
           <a
             href="https://www.themoviedb.org/"
             target="_blank"

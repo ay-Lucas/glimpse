@@ -2,7 +2,14 @@
 import { Button } from "./ui/button";
 import { FullMovie, FullTv, WatchlistI } from "@/types/camel-index";
 import { useWatchlist } from "@/context/watchlist";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuPortal, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
 import { Checkbox } from "./ui/checkbox";
 import { Fragment, MouseEvent, useEffect, useState } from "react";
 import { CheckedState } from "@radix-ui/react-checkbox";
@@ -40,7 +47,7 @@ export default function AddToWatchlistDropdown({
   const handleCheckboxChange = (
     checked: CheckedState,
     watchlistId: string,
-    mediaType: "movie" | "tv",
+    mediaType: "movie" | "tv"
   ) => {
     setCheckboxStates((prevStates) => ({
       ...prevStates,
@@ -63,7 +70,7 @@ export default function AddToWatchlistDropdown({
   function isItemOnWatchlist(watchlist: WatchlistI) {
     // watchlists?.some((item) => item.id === watchlist.id) || false
     const found = watchlist.items.find(
-      (watchlistItem) => watchlistItem.tmdbId === item.id,
+      (watchlistItem) => watchlistItem.tmdbId === item.id
     );
     return found !== undefined;
   }
@@ -80,7 +87,7 @@ export default function AddToWatchlistDropdown({
     <DropdownMenu open={open} onOpenChange={handleOpenChange}>
       <DropdownMenuTrigger asChild>
         <Button
-          className="focus-visible:outline-none flex px-2 py-1.5 focus:bg-accent"
+          className="flex px-2 py-1.5 focus:bg-accent focus-visible:outline-none"
           variant="outline"
         >
           <LucideListPlus className="mr-2 p-0.5" />
@@ -90,23 +97,22 @@ export default function AddToWatchlistDropdown({
       <DropdownMenuPortal>
         <DropdownMenuContent className="bg-black p-3">
           {watchlists.map((watchlist, index) => {
-
-            const isChecked = Boolean(checkboxStates[watchlist.id])
+            const isChecked = Boolean(checkboxStates[watchlist.id]);
 
             return (
               <Fragment key={index}>
-                <DropdownMenuItem className="p-2 flex items-center space-x-2 cursor-pointer "
+                <DropdownMenuItem
+                  className="flex cursor-pointer items-center space-x-2 p-2"
                   onSelect={(e) => {
                     // Prevent the default “close the menu” behavior
-                    e.preventDefault()
+                    e.preventDefault();
                     // toggle
                     handleCheckboxChange(
                       isChecked ? false : true,
                       watchlist.id,
                       mediaType
-                    )
+                    );
                   }}
-
                 >
                   <Checkbox
                     checked={checkboxStates[watchlist.id]}
@@ -118,10 +124,9 @@ export default function AddToWatchlistDropdown({
                   />
                   <p>{watchlist.watchlistName}</p>
                 </DropdownMenuItem>
-                {index !== watchlists.length - 1 &&
-                  <DropdownMenuSeparator />}
+                {index !== watchlists.length - 1 && <DropdownMenuSeparator />}
               </Fragment>
-            )
+            );
           })}
         </DropdownMenuContent>
       </DropdownMenuPortal>

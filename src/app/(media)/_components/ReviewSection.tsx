@@ -15,13 +15,13 @@ export default async function ReviewSection({
 }) {
   const res: MovieReviewsRequest | TvReviewsResponse = await getReviews(
     type,
-    id,
+    id
   );
   const reviews = res.results;
   if (!reviews || (reviews && reviews?.length < 1)) return;
   return (
     <div className="media-card">
-      <h2 className="text-2xl font-semibold pb-5 pr-3 inline-flex">Reviews</h2>
+      <h2 className="inline-flex pb-5 pr-3 text-2xl font-semibold">Reviews</h2>
       <span className="text-2xl font-semibold">({reviews?.length ?? 0})</span>
       <div className="space-y-3">
         {reviews?.map((reviews: ReviewI, index: number) => (

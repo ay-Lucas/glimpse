@@ -23,13 +23,13 @@ export async function Seasons({
       const episodes = await appendBlurDataToMediaArray(
         item.episodes!,
         BaseImageUrl.BLUR,
-        posterPaths,
+        posterPaths
       );
       return {
         ...item,
         episodes: episodes,
       };
-    }),
+    })
   )) as Array<TvSeasonResponse>;
   return (
     <>
@@ -46,7 +46,7 @@ export async function Seasons({
                     number={item.season_number!}
                     key={index}
                   />
-                ),
+                )
             )}
           </div>
         )}

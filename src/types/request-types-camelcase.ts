@@ -149,12 +149,12 @@ export interface Video {
   site?: string;
   size?: 360 | 480 | 720 | 1080;
   type:
-  | "Trailer"
-  | "Teaser"
-  | "Clip"
-  | "Featurette"
-  | "Behind the Scenes"
-  | "Bloopers";
+    | "Trailer"
+    | "Teaser"
+    | "Clip"
+    | "Featurette"
+    | "Behind the Scenes"
+    | "Bloopers";
 }
 
 /* ─────────────────────────────  Credits  ───────────────────────────── */
@@ -334,12 +334,12 @@ export interface MovieResponse extends Response {
   runtime?: number;
   spokenLanguages?: SpokenLanguage[];
   status:
-  | "Rumored"
-  | "Planned"
-  | "In Production"
-  | "Post Production"
-  | "Released"
-  | "Canceled";
+    | "Rumored"
+    | "Planned"
+    | "In Production"
+    | "Post Production"
+    | "Released"
+    | "Canceled";
   tagline?: string;
   title: string;
   video?: boolean;
@@ -560,19 +560,18 @@ export interface PaginatedResponse extends Response {
   totalPages: number;
 }
 
-export interface PopularMoviesResponse extends DiscoverMovieResponse { }
+export interface PopularMoviesResponse extends DiscoverMovieResponse {}
 
 export interface DiscoverMovieResponse extends PaginatedResponse {
   results?: Array<MovieResult>;
   credits?: CreditsResponse;
 }
 
-export interface PopularTvResponse extends DiscoverTvResponse { }
+export interface PopularTvResponse extends DiscoverTvResponse {}
 
 export interface DiscoverTvResponse extends PaginatedResponse {
   results?: Array<TvResult>;
 }
-
 
 export interface PersonCombinedCreditsResponse extends Response {
   id?: number;

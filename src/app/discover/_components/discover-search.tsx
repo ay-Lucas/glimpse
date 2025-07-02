@@ -16,10 +16,10 @@ export function DiscoverSearch() {
   };
 
   return (
-    <div className="flex space-x-3 items-center w-full">
+    <div className="flex w-full items-center space-x-3">
       <IoSearchOutline size={24} />
       <input
-        className={`h-8 placeholder-gray-600 focus-visible:outline-none w-full rounded-xl p-3 md:bg-primary/80 text-black bg-secondary border-gray-500 border transition-opacity ease-in-out duration-300 "`}
+        className={`" h-8 w-full rounded-xl border border-gray-500 bg-secondary p-3 text-black placeholder-gray-600 transition-opacity duration-300 ease-in-out focus-visible:outline-none md:bg-primary/80`}
         onKeyDown={handleEnter}
         onChange={(e) => setValue(e.target.value)}
         placeholder="Search for a series or movie"

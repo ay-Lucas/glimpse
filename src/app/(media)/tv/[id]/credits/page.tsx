@@ -5,7 +5,7 @@ export const revalidate = 43200; // 12 hours
 
 export async function generateStaticParams() {
   const discoverTvIds = await fetchDiscoverTvIds();
-  return discoverTvIds
+  return discoverTvIds;
 }
 
 export default function TvCreditsRoute({

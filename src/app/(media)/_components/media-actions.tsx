@@ -31,7 +31,7 @@ export default function MediaActions({
   const hasWatchlists = watchlists?.length > 0;
 
   return (
-    <div className="flex justify-center md:justify-start space-x-3">
+    <div className="flex justify-center space-x-3 md:justify-start">
       {canPlay && (
         <Link href={`${tmdbId}?show=true`} passHref>
           <Button variant="outline" className="flex items-center space-x-2">

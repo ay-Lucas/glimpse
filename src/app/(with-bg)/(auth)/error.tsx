@@ -15,9 +15,9 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="w-full flex justify-center p-2">
-      <div className="max-w-md bg-gray-800/75 rounded-lg shadow-2xl backdrop-blur p-8 sm:px-12">
-        <h2 className="text-xl pb-4">Something went wrong signing you in!</h2>
+    <div className="flex w-full justify-center p-2">
+      <div className="max-w-md rounded-lg bg-gray-800/75 p-8 shadow-2xl backdrop-blur sm:px-12">
+        <h2 className="pb-4 text-xl">Something went wrong signing you in!</h2>
         <Button onClick={() => reset()}>Try again</Button>
       </div>
     </div>

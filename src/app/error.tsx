@@ -16,7 +16,7 @@ export default function Error({
 
   return (
     <div className="pt-10 text-center">
-      <h2 className="text-xl pb-4">Something went wrong!</h2>
+      <h2 className="pb-4 text-xl">Something went wrong!</h2>
       <Button onClick={() => reset()}>Try again</Button>
     </div>
   );

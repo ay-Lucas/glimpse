@@ -19,8 +19,8 @@ export default function Backdrops({
   }, [images]);
 
   return (
-    <div className="absolute top-0 left-0 w-full h-full duration-300 ease-in overflow-hidden bg-gradient-to-t bg-blend-overlay from-gray-200 to-gray-950 -z-10">
-      <div className="absolute top-0 left-0 w-full h-full opacity-50">
+    <div className="absolute left-0 top-0 -z-10 h-full w-full overflow-hidden bg-gradient-to-t from-gray-200 to-gray-950 bg-blend-overlay duration-300 ease-in">
+      <div className="absolute left-0 top-0 h-full w-full opacity-50">
         {images.map((backdropPath, i) => (
           <Image
             fill
@@ -29,7 +29,7 @@ export default function Backdrops({
             key={i}
             quality={75}
             sizes="100vw"
-            className={`object-cover transition from-background duration-1000 ${i === index ? "bg-gray-400 blur-0 opacity-100" : "opacity-0"}`}
+            className={`from-background object-cover transition duration-1000 ${i === index ? "bg-gray-400 opacity-100 blur-0" : "opacity-0"}`}
             placeholder="blur"
             blurDataURL={firstBackdropBlurData}
           />

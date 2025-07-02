@@ -10,7 +10,7 @@ export async function PersonDetails({
   placeOfBirth,
   paramsId,
   gender,
-  knownCredits
+  knownCredits,
 }: {
   name?: string;
   biography?: string;
@@ -23,7 +23,6 @@ export async function PersonDetails({
   gender: string;
   knownCredits: number;
 }) {
-
   function getFormattedDate(dateStr: string) {
     return new Intl.DateTimeFormat("us", {
       timeZone: "UTC",
@@ -37,25 +36,22 @@ export async function PersonDetails({
     const miliseconds = new Date().valueOf() - new Date(birthDate).valueOf();
     const years = miliseconds / 1000 / 60 / 60 / 24 / 365;
     return years.toString().split(".")[0];
-
   }
   const age = birthDate ? getAge(birthDate) : null;
   const birthDateLabel = birthDate ? getFormattedDate(birthDate) : null;
   const deathDateLabel = deathDay ? getFormattedDate(deathDay) : null;
   return (
     <section className="flex flex-col space-y-6">
-      <div className="grid grid-cols-3 md:grid-cols-3 gap-y-6 gap-x-3 text-left">
+      <div className="grid grid-cols-3 gap-x-3 gap-y-6 text-left md:grid-cols-3">
         <div>
-          <div className="text-xs font-bold text-gray-400 uppercase">
-            Born
-          </div>
+          <div className="text-xs font-bold uppercase text-gray-400">Born</div>
           <time dateTime={birthDate!} className="mt-1 block">
             {birthDateLabel ?? "unknown"}
           </time>
         </div>
         {deathDateLabel && (
           <div>
-            <div className="text-xs font-bold text-gray-400 uppercase">
+            <div className="text-xs font-bold uppercase text-gray-400">
               Died
             </div>
             <time dateTime={birthDate!} className="mt-1 block">
@@ -64,39 +60,42 @@ export async function PersonDetails({
           </div>
         )}
         <div>
-          <div className="text-xs font-bold text-gray-400 uppercase">
-            Age
-          </div>
+          <div className="text-xs font-bold uppercase text-gray-400">Age</div>
           <div>{age ?? "unknown"}</div>
         </div>
         <div>
-          <div className="text-xs font-bold text-gray-400 uppercase">
+          <div className="text-xs font-bold uppercase text-gray-400">
             Gender
           </div>
           <div>{gender}</div>
         </div>
         <div>
-          <div className="text-xs font-bold text-gray-400 uppercase">
+          <div className="text-xs font-bold uppercase text-gray-400">
             Place Of Birth
           </div>
           <div>{placeOfBirth ?? "unknown"}</div>
         </div>
         <div>
-          <div className="text-xs font-bold text-gray-400 uppercase">
+          <div className="text-xs font-bold uppercase text-gray-400">
             Known For
           </div>
           <div>{knownForDept}</div>
         </div>
         <div>
-          <div className="text-xs font-bold text-gray-400 uppercase">
+          <div className="text-xs font-bold uppercase text-gray-400">
             Known Credits
           </div>
           <div>{knownCredits}</div>
         </div>
       </div>
-      {biography &&
-        <div><div className="text-xs font-bold text-gray-400 uppercase">Biography</div>
-          <Expandable>{biography}</Expandable></div>
-      }
-    </section>)
+      {biography && (
+        <div>
+          <div className="text-xs font-bold uppercase text-gray-400">
+            Biography
+          </div>
+          <Expandable>{biography}</Expandable>
+        </div>
+      )}
+    </section>
+  );
 }

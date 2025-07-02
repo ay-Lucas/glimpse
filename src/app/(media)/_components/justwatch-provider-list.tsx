@@ -17,15 +17,21 @@ import { GiHeadphones } from "react-icons/gi";
 import { BsCcSquare } from "react-icons/bs";
 import { GroupedProvider } from "@/types/camel-index";
 
-export default function JustWatchProviderList({ info }: { info: GroupedProvider[] }) {
+export default function JustWatchProviderList({
+  info,
+}: {
+  info: GroupedProvider[];
+}) {
   const MAX_INLINE = 4;
   const [open, setOpen] = useState(false);
-  const providers: StreamProvider[] = info.flatMap(item => ungroupProvider(item, true));
+  const providers: StreamProvider[] = info.flatMap((item) =>
+    ungroupProvider(item, true)
+  );
   const inlineProviders = providers.slice(0, MAX_INLINE);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <ul className="space-y-1 w-full">
+      <ul className="w-full space-y-1">
         {inlineProviders.map((p) => (
           <ProviderCard provider={p} key={`${p.Provider}:${p.Type}`} />
         ))}
@@ -37,7 +43,7 @@ export default function JustWatchProviderList({ info }: { info: GroupedProvider[
           </Button>
         </DialogTrigger>
       )}
-      <DialogContent className="max-w-[95vw] sm:max-w-[90vw] lg:max-w-5xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-h-[90vh] max-w-[95vw] overflow-y-auto sm:max-w-[90vw] lg:max-w-5xl">
         <DialogTitle>All Providers</DialogTitle>
         <ul className="space-y-0">
           {providers.map((p) => (
@@ -64,17 +70,16 @@ function ModalProviderCard({ provider }: { provider: StreamProvider }) {
     Name,
     Audio = [],
     Subtitle = [],
-    Icon: iconUrl
+    Icon: iconUrl,
   } = provider;
-
 
   const typeLabel = capitalizeFirst(
     Type === "FLATRATE" ? "subscription" : Type.toLowerCase()
   );
 
   const audioList = Audio.length
-    // ? sortLanguages(Audio.map(languageCodeToEnglishName)).join(", ")
-    ? sortLanguages(Audio.map(languageCodeToEnglishName)).join(", ")
+    ? // ? sortLanguages(Audio.map(languageCodeToEnglishName)).join(", ")
+      sortLanguages(Audio.map(languageCodeToEnglishName)).join(", ")
     : null;
   const subtitleList = Subtitle.length
     ? sortLanguages(Subtitle.map(languageCodeToEnglishName)).join(", ")
@@ -82,13 +87,19 @@ function ModalProviderCard({ provider }: { provider: StreamProvider }) {
 
   const isCinemaType = Type === "CINEMA";
   const ctaLabel = isCinemaType ? "Buy Tickets" : "Watch Now";
-  const resolution = Resolution === "4K" || Resolution === "HD" || Resolution === "SD" ? Resolution : null
+  const resolution =
+    Resolution === "4K" || Resolution === "HD" || Resolution === "SD"
+      ? Resolution
+      : null;
 
   return (
-    <li key={providerName} className="hover:bg-muted/70 duration-200 bg-transparent border p-1" >
+    <li
+      key={providerName}
+      className="border bg-transparent p-1 duration-200 hover:bg-muted/70"
+    >
       <div className="grid grid-cols-[minmax(100px,150px),1fr] items-center">
         <div className="">
-          {iconUrl &&
+          {iconUrl && (
             <Image
               src={iconUrl}
               alt={`${Name} logo`}
@@ -96,10 +107,10 @@ function ModalProviderCard({ provider }: { provider: StreamProvider }) {
               height={40}
               className="rounded object-cover"
             />
-          }
+          )}
         </div>
-        <div className="grid gap-4 grid-cols-[minmax(150px,600px),minmax(20px,50px),minmax(103px,150px)] sm:grid-cols-[minmax(150px,600px),minmax(20px,50px),minmax(80px,150px),minmax(103px,125px)] p-2">
-          <div className="flex space-x-2 items-center">
+        <div className="grid grid-cols-[minmax(150px,600px),minmax(20px,50px),minmax(103px,150px)] gap-4 p-2 sm:grid-cols-[minmax(150px,600px),minmax(20px,50px),minmax(80px,150px),minmax(103px,125px)]">
+          <div className="flex items-center space-x-2">
             {audioList && (
               <>
                 <div>
@@ -109,7 +120,7 @@ function ModalProviderCard({ provider }: { provider: StreamProvider }) {
               </>
             )}
           </div>
-          <div className="flex space-x-2 items-center row-start-2">
+          <div className="row-start-2 flex items-center space-x-2">
             {subtitleList && (
               <>
                 <div>
@@ -123,11 +134,13 @@ function ModalProviderCard({ provider }: { provider: StreamProvider }) {
             {resolution && <span>{getResolutionIcon(resolution, 22)}</span>}
           </div>
 
-          <div className={`flex flex-col text-sm sm:pl-0 pl-3`}>
+          <div className={`flex flex-col pl-3 text-sm sm:pl-0`}>
             <span className="font-medium">{typeLabel}</span>
-            {Price && <span className="text-xs text-muted-foreground">{Price}</span>}
+            {Price && (
+              <span className="text-xs text-muted-foreground">{Price}</span>
+            )}
           </div>
-          <div className="text-left sm:col-start-4 col-start-3">
+          <div className="col-start-3 text-left sm:col-start-4">
             <a href={url}>
               <Button size="sm" variant="outline">
                 {ctaLabel}
@@ -150,17 +163,21 @@ function ProviderCard({ provider }: { provider: StreamProvider }) {
     Name,
     Audio = [],
     Subtitle = [],
-    Icon: iconUrl
+    Icon: iconUrl,
   } = provider;
 
   // const highestRes = useMemo(
   //   () => getHighestProviderResolution(Resolution),
   //   [Resolution]
   // );
-  const resolution = Resolution === "4K" || Resolution === "HD" || Resolution === "SD" ? Resolution : null
+  const resolution =
+    Resolution === "4K" || Resolution === "HD" || Resolution === "SD"
+      ? Resolution
+      : null;
 
-  const typeLabel =
-    capitalizeFirst(Type === "FLATRATE" ? "subscription" : Type);
+  const typeLabel = capitalizeFirst(
+    Type === "FLATRATE" ? "subscription" : Type
+  );
 
   const audioList = Audio.length
     ? sortLanguages(Audio.map(languageCodeToEnglishName)).join(", ")
@@ -168,9 +185,11 @@ function ProviderCard({ provider }: { provider: StreamProvider }) {
 
   const isCinemaType = Type === "CINEMA";
   return (
-    <li className={`grid grid-cols-[1fr_103px] gap-5 px-2 py-2 items-center rounded-xl text-sm hover:bg-muted/70 duration-200`}>
+    <li
+      className={`grid grid-cols-[1fr_103px] items-center gap-5 rounded-xl px-2 py-2 text-sm duration-200 hover:bg-muted/70`}
+    >
       <DialogTrigger asChild>
-        <button className={`grid grid-cols-3 gap-5 items-center`}>
+        <button className={`grid grid-cols-3 items-center gap-5`}>
           <Image
             src={iconUrl}
             alt={Name}
@@ -178,8 +197,8 @@ function ProviderCard({ provider }: { provider: StreamProvider }) {
             height={32}
             className="rounded object-cover"
           />
-          <div className="flex flex-col text-sm truncate">
-            {((resolution || audioList) && (
+          <div className="flex flex-col truncate text-sm">
+            {(resolution || audioList) && (
               <>
                 {resolution && <span>{getResolutionIcon(resolution, 22)}</span>}
                 {audioList && (
@@ -187,11 +206,13 @@ function ProviderCard({ provider }: { provider: StreamProvider }) {
                     <div>
                       <GiHeadphones />
                     </div>
-                    <span className="truncate text-left text-gray-400 text-xs">{audioList}</span>
+                    <span className="truncate text-left text-xs text-gray-400">
+                      {audioList}
+                    </span>
                   </div>
                 )}
               </>
-            ))}
+            )}
           </div>
           <div className="flex flex-col items-start whitespace-nowrap">
             <span className="">{typeLabel}</span>
@@ -200,13 +221,13 @@ function ProviderCard({ provider }: { provider: StreamProvider }) {
         </button>
       </DialogTrigger>
       <a href={url}>
-        <Button size="sm" variant="outline">{isCinemaType ? "Buy Tickets" : "Watch Now"}</Button>
+        <Button size="sm" variant="outline">
+          {isCinemaType ? "Buy Tickets" : "Watch Now"}
+        </Button>
       </a>
     </li>
-  )
+  );
 }
-
-
 
 function capitalizeFirst(str: string): string {
   if (!str) return "";
@@ -215,25 +236,31 @@ function capitalizeFirst(str: string): string {
 }
 
 function getHighestProviderResolution(resolutions: string[]) {
-  if (resolutions.includes("_4K"))
-    return "4K"
-  else if (resolutions.includes("HD"))
-    return "HD"
-  else if (resolutions.includes("SD"))
-    return "SD"
-  else
-    return null;
+  if (resolutions.includes("_4K")) return "4K";
+  else if (resolutions.includes("HD")) return "HD";
+  else if (resolutions.includes("SD")) return "SD";
+  else return null;
 }
 
-function getResolutionIcon(resolution: "4K" | "HD" | "SD", size: number, className?: string) {
+function getResolutionIcon(
+  resolution: "4K" | "HD" | "SD",
+  size: number,
+  className?: string
+) {
   switch (resolution) {
-    case "4K": return <BsBadge4K size={size} className={className ?? ""} />
-    case "HD": return <BsBadgeHd size={size} className={className ?? ""} />
-    case "SD": return <BsBadgeSd size={size} className={className ?? ""} />
+    case "4K":
+      return <BsBadge4K size={size} className={className ?? ""} />;
+    case "HD":
+      return <BsBadgeHd size={size} className={className ?? ""} />;
+    case "SD":
+      return <BsBadgeSd size={size} className={className ?? ""} />;
   }
 }
 
-export function ungroupProvider(g: GroupedProvider, highestResOnly: boolean): StreamProvider[] {
+export function ungroupProvider(
+  g: GroupedProvider,
+  highestResOnly: boolean
+): StreamProvider[] {
   const {
     provider: Provider,
     name: Name,
@@ -264,7 +291,7 @@ export function ungroupProvider(g: GroupedProvider, highestResOnly: boolean): St
         Audio,
         Subtitle,
         Icon,
-      }
+      };
     }
 
     return ResList.map<StreamProvider>((Resolution) => ({

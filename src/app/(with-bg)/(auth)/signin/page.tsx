@@ -5,23 +5,23 @@ import Link from "next/link";
 export default async function SignInPage() {
   return (
     <div className="flex w-full justify-center">
-      <div className="flex flex-col space-y-4 w-[375px] px-2">
-        <div className="bg-gray-800/75 rounded-lg shadow-2xl backdrop-blur px-8 sm:px-12 py-8">
+      <div className="flex w-[375px] flex-col space-y-4 px-2">
+        <div className="rounded-lg bg-gray-800/75 px-8 py-8 shadow-2xl backdrop-blur sm:px-12">
           <div className="flex flex-col space-y-3">
             <Suspense>
               <SignInForm />
             </Suspense>
-            <span className="font-bold text-lg text-center">or</span>
+            <span className="text-center text-lg font-bold">or</span>
             <Link
               href="/signup"
-              className="mx-auto hover:text-white text-gray-300"
+              className="mx-auto text-gray-300 hover:text-white"
             >
               Create an Account
             </Link>
           </div>
         </div>
-        <div className="bg-gray-800/75 rounded-lg shadow-2xl backdrop-blur px-8 sm:px-12 py-8">
-          <div className="font-bold flex flex-col space-y-3 mb-2">
+        <div className="rounded-lg bg-gray-800/75 px-8 py-8 shadow-2xl backdrop-blur sm:px-12">
+          <div className="mb-2 flex flex-col space-y-3 font-bold">
             Demo Account
           </div>
           <div>

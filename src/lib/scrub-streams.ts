@@ -6,7 +6,7 @@ const RES_ORDER = ["SD", "HD", "_4K"] as const;
 export function scrubByMaxRes(streams: StreamProvider[]): StreamProvider[] {
   return streams.filter((s) => {
     const max = MAX_RES_BY_PROVIDER[s.Provider];
-    if (!max) return true;  // no override → keep everything
+    if (!max) return true; // no override → keep everything
 
     const idx = RES_ORDER.indexOf(s.Resolution as any);
     const maxIdx = RES_ORDER.indexOf(max);

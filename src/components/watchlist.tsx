@@ -50,12 +50,12 @@ export function EditableWatchlistTitle({
   };
 
   return (
-    <div className="text-2xl items-center">
+    <div className="items-center text-2xl">
       {isEditing ? (
         <Input
           type="text"
           size={10}
-          className="text-2xl text-center"
+          className="text-center text-2xl"
           value={title}
           onChange={handleTitleChange}
           onBlur={saveTitle}
@@ -96,15 +96,15 @@ function WatchlistDeleteConfirmation({
     <>
       <button className="absolute top-4">
         <X
-          className="text-gray-400 hover:text-gray-100 transition-colors"
+          className="text-gray-400 transition-colors hover:text-gray-100"
           onClick={handleDeleteClick}
           size={30}
         />
       </button>
 
       {showModal && (
-        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-background rounded-lg p-6 max-w-md mx-auto shadow-lg text-center space-y-4 mb-40">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-50">
+          <div className="mx-auto mb-40 max-w-md space-y-4 rounded-lg bg-background p-6 text-center shadow-lg">
             <h3 className="text-lg font-semibold">Delete Confirmation</h3>
             <p>Are you sure you want to delete this watchlist?</p>
             <div className="flex justify-center space-x-4">
@@ -126,7 +126,7 @@ export function Watchlist({ watchlist }: { watchlist: WatchlistI }) {
   const { session } = useSupabase();
   const { onDeleteWatchlist } = useWatchlist();
   return (
-    <div className="p-3 bg-background border-secondary border rounded-2xl backdrop-blur-3xl">
+    <div className="rounded-2xl border border-secondary bg-background p-3 backdrop-blur-3xl">
       {watchlist ? (
         <>
           <div className="flex justify-center p-3">
@@ -142,7 +142,7 @@ export function Watchlist({ watchlist }: { watchlist: WatchlistI }) {
           {watchlist.items.length > 0 ? (
             <div>
               <div className="grid space-y-2">
-                <div className="grid grid-cols-[1fr_75px_1fr_1fr_1fr_auto] gap-6 px-3 py-2 items-center">
+                <div className="grid grid-cols-[1fr_75px_1fr_1fr_1fr_auto] items-center gap-6 px-3 py-2">
                   <span className="text-gray-500">Title</span>
                   <span className="text-gray-500">Poster</span>
                   <span className="text-gray-500">Genres</span>
@@ -152,7 +152,7 @@ export function Watchlist({ watchlist }: { watchlist: WatchlistI }) {
                 {watchlist.items.map((item, index) => (
                   <div
                     key={item.itemId}
-                    className="grid grid-cols-[1fr_75px_1fr_1fr_1fr_auto] gap-6 border-secondary border p-3 rounded-xl items-center hover:border-primary/20 transition"
+                    className="grid grid-cols-[1fr_75px_1fr_1fr_1fr_auto] items-center gap-6 rounded-xl border border-secondary p-3 transition hover:border-primary/20"
                   >
                     <Link
                       href={`/${item.itemType}/${item.tmdbId}`}
@@ -166,13 +166,13 @@ export function Watchlist({ watchlist }: { watchlist: WatchlistI }) {
                       src={`https://image.tmdb.org/t/p/original/${item.posterPath}`}
                       alt={`${item.title} poster`}
                       quality={75}
-                      className="object-cover w-[75px] h-[75px] rounded-[40%]"
+                      className="h-[75px] w-[75px] rounded-[40%] object-cover"
                     />
                     <div className="flex flex-wrap gap-1">
                       {item.genres?.map((genre, genreIndex) => (
                         <span
                           key={genreIndex}
-                          className="shadow-lg rounded-lg px-2 py-1 select-none transition border bg-primary-foreground border-secondary"
+                          className="select-none rounded-lg border border-secondary bg-primary-foreground px-2 py-1 shadow-lg transition"
                         >
                           {genre}
                         </span>
@@ -196,7 +196,7 @@ export function Watchlist({ watchlist }: { watchlist: WatchlistI }) {
               </div>
             </div>
           ) : (
-            <div className="text-sm text-center">(Empty)</div>
+            <div className="text-center text-sm">(Empty)</div>
           )}
         </>
       ) : (
