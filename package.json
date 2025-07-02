@@ -36,7 +36,6 @@
     "clsx": "^2.1.1",
     "dotenv": "^16.4.5",
     "drizzle-orm": "^0.35.3",
-    "embla-carousel-react": "^8.1.5",
     "framer-motion": "^12.12.2",
     "justwatch-api-client": "^1.0.4",
     "lucide-react": "^0.390.0",
