@@ -12,7 +12,7 @@ export interface ImageCarouselProps {
   titleString?: string;
   variant?: string;
   userAgent?: string | null;
-  breakpoints?: "default" | "page" | "cast";
+  breakpoints?: "default" | "page" | "cast" | "taggedImages";
   className?: string;
   loading?: "lazy" | "eager";
   items: Array<ReactNode>;
@@ -28,6 +28,10 @@ const carouselBreakpoints: {
     [ratio: string]: SwiperOptions
   }
   cast: {
+    [width: number]: SwiperOptions
+    [ratio: string]: SwiperOptions
+  }
+  taggedImages: {
     [width: number]: SwiperOptions
     [ratio: string]: SwiperOptions
   }
@@ -127,6 +131,30 @@ const carouselBreakpoints: {
       spaceBetween: 10,
     },
   },
+  taggedImages: {
+    100: {
+      slidesPerView: 2,
+      slidesPerGroup: 2,
+      spaceBetween: 10,
+      cssMode: true,
+    },
+    650: {
+      slidesPerView: 3,
+      slidesPerGroup: 3,
+      cssMode: true,
+    },
+    900: {
+      slidesPerView: 3,
+      slidesPerGroup: 3,
+      cssMode: true,
+    },
+
+
+    1300: {
+      slidesPerView: 3,
+      slidesPerGroup: 3,
+    },
+  }
 };
 
 export default function ImageCarousel({
@@ -173,15 +201,18 @@ export default function ImageCarousel({
     case "cast":
       breakpointsOption = carouselBreakpoints.cast;
       break;
+    case "taggedImages":
+      breakpointsOption = carouselBreakpoints.taggedImages
+      break;
     default:
       breakpointsOption = carouselBreakpoints.default;
       break;
   }
 
   const handleBreakpointChange = (event: SwiperCore) => {
-    if (event.currentBreakpoint <= 950)
+    if (event.currentBreakpoint <= 900)
       swiperRef.current?.disable()
-    else if (event.currentBreakpoint > 950)
+    else if (event.currentBreakpoint > 900)
       swiperRef.current?.enable()
   }
 

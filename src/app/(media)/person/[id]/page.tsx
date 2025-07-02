@@ -1,5 +1,6 @@
 import { fetchTopPeopleIds, fetchPersonDetails } from "@/app/(media)/actions";
 import {
+  BASE_ORIGINAL_IMAGE_URL,
   BASE_POSTER_IMAGE_URL,
   BASE_PROFILE_IMAGE_URL,
   DEFAULT_BLUR_DATA_URL,
@@ -15,7 +16,6 @@ import { getTopPopularCredits } from "./utils";
 import PersonRank from "./_components/person-rank";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import ImdbLogo from "@/assets/IMDB_Logo_2016.svg";
 import PersonLinks from "./_components/person-links";
 
 export const revalidate = 43200; // 12 hours
@@ -43,16 +43,6 @@ export default async function PersonPage({
   const uniqueCombinedCredits = new Set(mixedCombinedCredits.filter(item => typeof item.id === "number" && item.id > 0));
   const top10PopularCredits = getTopPopularCredits(10, person.combinedCredits)
   const knownForCredits = top10PopularCredits && top10PopularCredits.length > 3 ? top10PopularCredits : uniqueCombinedCredits.values().toArray();
-  console.log(person.externalIds)
-  const imdbLogo =
-    <ImdbLogo
-      alt="IMDb Logo"
-      width={40}
-      height={40}
-      className="opacity-75"
-    />
-  const ids = person.externalIds;
-  console.log(ids)
   return (
     <main>
       <div className="h-full w-full overflow-x-hidden pb-20">
@@ -105,7 +95,47 @@ export default async function PersonPage({
             {(person.externalIds && person.id) &&
               <PersonLinks externalIds={person.externalIds} tmdbId={person.id} />
             }
-            {person.images.profiles?.length &&
+            {person.taggedImages.results?.length ?
+              <section className="media-card">
+                <ImageCarousel
+                  breakpoints="taggedImages"
+                  title={<h2 className={`text-2xl font-bold`}>Tagged Images</h2>}
+                  loading="lazy"
+                  items={
+                    (person.taggedImages.results ?? []).map((item) => {
+                      const mediaType = item.media?.mediaType;
+                      const isTv = mediaType === 'tv' || mediaType === 'tv_episode';
+
+                      return (
+                        <div key={item.id ?? item.filePath}>
+                          <Image
+                            src={`${BASE_ORIGINAL_IMAGE_URL}${item.filePath}`}
+                            width={300}
+                            height={240}
+                            alt={`tagged image of ${person.name}`}
+                            className="rounded-lg"
+                            unoptimized
+                          />
+
+                          {isTv && (
+                            <div className="mt-2">
+                              <p className="flex w-full gap-x-5 items-center">
+                                <span>{(item.media as any).name}</span>
+                                {mediaType === 'tv_episode' && (
+                                  <span className="font-semibold">
+                                    S{item.media!.seasonNumber} E{item.media!.episodeNumber}
+                                  </span>
+                                )}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })
+                  }
+                />
+              </section> : ""}
+            {person.images.profiles?.length ?
               <section className="media-card">
                 <ImageCarousel
                   breakpoints="page"
@@ -113,12 +143,11 @@ export default async function PersonPage({
                   loading="lazy"
                   items={
                     person.images.profiles?.map(item =>
-                      <Image src={`${BASE_PROFILE_IMAGE_URL}${item.filePath}`} width={400} height={400} alt={`tagged image of ${person.name}`} />
-                      // <Image src={`${BASE_PROFILE_IMAGE_URL}${item.filePath}`} width={400} height={632} alt={`tagged image of ${person.name}`} />
+                      <Image src={`${BASE_PROFILE_IMAGE_URL}${item.filePath}`} width={228} height={342} alt={`tagged image of ${person.name}`} unoptimized className="rounded-lg" />
                     )
                   }
                 />
-              </section>
+              </section> : <div />
             }
             <div className="media-card">
               <ImageCarousel
@@ -133,7 +162,8 @@ export default async function PersonPage({
                       title={(item as MovieResult).title ?? (item as TvResult).name}
                       overview={item.overview} />
                   </Link>
-                ))!} />
+                ))!}
+              />
             </div>
           </div>
         </div>

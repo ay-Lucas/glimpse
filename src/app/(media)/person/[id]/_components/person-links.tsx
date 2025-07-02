@@ -125,7 +125,6 @@ export default async function PersonLinks({ externalIds, tmdbId }: { externalIds
     wikipediaId: wikiTitle ? wikiTitle : null,
     tmdbId: tmdbId.toString()
   }
-  console.log(wikiTitle)
   const entries = Object.entries(ids).filter(([k, v]) => v != null && v !== "" && !IGNORE_KEYS.includes(k))
   const items = buildLinkItems(entries);
   const socialLinks = items.filter(item => SOCIAL_KEYS.includes(item.idLabel))

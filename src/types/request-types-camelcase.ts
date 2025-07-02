@@ -719,7 +719,7 @@ interface PersonTaggedImage extends BaseImage {
   id?: string;
   iso6391?: string | null;
   imageType?: string;
-  media?: MovieResult | TvResult;
+  media?: MovieResult | TvResult | EpisodeResult;
 }
 
 export interface PersonTaggedImagesResponse extends PaginatedResponse {
