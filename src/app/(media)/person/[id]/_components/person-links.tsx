@@ -133,60 +133,64 @@ export default async function PersonLinks({ externalIds, tmdbId }: { externalIds
 
   return (
     <>
-      <div className="media-card space-y-2">
-        <h2 className={`text-2xl font-bold`}>Social Links</h2>
-        <ul className="grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-5 items-center">
-          {socialLinks.map(item => (
-            <li key={item.id}>
-              <div className="grid grid-cols-2 items-center"><strong>{item.label}</strong>{item.logo}</div>
-              {item.href ? (
-                <a
-                  href={item.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-400 hover:underline"
-                >
-                  <p className="hover:underline text-blue-400">
-                    {item.id}
-                  </p>
-                </a>
-              ) : (
-                <>
-                  <span>{item.label}</span>
-                  <span>{item.id}</span>
-                </>
-              )}
-            </li>
-          ))}
-        </ul>
-      </div>
-      <div className="media-card space-y-2">
-        <h2 className={`text-2xl font-bold`}>Database Links</h2>
-        <ul className="grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-5 items-center">
-          {dbLinks.map(item => (
-            <li key={item.id}>
-              <div className="grid grid-cols-2 items-center"><strong>{item.label}</strong>{item.logo}</div>
-              {item.href ? (
-                <a
-                  href={item.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-400 hover:underline"
-                >
-                  <p className="hover:underline text-blue-400">
-                    {item.id}
-                  </p>
-                </a>
-              ) : (
-                <>
-                  <span>{item.label}</span>
-                  <span>{item.id}</span>
-                </>
-              )}
-            </li>
-          ))}
-        </ul>
-      </div>
+      {socialLinks.length > 0 &&
+        <div className="media-card space-y-2">
+          <h2 className={`text-2xl font-bold`}>Social Links</h2>
+          <ul className="grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-5 items-center">
+            {socialLinks.map(item => (
+              <li key={item.id}>
+                <div className="grid grid-cols-2 items-center"><strong>{item.label}</strong>{item.logo}</div>
+                {item.href ? (
+                  <a
+                    href={item.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-400 hover:underline"
+                  >
+                    <p className="hover:underline text-blue-400">
+                      {item.id}
+                    </p>
+                  </a>
+                ) : (
+                  <>
+                    <span>{item.label}</span>
+                    <span>{item.id}</span>
+                  </>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      }
+      {dbLinks.length > 0 &&
+        <div className="media-card space-y-2">
+          <h2 className={`text-2xl font-bold`}>Database Links</h2>
+          <ul className="grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-5 items-center">
+            {dbLinks.map(item => (
+              <li key={item.id}>
+                <div className="grid grid-cols-2 items-center"><strong>{item.label}</strong>{item.logo}</div>
+                {item.href ? (
+                  <a
+                    href={item.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-400 hover:underline"
+                  >
+                    <p className="hover:underline text-blue-400">
+                      {item.id}
+                    </p>
+                  </a>
+                ) : (
+                  <>
+                    <span>{item.label}</span>
+                    <span>{item.id}</span>
+                  </>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      }
     </>
   );
 }
