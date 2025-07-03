@@ -765,3 +765,17 @@ export interface PersonExternalIdsResponse extends Response {
   tvrageId?: number | null;
   id: number;
 }
+
+export interface TvImagesResponse extends Response {
+  backdrops?: Array<Backdrop>;
+  id?: number;
+  posters?: Array<Poster>;
+  logos?: Array<TitleLogo>;
+}
+
+export interface MovieImagesResponse extends Response {
+  id?: number;
+  backdrops?: Array<Backdrop>;
+  posters?: Array<Poster>;
+  logos?: Array<TitleLogo>;
+}

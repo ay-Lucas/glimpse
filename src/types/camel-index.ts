@@ -26,6 +26,8 @@ import {
   TvExternalIdsResponse,
   PersonExternalIdsResponse,
   MovieExternalIdsResponse,
+  TvImagesResponse,
+  MovieImagesResponse,
 } from "./request-types-camelcase";
 
 export interface CardTypes {
@@ -165,6 +167,7 @@ export type FullMovie = {
   credits?: CreditsResponse;
   watchProviders?: WatchProviderResponse;
   externalIds?: MovieExternalIdsResponse;
+  images?: MovieImagesResponse;
   // media_type: "tv"; // Not provided by api
 };
 
@@ -216,6 +219,7 @@ export type FullTv = {
   spokenLanguages?: Array<SpokenLanguage>;
   contentRatings?: { results: RatingResponse[] };
   externalIds?: TvExternalIdsResponse;
+  images?: TvImagesResponse;
 };
 
 export interface FullPerson extends Person {

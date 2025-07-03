@@ -63,7 +63,7 @@ export const fetchTvDetails = unstable_cache(
   async (id: number, resOptions: RequestInit = options): Promise<FullTv> => {
     try {
       const res = await fetch(
-        `${BASE_API_URL}/tv/${id}?append_to_response=videos,releases,content_ratings,credits,aggregate_credits,episode_groups,watch/providers,external_ids&language=en-US`,
+        `${BASE_API_URL}/tv/${id}?append_to_response=videos,images,releases,content_ratings,credits,aggregate_credits,episode_groups,watch/providers,external_ids&language=en`,
         resOptions
       );
       const data = await res.json();
@@ -79,11 +79,9 @@ export const fetchTvDetails = unstable_cache(
         deep: true,
         exclude: [/^[A-Z]{2}$/],
       }) as FullTv;
-
       // fix up dates, etc…
       if (camel.firstAirDate) camel.firstAirDate = new Date(camel.firstAirDate);
       camel.tmdbId = camel.id;
-      camel.id = -1;
       return camel as FullTv;
     } catch (err) {
       console.error("fetchTvDetails failed for,", id, err);
@@ -101,8 +99,8 @@ export const fetchMovieDetails = unstable_cache(
     try {
       const res = await fetch(
         `${BASE_API_URL}/movie/${id}` +
-          `?append_to_response=videos,releases,content_ratings,credits,aggregate_credits,` +
-          `episode_groups,watch/providers,external_ids&language=en-US`,
+          `?append_to_response=videos,images,releases,content_ratings,credits,aggregate_credits,` +
+          `episode_groups,watch/providers,external_ids&language=en`,
         resOptions
       );
       const data = await res.json();
@@ -123,6 +121,7 @@ export const fetchMovieDetails = unstable_cache(
 
       // fix up dates, etc…
       if (camel.releaseDate) camel.releaseDate = new Date(camel.releaseDate);
+      camel.tmdbId = camel.id;
       return camel as FullMovie;
     } catch (err) {
       console.error("fetchMovieDetails failed for,", id, err);
