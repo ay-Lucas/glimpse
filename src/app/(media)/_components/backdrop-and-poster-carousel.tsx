@@ -40,15 +40,14 @@ export default function BackdropAndPosterCarousel({
     backdropItems.length ? backdropItems : posterItems
   );
 
-  const [show, setShow] = useState(true);
+  // const [show, setShow] = useState(true);
   function toggle(to: CarouselBreakpoints, newItems: JSX.Element[]) {
     // fade out
-    setShow(false);
+    // setShow(false);
     setTimeout(() => {
       setCarouselItems(newItems);
       setBreakpointType(to);
       // fade back in
-      setShow(true);
     }, 300); // match your CSS duration
   }
   const [breakpointType, setBreakpointType] =

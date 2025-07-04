@@ -2,6 +2,10 @@
 
 import { useState } from "react";
 import ImageCarousel from "@/components/image-carousel";
+import MediaCarousel, {
+  CarouselBreakpoints,
+} from "@/components/media-carousel";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 interface CarouselToggleProps {
   options: {
@@ -16,32 +20,47 @@ export default function CarouselToggle({
   title,
 }: CarouselToggleProps) {
   const [view, setView] = useState<0 | 1>(0);
+  const [breakpointType, setBreakpointType] =
+    useState<CarouselBreakpoints>("backdrop");
+
+  function toggle(to: CarouselBreakpoints, newItems: JSX.Element[]) {
+    // fade out
+    setTimeout(() => {
+      setCarouselItems(newItems);
+      setBreakpointType(to);
+      // fade back in
+    }, 300); // match your CSS duration
+  }
+  const validOptions = options.filter((opt) => opt.items.length > 0);
+  const firstOption = validOptions[0];
+  const [carouselItems, setCarouselItems] = useState<JSX.Element[]>(
+    validOptions[0]?.items ?? []
+  );
 
   return (
     <div className="space-y-4">
-      <ImageCarousel
-        title={
-          <div className="grid w-full auto-cols-max grid-flow-col items-center justify-between sm:grid-cols-[225px_1fr_auto]">
-            <h2 className={`text-2xl font-bold sm:pl-2`}>{title}</h2>
-            <div className="flex items-center space-x-2">
-              {options.map((opt, index) => (
-                <button
-                  key={index}
-                  onClick={() => setView(index as 0 | 1)}
-                  className={`sm:text-md rounded-2xl px-3 text-sm font-semibold transition ${
-                    view === index
-                      ? "bg-blue-500/80 text-white backdrop-blur-lg"
-                      : "bg-gray-200 text-gray-700"
-                  }`}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        }
-        items={options[view]?.items!}
-      />
+      <div className="xxs:grid-cols-[225px_1fr] grid w-full auto-cols-auto grid-flow-col grid-cols-[200px_1fr] items-center justify-between">
+        <h2 className="text-2xl font-bold sm:pl-2">{title}</h2>
+
+        <ToggleGroup
+          variant="outline"
+          type="single"
+          defaultValue={validOptions[0]?.label}
+          className="justify-start"
+        >
+          {validOptions.length > 0 &&
+            validOptions.map((opt, index) => (
+              <ToggleGroupItem
+                value={opt.label}
+                aria-label={`Toggle ${opt.label}`}
+                onClick={() => toggle("title", opt.items)}
+              >
+                <h2>{opt.label}</h2>
+              </ToggleGroupItem>
+            ))}
+        </ToggleGroup>
+      </div>
+      <MediaCarousel breakpointType="title" items={carouselItems} />
     </div>
   );
 }

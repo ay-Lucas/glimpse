@@ -61,7 +61,8 @@ export const theme = {
       },
     },
     screens: {
-      xs: "480px",
+      xxs: "400px",
+      xs: "500px",
       ...defaultTheme.screens,
     },
     borderRadius: {

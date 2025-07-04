@@ -19,6 +19,10 @@ const breakpointOptions: {
     [width: number]: SwiperOptions;
     [ratio: string]: SwiperOptions;
   };
+  title: {
+    [width: number]: SwiperOptions;
+    [ratio: string]: SwiperOptions;
+  };
 } = {
   poster: {
     "@0.00": {
@@ -54,9 +58,41 @@ const breakpointOptions: {
       spaceBetween: 10,
     },
   },
+  title: {
+    "@0.00": {
+      slidesPerView: 2,
+      slidesPerGroup: 2,
+      spaceBetween: 10,
+    },
+    "@0.6": {
+      slidesPerView: 3,
+      slidesPerGroup: 3,
+      spaceBetween: 10,
+    },
+    "@0.8": {
+      slidesPerView: 4,
+      slidesPerGroup: 4,
+      spaceBetween: 20,
+    },
+    "@1.1": {
+      slidesPerView: 5,
+      slidesPerGroup: 5,
+      spaceBetween: 20,
+    },
+    "@1.25": {
+      slidesPerView: 6,
+      slidesPerGroup: 6,
+      spaceBetween: 10,
+    },
+    "@1.50": {
+      slidesPerView: 7,
+      slidesPerGroup: 4,
+      spaceBetween: 20,
+    },
+  },
 };
 //
-export type CarouselBreakpoints = "poster" | "backdrop";
+export type CarouselBreakpoints = "poster" | "backdrop" | "title";
 
 export default function MediaCarousel({
   items,
@@ -132,17 +168,17 @@ export default function MediaCarousel({
           swiperRef.current = swiper;
         }}
         onInit={handleSlideChange}
-        className="mySwiper"
+        className="mySwiper min-w-[500px]"
         watchSlidesProgress={true}
       >
         <button
-          className={`absolute left-0 top-1/2 z-10 mt-[calc(0px-var(--swiper-navigation-size)/2)] h-[var(--swiper-navigation-size)] items-center rounded-md border border-primary bg-background/80 px-1 transition-opacity ${prevOpacity} `}
+          className={`absolute left-0 top-1/2 z-10 mt-[calc(0px-var(--swiper-navigation-size)/2)] h-[var(--swiper-navigation-size)] items-center rounded-md border border-primary bg-background/80 px-1 transition-opacity ${prevOpacity} invisible xs:visible`}
           onClick={() => swiperRef.current?.slidePrev()}
         >
           <ChevronLeft size={40} />
         </button>
         <button
-          className={`absolute right-0 top-1/2 z-10 mt-[calc(0px-var(--swiper-navigation-size)/2)] h-[var(--swiper-navigation-size)] items-center rounded-md border border-primary bg-background/80 px-1 transition-opacity ${nextOpacity}`}
+          className={`absolute right-0 top-1/2 z-10 mt-[calc(0px-var(--swiper-navigation-size)/2)] h-[var(--swiper-navigation-size)] items-center rounded-md border border-primary bg-background/80 px-1 transition-opacity ${nextOpacity} invisible xs:visible`}
           onClick={() => swiperRef.current?.slideNext()}
         >
           <ChevronRight size={40} />
