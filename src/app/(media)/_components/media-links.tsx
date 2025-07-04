@@ -159,7 +159,7 @@ export default async function MediaLinks({
           <h2 className={`text-2xl font-bold`}>Social Links</h2>
           <ul className="grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] items-center gap-5">
             {socialLinks.map((item) => (
-              <li key={item.id}>
+              <li key={item.href}>
                 <div className="grid grid-cols-[80px,50px] items-center space-x-4">
                   <strong>{item.label}</strong>
                   {item.logo}

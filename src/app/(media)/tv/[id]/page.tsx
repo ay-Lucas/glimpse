@@ -18,9 +18,16 @@ import MediaProviders from "../../_components/media-providers";
 import { buildTvDetailItems } from "./utils";
 import ImageCarousel from "@/components/image-carousel";
 import CastCard from "@/components/cast-card";
-import { BASE_CAST_IMAGE_URL, DEFAULT_BLUR_DATA_URL } from "@/lib/constants";
-import { Separator } from "@radix-ui/react-dropdown-menu";
+import {
+  BASE_MEDIUM_BACKDROP_URL,
+  BASE_POSTER_IMAGE_URL,
+  BASE_SMALL_BACKDROP_URL,
+  DEFAULT_BLUR_DATA_URL,
+} from "@/lib/constants";
 import MediaLinks from "../../_components/media-links";
+import Image from "next/image";
+import BackdropAndPosterCarousel from "../../_components/backdrop-and-poster-carousel";
+import MediaCarousel from "@/components/media-carousel";
 
 function getTrailer(videoArray: Array<Video>) {
   const trailer: Array<Video> = videoArray.filter(
@@ -197,6 +204,12 @@ export default async function TvPage({ params }: { params: { id: number } }) {
                     mediaType="tv"
                   />
                 )}
+                <BackdropAndPosterCarousel
+                  backdrops={tv.images?.backdrops ?? []}
+                  logos={tv.images?.logos ?? []}
+                  posters={tv.images?.posters ?? []}
+                  name={tv.name}
+                />
                 <Suspense
                   fallback={
                     <Skeleton className="h-[356px] w-full rounded-xl" />

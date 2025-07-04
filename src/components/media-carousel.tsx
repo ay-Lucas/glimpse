@@ -1,0 +1,156 @@
+"use client";
+import { Keyboard, Mousewheel, Pagination, Scrollbar } from "swiper/modules";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Swiper as SwiperCore, SwiperOptions } from "swiper/types";
+
+import "swiper/css";
+import "swiper/css/pagination";
+import "swiper/css/scrollbar";
+import "@/styles/swiper.css";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+
+const breakpointOptions: {
+  poster: {
+    [width: number]: SwiperOptions;
+    [ratio: string]: SwiperOptions;
+  };
+  backdrop: {
+    [width: number]: SwiperOptions;
+    [ratio: string]: SwiperOptions;
+  };
+} = {
+  poster: {
+    "@0.00": {
+      slidesPerView: 2,
+      slidesPerGroup: 2,
+      spaceBetween: 10,
+    },
+    "@0.5": {
+      slidesPerView: 3,
+      slidesPerGroup: 3,
+      spaceBetween: 20,
+    },
+    "@1.50": {
+      slidesPerView: 4,
+      slidesPerGroup: 4,
+      spaceBetween: 20,
+    },
+  },
+  backdrop: {
+    "@0.00": {
+      slidesPerView: 1,
+      slidesPerGroup: 1,
+      spaceBetween: 10,
+    },
+    "@0.5": {
+      slidesPerView: 2,
+      slidesPerGroup: 2,
+      spaceBetween: 20,
+    },
+    "@1.00": {
+      slidesPerView: 3,
+      slidesPerGroup: 3,
+      spaceBetween: 10,
+    },
+  },
+};
+//
+export type CarouselBreakpoints = "poster" | "backdrop";
+
+export default function MediaCarousel({
+  items,
+  breakpointType,
+}: {
+  items: Array<JSX.Element>;
+  breakpointType: CarouselBreakpoints;
+}) {
+  const swiperRef = useRef<SwiperCore>();
+  const [isPrevDisabled, setPrevDisabled] = useState(true);
+  const [isNextDisabled, setNextDisabled] = useState(false);
+
+  const handleSlideChange = () => {
+    const swiper = swiperRef.current;
+    if (!swiper) return;
+
+    const totalSlides = swiper.slides.length;
+    // slidesPerView comes from your breakpoints and is always a number
+    const spv = swiper.params.slidesPerView;
+    const perView = typeof spv === "number" ? spv : 1;
+
+    const idx = swiper.activeIndex;
+    setPrevDisabled(idx <= 0);
+    // when the first visible slide index idx reaches totalSlides - perView, you’re at the end
+    setNextDisabled(idx >= totalSlides - perView);
+  };
+
+  useEffect(() => {
+    if (swiperRef.current) {
+      // override the breakpoints on the fly
+      swiperRef.current.params.breakpoints = breakpointOptions[breakpointType];
+      swiperRef.current.currentBreakpoint = breakpointOptions[breakpointType];
+      swiperRef.current.setProgress(0, 500);
+      swiperRef.current.update(); // re-calculate slidesPerView, groups, etc.
+      handleSlideChange();
+    }
+  }, [breakpointType]);
+
+  const areButtonsDisabled = isPrevDisabled && isNextDisabled;
+
+  const prevOpacity = areButtonsDisabled
+    ? "opacity-0"
+    : isPrevDisabled
+      ? "opacity-30"
+      : "opacity-100";
+
+  const nextOpacity = areButtonsDisabled
+    ? "opacity-0"
+    : isNextDisabled
+      ? "opacity-30"
+      : "opacity-100";
+
+  return (
+    <>
+      <Swiper
+        cssMode
+        speed={750}
+        scrollbar={{
+          enabled: true,
+          draggable: true,
+        }}
+        // key={breakpointType} // ← force remount on each toggle
+        breakpoints={breakpointOptions[breakpointType]}
+        //pagination={{
+        //  type: "progressbar",
+        //}}
+        mousewheel={true}
+        keyboard={true}
+        lazyPreloadPrevNext={3}
+        modules={[Mousewheel, Pagination, Keyboard, Scrollbar]}
+        onSlideChange={handleSlideChange}
+        onBeforeInit={(swiper) => {
+          swiperRef.current = swiper;
+        }}
+        onInit={handleSlideChange}
+        className="mySwiper"
+        watchSlidesProgress={true}
+      >
+        <button
+          className={`absolute left-0 top-1/2 z-10 mt-[calc(0px-var(--swiper-navigation-size)/2)] h-[var(--swiper-navigation-size)] items-center rounded-md border border-primary bg-background/80 px-1 transition-opacity ${prevOpacity} `}
+          onClick={() => swiperRef.current?.slidePrev()}
+        >
+          <ChevronLeft size={40} />
+        </button>
+        <button
+          className={`absolute right-0 top-1/2 z-10 mt-[calc(0px-var(--swiper-navigation-size)/2)] h-[var(--swiper-navigation-size)] items-center rounded-md border border-primary bg-background/80 px-1 transition-opacity ${nextOpacity}`}
+          onClick={() => swiperRef.current?.slideNext()}
+        >
+          <ChevronRight size={40} />
+        </button>
+        {items.map((item, index) => (
+          <SwiperSlide key={index}>{item}</SwiperSlide>
+        ))}
+      </Swiper>
+    </>
+  );
+}
