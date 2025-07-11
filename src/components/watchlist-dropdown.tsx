@@ -3,6 +3,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuPortal,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -34,25 +35,27 @@ export function WatchlistDropdown({
           <EllipsisVertical />
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent>
-        <DropdownMenuItem>
-          <DeleteWatchlistItem
-            tmdbId={tmdbId}
-            watchlistId={watchlistId}
-            mediaType={mediaType}
-          />
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-          <EditWatchlist
-            watchlistId={watchlistId}
-            watchlistName={watchlistName}
-            isDefaultWatchlist={isDefaultWatchlist}
-            watchlistDescription={watchlistDescription}
-            isPublic={isPublic}
-          />
-        </DropdownMenuItem>
-      </DropdownMenuContent>
+      <DropdownMenuPortal>
+        <DropdownMenuContent>
+          <DropdownMenuItem>
+            <DeleteWatchlistItem
+              tmdbId={tmdbId}
+              watchlistId={watchlistId}
+              mediaType={mediaType}
+            />
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+            <EditWatchlist
+              watchlistId={watchlistId}
+              watchlistName={watchlistName}
+              isDefaultWatchlist={isDefaultWatchlist}
+              watchlistDescription={watchlistDescription}
+              isPublic={isPublic}
+            />
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenuPortal>
     </DropdownMenu>
   );
 }

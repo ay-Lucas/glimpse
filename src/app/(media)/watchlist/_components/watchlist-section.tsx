@@ -13,12 +13,10 @@ export default function WatchlistSection({
   const { watchlists } = useWatchlist();
   const listsToRender = watchlists.length ? watchlists : initialWatchlists;
 
-  // 1) Early-return when empty
   if (listsToRender.length === 0) {
     return <div className="text-center">You have 0 watchlists</div>;
   }
 
-  // 2) Build a single "tabs" array
   const tabs = [
     {
       key: "all",
@@ -41,14 +39,13 @@ export default function WatchlistSection({
           </TabsTrigger>
         ))}
       </TabsList>
-
-      <div className="relative mt-4">
+      <div className="relative grid">
         {tabs.map(({ key, items }) => (
           <TabsContent
             key={key}
             value={key}
             forceMount
-            className={`absolute inset-0 space-y-3 transition-opacity duration-200 ease-in-out data-[state=active]:opacity-100 data-[state=inactive]:opacity-0`}
+            className={`space-y-3 transition-opacity duration-300 ease-in-out data-[state=inactive]:pointer-events-none data-[state=active]:pointer-events-auto data-[state=inactive]:absolute data-[state=active]:relative data-[state=inactive]:inset-0 data-[state=active]:opacity-100 data-[state=inactive]:opacity-0`}
           >
             {items.map((wl) => (
               <Watchlist watchlist={wl} key={wl.id} />
