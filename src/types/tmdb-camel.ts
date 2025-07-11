@@ -14,12 +14,17 @@ import {
   VideosResponse,
   WatchProviderResponse,
 } from "./request-types-camelcase";
+import { JustWatchInfo } from "./camel-index";
 
 export type TmdbTvDetailsResponseAppendedWatchlist =
   TmdbTvDetailsResponseAppended & WatchlistItemModel;
 
 export type TmdbMovieDetailsResponseAppendedWatchlist =
   TmdbMovieDetailsResponseAppended & WatchlistItemModel;
+
+export interface TmdbTvDetailsBackfilled extends TmdbTvDetailsResponseAppended {
+  justWatchInfo?: JustWatchInfo | null;
+}
 
 export interface TmdbTvDetailsResponseAppended extends TmdbTvDetailsResponse {
   videos?: VideosResponse;
@@ -79,6 +84,11 @@ export interface TmdbMovieDetailsResponseAppended
   externalIds?: MovieExternalIdsResponse;
   images?: MovieImagesResponse;
   similar?: SimilarShowsResponse;
+}
+
+export interface TmdbMovieDetailsBackfilled
+  extends TmdbMovieDetailsResponseAppended {
+  justWatchInfo?: JustWatchInfo | null;
 }
 
 export interface CreatedBy {

@@ -1,8 +1,8 @@
 "use server";
 import { db } from "@/db/index";
 import {
-  TmdbMovieDetailsResponseAppended,
-  TmdbTvDetailsResponseAppended,
+  TmdbMovieDetailsBackfilled,
+  TmdbTvDetailsBackfilled,
 } from "@/types/tmdb-camel";
 import { AnyPgTable } from "drizzle-orm/pg-core";
 import { normalizeMovieDetails, normalizeTvDetails } from "./media";
@@ -31,14 +31,12 @@ export async function upsertRecord<
   return row!;
 }
 
-export async function upsertMovieDetails(
-  details: TmdbMovieDetailsResponseAppended
-) {
+export async function upsertMovieDetails(details: TmdbMovieDetailsBackfilled) {
   const insertable = normalizeMovieDetails(details);
   return upsertRecord(movies, insertable, "id");
 }
 
-export async function upsertTvDetails(details: TmdbTvDetailsResponseAppended) {
+export async function upsertTvDetails(details: TmdbTvDetailsBackfilled) {
   const insertable = normalizeTvDetails(details);
   return upsertRecord(tvShows, insertable, "id");
 }

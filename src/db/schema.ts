@@ -129,6 +129,7 @@ export const movies = pgTable("movies", {
   externalIds: jsonb("external_ids"), // MovieExternalIdsResponse
   images: jsonb("images"), // MovieImagesResponse
   similar: jsonb("similar"), // SimilarShowsResponse
+  justWatchInfo: jsonb("justwatch_info"),
 });
 
 export const tvShows = pgTable("tv_shows", {
@@ -180,6 +181,7 @@ export const tvShows = pgTable("tv_shows", {
   externalIds: jsonb("external_ids"), // TvExternalIdsResponse
   images: jsonb("images"), // TvImagesResponse
   similar: jsonb("similar"), // SimilarShowsResponse
+  justWatchInfo: jsonb("justwatch_info"),
 });
 
 export const watchlist = pgTable(
