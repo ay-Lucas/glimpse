@@ -3,7 +3,7 @@ import TmdbProviderList from "./tmdb-provider-list";
 import JustWatchProviderList from "./justwatch-provider-list";
 import JustWatchLogo from "@/assets/justwatch-logo.svg";
 import Link from "next/link";
-import { getCachedJustWatch } from "../actions";
+import { getCachedJustWatch } from "@/lib/justwatch";
 
 export default async function MediaProviders({
   tmdbWatchProviders,
@@ -32,7 +32,6 @@ export default async function MediaProviders({
     justWatchInfo?.streams !== undefined &&
     justWatchInfo.streams !== null &&
     justWatchInfo?.streams.length > 0;
-
   return (
     <>
       {(isTmdbValid || isJustWatchValid) && (

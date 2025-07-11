@@ -3,45 +3,38 @@ import { Response } from "./types";
 /* ────────────────────  Search / Movie / TV Results ──────────────────── */
 
 export interface MovieResult {
-  posterPath?: string;
-  adult?: boolean;
-  overview?: string;
-  releaseDate?: string;
+  adult: boolean;
+  backdropPath: string;
   genreIds?: number[];
   id: number;
-  mediaType: "movie";
-  originalTitle?: string;
-  originalLanguage?: string;
+  originCountry: string[];
+  originalLanguage: string;
+  originalTitle: string;
+  overview: string;
+  popularity: number;
+  posterPath: string;
+  releaseDate?: string | null;
   title: string;
-  backdropPath?: string;
-  popularity?: number;
-  voteCount?: number;
-  video?: boolean;
-  voteAverage?: number;
-  videos?: { results: Video[] };
-  // credits?: CreditsResponse;
-  rating?: string; // Not provided by TMDB
+  video: boolean;
+  voteAverage: number;
+  voteCount: number;
 }
 
 export interface TvResult {
-  posterPath?: string;
-  popularity?: number;
-  id: number;
-  overview?: string;
-  backdropPath?: string;
-  voteAverage?: number;
-  mediaType: "tv";
-  firstAirDate?: string;
-  originCountry?: string[];
+  adult: boolean;
+  backdropPath: string;
   genreIds?: number[];
-  originalLanguage?: string;
-  voteCount?: number;
+  id: number;
+  originCountry: string[];
+  originalLanguage: string;
+  originalName: string;
+  overview: string;
+  popularity: number;
+  posterPath: string;
+  firstAirDate?: string | null | Date;
   name: string;
-  originalName?: string;
-  videos?: { results: Video[] };
-  // credits: CreditsResponse;
-  // aggregateCredits?: AggregateCreditsResponse;
-  rating?: string;
+  voteAverage: number;
+  voteCount: number;
 }
 
 export interface PersonResult {
@@ -128,26 +121,35 @@ export interface Keyword {
   name?: string;
 }
 
+export interface ReleasesReleaseDate {
+  certification: string;
+  descriptors: string;
+  iso31661: string;
+  primary: boolean;
+  releaseDate: string;
+}
+
 export interface ReleaseDate {
-  certification?: string;
-  descriptors?: string;
-  iso31661?: string;
-  primary?: boolean;
-  releaseDate?: string;
+  certification: string;
+  descriptors: string[];
+  iso6391: string;
+  note: string;
+  releaseDate: string;
+  type: number;
 }
 
 /* ─────────────────────────────  Videos  ────────────────────────────── */
 
 export interface Video {
-  id?: string;
-  iso6391?: string;
-  iso31661?: string;
-  key?: string;
-  name?: string;
-  official?: boolean;
-  publishedAt?: string;
-  site?: string;
-  size?: 360 | 480 | 720 | 1080;
+  id: string;
+  iso6391: string;
+  iso31661: string;
+  key: string;
+  name: string;
+  official: boolean;
+  publishedAt: string;
+  site: string;
+  size: 360 | 480 | 720 | 1080;
   type:
     | "Trailer"
     | "Teaser"
@@ -160,9 +162,9 @@ export interface Video {
 /* ─────────────────────────────  Credits  ───────────────────────────── */
 
 export interface CreditsResponse extends Response {
-  id?: number;
-  cast?: Cast[];
-  crew?: Crew[];
+  id: number;
+  cast: Cast[];
+  crew: Crew[];
 }
 
 export interface Cast {
@@ -238,9 +240,9 @@ export interface Episode {
 /* ────────────────────────  Aggregate Credits  ──────────────────────── */
 
 export interface AggregateCreditsResponse extends Response {
-  cast?: AggregateCast[];
-  crew?: AggregateCrew[];
-  id?: number;
+  cast: AggregateCast[];
+  crew: AggregateCrew[];
+  id: number;
 }
 
 export interface GuestStar {
@@ -253,37 +255,37 @@ export interface GuestStar {
 }
 
 export interface AggregateCast {
-  adult?: boolean;
-  gender?: number;
-  id?: number;
-  knownForDepartment?: string;
-  name?: string;
-  originalName?: string;
-  popularity?: number;
-  profilePath?: string;
-  roles?: Role[];
-  totalEpisodeCount?: number;
-  order?: number;
+  adult: boolean;
+  gender: number;
+  id: number;
+  knownForDepartment: string;
+  name: string;
+  originalName: string;
+  popularity: number;
+  profilePath: string;
+  roles: Role[];
+  totalEpisodeCount: number;
+  order: number;
 }
 
 export interface AggregateJob {
-  creditId?: string;
-  job?: string;
-  episodeCount?: number;
+  creditId: string;
+  job: string;
+  episodeCount: number;
 }
 
 export interface AggregateCrew {
-  adult?: boolean;
-  gender?: number;
-  id?: number;
-  knownForDepartment?: string;
-  name?: string;
-  originalName?: string;
-  popularity?: number;
-  profilePath?: string;
-  jobs?: AggregateJob[];
-  department?: string;
-  totalEpisodeCount?: number;
+  adult: boolean;
+  gender: number;
+  id: number;
+  knownForDepartment: string;
+  name: string;
+  originalName: string;
+  popularity: number;
+  profilePath: string;
+  jobs: AggregateJob[];
+  department: string;
+  totalEpisodeCount: number;
 }
 
 /* ─────────────────────────  Simple Episode  ────────────────────────── */
@@ -348,7 +350,7 @@ export interface MovieResponse extends Response {
 }
 
 export interface MovieResponseAppended extends MovieResponse {
-  releases: { countries: ReleaseDate[] };
+  releases: { countries: ReleasesReleaseDate[] };
   videos: VideosResponse;
   "watch/providers"?: WatchProviderResponse;
   mediaType: "movie"; // Not provided by API
@@ -404,15 +406,15 @@ export interface ShowResponseAppended extends ShowResponse {
 /* ───────────────────────────  Video Lists  ─────────────────────────── */
 
 export interface VideosResponse extends Response {
-  id?: number;
-  results?: Video[];
+  id: number;
+  results: Video[];
 }
 
 /* ────────────────────────  Watch Providers  ────────────────────────── */
 
 export interface WatchProviderResponse {
-  id?: number;
-  results?: {
+  id: number;
+  results: {
     AR?: WatchProviderCountry;
     AT?: WatchProviderCountry;
     AU?: WatchProviderCountry;
@@ -472,14 +474,14 @@ export interface WatchProviderCountry {
 }
 
 export interface WatchProvider {
-  displayPriority?: number;
-  logoPath?: string;
-  providerId?: number;
-  providerName?: string;
+  displayPriority: number;
+  logoPath: string;
+  providerId: number;
+  providerName: string;
 }
 
 export interface WatchProviderListResponse {
-  results?: WatchProvider[];
+  results: WatchProvider[];
 }
 
 /* ───────────────────────────  Misc Models  ─────────────────────────── */
@@ -526,9 +528,20 @@ export interface SpokenLanguage {
 }
 
 export interface RatingResponse {
-  descriptors: string[];
+  descriptors: Array<String>;
+  iso31661: string;
+  rating: string;
+}
+
+export interface MovieRatingResponse {
+  descriptors: Array<String>;
   iso31661?: string;
-  rating?: string;
+  certification?: string;
+}
+
+export interface ShowContentRatingResponse extends Response {
+  results: Array<RatingResponse>;
+  id: number;
 }
 
 export interface Network {
@@ -731,16 +744,16 @@ export interface SearchPersonResponse extends PaginatedResponse {
 }
 
 export interface TvExternalIdsResponse extends Response {
-  imdbId?: string | null;
-  freebaseMid?: string | null;
-  freebaseId?: string | null;
-  tvdbId?: number | null;
-  tvrageId?: number | null;
-  facebookId?: string | null;
-  instagramId?: string | null;
-  twitterId?: string | null;
-  wikidataId?: string | null;
-  id?: number;
+  imdbId: string | null;
+  freebaseMid: string | null;
+  freebaseId: string | null;
+  tvdbId: number | null;
+  tvrageId: number | null;
+  facebookId: string | null;
+  instagramId: string | null;
+  twitterId: string | null;
+  wikidataId: string | null;
+  id: number;
 }
 
 export interface MovieExternalIdsResponse extends Response {
@@ -767,10 +780,10 @@ export interface PersonExternalIdsResponse extends Response {
 }
 
 export interface TvImagesResponse extends Response {
-  backdrops?: Array<Backdrop>;
-  id?: number;
-  posters?: Array<Poster>;
-  logos?: Array<TitleLogo>;
+  backdrops: Array<Backdrop>;
+  id: number;
+  posters: Array<Poster>;
+  logos: Array<TitleLogo>;
 }
 
 export interface MovieImagesResponse extends Response {
@@ -778,4 +791,30 @@ export interface MovieImagesResponse extends Response {
   backdrops?: Array<Backdrop>;
   posters?: Array<Poster>;
   logos?: Array<TitleLogo>;
+}
+
+export interface MovieResultsResponse extends PaginatedResponse {
+  results?: Array<MovieResult>;
+}
+
+export interface TvResultsResponse extends PaginatedResponse {
+  results?: Array<TvResult>;
+}
+
+export interface MovieReleaseDatesResponse extends Response {
+  id: number;
+  results: Array<{
+    iso31661: string;
+    releaseDates: Array<ReleaseDate>;
+  }>;
+}
+
+export interface SimilarMovieResponse extends MovieRecommendationsResponse {}
+
+export interface MovieRecommendationsResponse extends PaginatedResponse {
+  results?: Array<MovieResult>;
+}
+
+export interface SimilarShowsResponse extends PaginatedResponse {
+  results: Array<TvResult>;
 }

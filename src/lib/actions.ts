@@ -1,24 +1,12 @@
 "use server";
 
-import { watchlistNameSchema } from "@/types/schema";
+import { watchlistSchema } from "@/types/schema";
 import { db } from "@/db/index";
-import { and, asc, eq, gt, sql } from "drizzle-orm";
-import {
-  rateLimitViolation,
-  profiles,
-  watchlist,
-  watchlistItems,
-} from "@/db/schema";
-import {
-  FullMovie,
-  FullTv,
-  JustWatchInfo,
-  WatchlistI,
-  WatchlistSchemaI,
-} from "@/types/camel-index";
+import { and, asc, eq, gt, not, sql } from "drizzle-orm";
+import { rateLimitViolation, watchlist, watchlistItems } from "@/db/schema";
+import { JustWatchInfo } from "@/types/camel-index";
 import { rateLimitLog } from "@/db/schema";
 import { nanoid } from "nanoid";
-import { Genre } from "@/types/types";
 import { movieSummaries } from "@/db/schema";
 import { tvSummaries } from "@/db/schema";
 import { DiscoverItem } from "@/types/camel-index";
@@ -26,119 +14,93 @@ import { DiscoverItem } from "@/types/camel-index";
 const LIMIT = 10;
 const WINDOW = 60_000;
 
-export async function deleteItemFromWatchlist(
+export async function setWatchlistDetails(
   watchlistId: string,
-  watchlistItemId: string
-) {
-  await deleteWatchlistItem(watchlistId, watchlistItemId);
-}
-
-export async function addMovieToWatchlist(
-  watchlistId: string,
-  data: FullMovie,
-  rating: string
+  name: string,
+  isPublic: boolean,
+  description: string | undefined
 ) {
   const result = await db
-    .insert(watchlistItems)
-    .values({
-      tmdbId: data.id,
-      watchlistId: watchlistId,
-      title: data.title ?? "",
-      itemType: "movie",
-      genres:
-        (data.genres as Genre[])?.map((genre) => genre.name || "none") ?? [], // Array of genre names (string[])
-      tmdbVoteAverage: data.voteAverage
-        ? parseFloat(data.voteAverage.toString())
-        : null,
-      rating: rating,
-      popularity: Number(data.popularity?.toFixed()), // Popularity as integer or null
-      language: data.originalLanguage,
-      summary: data.overview,
-      posterPath: data.posterPath,
-      backdropPath: data.backdropPath,
+    .update(watchlist)
+    .set({
+      name,
+      isPublic,
+      description: description ?? null,
     })
+    .where(eq(watchlist.id, watchlistId))
     .returning();
 
   return result;
 }
-
-export async function addTvToWatchlist(
-  watchlistId: string,
-  data: FullTv,
-  rating: string
+export async function isUniqueWatchlistName(
+  watchlistId: string | undefined,
+  name: string,
+  userId: string
 ) {
-  const result = await db
-    .insert(watchlistItems)
-    .values({
-      tmdbId: data.id,
-      watchlistId: watchlistId,
-      title: data.name ?? "",
-      itemType: "tv",
-      genres: data.genres?.map((genre) => genre.name || "none") ?? [], // Array of genre names (string[])
-      tmdbVoteAverage: data.voteAverage
-        ? parseFloat(data.voteAverage.toString())
-        : null, // Parse as float
-      rating: rating ?? null, // Rating is either string or null
-      popularity: Number(data.popularity?.toFixed()) ?? null, // Popularity as integer or null
-      language: data.originalLanguage || null, // Language as string or null
-      numberOfSeasons: data.numberOfSeasons ?? null, // Integer or null
-      numberOfEpisodes: data.numberOfEpisodes ?? null, // Integer or null
-      summary: data.overview ?? null, // Summary is string or null
-      posterPath: data.posterPath,
-      backdropPath: data.backdropPath,
-    })
-    .returning();
-
-  return result;
+  const baseFilter = and(
+    eq(watchlist.userId, userId),
+    eq(watchlist.name, name)
+  );
+  const conflict = await db.query.watchlist.findFirst({
+    where: watchlistId
+      ? and(baseFilter, not(eq(watchlist.id, watchlistId)))
+      : baseFilter,
+    columns: { id: true }, // only fetch the PK
+  });
+  return conflict === undefined;
 }
 
-export async function createWatchlist(userId: string, watchlistName: string) {
+export async function createWatchlist(
+  userId: string,
+  name: string,
+  isPublic: boolean,
+  description: string | undefined
+) {
   const result = await db
     .insert(watchlist)
     .values({
       userId,
-      watchlistName,
+      name,
+      isPublic,
+      description: description ?? null,
     })
     .returning();
 
   return result; // Returns the newly created watchlist entry
 }
 
-/** This function determines the type of the `watchlistItemId` parameter and uses the appropriate
- * field (`itemId` or `tmdbId`) to locate and delete the item in the `watchlistItems` table.
+/**
+ * Delete one item (movie or TV) from a watchlist.
+ *
+ * @param opts.watchlistId  - the UUID of the watchlist
+ * @param opts.mediaType    - "movie" or "tv"
+ * @param opts.tmdbId       - the TMDb ID of the media
+ * @returns the deleted row, or null if none matched
  */
-export async function deleteWatchlistItem(
-  watchlistId: string,
-  watchlistItemId: string | number
-) {
-  const result = await db
-    .delete(watchlistItems)
-    .where(
-      and(
-        eq(watchlistItems.watchlistId, watchlistId),
-        typeof watchlistItemId === "string"
-          ? eq(watchlistItems.itemId, watchlistItemId)
-          : eq(watchlistItems.tmdbId, watchlistItemId)
-      )
-    )
-    .returning();
-  return result;
-}
+export async function deleteWatchlistItem(opts: {
+  watchlistId: string;
+  mediaType: "movie" | "tv";
+  tmdbId: number;
+}) {
+  const { watchlistId, mediaType, tmdbId } = opts;
 
-export async function deleteWatchlistItemTmdbId(
-  watchlistId: string,
-  tmdbId: number
-) {
-  const result = await db
+  const predicate =
+    mediaType === "movie"
+      ? and(
+          eq(watchlistItems.watchlistId, watchlistId),
+          eq(watchlistItems.movieId, tmdbId)
+        )
+      : and(
+          eq(watchlistItems.watchlistId, watchlistId),
+          eq(watchlistItems.tvId, tmdbId)
+        );
+
+  const [deleted] = await db
     .delete(watchlistItems)
-    .where(
-      and(
-        eq(watchlistItems.watchlistId, watchlistId),
-        eq(watchlistItems.tmdbId, tmdbId)
-      )
-    )
+    .where(predicate)
     .returning();
-  return result;
+
+  return deleted || null;
 }
 
 export async function deleteWatchlist(userId: string, watchlistId: string) {
@@ -179,62 +141,12 @@ export async function getDefaultWatchlist(userId: string) {
   return defaultWatchlist || null; // Return the watchlist or null if not found
 }
 
-export async function addToDefaultWatchlist(
-  userId: string,
-  data: FullTv | FullMovie,
-  rating: string,
-  mediaType: "tv" | "movie"
-) {
-  try {
-    let defaultWatchlist;
-    defaultWatchlist = await getDefaultWatchlist(userId);
-    if (!defaultWatchlist) {
-      setFirstWatchlistAsDefault(userId);
-      defaultWatchlist = await getDefaultWatchlist(userId);
-    }
-    const existingItem = await getWatchlistItem(
-      userId,
-      defaultWatchlist?.id!,
-      data.id
-    );
-    if (existingItem.length > 0) {
-      console.log("Item already exists");
-      return null;
-    }
-    let result;
-    switch (mediaType) {
-      case "movie":
-        result = await addMovieToWatchlist(
-          defaultWatchlist?.id!,
-          data as FullMovie,
-          rating
-        );
-        break;
-      case "tv":
-        result = await addTvToWatchlist(
-          defaultWatchlist?.id!,
-          data as FullTv,
-          rating
-        );
-        break;
-      default:
-        result = null;
-        console.error(
-          `Failed to add ${(data as any).name || (data as any).title} to default watchlist`
-        );
-    }
-    return result;
-  } catch (error) {
-    console.log(error);
-  }
-}
-
 export async function setWatchlistName(
   userId: string,
   watchlistId: string,
   newWatchlistName: string
 ) {
-  const validatedFields = watchlistNameSchema.safeParse({
+  const validatedFields = watchlistSchema.safeParse({
     name: newWatchlistName,
   });
 
@@ -248,12 +160,11 @@ export async function setWatchlistName(
   try {
     const [watchlistToChange] = await db
       .update(watchlist)
-      .set({ watchlistName: validatedFields.data.name })
+      .set({ name: validatedFields.data.name })
       .where(and(eq(watchlist.userId, userId), eq(watchlist.id, watchlistId)))
       .returning();
 
-    if (watchlistToChange?.watchlistName === newWatchlistName)
-      return watchlistToChange;
+    if (watchlistToChange?.name === newWatchlistName) return watchlistToChange;
   } catch (error) {
     console.log("Failed to set watchlist name", error);
   }
@@ -286,159 +197,71 @@ async function setFirstWatchlistAsDefault(userId: string): Promise<void> {
   }
 }
 
-async function getWatchlistItems(userId: string, watchlistId: string) {
-  const items = await db
-    .select({
-      id: watchlistItems.id,
-      watchlistId: watchlistItems.watchlistId,
-      itemId: watchlistItems.itemId,
-      tmdbId: watchlistItems.tmdbId,
-      title: watchlistItems.title,
-      itemType: watchlistItems.itemType,
-      genres: watchlistItems.genres,
-      watchlistName: watchlist.watchlistName,
-      tmdbVoteAverage: watchlistItems.tmdbVoteAverage,
-      rating: watchlistItems.rating,
-      popularity: watchlistItems.popularity,
-      language: watchlistItems.language,
-      numberOfSeasons: watchlistItems.numberOfSeasons,
-      numberOfEpisodes: watchlistItems.numberOfEpisodes,
-      summary: watchlistItems.summary,
-      posterPath: watchlistItems.posterPath,
-      backdropPath: watchlistItems.backdropPath,
-    })
-    .from(watchlistItems)
-    .leftJoin(watchlist, eq(watchlistItems.watchlistId, watchlistId)) // Corrected join syntax with eq
-    .where(eq(watchlist.userId, userId)); // where expects a single condition argument
+export async function isItemOnWatchlist(opts: {
+  watchlistId: string;
+  mediaType: "movie" | "tv";
+  tmdbId: number;
+}): Promise<boolean> {
+  const { watchlistId, mediaType, tmdbId } = opts;
 
-  return items;
-}
-async function getWatchlistItem(
-  userId: string,
-  watchlistId: string,
-  tmdbId: number
-) {
-  const items = await db
-    .select({
-      id: watchlistItems.id,
-      watchlistId: watchlistItems.watchlistId,
-      itemId: watchlistItems.itemId,
-      tmdbId: watchlistItems.tmdbId,
-      title: watchlistItems.title,
-      itemType: watchlistItems.itemType,
-      genres: watchlistItems.genres,
-      tmdbVoteAverage: watchlistItems.tmdbVoteAverage,
-      rating: watchlistItems.rating,
-      popularity: watchlistItems.popularity,
-      language: watchlistItems.language,
-      numberOfSeasons: watchlistItems.numberOfSeasons,
-      numberOfEpisodes: watchlistItems.numberOfEpisodes,
-      summary: watchlistItems.summary,
-      posterPath: watchlistItems.posterPath,
-      backdropPath: watchlistItems.backdropPath,
-    })
-    .from(watchlistItems)
-    .leftJoin(watchlist, eq(watchlistItems.watchlistId, watchlistId)) // Corrected join syntax with eq
-    .where(
-      and(eq(watchlist.userId, userId), eq(watchlistItems.tmdbId, tmdbId))
-    ); // where expects a single condition argument
-
-  return items;
-}
-export async function getWatchlist(
-  userId: string,
-  watchlistId: string
-): Promise<WatchlistSchemaI[]> {
-  const items = await db
-    .select({
-      id: watchlist.id,
-      watchlistName: watchlist.watchlistName,
-      userid: watchlist.userId,
-      createdAt: watchlist.createdAt,
-      default: watchlist.isDefault,
-    })
-    .from(watchlist)
-    .where(and(eq(watchlist.userId, userId), eq(watchlist.id, watchlistId)))
-    .limit(1);
-  return items;
-}
-
-export async function getWatchlists(
-  userId: string
-): Promise<WatchlistSchemaI[]> {
-  const items = await db
-    .select({
-      id: watchlist.id,
-      watchlistName: watchlist.watchlistName,
-      userid: watchlist.userId,
-      createdAt: watchlist.createdAt,
-      default: watchlist.isDefault,
-    })
-    .from(watchlist)
-    .where(eq(watchlist.userId, userId));
-  return items;
-}
-
-export async function getWatchlistsAndItems(
-  userId: string
-): Promise<WatchlistI[]> {
-  // Get the user's watchlists
-  const watchlistsRes = await getWatchlists(userId);
-
-  // Get all items associated with the user's watchlists
-  const items = await db
-    .select({
-      id: watchlistItems.id,
-      watchlistId: watchlistItems.watchlistId,
-      itemId: watchlistItems.itemId,
-      tmdbId: watchlistItems.tmdbId,
-      title: watchlistItems.title,
-      itemType: watchlistItems.itemType,
-      genres: watchlistItems.genres,
-      tmdbVoteAverage: watchlistItems.tmdbVoteAverage,
-      rating: watchlistItems.rating,
-      popularity: watchlistItems.popularity,
-      language: watchlistItems.language,
-      numberOfSeasons: watchlistItems.numberOfSeasons,
-      numberOfEpisodes: watchlistItems.numberOfEpisodes,
-      summary: watchlistItems.summary,
-      posterPath: watchlistItems.posterPath,
-      backdropPath: watchlistItems.backdropPath,
-    })
-    .from(watchlistItems)
-    .leftJoin(watchlist, eq(watchlist.id, watchlistItems.watchlistId))
-    .where(eq(watchlist.userId, userId));
-
-  const watchlists: WatchlistI[] = watchlistsRes.map((watchlist) => {
-    const filteredItems = items
-      .filter((item) => item.watchlistId === watchlist.id)
-      .map((item) => ({
-        id: item.id,
-        watchlistId: item.watchlistId as string,
-        itemId: item.itemId as string,
-        tmdbId: item.tmdbId,
-        title: item.title,
-        itemType: item.itemType as "tv" | "movie",
-        genres: item.genres,
-        tmdbVoteAverage: Number(item.tmdbVoteAverage) || 0,
-        rating: item.rating ?? "",
-        popularity: item.popularity ?? 0,
-        language: item.language ?? "",
-        numberOfSeasons: item.numberOfSeasons ?? 0,
-        numberOfEpisodes: item.numberOfEpisodes ?? 0,
-        summary: item.summary ?? "",
-        posterPath: item.posterPath ?? null,
-        backdropPath: item.backdropPath ?? null,
-      }));
-
-    return {
-      ...watchlist,
-      items: filteredItems,
-    };
+  const found = await db.query.watchlistItems.findFirst({
+    where: (wi, { and, eq }) =>
+      and(
+        eq(wi.watchlistId, watchlistId),
+        mediaType === "movie" ? eq(wi.movieId, tmdbId) : eq(wi.tvId, tmdbId)
+      ),
   });
 
-  return watchlists;
+  return found !== undefined;
 }
+
+// export async function getWatchlistsWithItems(userId: string): Promise<WatchlistWithItems[] | null> {
+//   return db.query.watchlist.findMany({
+//     where: (w, { eq }) => eq(w.userId, userId),
+//     with: watchlistRelations,
+//   });
+// }
+
+// export async function getWatchlistsWithItems(
+//   userId: string
+// ): Promise<WatchlistWithItems[] | null> {
+//   return db.query.watchlist.findMany({
+//     where: (w, { eq }) => eq(w.userId, userId),
+//     with: watchlistRelations,
+//   });
+// }
+// export async function getWatchlistsAndItems(
+//   userId: string
+// ): Promise<WatchlistI[]> {
+//   // Get the user's watchlists
+//   const watchlistsRes = await getWatchlists(userId);
+//
+//   // Get all items associated with the user's watchlists
+//   const items = await db
+//     .select({
+//       id: watchlistItems.id,
+//       watchlistId: watchlistItems.watchlistId,
+//       tvId: watchlistItems.tvId,
+//       movieId: watchlistItems.movieId
+//     })
+//     .from(watchlistItems)
+//     .leftJoin(watchlist, eq(watchlist.id, watchlistItems.watchlistId))
+//     .where(eq(watchlist.userId, userId));
+//
+//   const watchlists: WatchlistI[] = watchlistsRes.map((watchlist) => {
+//     const filteredItems = items
+//       .filter((item) => item.watchlistId === watchlist.id)
+//       .map((item) => ({
+//       }));
+//
+//     return {
+//       ...watchlist,
+//       items: filteredItems,
+//     };
+//   });
+//
+//   return watchlists;
+// }
 
 export async function getAllTv(): Promise<DiscoverItem[] | undefined> {
   try {

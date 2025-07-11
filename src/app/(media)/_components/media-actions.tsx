@@ -3,33 +3,25 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Play } from "lucide-react";
-import { FullMovie, FullTv } from "@/types/camel-index";
-import AddToWatchlistDropdown from "@/components/add-to-watchlist-button";
-import { useSupabase } from "@/context/supabase";
-import { useWatchlist } from "@/context/watchlist";
+import { MovieResult, TvResult } from "@/types/request-types-camelcase";
+import WatchlistDropdown from "./watchlist-dropdown";
 
 interface Props {
   tmdbId: number;
-  data: FullMovie | FullTv;
-  rating: string;
+  data: TvResult | MovieResult | null;
   videoPath?: string;
   mediaType: "tv" | "movie";
+  variant?: "default" | "icon";
 }
 
 export default function MediaActions({
   tmdbId,
   data,
-  rating,
   videoPath,
   mediaType,
+  variant = "default",
 }: Props) {
-  const { session } = useSupabase();
-  const user = session?.user;
-  const { watchlists } = useWatchlist();
-
   const canPlay = Boolean(videoPath?.trim());
-  const hasWatchlists = watchlists?.length > 0;
-
   return (
     <div className="flex justify-center space-x-3 md:justify-start">
       {canPlay && (
@@ -40,25 +32,12 @@ export default function MediaActions({
           </Button>
         </Link>
       )}
-
-      {user ? (
-        hasWatchlists ? (
-          <AddToWatchlistDropdown
-            userId={user.id}
-            item={data}
-            rating={rating}
-            mediaType={mediaType}
-          />
-        ) : (
-          <Link href="/watchlists/create">
-            <Button variant="secondary">Create Watchlist</Button>
-          </Link>
-        )
-      ) : (
-        <Link href="/signin">
-          <Button variant="secondary">Add to Watchlist</Button>
-        </Link>
-      )}
+      <WatchlistDropdown
+        data={data}
+        mediaType={mediaType}
+        tmdbId={tmdbId}
+        variant={variant}
+      />
     </div>
   );
 }

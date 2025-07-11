@@ -5,6 +5,11 @@ import { Genre } from "@/types/types";
 import { FullMovie, FullTv } from "@/types/camel-index";
 import { Expandable } from "./expandable";
 import MediaRatings from "./media-ratings";
+import LocalRating from "./local-rating";
+import {
+  TmdbMovieDetailsResponseAppended,
+  TmdbTvDetailsResponseAppended,
+} from "@/types/tmdb-camel";
 
 export interface MediaHeaderProps {
   title: string;
@@ -20,7 +25,7 @@ export interface MediaHeaderProps {
   tmdbVoteAverage: number | null;
   tmdbVoteCount: number | null;
   genres: Genre[] | null;
-  data: FullTv | FullMovie;
+  data: TmdbTvDetailsResponseAppended | TmdbMovieDetailsResponseAppended;
   trailerPath: string | undefined;
   tmdbId: number;
   imdbId: string | null;
@@ -175,9 +180,20 @@ export async function MediaHeader({
                 <div className="text-xs font-medium uppercase text-gray-400">
                   Rated
                 </div>
-                <div className="mt-1 inline-block border px-1 text-sm">
-                  {rating}
-                </div>
+                <LocalRating
+                  initialValue={rating}
+                  mediaType={mediaType}
+                  ratings={
+                    ((data as TmdbTvDetailsResponseAppended).contentRatings
+                      ?.results ??
+                      []) ||
+                    (data as TmdbMovieDetailsResponseAppended).releaseDates
+                      ?.results
+                  }
+                />
+                {/* <div className="mt-1 inline-block border px-1 text-sm"> */}
+                {/*   {rating} */}
+                {/* </div> */}
               </div>
             )}
 
@@ -186,7 +202,7 @@ export async function MediaHeader({
                 <div className="text-xs font-medium uppercase text-gray-400">
                   Runtime
                 </div>
-                <div className="mt-1 inline-block border px-1 text-sm">
+                <div className="mt-1 inline-block border border-gray-300 px-1 text-sm">
                   {runtimeLabel}
                 </div>
               </div>
@@ -215,7 +231,6 @@ export async function MediaHeader({
           data={data}
           videoPath={trailerPath}
           tmdbId={tmdbId}
-          rating={rating ?? ""}
           mediaType={mediaType}
         />
       </div>

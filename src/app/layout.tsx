@@ -7,6 +7,7 @@ import { Footer } from "@/components/footer";
 import { Analytics } from "@vercel/analytics/react";
 import { SupabaseProvider } from "@/context/supabase";
 import { Toaster } from "sonner";
+import { WatchlistProvider } from "@/context/watchlist";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -32,18 +33,20 @@ export default async function RootLayout({
         )}
       >
         <SupabaseProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="dark"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <TopNav />
-            {children}
-            <Toaster />
-            <Analytics />
-            <Footer />
-          </ThemeProvider>
+          <WatchlistProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="dark"
+              enableSystem
+              disableTransitionOnChange
+            >
+              <TopNav />
+              {children}
+              <Toaster />
+              <Analytics />
+              <Footer />
+            </ThemeProvider>
+          </WatchlistProvider>
         </SupabaseProvider>
       </body>
     </html>

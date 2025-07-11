@@ -1,10 +1,6 @@
 "server only";
 // import { getWatchlistsAndItems } from "@/lib/actions";
-import {
-  BASE_API_URL,
-  NUM_OF_POPULAR_PEOPLE_PAGES,
-  options,
-} from "@/lib/constants";
+import { BASE_API_URL, options } from "@/lib/constants";
 import {
   FullMovie,
   FullPerson,
@@ -12,16 +8,10 @@ import {
   GroupedProvider,
 } from "@/types/camel-index";
 import {
-  MovieContentRatingResponse,
-  MovieResponseAppended,
-  MovieResultsResponse,
   MovieReviewsResponse,
-  PersonPopularResponse,
   PersonResult,
+  ReleaseDate,
   SearchRequest,
-  ShowContentRatingResponse,
-  ShowResponseAppended,
-  TvResultsResponse,
   TvReviewsResponse,
   TvSeasonResponse,
 } from "@/types/request-types-snakecase";
@@ -29,6 +19,10 @@ import {
   MovieResult,
   TvResult,
   SearchPersonResponse,
+  MovieResultsResponse,
+  TvResultsResponse,
+  ShowContentRatingResponse,
+  MovieReleaseDatesResponse,
 } from "@/types/request-types-camelcase";
 import camelcaseKeys from "camelcase-keys";
 import { unstable_cache } from "next/cache";
@@ -37,9 +31,12 @@ import {
   fetchTmdbTvLists,
   getTrendingPages,
 } from "@/app/discover/actions";
-import JustWatch, { StreamingInfo, StreamProvider } from "justwatch-api-client";
 import { scrubByMaxRes } from "@/lib/scrub-streams";
 import { getJustWatchInfoFromDb } from "@/lib/actions";
+import {
+  TmdbMovieDetailsResponseAppended,
+  TmdbTvDetailsResponseAppended,
+} from "@/types/tmdb-camel";
 // Don't import React cache: /scripts/revalidate.ts throws error
 
 export const fetchPersonDetails = unstable_cache(
@@ -60,10 +57,13 @@ export const fetchPersonDetails = unstable_cache(
 );
 
 export const fetchTvDetails = unstable_cache(
-  async (id: number, resOptions: RequestInit = options): Promise<FullTv> => {
+  async (
+    id: number,
+    resOptions: RequestInit = options
+  ): Promise<TmdbTvDetailsResponseAppended> => {
     try {
       const res = await fetch(
-        `${BASE_API_URL}/tv/${id}?append_to_response=videos,images,releases,content_ratings,credits,aggregate_credits,episode_groups,watch/providers,external_ids&language=en`,
+        `${BASE_API_URL}/tv/${id}?append_to_response=videos,images,releases,content_ratings,credits,aggregate_credits,episode_groups,watch/providers,external_ids,similar&language=en`,
         resOptions
       );
       const data = await res.json();
@@ -75,14 +75,14 @@ export const fetchTvDetails = unstable_cache(
       };
       delete dataFixed["watch/providers"];
       // camelCase everything else
-      const camel = camelcaseKeys<Record<string, unknown>>(dataFixed, {
+      const camel = camelcaseKeys(dataFixed, {
         deep: true,
         exclude: [/^[A-Z]{2}$/],
-      }) as FullTv;
+      });
       // fix up dates, etc…
       if (camel.firstAirDate) camel.firstAirDate = new Date(camel.firstAirDate);
       camel.tmdbId = camel.id;
-      return camel as FullTv;
+      return camel as TmdbTvDetailsResponseAppended;
     } catch (err) {
       console.error("fetchTvDetails failed for,", id, err);
       throw err;
@@ -95,12 +95,15 @@ export const fetchTvDetails = unstable_cache(
 );
 
 export const fetchMovieDetails = unstable_cache(
-  async (id: number, resOptions: RequestInit = options): Promise<FullMovie> => {
+  async (
+    id: number,
+    resOptions: RequestInit = options
+  ): Promise<TmdbMovieDetailsResponseAppended> => {
     try {
       const res = await fetch(
         `${BASE_API_URL}/movie/${id}` +
-          `?append_to_response=videos,images,releases,content_ratings,credits,aggregate_credits,` +
-          `episode_groups,watch/providers,external_ids&language=en`,
+          `?append_to_response=videos,images,releases,release_dates,credits,aggregate_credits,` +
+          `watch/providers,external_ids,similar&language=en`,
         resOptions
       );
       const data = await res.json();
@@ -114,15 +117,16 @@ export const fetchMovieDetails = unstable_cache(
       delete dataFixed["watch/providers"];
 
       // camelCase everything else
-      const camel = camelcaseKeys<Record<string, unknown>>(dataFixed, {
+      const camel = camelcaseKeys(dataFixed, {
         deep: true,
         exclude: [/^[A-Z]{2}$/],
-      }) as FullMovie;
+      });
 
       // fix up dates, etc…
       if (camel.releaseDate) camel.releaseDate = new Date(camel.releaseDate);
       camel.tmdbId = camel.id;
-      return camel as FullMovie;
+      console.log(camel.releaseDates);
+      return camel as TmdbMovieDetailsResponseAppended;
     } catch (err) {
       console.error("fetchMovieDetails failed for,", id, err);
       throw err;
@@ -144,6 +148,22 @@ export async function getReviews(
   return res.json();
 }
 
+export async function fetchSimilarMovies(
+  id: number,
+  resOptions: RequestInit = options
+): Promise<MovieResultsResponse | undefined> {
+  try {
+    const res = await fetch(`${BASE_API_URL}/movie/${id}/similar`, resOptions);
+    const data = await res.json();
+    const camel = camelcaseKeys(data, {
+      deep: true,
+    });
+    return camel;
+  } catch (error) {
+    console.error(`Error fetching similar movies with id: ${id}`);
+  }
+}
+
 export async function getRecommendations(
   id: number,
   type: "tv" | "movie",
@@ -154,23 +174,54 @@ export async function getRecommendations(
       `${BASE_API_URL}/${type}/${id}/recommendations`,
       resOptions
     );
-    return res.json();
+    const data = await res.json();
+    const camel = camelcaseKeys(data, {
+      deep: true,
+    });
+    // const camel = camelcaseKeys<Record<string, unknown>>(data, {
+    //   deep: true,
+    // });
+    return camel;
   } catch (error) {
     console.error(`Error fetching recommendations for ${type} with id: ${id}`);
   }
 }
 
-export async function getContentRating(
-  type: "tv" | "movie",
+export async function fetchTvContentRatings(
   id: number,
   resOptions: RequestInit = options
-): Promise<ShowContentRatingResponse | MovieContentRatingResponse | undefined> {
+): Promise<ShowContentRatingResponse | undefined> {
   try {
     const res = await fetch(
-      `${BASE_API_URL}/${type}/${id}/${type === "tv" ? "content_ratings" : "releases"}`,
+      `${BASE_API_URL}/tv/${id}/content_ratings`,
       resOptions
     );
-    return res.json();
+
+    const data = await res.json();
+    const camel = camelcaseKeys(data, {
+      deep: true,
+    });
+    return camel;
+  } catch (error) {
+    console.error("Error fetching content ratings");
+  }
+}
+
+export async function fetchMovieReleaseDates(
+  id: number,
+  resOptions: RequestInit = options
+): Promise<ShowContentRatingResponse | MovieReleaseDatesResponse | undefined> {
+  try {
+    const res = await fetch(
+      `${BASE_API_URL}/movie/${id}/release_dates`,
+      resOptions
+    );
+
+    const data = await res.json();
+    const camel = camelcaseKeys(data, {
+      deep: true,
+    });
+    return camel;
   } catch (error) {
     console.error("Error fetching content ratings");
   }
@@ -283,174 +334,4 @@ export async function fetchTopPeopleIds(reqOptions: RequestInit = options) {
   }));
 
   return trendingPeopleIds;
-}
-
-// Called by /scripts/revalidate.ts: Don't wrap with React cache or unstable_cache
-export const fetchJustWatchData = async (
-  tmdbTitle: string,
-  type: "movie" | "tv",
-  tmdbId: number,
-  releaseDate?: Date | null
-): Promise<StreamingInfo | undefined> => {
-  try {
-    const releaseYear = releaseDate
-      ? new Date(releaseDate).getFullYear()
-      : null;
-    // 1) Search JustWatch for your title
-    const justwatch = new JustWatch(5000);
-    // Search for a movie/show (with optional country code, default is "IN")
-    const searchResults = await justwatch.searchByQuery(tmdbTitle, "US");
-    const matches = searchResults.filter(
-      (item) =>
-        item.title?.toLowerCase() === tmdbTitle.toLowerCase() &&
-        item.fullPath &&
-        (releaseYear ? item.originalReleaseYear === releaseYear : true)
-    );
-    const firstMatch = matches[0];
-    // console.log(searchResults)
-    // console.log(firstMatch)
-    const data =
-      firstMatch?.fullPath &&
-      (await justwatch.getData(firstMatch.fullPath, "US"));
-    // console.log(JSON.stringify(data, null, 2))
-    return data ? data : undefined;
-  } catch (err) {
-    console.error(
-      `Error fetching JustWatch ${tmdbTitle}: ${type}/${tmdbId} (${releaseDate})`
-    );
-  }
-};
-
-export const getJustWatchInfo = async (
-  tmdbTitle: string,
-  type: "movie" | "tv",
-  tmdbId: number,
-  releaseDate?: Date | null
-) => {
-  const justWatchResponse = await fetchJustWatchData(
-    tmdbTitle,
-    type,
-    tmdbId,
-    releaseDate
-  );
-
-  if (!justWatchResponse || !justWatchResponse.Streams?.length) return null;
-
-  const cleaned = scrubByMaxRes(justWatchResponse.Streams);
-  const providers = groupStreams(cleaned);
-
-  return {
-    ID: justWatchResponse.ID,
-    originalTitle: justWatchResponse.originalTitle,
-    isReleased: justWatchResponse.isReleased,
-    releastyear: justWatchResponse.releastyear,
-    genres: justWatchResponse.genres,
-    imdbScore: justWatchResponse.imdbScore,
-    imdbCount: justWatchResponse.imdbCount,
-    tmdbRating: justWatchResponse.tmdbRating,
-    tomatoMeter: justWatchResponse.tomatoMeter,
-    productionCountries: justWatchResponse.productionCountries,
-    shortDescription: justWatchResponse.shortDescription,
-    streams: providers,
-  };
-};
-
-export const getCachedJustWatch = unstable_cache(
-  async (
-    tmdbTitle: string,
-    type: "movie" | "tv",
-    tmdbId: number,
-    releaseDate?: Date | null
-  ) => {
-    const info = await getJustWatchInfoFromDb(Number(tmdbId), type);
-    if (info && info.streams) return info;
-
-    const res = await getJustWatchInfo(tmdbTitle, type, tmdbId, releaseDate);
-    return res;
-  },
-  [],
-  { revalidate: 60 * 60 * 12 }
-);
-
-export function groupStreams(streams: StreamProvider[]): GroupedProvider[] {
-  const map = new Map<
-    string,
-    {
-      provider: string;
-      name: string;
-      link: string;
-      icon: string;
-      types: Set<string>;
-      priceByType: Map<string, string>;
-      resolutionsByType: Map<string, Set<string>>;
-      audioByType: Map<string, Set<string>>;
-      subtitleByType: Map<string, Set<string>>;
-    }
-  >();
-
-  for (const s of streams) {
-    let e = map.get(s.Provider);
-    if (!e) {
-      e = {
-        provider: s.Provider,
-        name: s.Name,
-        link: s.Link,
-        icon: s.Icon,
-        types: new Set(),
-        priceByType: new Map(),
-        resolutionsByType: new Map(),
-        audioByType: new Map(),
-        subtitleByType: new Map(),
-      };
-      map.set(s.Provider, e);
-    }
-
-    // 1) record this type
-    e.types.add(s.Type);
-    // 2) price
-    e.priceByType.set(s.Type, s.Price);
-    // 3) resolution
-    if (!e.resolutionsByType.has(s.Type))
-      e.resolutionsByType.set(s.Type, new Set());
-    e.resolutionsByType.get(s.Type)!.add(s.Resolution);
-    // 4) audio
-    if (!e.audioByType.has(s.Type)) e.audioByType.set(s.Type, new Set());
-    s.Audio.forEach((a) => e.audioByType.get(s.Type)!.add(a));
-    // 5) subtitle
-    if (!e.subtitleByType.has(s.Type)) e.subtitleByType.set(s.Type, new Set());
-    s.Subtitle.forEach((t) => e.subtitleByType.get(s.Type)!.add(t));
-  }
-
-  // flatten
-  return Array.from(map.values()).map((e) => {
-    const types = Array.from(e.types);
-    const priceByType: Record<string, string> = {};
-    types.forEach((t) => {
-      priceByType[t] = e.priceByType.get(t) || "";
-    });
-    const resolutionsByType: Record<string, string[]> = {};
-    types.forEach((t) => {
-      resolutionsByType[t] = Array.from(e.resolutionsByType.get(t) || []);
-    });
-    const audioByType: Record<string, string[]> = {};
-    types.forEach((t) => {
-      audioByType[t] = Array.from(e.audioByType.get(t) || []);
-    });
-    const subtitleByType: Record<string, string[]> = {};
-    types.forEach((t) => {
-      subtitleByType[t] = Array.from(e.subtitleByType.get(t) || []);
-    });
-
-    return {
-      provider: e.provider,
-      name: e.name,
-      link: e.link,
-      icon: e.icon,
-      types,
-      priceByType,
-      resolutionsByType,
-      audioByType,
-      subtitleByType,
-    };
-  });
 }

@@ -1,14 +1,11 @@
 import Link from "next/link";
-import { Cast } from "@/types/request-types-camelcase";
 import Image from "next/image";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
-  BASE_CAST_IMAGE_URL,
   BASE_ORIGINAL_IMAGE_URL,
   DEFAULT_BLUR_DATA_URL,
 } from "@/lib/constants";
-import { RecommededSection } from "@/app/(media)/_components/recommendedSection";
 import ReviewSection from "@/app/(media)/_components/ReviewSection";
 import {
   fetchMovieDetails,
@@ -16,17 +13,16 @@ import {
   getRecommendations,
 } from "../../actions";
 import { getTrailer } from "@/lib/utils";
-import CastCard from "@/components/cast-card";
-import ImageCarousel from "@/components/image-carousel";
 import VideoPlayer from "../../_components/video-player";
 import { getRedisBlurValue } from "@/services/cache";
 import { MediaHeader } from "../../_components/media-header";
 import MediaProviders from "../../_components/media-providers";
 import { MediaDetails } from "../../_components/media-details";
-import { buildMovieDetailItems } from "./utils";
-import { Credits } from "../../_components/media-credits";
+import { buildMovieDetailItems, pickMovieRating } from "./utils";
 import { ChevronRight } from "lucide-react";
 import MediaLinks from "../../_components/media-links";
+import TopCast from "../../_components/top-cast";
+import { SimilarSection } from "../../_components/similar-section";
 
 export const revalidate = 43200; // 12 hours
 
@@ -63,18 +59,20 @@ export default async function MoviePage({
   if (!movie) throw new Error("fetchMovieDetails returned undefined");
 
   const videoPath = getTrailer(movie?.videos?.results || [])?.key;
-  const rating =
-    movie?.releases?.countries?.find(
-      (c) => c.iso31661 === "US" && c.certification
-    )?.certification ?? "";
+  const rating = movie.releaseDates
+    ? pickMovieRating(movie.releaseDates.results)
+    : null;
   const isReleased: boolean =
     (movie?.releaseDate &&
       new Date(movie?.releaseDate!).valueOf() < Date.now()) ||
     false;
-
+  console.log(rating);
   const detailItems = buildMovieDetailItems(movie);
   const blurData = await getRedisBlurValue("movie", params.id);
-  console.log(movie.externalIds);
+  const isCastValid = movie.credits?.cast && movie.credits.cast.length > 0;
+  const releaseDate =
+    typeof movie.releaseDate === "string" ? new Date(movie.releaseDate) : null;
+  // console.log(movie.releases);
   // console.log(movie.watchProviders?.results)
   // console.log(`Movie page rendered! ${movie.title}`)
   // TODO: Add all watch providers
@@ -120,7 +118,7 @@ export default async function MoviePage({
                     posterBlur={blurData?.posterBlur ?? null}
                     title={movie.title}
                     genres={movie.genres ?? null}
-                    tmdbId={params.id}
+                    tmdbId={movie.id}
                     imdbId={movie.externalIds?.imdbId ?? null}
                     tmdbVoteAverage={movie.voteAverage ?? null}
                     tmdbVoteCount={movie.voteCount ?? null}
@@ -143,7 +141,7 @@ export default async function MoviePage({
                     <MediaProviders
                       tmdbWatchProviders={movie.watchProviders}
                       mediaType="movie"
-                      releaseDate={movie.releaseDate ?? null}
+                      releaseDate={releaseDate}
                       title={movie.title}
                       tmdbId={movie.id}
                     />
@@ -167,28 +165,7 @@ export default async function MoviePage({
                         <Skeleton className="h-[356px] w-full rounded-xl" />
                       }
                     >
-                      <section className="media-card space-y-10">
-                        <ImageCarousel
-                          title={
-                            <h2 className={`text-2xl font-bold`}>Top Cast</h2>
-                          }
-                          items={movie.credits.cast
-                            ?.splice(0, 10)
-                            .map((item, index: number) => (
-                              <Link href={`/person/${item.id}`} key={index}>
-                                <CastCard
-                                  name={item.name}
-                                  character={item.character}
-                                  imagePath={item.profilePath}
-                                  index={index}
-                                  blurDataURL={DEFAULT_BLUR_DATA_URL}
-                                  className="pt-2"
-                                />
-                              </Link>
-                            ))}
-                          breakpoints="cast"
-                        />
-                      </section>
+                      {isCastValid && <TopCast cast={movie.credits?.cast!} />}
                     </Suspense>
                   </>
                 )}
@@ -204,12 +181,13 @@ export default async function MoviePage({
                     <Skeleton className="h-[356px] w-full rounded-xl" />
                   }
                 >
-                  <RecommededSection
-                    isReleased={isReleased}
-                    tmdbId={tmdbId}
-                    mediaType="movie"
-                    rating={rating}
-                  />
+                  {movie.similar?.results &&
+                    movie.similar.results.length > 0 && (
+                      <SimilarSection
+                        titles={movie.similar.results}
+                        mediaType="movie"
+                      />
+                    )}
                 </Suspense>
                 <Suspense
                   fallback={

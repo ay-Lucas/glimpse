@@ -6,6 +6,11 @@
   --swiper-pagination-bullet-size: 12px;
   --swiper-scrollbar-bg-color: rgba(255, 255, 255, 0.1);
   --swiper-scrollbar-drag-bg-color: rgba(255, 255, 255, 0.8);
+
+  /* --swiper-scrollbar-top: 0px; */
+  /* --swiper-scrollbar-bottom: auto; */
+  /* --swiper-scrollbar-left: auto; */
+  /* --swiper-scrollbar-right: 4px; */
   /*
   --swiper-navigation-top-offset: 50%;
   --swiper-navigation-sides-offset: 10px;

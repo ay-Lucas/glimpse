@@ -28,3 +28,10 @@ export async function getServerSupabase() {
     }
   );
 }
+
+export async function getCurrentUserId() {
+  const supabase = await getServerSupabase();
+  const { data, error } = await supabase.auth.getUser();
+  if (error || !data.user) throw new Error("Not authenticated");
+  return data.user.id;
+}

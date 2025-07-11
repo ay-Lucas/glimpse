@@ -3,20 +3,29 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useWatchlist } from "@/context/watchlist";
-import { Session } from "@supabase/supabase-js";
 import { EllipsisVertical } from "lucide-react";
+import EditWatchlist from "@/app/(media)/watchlist/_components/edit-watchlist";
 
 export function WatchlistDropdown({
-  watchlistItemId,
   watchlistId,
-  session,
+  watchlistName,
+  watchlistDescription,
+  isDefaultWatchlist,
+  isPublic,
+  tmdbId,
+  mediaType,
 }: {
-  watchlistItemId: string;
   watchlistId: string;
-  session: Session;
+  watchlistName: string;
+  watchlistDescription: string;
+  isDefaultWatchlist: boolean;
+  isPublic: boolean;
+  tmdbId: number;
+  mediaType: "tv" | "movie";
 }) {
   return (
     <DropdownMenu>
@@ -28,9 +37,19 @@ export function WatchlistDropdown({
       <DropdownMenuContent>
         <DropdownMenuItem>
           <DeleteWatchlistItem
+            tmdbId={tmdbId}
             watchlistId={watchlistId}
-            watchlistItemId={watchlistItemId}
-            session={session}
+            mediaType={mediaType}
+          />
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+          <EditWatchlist
+            watchlistId={watchlistId}
+            watchlistName={watchlistName}
+            isDefaultWatchlist={isDefaultWatchlist}
+            watchlistDescription={watchlistDescription}
+            isPublic={isPublic}
           />
         </DropdownMenuItem>
       </DropdownMenuContent>
@@ -39,23 +58,19 @@ export function WatchlistDropdown({
 }
 
 function DeleteWatchlistItem({
-  watchlistItemId,
+  tmdbId,
   watchlistId,
-  session,
+  mediaType,
 }: {
-  watchlistItemId: string;
+  tmdbId: number;
   watchlistId: string;
-  session: Session;
+  mediaType: "tv" | "movie";
 }) {
   const { deleteItem } = useWatchlist();
 
-  const handleDelete = async () => {
-    await deleteItem(watchlistId, watchlistItemId, session?.user.id!);
-  };
-
   return (
     <button
-      onClick={handleDelete}
+      onClick={() => deleteItem(watchlistId, tmdbId, mediaType)}
       className="flex w-full px-2 py-1.5 focus:bg-accent"
     >
       Delete

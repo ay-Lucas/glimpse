@@ -9,6 +9,7 @@ import "swiper/css/scrollbar";
 import "@/styles/swiper.css";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { Skeleton } from "./ui/skeleton";
 
 const breakpointOptions: {
   poster: {
@@ -97,13 +98,16 @@ export type CarouselBreakpoints = "poster" | "backdrop" | "title";
 export default function MediaCarousel({
   items,
   breakpointType,
+  className = "",
 }: {
   items: Array<JSX.Element>;
   breakpointType: CarouselBreakpoints;
+  className?: string;
 }) {
   const swiperRef = useRef<SwiperCore>();
   const [isPrevDisabled, setPrevDisabled] = useState(true);
   const [isNextDisabled, setNextDisabled] = useState(false);
+  const [loaded, setLoaded] = useState(false);
 
   const handleSlideChange = () => {
     const swiper = swiperRef.current;
@@ -147,6 +151,10 @@ export default function MediaCarousel({
 
   return (
     <>
+      {!loaded && (
+        <Skeleton className="rounded-lg" />
+        //<div className="absolute inset-0 animate-pulse rounded-lg bg-black" />
+      )}
       <Swiper
         cssMode
         speed={750}
@@ -168,8 +176,10 @@ export default function MediaCarousel({
           swiperRef.current = swiper;
         }}
         onInit={handleSlideChange}
-        className="mySwiper min-w-[500px]"
+        className={`mySwiper min-w-[500px] ${className}`}
         watchSlidesProgress={true}
+        simulateTouch={false}
+        onLoad={() => setLoaded(true)}
       >
         <button
           className={`absolute left-0 top-1/2 z-10 mt-[calc(0px-var(--swiper-navigation-size)/2)] h-[var(--swiper-navigation-size)] items-center rounded-md border border-primary bg-background/80 px-1 transition-opacity ${prevOpacity} invisible xs:visible`}

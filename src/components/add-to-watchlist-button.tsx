@@ -1,6 +1,5 @@
 "use client";
 import { Button } from "./ui/button";
-import { FullMovie, FullTv, WatchlistI } from "@/types/camel-index";
 import { useWatchlist } from "@/context/watchlist";
 import {
   DropdownMenu,
@@ -11,20 +10,23 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { Checkbox } from "./ui/checkbox";
-import { Fragment, MouseEvent, useEffect, useState } from "react";
+import { forwardRef, Fragment, useEffect, useState } from "react";
 import { CheckedState } from "@radix-ui/react-checkbox";
-import { LucideListPlus } from "lucide-react";
+import { BookmarkPlus } from "lucide-react";
+import { MovieResult, TvResult } from "@/types/request-types-camelcase";
 
 export default function AddToWatchlistDropdown({
   userId,
+  tmdbId,
   item,
-  rating,
   mediaType,
+  variant,
 }: {
   userId: string;
-  item: FullTv | FullMovie;
+  tmdbId: number;
+  item: TvResult | MovieResult | null;
   mediaType: "tv" | "movie";
-  rating: string;
+  variant: "default" | "icon";
 }) {
   const { addItemToWatchlist, deleteItem, watchlists } = useWatchlist();
   const [open, setOpen] = useState(false);
@@ -32,13 +34,7 @@ export default function AddToWatchlistDropdown({
   // Track checkbox states for each watchlist item by ID
   const [checkboxStates, setCheckboxStates] = useState<
     Record<string, CheckedState>
-  >(() => {
-    const initialStates: Record<string, CheckedState> = {};
-    watchlists.forEach((watchlist) => {
-      initialStates[watchlist.id] = isItemOnWatchlist(watchlist);
-    });
-    return initialStates;
-  });
+  >(() => getCheckboxStates());
 
   const handleOpenChange = (isOpen: boolean) => {
     setOpen(isOpen);
@@ -53,46 +49,34 @@ export default function AddToWatchlistDropdown({
       ...prevStates,
       [watchlistId]: checked,
     }));
+    if (!item) return;
     if (checked) {
-      switch (mediaType) {
-        case "movie":
-          addItemToWatchlist(watchlistId, item, rating, "movie");
-          break;
-        case "tv":
-          addItemToWatchlist(watchlistId, item, rating, "tv");
-          break;
-      }
+      addItemToWatchlist(watchlistId, tmdbId, mediaType);
     } else {
-      deleteItem(watchlistId, item.id, userId);
+      deleteItem(watchlistId, tmdbId, mediaType);
     }
   };
 
-  function isItemOnWatchlist(watchlist: WatchlistI) {
-    // watchlists?.some((item) => item.id === watchlist.id) || false
-    const found = watchlist.items.find(
-      (watchlistItem) => watchlistItem.tmdbId === item.id
-    );
-    return found !== undefined;
+  function getCheckboxStates() {
+    const s: Record<string, CheckedState> = {};
+    watchlists.forEach((wl) => {
+      const list = mediaType === "tv" ? wl.items.tvShows : wl.items.movies;
+      s[wl.id] = list.some(
+        (m) => (mediaType === "tv" ? m.tvId : m.movieId) === tmdbId
+      );
+    });
+    return s;
   }
   // Sync checkbox states with watchlistsWithItem and userWatchlists whenever they change
   useEffect(() => {
-    const initialStates: Record<string, CheckedState> = {};
-    watchlists.forEach((watchlist) => {
-      initialStates[watchlist.id] = isItemOnWatchlist(watchlist);
-    });
+    const initialStates = getCheckboxStates();
     setCheckboxStates(initialStates);
-  }, [watchlists]);
+  }, [watchlists, tmdbId, mediaType]);
 
   return (
     <DropdownMenu open={open} onOpenChange={handleOpenChange}>
       <DropdownMenuTrigger asChild>
-        <Button
-          className="flex px-2 py-1.5 focus:bg-accent focus-visible:outline-none"
-          variant="outline"
-        >
-          <LucideListPlus className="mr-2 p-0.5" />
-          Add to Watchlist
-        </Button>
+        <WatchlistButton variant={variant} />
       </DropdownMenuTrigger>
       <DropdownMenuPortal>
         <DropdownMenuContent className="bg-black p-3">
@@ -122,7 +106,7 @@ export default function AddToWatchlistDropdown({
                     className="h-5 w-5"
                     onClick={(e) => e.stopPropagation()} // Prevent dropdown from closing
                   />
-                  <p>{watchlist.watchlistName}</p>
+                  <p>{watchlist.name}</p>
                 </DropdownMenuItem>
                 {index !== watchlists.length - 1 && <DropdownMenuSeparator />}
               </Fragment>
@@ -133,3 +117,33 @@ export default function AddToWatchlistDropdown({
     </DropdownMenu>
   );
 }
+type WatchlistButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
+  variant: "default" | "icon";
+};
+
+export const WatchlistButton = forwardRef<
+  HTMLButtonElement,
+  WatchlistButtonProps
+>(({ variant, ...props }, ref) => {
+  // pick the CVA size: "default" or "icon"
+  const size = variant === "icon" ? "icon" : "default";
+
+  return (
+    <Button
+      ref={ref}
+      variant="outline"
+      size={size}
+      {...props} // now onClick etc. flow to the real <button>
+    >
+      {variant === "default" ? (
+        <>
+          <BookmarkPlus size={20} />
+          <span>Add to Watchlist</span>
+        </>
+      ) : (
+        <BookmarkPlus size={20} />
+      )}
+    </Button>
+  );
+});
+WatchlistButton.displayName = "WatchlistButton";

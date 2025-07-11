@@ -7,8 +7,16 @@ import {
   languageCodeToEnglishName,
 } from "@/lib/utils";
 import { ExternalLink } from "lucide-react";
+import {
+  MovieResult,
+  ReleaseDate,
+  ReleasesReleaseDate,
+} from "@/types/request-types-camelcase";
+import { TmdbMovieDetailsResponseAppended } from "@/types/tmdb-camel";
 
-export function buildMovieDetailItems(movie: FullMovie): DetailItem[] {
+export function buildMovieDetailItems(
+  movie: TmdbMovieDetailsResponseAppended
+): DetailItem[] {
   const items: DetailItem[] = [];
 
   // 1) Directors
@@ -160,4 +168,93 @@ export function buildMovieDetailItems(movie: FullMovie): DetailItem[] {
   }
 
   return items;
+}
+//
+// /**
+//  * Pick a single certification string to show from the TMDB movie /content_ratings endpoint.
+//  *
+//  * @param entries        - the `countries` array from TMDB
+//  * @param preferred      - your user’s locale (e.g. "US")
+//  * @param fallback       - a secondary locale to try (e.g. "GB")
+//  */
+// export function pickMovieRating(
+//   entries: ReleasesReleaseDate[],
+//   preferred = "US",
+//   fallback?: string
+// ): string | null {
+//   // 1️⃣ Filter out any blank certifications
+//   const valid = entries.filter((e) => e.certification?.trim() !== "");
+//   // 2️⃣ Build a map for quick lookup (last‐write wins)
+//   const byRegion = valid.reduce((map, { iso31661, certification }) => {
+//     // console.log(map.get("US"));
+//     if (typeof iso31661 === "string" && typeof certification === "string")
+//       map.set(iso31661, certification);
+//     return map;
+//   }, new Map<string, string>());
+//   // 3️⃣ Try your preferred region
+//   if (byRegion.has(preferred)) {
+//     return byRegion.get(preferred)!;
+//   }
+//
+//   // 4️⃣ Then a fallback region if given
+//   if (fallback && byRegion.has(fallback)) {
+//     return byRegion.get(fallback)!;
+//   }
+//
+//   // 5️⃣ Finally, pick the “primary” one if TMDB marked it so
+//   const primary = valid.find((e) => e.primary && e.certification);
+//   if (primary) return primary.certification ?? null;
+//
+//   // 6️⃣ Last, fall back to the entry with the most recent releaseDate
+//   const newest = valid
+//     .slice()
+//     .sort(
+//       (a, b) =>
+//         new Date(b.releaseDate ?? 0).getTime() -
+//         new Date(a.releaseDate ?? 0).getTime()
+//     )[0];
+//   return newest ? (newest.certification ?? null) : null;
+// }
+
+export function pickMovieRating(
+  entries: Array<{
+    iso31661: string;
+    releaseDates: ReleaseDate[];
+  }>,
+  preferred = "US",
+  fallback?: string
+): string | null {
+  // 1️⃣ Flatten all releaseDates, retaining each country code
+  const allDates = entries.flatMap(({ iso31661, releaseDates }) =>
+    releaseDates.map((rd) => ({ ...rd, iso31661 }))
+  );
+
+  // 2️⃣ Filter out any blank certifications
+  const valid = allDates.filter((rd) => rd.certification.trim() !== "");
+
+  // 3️⃣ Build a region→certification map (last-write wins)
+  const byRegion = new Map<string, string>();
+  for (const rd of valid) {
+    byRegion.set(rd.iso31661, rd.certification);
+  }
+
+  // 4️⃣ Try your preferred region
+  if (byRegion.has(preferred)) {
+    return byRegion.get(preferred)!;
+  }
+
+  // 5️⃣ Then a fallback region if given
+  if (fallback && byRegion.has(fallback)) {
+    return byRegion.get(fallback)!;
+  }
+
+  // 6️⃣ Finally, pick the entry with the most recent date
+  const newest = valid
+    .slice()
+    .sort(
+      (a, b) =>
+        new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime()
+    )[0];
+
+  return newest ? newest.certification : null;
 }

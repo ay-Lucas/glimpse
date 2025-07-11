@@ -1,4 +1,5 @@
 import { sql } from "drizzle-orm";
+import { double } from "drizzle-orm/mysql-core";
 import {
   boolean,
   timestamp,
@@ -13,6 +14,9 @@ import {
   jsonb,
   unique,
   bigint,
+  check,
+  varchar,
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
 
 export const profiles = pgTable("profiles", {
@@ -30,40 +34,202 @@ export const profiles = pgTable("profiles", {
   }),
 });
 
-export const watchlistItems = pgTable("watchlist_items", {
-  id: serial("id").primaryKey(),
-  watchlistId: uuid("watchlist_id").references(() => watchlist.id, {
-    onDelete: "cascade",
-  }),
-  itemId: uuid("item_id").default(sql`gen_random_uuid()`), // ID of the item being watched
-  tmdbId: integer("tmdb_id").notNull(),
+export const watchlistItems = pgTable(
+  "watchlist_items",
+  {
+    id: serial("id").primaryKey(),
+    watchlistId: uuid("watchlist_id")
+      .notNull()
+      .references(() => watchlist.id, { onDelete: "cascade" }),
+    movieId: integer("movie_id").references(() => movies.id),
+    tvId: integer("tv_id").references(() => tvShows.id),
+    addedAt: timestamp("added_at", { mode: "string" })
+      .notNull()
+      .default(sql`now()`),
+  },
+  (table) => ({
+    // ensure exactly one of movieId / tvId is non-null
+    oneOrTheOther: check(
+      "watchlist_items_one_media_xor", // ← You choose a unique name
+      sql`(
+        (movie_id IS NOT NULL AND tv_id IS NULL)
+        OR
+        (movie_id IS NULL     AND tv_id IS NOT NULL)
+      )`
+    ),
+  })
+);
+
+// export const watchlistItems = pgTable("watchlist_items", {
+//   id: serial("id").primaryKey(),
+//   watchlistId: uuid("watchlist_id").references(() => watchlist.id, {
+//     onDelete: "cascade",
+//   }),
+//   mediaId: integer("media_id")
+//     .notNull()
+//     .references(() => tv.id || movie.id),
+//   tmdbId: integer("tmdb_id").notNull(),
+//   title: text("title").notNull(),
+//   itemType: text({ enum: ["tv", "movie"] }).notNull(),
+//   genres: text("genres").array().notNull(),
+//   tmdbVoteAverage: doublePrecision(),
+//   rating: text("rating"),
+//   popularity: integer("popularity"),
+//   language: text("language"),
+//   numberOfSeasons: integer("number_of_seasons"),
+//   numberOfEpisodes: integer("number_of_episodes"),
+//   imdbScore: doublePrecision("imdb_score"),
+//   imdbCount: doublePrecision("imdb_count"),
+//   rottenTomatoesScore: doublePrecision("rotten_tomatoes_score"),
+//   justWatchInfo: jsonb("justwatch_info"),
+//   summary: text("summary"),
+//   posterPath: text("poster_path"),
+//   backdropPath: text("backdrop_path"),
+// });
+
+export const movies = pgTable("movies", {
+  // TMDb’s own id
+  id: integer("id").primaryKey(),
+
+  // from MovieResult
+  adult: boolean("adult").notNull(),
+  backdropPath: text("backdrop_path").notNull(),
+  genreIds: jsonb("genre_ids").notNull(), // number[]
+  originCountry: text("origin_country").array(),
+  originalLanguage: text("original_language").notNull(),
+  originalTitle: text("original_title").notNull(),
+  overview: text("overview").notNull(),
+  popularity: doublePrecision("popularity").notNull(),
+  posterPath: text("poster_path").notNull(),
+  releaseDate: timestamp("release_date", { mode: "string" }),
   title: text("title").notNull(),
-  itemType: text({ enum: ["tv", "movie"] }).notNull(),
-  genres: text("genres").array().notNull(),
-  tmdbVoteAverage: doublePrecision(),
-  rating: text("rating"),
-  popularity: integer("popularity"),
-  language: text("language"),
-  numberOfSeasons: integer("number_of_seasons"),
-  numberOfEpisodes: integer("number_of_episodes"),
-  summary: text("summary"),
-  posterPath: text("poster_path"),
-  backdropPath: text("backdrop_path"),
+  video: boolean("video").notNull(),
+  voteAverage: doublePrecision("vote_average").notNull(),
+  voteCount: integer("vote_count").notNull(),
+
+  // from TmdbMovieDetailsResponse
+  belongsToCollection: boolean("belongs_to_collection"),
+  budget: integer("budget").notNull(),
+  genres: jsonb("genres").notNull(), // Genre[]
+  homepage: text("homepage"),
+  revenue: integer("revenue").notNull(),
+  runtime: integer("runtime"),
+  spokenLanguages: jsonb("spoken_languages").notNull(), // SpokenLanguage[]
+  status: text("status"),
+  tagline: text("tagline"),
+  productionCompanies: jsonb("production_companies").notNull(), // ProductionCompany[]
+  productionCountries: jsonb("production_countries").notNull(), // ProductionCountry[]
+
+  // from TmdbMovieDetailsResponseAppended
+  videos: jsonb("videos"), // VideosResponse
+  credits: jsonb("credits"), // CreditsResponse
+  aggregateCredits: jsonb("aggregate_credits"), // AggregateCreditsResponse
+  watchProviders: jsonb("watch_providers"), // WatchProviderResponse
+  releaseDates: jsonb("release_dates"), // MovieReleaseDatesResponse
+  externalIds: jsonb("external_ids"), // MovieExternalIdsResponse
+  images: jsonb("images"), // MovieImagesResponse
+  similar: jsonb("similar"), // SimilarShowsResponse
 });
 
-export const watchlist = pgTable("watchlist", {
-  id: uuid("id")
-    .default(sql`gen_random_uuid()`)
-    .primaryKey(),
-  userId: uuid("user_id")
-    .notNull()
-    .references(() => profiles.id, { onDelete: "cascade" }),
-  watchlistName: text("watchlist_name").notNull(),
-  createdAt: timestamp("created_at", { mode: "string" })
-    .notNull()
-    .default(sql`now()`),
-  isDefault: boolean("is_default").notNull().default(false), // Indicates if this is the default watchlist
+export const tvShows = pgTable("tv_shows", {
+  // TMDb’s own id
+  id: integer("id").primaryKey(),
+
+  // from TvResult
+  adult: boolean("adult").notNull(),
+  backdropPath: text("backdrop_path").notNull(),
+  genreIds: jsonb("genre_ids").notNull(), // number[]
+  originCountry: text("origin_country").array(),
+  originalLanguage: text("original_language").notNull(),
+  originalName: text("original_name").notNull(),
+  overview: text("overview").notNull(),
+  popularity: doublePrecision("popularity").notNull(),
+  posterPath: text("poster_path").notNull(),
+  firstAirDate: timestamp("first_air_date", { mode: "string" }),
+  name: text("name").notNull(),
+  voteAverage: doublePrecision("vote_average").notNull(),
+  voteCount: integer("vote_count").notNull(),
+
+  // from TmdbTvDetailsResponse
+  createdBy: jsonb("created_by").notNull(), // CreatedBy[]
+  episodeRunTime: jsonb("episode_run_time").notNull(), // number[]
+  genres: jsonb("genres").notNull(), // Genre[]
+  homepage: text("homepage"),
+  inProduction: boolean("in_production").notNull(),
+  languages: jsonb("languages").notNull(), // string[]
+  lastAirDate: timestamp("last_air_date", { mode: "string" }),
+  lastEpisodeToAir: jsonb("last_episode_to_air"), // EpisodeToAir
+  nextEpisodeToAir: jsonb("next_episode_to_air"),
+  networks: jsonb("networks").notNull(), // Network[]
+  numberOfEpisodes: integer("number_of_episodes").notNull(),
+  numberOfSeasons: integer("number_of_seasons").notNull(),
+  productionCompanies: jsonb("production_companies").notNull(), // ProductionCompany[]
+  productionCountries: jsonb("production_countries").notNull(), // ProductionCountry[]
+  seasons: jsonb("seasons").notNull(), // Season[]
+  spokenLanguages: jsonb("spoken_languages").notNull(), // SpokenLanguage[]
+  status: text("status"),
+  tagline: text("tagline"),
+  type: text("type"),
+
+  // from TmdbTvDetailsResponseAppended
+  videos: jsonb("videos"), // VideosResponse
+  credits: jsonb("credits"), // CreditsResponse
+  aggregateCredits: jsonb("aggregate_credits"), // AggregateCreditsResponse
+  watchProviders: jsonb("watch_providers"), // WatchProviderResponse
+  contentRatings: jsonb("content_ratings"), // ShowContentRatingResponse
+  externalIds: jsonb("external_ids"), // TvExternalIdsResponse
+  images: jsonb("images"), // TvImagesResponse
+  similar: jsonb("similar"), // SimilarShowsResponse
 });
+
+export const watchlist = pgTable(
+  "watchlist",
+  {
+    id: uuid("id")
+      .default(sql`gen_random_uuid()`)
+      .primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => profiles.id, { onDelete: "cascade" }),
+    name: varchar("name", { length: 50 }).notNull(),
+    createdAt: timestamp("created_at", { mode: "string" })
+      .notNull()
+      .default(sql`now()`),
+    isDefault: boolean("is_default").notNull().default(false),
+    description: text("description"), // optional longer blurb
+    isPublic: boolean("is_public") // can share/follow
+      .notNull()
+      .default(false),
+    slug: varchar("slug", { length: 100 }).unique(), // shareable URL
+    updatedAt: timestamp("updated_at", { mode: "string" })
+      .notNull()
+      .defaultNow()
+      .$onUpdateFn(() => sql`now()`),
+    itemCount: integer("item_count") // denormalized count
+      .notNull()
+      .default(0),
+    coverImage: text("cover_image"), // optional thumbnail URL
+    sortOrder: jsonb("sort_order") // e.g. [ { id: 123, pos: 0 }, … ]
+      .notNull()
+      .default(sql`'[]'::jsonb`),
+    tags: text("tags")
+      .array()
+      .notNull()
+      .default(sql`'{}'`),
+  },
+  (table) => {
+    // Partial unique index so only one isDefault=true per user
+    return {
+      oneDefaultPerUser: uniqueIndex("one_default_per_user")
+        .on(table.userId)
+        .where(sql`${table.isDefault} = true`),
+      userNameUnique: uniqueIndex("watchlist_user_name_unique").on(
+        table.userId,
+        table.name
+      ),
+    };
+  }
+);
 
 export const rateLimitLog = pgTable("rate_limit_log", {
   id: text("id").primaryKey(), // use nanoid or similar

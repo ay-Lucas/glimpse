@@ -13,9 +13,9 @@ import { getAllMovies, getAllTv } from "@/lib/actions";
 import { db } from "@/db/index";
 import { DiscoverItem } from "@/types/camel-index";
 import { redis, writePopularPeopleScores } from "@/services/cache";
-import { getJustWatchInfo } from "@/app/(media)/actions";
 import { revalidate } from "./revalidate";
 import { fetchPopularPeopleScores } from "@/app/(media)/person/[id]/actions";
+import { getJustWatchInfo } from "@/lib/justwatch";
 
 async function backfillAndRevalidate() {
   const backfillSuccessful = await backfill();
@@ -398,6 +398,7 @@ async function insertLQIP(
 async function insertPopularPeopleScores() {
   const popularPeople = await fetchPopularPeopleScores(); // top 10000 people popularity scores
   const scores = popularPeople?.sortedScores;
+  console.log("Inserting popular people scores...");
 
   // Check for equal length
   if (scores?.length === NUM_OF_POPULAR_PEOPLE_PAGES * 10) {

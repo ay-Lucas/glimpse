@@ -5,7 +5,7 @@ import {
   CreditsResponse,
   MovieResult,
   PersonResult,
-  ReleaseDate,
+  ReleasesReleaseDate,
   TvResult,
   VideosResponse,
   WatchProviderResponse,
@@ -28,6 +28,8 @@ import {
   MovieExternalIdsResponse,
   TvImagesResponse,
   MovieImagesResponse,
+  SimilarMovieResponse,
+  SimilarShowsResponse,
 } from "./request-types-camelcase";
 
 export interface CardTypes {
@@ -41,22 +43,22 @@ export interface CardTypes1 {
   result?: MovieResult | TvResult | PersonResult | Cast;
 }
 
-export interface WatchlistI {
-  id: string;
-  userid: string | null;
-  watchlistName: string;
-  createdAt: string;
-  default: boolean;
-  items: WatchlistItemI[];
-}
+// export interface WatchlistI {
+//   id: string;
+//   userid: string | null;
+//   watchlistName: string;
+//   createdAt: string;
+//   default: boolean;
+//   items: WatchlistItemI[];
+// }
 
-export interface WatchlistSchemaI {
-  id: string;
-  userid: string | null;
-  watchlistName: string;
-  createdAt: string;
-  default: boolean;
-}
+// export interface WatchlistSchemaI {
+//   id: string;
+//   userid: string | null;
+//   watchlistName: string;
+//   createdAt: string;
+//   default: boolean;
+// }
 
 export interface WatchlistItemI {
   id: number;
@@ -114,6 +116,9 @@ export type DiscoverItem = {
   posterPath?: string;
   backdropPath?: string;
   posterBlurDataUrl?: string;
+  voteAverage?: number | null;
+  voteCount?: number | null;
+  releaseDate?: Date | null;
   overview?: string;
   mediaType: "tv" | "movie";
 };
@@ -158,7 +163,7 @@ export type FullMovie = {
   productionCountries?: Array<ProductionCountry>;
   spokenLanguages?: Array<SpokenLanguage>;
   releases: {
-    countries: Array<ReleaseDate>;
+    countries: Array<ReleasesReleaseDate>;
   };
   voteAverageDetail?: number | null; // if you want to override the summary one
   voteCountDetail?: number | null;
@@ -168,7 +173,8 @@ export type FullMovie = {
   watchProviders?: WatchProviderResponse;
   externalIds?: MovieExternalIdsResponse;
   images?: MovieImagesResponse;
-  // media_type: "tv"; // Not provided by api
+  similar?: SimilarMovieResponse;
+  mediaType: "movie"; // Not provided by api
 };
 
 export type FullTv = {
@@ -220,6 +226,8 @@ export type FullTv = {
   contentRatings?: { results: RatingResponse[] };
   externalIds?: TvExternalIdsResponse;
   images?: TvImagesResponse;
+  similar?: SimilarShowsResponse;
+  mediaType: "tv"; // Not provided by api
 };
 
 export interface FullPerson extends Person {

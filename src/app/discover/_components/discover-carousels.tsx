@@ -1,7 +1,6 @@
 import { MovieResult, TvResult } from "@/types/request-types-camelcase";
-import { convertToDiscoverItems, mkCards } from "./discover-utils";
+import { mkCards } from "./discover-utils";
 import CarouselToggle from "@/app/(media)/_components/carousel-toggle";
-import ImageCarousel from "@/components/image-carousel";
 import { BlurMap } from "@/types/redis";
 import MediaCarousel from "@/components/media-carousel";
 
@@ -11,8 +10,8 @@ export async function TrendingSeriesCarousel(data: {
   blurMap: BlurMap;
 }) {
   const [trendingTvDailyCards, trendingTvWeeklyCards] = await Promise.all([
-    mkCards(await convertToDiscoverItems(data.daily, data.blurMap), "tv"),
-    mkCards(await convertToDiscoverItems(data.weekly, data.blurMap), "tv"),
+    mkCards(data.daily, "tv", data.blurMap),
+    mkCards(data.weekly, "tv", data.blurMap),
   ]);
 
   return (
@@ -33,8 +32,8 @@ export async function TrendingMoviesCarousel(data: {
 }) {
   const [trendingMoviesDailyCards, trendingMoviesWeeklyCards] =
     await Promise.all([
-      mkCards(await convertToDiscoverItems(data.daily, data.blurMap), "movie"),
-      mkCards(await convertToDiscoverItems(data.weekly, data.blurMap), "movie"),
+      mkCards(data.daily, "movie", data.blurMap),
+      mkCards(data.weekly, "movie", data.blurMap),
     ]);
 
   return (
@@ -54,8 +53,8 @@ export async function PopularMoviesAndSeriesCarousel(data: {
   blurMap: BlurMap;
 }) {
   const [popularTvCards, popularMovieCards] = await Promise.all([
-    mkCards(await convertToDiscoverItems(data.tv, data.blurMap), "tv"),
-    mkCards(await convertToDiscoverItems(data.movies, data.blurMap), "movie"),
+    mkCards(data.tv, "tv", data.blurMap),
+    mkCards(data.movies, "tv", data.blurMap),
   ]);
 
   return (
@@ -73,10 +72,7 @@ export async function UpcomingMoviesCarousel(data: {
   movies: MovieResult[];
   blurMap: BlurMap;
 }) {
-  const upcomingMovieCards = mkCards(
-    await convertToDiscoverItems(data.movies, data.blurMap),
-    "movie"
-  );
+  const upcomingMovieCards = mkCards(data.movies, "movie", data.blurMap);
 
   return (
     <>

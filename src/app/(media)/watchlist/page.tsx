@@ -1,18 +1,12 @@
-"use client";
-import { Button } from "@/components/ui/button";
-import { Watchlist } from "@/components/watchlist";
-import { useWatchlist } from "@/context/watchlist";
+export const dynamic = "force-dynamic";
 
-function CreateWatchlistButton({ handleClick }: { handleClick: () => void }) {
-  return (
-    <Button onClick={handleClick} variant="default">
-      Create Watchlist
-    </Button>
-  );
-}
+import CreateWatchlist from "./_components/create-watchlist";
+import WatchlistSection from "./_components/watchlist-section";
+import { getWatchlistsWithMedia } from "@/lib/repositories/watchlist";
 
-export default function WatchlistPage() {
-  const { watchlists, addWatchlist } = useWatchlist();
+export default async function WatchlistPage() {
+  const watchlists = await getWatchlistsWithMedia();
+
   return (
     <main>
       <div className="pt-10 md:container">
@@ -21,17 +15,11 @@ export default function WatchlistPage() {
             Watchlists
           </h1>
           <div className="col-start-3 col-end-4 justify-self-end">
-            <CreateWatchlistButton handleClick={addWatchlist} />
+            <CreateWatchlist />
           </div>
         </div>
         <div className="mx-auto grid gap-6 pt-10">
-          {watchlists && watchlists.length > 0 ? (
-            watchlists.map((watchlist, index) => (
-              <Watchlist watchlist={watchlist} key={index} />
-            ))
-          ) : (
-            <div className="text-center">You have 0 watchlists</div>
-          )}
+          <WatchlistSection initialWatchlists={watchlists} />
         </div>
       </div>
     </main>

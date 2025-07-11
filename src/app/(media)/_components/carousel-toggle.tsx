@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import ImageCarousel from "@/components/image-carousel";
 import MediaCarousel, {
   CarouselBreakpoints,
 } from "@/components/media-carousel";
@@ -19,7 +18,6 @@ export default function CarouselToggle({
   options,
   title,
 }: CarouselToggleProps) {
-  const [view, setView] = useState<0 | 1>(0);
   const [breakpointType, setBreakpointType] =
     useState<CarouselBreakpoints>("backdrop");
 
@@ -51,6 +49,7 @@ export default function CarouselToggle({
           {validOptions.length > 0 &&
             validOptions.map((opt, index) => (
               <ToggleGroupItem
+                key={`${opt.label}${index}`}
                 value={opt.label}
                 aria-label={`Toggle ${opt.label}`}
                 onClick={() => toggle("title", opt.items)}

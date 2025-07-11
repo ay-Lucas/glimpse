@@ -2,10 +2,10 @@ import { type ClassValue, clsx } from "clsx";
 import {
   MovieResult,
   PersonResult,
-  RatingResponse,
   TvResult,
   Video,
 } from "@/types/request-types-snakecase";
+import { RatingResponse } from "@/types/request-types-camelcase";
 import { twMerge } from "tailwind-merge";
 import camelcaseKeys from "camelcase-keys";
 import { Card } from "@/components/card";
@@ -101,7 +101,7 @@ export function isUnique(
 }
 
 export function isUsRating(item: RatingResponse) {
-  return item.iso_3166_1 === "US" && item !== undefined;
+  return item.iso31661 === "US" && item !== undefined;
 }
 
 export function getTrailer(videoArray: Array<Video>) {
@@ -254,6 +254,22 @@ export function stripJustWatchTracking(raw: string): string {
   } catch {
     return raw;
   }
+}
+
+export function isValidDateString(s: string | null | undefined): boolean {
+  if (!s) return false;
+  const d = new Date(s);
+  return !isNaN(d.getTime());
+}
+
+export function toDateString(value?: string | Date | null): string | null {
+  if (value == null) return null; // catch undefined or null
+  // if it’s already a Date, use it; otherwise parse the string
+  const d = value instanceof Date ? value : new Date(value);
+  // invalid‐date guard
+  if (isNaN(d.getTime())) return null;
+  // return only the YYYY-MM-DD part
+  return d.toISOString().split("T")[0] ?? null;
 }
 
 export function pause(ms: number) {

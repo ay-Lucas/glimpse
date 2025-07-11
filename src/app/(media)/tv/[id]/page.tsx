@@ -7,7 +7,6 @@ import Link from "next/link";
 import { Video } from "@/types/request-types-snakecase";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { RecommededSection } from "@/app/(media)/_components/recommendedSection";
 import ReviewSection from "@/app/(media)/_components/ReviewSection";
 import { ChevronRight } from "lucide-react";
 import VideoPlayer from "../../_components/video-player";
@@ -15,19 +14,11 @@ import { getRedisBlurValue } from "@/services/cache";
 import { MediaHeader } from "../../_components/media-header";
 import { MediaDetails } from "../../_components/media-details";
 import MediaProviders from "../../_components/media-providers";
-import { buildTvDetailItems } from "./utils";
-import ImageCarousel from "@/components/image-carousel";
-import CastCard from "@/components/cast-card";
-import {
-  BASE_MEDIUM_BACKDROP_URL,
-  BASE_POSTER_IMAGE_URL,
-  BASE_SMALL_BACKDROP_URL,
-  DEFAULT_BLUR_DATA_URL,
-} from "@/lib/constants";
+import { buildTvDetailItems, pickTvRating } from "./utils";
 import MediaLinks from "../../_components/media-links";
-import Image from "next/image";
 import BackdropAndPosterCarousel from "../../_components/backdrop-and-poster-carousel";
-import MediaCarousel from "@/components/media-carousel";
+import TopCast from "../../_components/top-cast";
+import { SimilarSection } from "../../_components/similar-section";
 
 function getTrailer(videoArray: Array<Video>) {
   const trailer: Array<Video> = videoArray.filter(
@@ -74,11 +65,13 @@ export default async function TvPage({ params }: { params: { id: number } }) {
   let videoPath;
   if (tv.videos !== undefined && tv.videos.results)
     videoPath = getTrailer(tv.videos.results)?.key;
-  const rating =
-    tv.contentRatings?.results.filter(
+  const ratingOld =
+    tv.contentRatings?.results?.filter(
       (item) => item.iso31661 === "US" && item.rating !== ""
     )[0]?.rating ?? "";
-
+  const rating = pickTvRating(tv.contentRatings?.results ?? []);
+  console.log(rating);
+  console.log(ratingOld);
   const isReleased: boolean =
     tv.firstAirDate !== undefined &&
     tv.firstAirDate !== null &&
@@ -87,6 +80,9 @@ export default async function TvPage({ params }: { params: { id: number } }) {
 
   // console.log(tv)
   const detailItems = buildTvDetailItems(tv);
+  const isCastValid = tv.credits?.cast && tv.credits.cast.length > 0;
+  const firstAirDate =
+    typeof tv.firstAirDate === "string" ? new Date(tv.firstAirDate) : null;
   // console.log(`Tv page rendered! ${tv.name}`)
   return (
     <main>
@@ -111,14 +107,14 @@ export default async function TvPage({ params }: { params: { id: number } }) {
                     title={tv.name}
                     genres={tv.genres ?? null}
                     imdbId={tv.externalIds?.imdbId ?? null}
-                    tmdbId={params.id}
+                    tmdbId={tv.id}
                     tmdbVoteAverage={tv.voteAverage ?? null}
                     tmdbVoteCount={tv.voteCount ?? null}
                     trailerPath={videoPath}
                     tagline={tv.tagline ?? null}
                     homepage={tv.homepage ?? null}
                     data={tv}
-                    runtime={tv.runtime ?? null}
+                    runtime={null}
                     typeLabel="Series"
                     mediaType="tv"
                   />
@@ -133,7 +129,7 @@ export default async function TvPage({ params }: { params: { id: number } }) {
                     <MediaProviders
                       tmdbWatchProviders={tv.watchProviders}
                       mediaType="tv"
-                      releaseDate={tv.firstAirDate ?? null}
+                      releaseDate={firstAirDate}
                       title={tv.name}
                       tmdbId={tv.id}
                     />
@@ -154,7 +150,7 @@ export default async function TvPage({ params }: { params: { id: number } }) {
                     </Link>
                   )}
                 </section>
-                {tv.credits?.cast && tv.credits.cast.length > 0 && (
+                {isCastValid && (
                   <>
                     <section className="media-card space-y-10">
                       <Link
@@ -167,36 +163,9 @@ export default async function TvPage({ params }: { params: { id: number } }) {
                         <ChevronRight size={30} />
                       </Link>
                     </section>
-                    <Suspense
-                      fallback={
-                        <Skeleton className="h-[356px] w-full rounded-xl" />
-                      }
-                    >
-                      <section className="media-card">
-                        <ImageCarousel
-                          title={
-                            <h2 className={`text-2xl font-bold`}>Top Cast</h2>
-                          }
-                          items={tv.credits.cast
-                            ?.splice(0, 10)
-                            .map((item, index: number) => (
-                              <Link href={`/person/${item.id}`} key={index}>
-                                <CastCard
-                                  name={item.name}
-                                  character={item.character}
-                                  imagePath={item.profilePath}
-                                  index={index}
-                                  blurDataURL={DEFAULT_BLUR_DATA_URL}
-                                  className="pt-2"
-                                />
-                              </Link>
-                            ))}
-                          breakpoints="cast"
-                        />
-                      </section>
-                    </Suspense>
                   </>
                 )}
+                {isCastValid && <TopCast cast={tv.credits?.cast!} />}
                 {tv.externalIds && (
                   <MediaLinks
                     externalIds={tv.externalIds}
@@ -215,12 +184,12 @@ export default async function TvPage({ params }: { params: { id: number } }) {
                     <Skeleton className="h-[356px] w-full rounded-xl" />
                   }
                 >
-                  <RecommededSection
-                    isReleased={isReleased}
-                    mediaType="tv"
-                    rating={rating}
-                    tmdbId={tmdbId}
-                  />
+                  {tv.similar?.results && tv.similar.results.length > 0 && (
+                    <SimilarSection
+                      titles={tv.similar.results}
+                      mediaType="tv"
+                    />
+                  )}
                 </Suspense>
                 <Suspense
                   fallback={

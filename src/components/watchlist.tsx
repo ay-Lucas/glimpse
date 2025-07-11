@@ -1,17 +1,29 @@
 "use client";
-import { WatchlistI } from "@/types/camel-index";
 import Link from "next/link";
 import { WatchlistDropdown } from "./watchlist-dropdown";
 import Image from "next/image";
 import { ChangeEvent, useEffect, useState } from "react";
-import { setWatchlistName } from "@/lib/actions";
-import { watchlistNameSchema } from "@/types/schema";
+import { watchlistSchema } from "@/types/schema";
 import { Edit2Icon, X } from "lucide-react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { useWatchlist } from "@/context/watchlist";
 import { Session } from "@supabase/supabase-js";
-import { useSupabase } from "@/context/supabase";
+import { pickTvRating } from "@/app/(media)/tv/[id]/utils";
+import { pickMovieRating } from "@/app/(media)/movie/[id]/utils";
+import {
+  MovieReleaseDatesResponse,
+  ReleaseDate,
+  ShowContentRatingResponse,
+} from "@/types/request-types-camelcase";
+import { Genre } from "@/types/types";
+import { setWatchlistName } from "@/lib/actions";
+import {
+  WatchlistWithMedia,
+  MovieWatchlistModel,
+  TvShowWatchlistModel,
+  WatchlistModel,
+} from "@/lib/repositories/watchlist";
 
 export function EditableWatchlistTitle({
   initialTitle,
@@ -43,7 +55,7 @@ export function EditableWatchlistTitle({
     await setWatchlistName(session.user.id, watchlistId, title);
   };
   const isInputValid = (string: string) => {
-    const validatedFields = watchlistNameSchema.safeParse({
+    const validatedFields = watchlistSchema.safeParse({
       name: string,
     });
     return validatedFields.success;
@@ -65,7 +77,7 @@ export function EditableWatchlistTitle({
       ) : (
         <div
           onClick={() => setIsEditing(true)}
-          className="inline-flex items-center p-1.5"
+          className="inline-flex items-center"
         >
           <h2 className="mr-2">{title}</h2>
           <Edit2Icon size={17} />
@@ -94,7 +106,7 @@ function WatchlistDeleteConfirmation({
 
   return (
     <>
-      <button className="absolute top-4">
+      <button>
         <X
           className="text-gray-400 transition-colors hover:text-gray-100"
           onClick={handleDeleteClick}
@@ -122,86 +134,116 @@ function WatchlistDeleteConfirmation({
   );
 }
 
-export function Watchlist({ watchlist }: { watchlist: WatchlistI }) {
-  const { session } = useSupabase();
+export function Watchlist({ watchlist }: { watchlist: WatchlistWithMedia }) {
   const { onDeleteWatchlist } = useWatchlist();
+  const { tvShows, movies } = watchlist.items;
+  function getMediaType(tvId: number | null) {
+    return typeof tvId === "number" ? "tv" : "movie";
+  }
+  const media = [...tvShows, ...movies];
+  if (!watchlist) return <div>You have 0 watchlists</div>;
   return (
     <div className="rounded-2xl border border-secondary bg-background p-3 backdrop-blur-3xl">
-      {watchlist ? (
-        <>
-          <div className="flex justify-center p-3">
-            <EditableWatchlistTitle
-              initialTitle={watchlist.watchlistName}
-              session={session!}
-              watchlistId={watchlist.id}
-            />
-          </div>
+      <div className="flex flex-row space-x-5">
+        <div className="items-start">
           <WatchlistDeleteConfirmation
             onConfirm={() => onDeleteWatchlist(watchlist.id)}
           />
-          {watchlist.items.length > 0 ? (
-            <div>
-              <div className="grid space-y-2">
-                <div className="grid grid-cols-[1fr_75px_1fr_1fr_1fr_auto] items-center gap-6 px-3 py-2">
-                  <span className="text-gray-500">Title</span>
-                  <span className="text-gray-500">Poster</span>
-                  <span className="text-gray-500">Genres</span>
-                  <span className="text-gray-500">Vote Avg</span>
-                  <span className="text-gray-500">Popularity</span>
-                </div>
-                {watchlist.items.map((item, index) => (
-                  <div
-                    key={item.itemId}
-                    className="grid grid-cols-[1fr_75px_1fr_1fr_1fr_auto] items-center gap-6 rounded-xl border border-secondary p-3 transition hover:border-primary/20"
-                  >
-                    <Link
-                      href={`/${item.itemType}/${item.tmdbId}`}
-                      className="flex items-center"
-                    >
-                      <div>{item.title}</div>
-                    </Link>
-                    <Image
-                      width={75}
-                      height={75}
-                      src={`https://image.tmdb.org/t/p/original/${item.posterPath}`}
-                      alt={`${item.title} poster`}
-                      quality={75}
-                      className="h-[75px] w-[75px] rounded-[40%] object-cover"
-                    />
-                    <div className="flex flex-wrap gap-1">
-                      {item.genres?.map((genre, genreIndex) => (
-                        <span
-                          key={genreIndex}
-                          className="select-none rounded-lg border border-secondary bg-primary-foreground px-2 py-1 shadow-lg transition"
-                        >
-                          {genre}
-                        </span>
-                      ))}
-                    </div>
-                    <div className="ml-7">
-                      {(item.tmdbVoteAverage * 10).toFixed(0)}%
-                    </div>
-                    <div className="ml-7">
-                      {(item.popularity * 10).toFixed(0)}
-                    </div>
-                    <div className="justify-self-end">
-                      <WatchlistDropdown
-                        watchlistId={item.watchlistId}
-                        watchlistItemId={item.itemId}
-                        session={session!}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ) : (
-            <div className="text-center text-sm">(Empty)</div>
-          )}
+        </div>
+        <div className="items-start">
+          <h2 className="text-2xl font-bold">{watchlist.name}</h2>
+          <p className="">{watchlist.description}</p>
+        </div>
+      </div>
+      {media.length > 0 ? (
+        <>
+          <div className="grid grid-cols-[1fr_minmax(75px,1fr)_1fr_1fr_1fr_1fr_1fr_30px] items-center gap-6 px-3 pb-1">
+            <span className="text-gray-500">Title</span>
+            <span className="text-gray-500">Poster</span>
+            <span className="text-gray-500">Genres</span>
+            <span className="text-gray-500">Vote Avg</span>
+            <span className="text-gray-500">Popularity</span>
+            <span className="text-gray-500">Rating</span>
+          </div>
+
+          <div className="grid space-y-2">
+            {media.map((media, index) => (
+              <WatchlistCard
+                mediaType={getMediaType(media.tvId)}
+                media={media}
+                key={media.id + index}
+                watchlist={watchlist}
+              />
+            ))}
+          </div>
         </>
       ) : (
-        <div>You have no playlists</div>
+        <div className="text-center text-sm">(Empty)</div>
       )}
+    </div>
+  );
+}
+
+function WatchlistCard({
+  media,
+  mediaType,
+  watchlist,
+}: {
+  media: MovieWatchlistModel | TvShowWatchlistModel;
+  mediaType: "movie" | "tv";
+  watchlist: WatchlistModel;
+}) {
+  const ratingsRes =
+    mediaType === "tv"
+      ? (media as TvShowWatchlistModel).contentRatings
+      : (media as MovieWatchlistModel).releaseDates;
+  const rating =
+    mediaType === "tv"
+      ? pickTvRating((ratingsRes as ShowContentRatingResponse).results)
+      : pickMovieRating((ratingsRes as MovieReleaseDatesResponse).results);
+  const title =
+    (media as MovieWatchlistModel).title ||
+    (media as TvShowWatchlistModel).name;
+  const genres = media.genres as Genre[];
+  const tmdbId = media.tvId || media.movieId;
+  return (
+    <div className="grid grid-cols-[1fr_minmax(75px,1fr)_1fr_1fr_1fr_1fr_1fr_30px] items-center gap-6 rounded-xl border border-secondary p-3 transition hover:border-primary/20">
+      <Link href={`/${mediaType}/${tmdbId}`} className="medias-center flex">
+        <p className="text-xl font-bold">{title}</p>
+      </Link>
+      <Image
+        width={75}
+        height={75}
+        src={`https://image.tmdb.org/t/p/original/${media.posterPath}`}
+        alt={`${title} poster`}
+        quality={75}
+        className="rounded-lg object-cover"
+      />
+      <div className="flex flex-wrap gap-1">
+        {genres?.map((genre, genreIndex) => (
+          <span
+            key={genreIndex}
+            className="flex select-none items-center rounded-lg border border-secondary bg-primary-foreground px-2 py-1 shadow-lg transition"
+          >
+            {genre.name}
+          </span>
+        ))}
+      </div>
+      <div>{(media.voteAverage * 10).toFixed(0)}%</div>
+      <div>{(media.popularity * 10).toFixed(0)}</div>
+      <div>{rating}</div>
+      <div>{new Date(media.addedAt).toLocaleDateString()}</div>
+      <div>
+        <WatchlistDropdown
+          watchlistId={media.watchlistId}
+          mediaType={mediaType}
+          tmdbId={tmdbId!}
+          isPublic={watchlist.isPublic}
+          watchlistDescription={watchlist.description ?? ""}
+          isDefaultWatchlist={watchlist.isDefault}
+          watchlistName={watchlist.name}
+        />
+      </div>
     </div>
   );
 }

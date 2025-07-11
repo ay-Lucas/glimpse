@@ -6,31 +6,26 @@ import {
   useState,
   useEffect,
 } from "react";
-import {
-  addTvToWatchlist,
-  addMovieToWatchlist,
-  createWatchlist,
-  deleteWatchlist,
-  deleteWatchlistItem,
-  getWatchlistsAndItems,
-} from "@/lib/actions";
-import { FullMovie, FullTv, WatchlistI } from "@/types/camel-index";
+import { deleteWatchlist, deleteWatchlistItem } from "@/lib/actions";
 import { useSupabase } from "./supabase";
+import { addWatchlistItemAndUpsertMedia } from "@/lib/repositories/service";
+import {
+  WatchlistWithMedia,
+  getWatchlistsWithMedia,
+} from "@/lib/repositories/watchlist";
 
 interface WatchlistContextType {
-  watchlists: WatchlistI[];
+  watchlists: WatchlistWithMedia[];
   deleteItem: (
     watchlistId: string,
-    watchlistItemId: string | number,
-    userId: string
+    tmdbId: number,
+    mediaType: "tv" | "movie"
   ) => Promise<void>;
   fetchWatchlists: () => Promise<void>;
-  addWatchlist: () => Promise<void>;
   onDeleteWatchlist: (watchlistId: string) => Promise<void>;
   addItemToWatchlist: (
     watchlistId: string,
-    watchlistItem: FullTv | FullMovie,
-    rating: string,
+    tmdbId: number,
     mediaType: "tv" | "movie"
   ) => Promise<boolean>;
 }
@@ -41,43 +36,32 @@ const WatchlistContext = createContext<WatchlistContextType | undefined>(
 
 export const WatchlistProvider = ({ children }: { children: ReactNode }) => {
   const { session } = useSupabase();
-  const [watchlists, setWatchlists] = useState<WatchlistI[]>([]);
+  const [watchlists, setWatchlists] = useState<WatchlistWithMedia[]>([]);
 
   const fetchWatchlists = async () => {
-    const watchlist: WatchlistI[] = await getWatchlistsAndItems(
-      session?.user.id!
-    );
-    setWatchlists([...watchlist]);
+    const data = (await getWatchlistsWithMedia()) ?? [];
+    setWatchlists(data);
   };
   // Render on mount and on user signin / login
   useEffect(() => {
     if (session?.user.id) fetchWatchlists();
   }, [session?.user.id]);
 
-  /** watchlistItemId is can be itemId or tmdbId
-   */
   const deleteItem = async (
     watchlistId: string,
-    watchlistItemId: string | number
+    tmdbId: number,
+    mediaType: "tv" | "movie"
   ) => {
-    await deleteWatchlistItem(watchlistId, watchlistItemId);
+    await deleteWatchlistItem({ watchlistId, mediaType, tmdbId });
     await fetchWatchlists();
   };
 
-  const addWatchlist = async () => {
-    const res = await createWatchlist(session?.user.id!, "Empty");
-    if (res) {
-      // watchlists.push(res as any[0]);
-      // let items: WatchlistItemI[] = [];
-      //
-      // const newWatchlist = {
-      //   ...res[0]!,
-      //   items: items,
-      // };
-      // setWatchlists(watchlists.concat(newWatchlist));
-      fetchWatchlists();
-    }
-  };
+  // const addWatchlist = async () => {
+  //   const res = await createWatchlist(session?.user.id!, "Empty");
+  //   if (res) {
+  //     fetchWatchlists();
+  //   }
+  // };
 
   const onDeleteWatchlist = async (watchlistId: string) => {
     const res = await deleteWatchlist(session!.user.id, watchlistId);
@@ -90,25 +74,16 @@ export const WatchlistProvider = ({ children }: { children: ReactNode }) => {
   };
   const addItemToWatchlist = async (
     watchlistId: string,
-    watchlistItem: FullMovie | FullTv,
-    rating: string,
+    tmdbId: number,
     mediaType: "tv" | "movie"
   ) => {
-    let res;
-    if (mediaType == "tv")
-      res = await addTvToWatchlist(
-        watchlistId,
-        watchlistItem as FullTv,
-        rating
-      );
-    else if (mediaType == "movie")
-      res = await addMovieToWatchlist(
-        watchlistId,
-        watchlistItem as FullMovie,
-        rating
-      );
+    const item = await addWatchlistItemAndUpsertMedia(
+      watchlistId,
+      mediaType,
+      tmdbId
+    );
     fetchWatchlists();
-    return res !== undefined;
+    return item !== undefined;
   };
 
   return (
@@ -117,7 +92,6 @@ export const WatchlistProvider = ({ children }: { children: ReactNode }) => {
         watchlists,
         deleteItem,
         fetchWatchlists,
-        addWatchlist,
         onDeleteWatchlist,
         addItemToWatchlist,
       }}
@@ -134,4 +108,3 @@ export const useWatchlist = () => {
   }
   return context;
 };
-// export default WatchlistProvider;

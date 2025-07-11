@@ -3,6 +3,7 @@ import MediaCarousel, {
   CarouselBreakpoints,
 } from "@/components/media-carousel";
 import { SlideCard } from "@/components/slide-card";
+import { SlideImageCard } from "@/components/slide-image-card";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Backdrop, Logo, Poster } from "@/types/request-types-camelcase";
 import { useState } from "react";
@@ -19,7 +20,7 @@ export default function BackdropAndPosterCarousel({
   posters: Array<Poster>;
 }) {
   const posterItems = posters.map((p, i) => (
-    <SlideCard
+    <SlideImageCard
       key={i}
       src={`/tmdb/t/p/w342${p.filePath}`}
       alt={`poster of ${name}`}
@@ -28,7 +29,7 @@ export default function BackdropAndPosterCarousel({
   ));
 
   const backdropItems = backdrops.map((b, i) => (
-    <SlideCard
+    <SlideImageCard
       key={i}
       src={`/tmdb/t/p/w780${b.filePath}`}
       alt={`backdrop of ${name}`}

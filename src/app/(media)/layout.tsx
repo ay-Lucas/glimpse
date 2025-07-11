@@ -1,13 +1,13 @@
 import { ReactNode } from "react";
-import { WatchlistProvider } from "@/context/watchlist";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { MediaProvider } from "@/context/media";
 
 export default async function Layout({ children }: { children: ReactNode }) {
   return (
-    <WatchlistProvider>
+    <MediaProvider>
       <TooltipProvider>
         <div className="min-h-screen">{children}</div>
       </TooltipProvider>
-    </WatchlistProvider>
+    </MediaProvider>
   );
 }
