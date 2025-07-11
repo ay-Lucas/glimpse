@@ -16,6 +16,7 @@ import { redis, writePopularPeopleScores } from "@/services/cache";
 import { revalidate } from "./revalidate";
 import { fetchPopularPeopleScores } from "@/app/(media)/person/[id]/actions";
 import { getJustWatchInfo } from "@/lib/justwatch";
+import { toDateString } from "@/lib/utils";
 
 async function backfillAndRevalidate() {
   const backfillSuccessful = await backfill();
@@ -77,7 +78,7 @@ async function insertSummaries(movies: MovieResult[], tvShows: TvResult[]) {
         // const posterBlurUrl = m.posterPath
         //   ? await getBlurData(`${BaseImageUrl.BLUR}${m.posterPath}`)
         //   : null;
-        const releaseDateStr = m.releaseDate?.trim() || undefined;
+        const releaseDateStr = toDateString();
         const releaseDate = releaseDateStr ? new Date(releaseDateStr) : null;
         const justWatchInfo = await getJustWatchInfo(
           m.title,
@@ -139,7 +140,7 @@ async function insertSummaries(movies: MovieResult[], tvShows: TvResult[]) {
         // const posterBlurUrl = t.posterPath
         //   ? await getBlurData(`${BaseImageUrl.BLUR}${t.posterPath}`)
         //   : null;
-        const firstAirDateStr = t.firstAirDate?.trim() || undefined;
+        const firstAirDateStr = toDateString();
         const firstAirDate = firstAirDateStr ? new Date(firstAirDateStr) : null;
         const justWatchInfo = await getJustWatchInfo(
           t.name,
