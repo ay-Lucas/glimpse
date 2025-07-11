@@ -108,7 +108,6 @@ export function SlideCard({
               <MediaActions
                 variant="icon"
                 mediaType={mediaType}
-                rating={rating}
                 data={data as TvResult | MovieResult}
                 tmdbId={tmdbId}
               />

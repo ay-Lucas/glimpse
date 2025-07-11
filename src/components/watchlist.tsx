@@ -13,8 +13,11 @@ import { pickTvRating } from "@/app/(media)/tv/[id]/utils";
 import { pickMovieRating } from "@/app/(media)/movie/[id]/utils";
 import {
   MovieReleaseDatesResponse,
+  MovieResult,
   ReleaseDate,
   ShowContentRatingResponse,
+  TvResult,
+  TvResultsResponse,
 } from "@/types/request-types-camelcase";
 import { Genre } from "@/types/types";
 import { setWatchlistName } from "@/lib/actions";
@@ -24,6 +27,9 @@ import {
   TvShowWatchlistModel,
   WatchlistModel,
 } from "@/lib/repositories/watchlist";
+import { MediaHeader } from "@/app/(media)/_components/media-header";
+import { SlideCard } from "./slide-card";
+import { BASE_POSTER_IMAGE_URL } from "@/lib/constants";
 
 export function EditableWatchlistTitle({
   initialTitle,
@@ -144,7 +150,7 @@ export function Watchlist({ watchlist }: { watchlist: WatchlistWithMedia }) {
   if (!watchlist) return <div>You have 0 watchlists</div>;
   return (
     <div className="rounded-2xl border border-secondary bg-background p-3 backdrop-blur-3xl">
-      <div className="flex flex-row space-x-5">
+      <div className="flex flex-row space-x-5 pb-2">
         <div className="items-start">
           <WatchlistDeleteConfirmation
             onConfirm={() => onDeleteWatchlist(watchlist.id)}
@@ -152,21 +158,12 @@ export function Watchlist({ watchlist }: { watchlist: WatchlistWithMedia }) {
         </div>
         <div className="items-start">
           <h2 className="text-2xl font-bold">{watchlist.name}</h2>
-          <p className="">{watchlist.description}</p>
+          <p>{watchlist.description}</p>
         </div>
       </div>
       {media.length > 0 ? (
         <>
-          <div className="grid grid-cols-[1fr_minmax(75px,1fr)_1fr_1fr_1fr_1fr_1fr_30px] items-center gap-6 px-3 pb-1">
-            <span className="text-gray-500">Title</span>
-            <span className="text-gray-500">Poster</span>
-            <span className="text-gray-500">Genres</span>
-            <span className="text-gray-500">Vote Avg</span>
-            <span className="text-gray-500">Popularity</span>
-            <span className="text-gray-500">Rating</span>
-          </div>
-
-          <div className="grid space-y-2">
+          <div className="flex flex-row space-x-4">
             {media.map((media, index) => (
               <WatchlistCard
                 mediaType={getMediaType(media.tvId)}
@@ -206,44 +203,27 @@ function WatchlistCard({
     (media as TvShowWatchlistModel).name;
   const genres = media.genres as Genre[];
   const tmdbId = media.tvId || media.movieId;
+  const releaseDateStr =
+    (media as TvShowWatchlistModel).firstAirDate ||
+    (media as MovieWatchlistModel).releaseDate;
+  const releaseDate = releaseDateStr ? new Date(releaseDateStr) : null;
+  const data =
+    mediaType === "tv" ? (media as TvResult) : (media as MovieResult);
   return (
-    <div className="grid grid-cols-[1fr_minmax(75px,1fr)_1fr_1fr_1fr_1fr_1fr_30px] items-center gap-6 rounded-xl border border-secondary p-3 transition hover:border-primary/20">
-      <Link href={`/${mediaType}/${tmdbId}`} className="medias-center flex">
-        <p className="text-xl font-bold">{title}</p>
-      </Link>
-      <Image
-        width={75}
-        height={75}
-        src={`https://image.tmdb.org/t/p/original/${media.posterPath}`}
-        alt={`${title} poster`}
-        quality={75}
-        className="rounded-lg object-cover"
-      />
-      <div className="flex flex-wrap gap-1">
-        {genres?.map((genre, genreIndex) => (
-          <span
-            key={genreIndex}
-            className="flex select-none items-center rounded-lg border border-secondary bg-primary-foreground px-2 py-1 shadow-lg transition"
-          >
-            {genre.name}
-          </span>
-        ))}
-      </div>
-      <div>{(media.voteAverage * 10).toFixed(0)}%</div>
-      <div>{(media.popularity * 10).toFixed(0)}</div>
-      <div>{rating}</div>
-      <div>{new Date(media.addedAt).toLocaleDateString()}</div>
-      <div>
-        <WatchlistDropdown
-          watchlistId={media.watchlistId}
-          mediaType={mediaType}
-          tmdbId={tmdbId!}
-          isPublic={watchlist.isPublic}
-          watchlistDescription={watchlist.description ?? ""}
-          isDefaultWatchlist={watchlist.isDefault}
-          watchlistName={watchlist.name}
-        />
-      </div>
-    </div>
+    <SlideCard
+      rating={null}
+      alt={`poster of ${title}`}
+      aspectClass="aspect-[2/3]"
+      title={title}
+      overview={media.overview}
+      tmdbVoteAverage={media.voteAverage}
+      tmdbVoteCount={media.voteCount}
+      releaseDate={releaseDate}
+      mediaType={mediaType}
+      tmdbId={tmdbId!}
+      imagePath={media.posterPath}
+      baseUrl={BASE_POSTER_IMAGE_URL}
+      data={data}
+    />
   );
 }
