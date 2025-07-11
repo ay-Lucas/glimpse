@@ -113,11 +113,25 @@ export async function MediaHeader({
         <div className="h-[357px] w-[238px]" />
       )}
 
-      <div className="space-y-3">
+      <div className="space-y-2.5">
         <div>
           <h1 className="text-3xl font-bold md:text-5xl">{title}</h1>
           {tagline && (
             <p className="text-md pt-1 italic text-gray-300">“{tagline}”</p>
+          )}
+        </div>
+        <div className="mb-4 flex flex-wrap items-center gap-2">
+          {genres && genres.length > 0 && (
+            <>
+              {genres.map((g) => (
+                <span
+                  key={g.id}
+                  className="rounded-lg bg-primary-foreground px-2 py-0.5 text-sm ring-1 ring-gray-800 transition hover:bg-gray-700"
+                >
+                  {g.name}
+                </span>
+              ))}
+            </>
           )}
         </div>
         <MediaRatings
@@ -130,20 +144,6 @@ export async function MediaHeader({
           tmdbVoteCount={tmdbVoteCount}
           imdbId={imdbId}
         />
-        <div className="mb-4 flex flex-wrap items-center gap-4">
-          {genres && genres.length > 0 && (
-            <>
-              {genres.map((g) => (
-                <span
-                  key={g.id}
-                  className="rounded-full bg-gray-700/60 px-2 py-0.5 text-sm ring-1 ring-gray-400 transition hover:bg-gray-700"
-                >
-                  {g.name}
-                </span>
-              ))}
-            </>
-          )}
-        </div>
         <section className="flex flex-col space-y-4">
           <div className="grid grid-cols-4 gap-6 md:grid-cols-5">
             {formattedDate1 && (
