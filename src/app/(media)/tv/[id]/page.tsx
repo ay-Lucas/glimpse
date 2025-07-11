@@ -65,13 +65,7 @@ export default async function TvPage({ params }: { params: { id: number } }) {
   let videoPath;
   if (tv.videos !== undefined && tv.videos.results)
     videoPath = getTrailer(tv.videos.results)?.key;
-  const ratingOld =
-    tv.contentRatings?.results?.filter(
-      (item) => item.iso31661 === "US" && item.rating !== ""
-    )[0]?.rating ?? "";
   const rating = pickTvRating(tv.contentRatings?.results ?? []);
-  console.log(rating);
-  console.log(ratingOld);
   const isReleased: boolean =
     tv.firstAirDate !== undefined &&
     tv.firstAirDate !== null &&

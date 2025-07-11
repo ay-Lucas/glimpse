@@ -125,7 +125,6 @@ export const fetchMovieDetails = unstable_cache(
       // fix up dates, etc…
       if (camel.releaseDate) camel.releaseDate = new Date(camel.releaseDate);
       camel.tmdbId = camel.id;
-      console.log(camel.releaseDates);
       return camel as TmdbMovieDetailsResponseAppended;
     } catch (err) {
       console.error("fetchMovieDetails failed for,", id, err);

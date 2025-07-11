@@ -66,7 +66,6 @@ export default async function MoviePage({
     (movie?.releaseDate &&
       new Date(movie?.releaseDate!).valueOf() < Date.now()) ||
     false;
-  console.log(rating);
   const detailItems = buildMovieDetailItems(movie);
   const blurData = await getRedisBlurValue("movie", params.id);
   const isCastValid = movie.credits?.cast && movie.credits.cast.length > 0;
