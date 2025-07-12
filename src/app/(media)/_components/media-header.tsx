@@ -228,7 +228,6 @@ export async function MediaHeader({
           </div>
         </section>
         <MediaActions
-          data={data}
           videoPath={trailerPath}
           tmdbId={tmdbId}
           mediaType={mediaType}

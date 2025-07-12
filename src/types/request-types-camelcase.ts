@@ -18,6 +18,7 @@ export interface MovieResult {
   video: boolean;
   voteAverage: number;
   voteCount: number;
+  mediaType?: "movie";
 }
 
 export interface TvResult {
@@ -35,6 +36,7 @@ export interface TvResult {
   name: string;
   voteAverage: number;
   voteCount: number;
+  mediaType?: "tv";
 }
 
 export interface PersonResult {

@@ -14,7 +14,6 @@ export async function setWatchlist(formData: FormData) {
     description: formData.get("description") as string | null,
     isPublic: formData.get("isPublic"),
   };
-  console.log(raw);
 
   const result = watchlistSchema.safeParse(raw);
 

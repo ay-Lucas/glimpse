@@ -1,6 +1,5 @@
 import MediaBanner from "@/app/(media)/_components/media-banner";
 import { fetchMovieDetails, fetchTvDetails } from "@/app/(media)/actions";
-import { bannerColor } from "@/lib/bannerColor";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Fragment } from "react";
 import { Cast, Crew } from "@/types/request-types-camelcase";
@@ -20,10 +19,10 @@ export default async function CreditsPage({
     mediaType === "movie"
       ? await fetchMovieDetails(tmdbId)
       : await fetchTvDetails(tmdbId);
-  const backdropPath = data.backdropPath ?? "";
-  const darkVibrantBackdropHex = (data as any).darkVibrantBackdropHex ?? "";
+  // const backdropPath = data.backdropPath ?? "";
+  // const darkVibrantBackdropHex = (data as any).darkVibrantBackdropHex ?? "";
 
-  const color = await bannerColor(backdropPath, darkVibrantBackdropHex);
+  // const color = await bannerColor(backdropPath, darkVibrantBackdropHex);
 
   if (!data.credits) throw new Error("fetchTvDetails returned undefined");
 
@@ -65,7 +64,7 @@ export default async function CreditsPage({
         name={title}
         firstAirDate={releaseDate}
         id={tmdbId}
-        color={color}
+        backdropPath={data.backdropPath}
         mediaType={mediaType}
       />
       <div className="container h-full pt-3">

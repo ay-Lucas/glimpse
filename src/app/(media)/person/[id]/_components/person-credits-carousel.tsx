@@ -29,7 +29,6 @@ export default function KnownForCredits({
     return true;
   });
   const top10PopularCredits = getTopPopularCastCredits(10, uniqueCast ?? []);
-  console.log(top10PopularCredits);
   const knownForCredits =
     top10PopularCredits && top10PopularCredits.length > 5
       ? top10PopularCredits
@@ -50,6 +49,7 @@ export default function KnownForCredits({
               : "movie";
           return (
             <SlideCard
+              key={item.id}
               alt={`poster of ${title}`}
               aspectClass="aspect-[2/3]"
               tmdbId={item.id}

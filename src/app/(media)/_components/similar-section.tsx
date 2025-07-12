@@ -33,7 +33,6 @@ export async function SimilarSection({
           imagePath={item.posterPath}
           baseUrl={BASE_POSTER_IMAGE_URL}
           key={index}
-          data={item}
         />
       );
     }

@@ -1,12 +1,10 @@
-import { ReactNode, Suspense } from "react";
+import { ReactNode } from "react";
 import Image from "next/image";
 import { fetchTvDetails } from "@/app/(media)/actions";
 import {
   BASE_ORIGINAL_IMAGE_URL,
-  BASE_BLUR_IMAGE_URL,
   DEFAULT_BLUR_DATA_URL,
 } from "@/lib/constants";
-import PrefetchBannerColor from "../../_components/prefetch-banner-color";
 import { getRedisBlurValue } from "@/services/cache";
 
 export const revalidate = 43200; // 12 hours
@@ -47,12 +45,12 @@ export default async function TvLayout({
       {/* <TvProvider tv={tv}> */}
       {children}
       {/* </TvProvider> */}
-      <Suspense fallback={null}>
-        <PrefetchBannerColor
-          backdropPath={tv.backdropPath ?? ""}
-          darkVibrantBackdropHex={tv.darkVibrantBackdropHex ?? ""}
-        />
-      </Suspense>
+      {/* <Suspense fallback={null}> */}
+      {/*   <PrefetchBannerColor */}
+      {/*     backdropPath={tv.backdropPath ?? ""} */}
+      {/*     darkVibrantBackdropHex={tv.darkVibrantBackdropHex ?? ""} */}
+      {/*   /> */}
+      {/* </Suspense> */}
     </div>
   );
 }

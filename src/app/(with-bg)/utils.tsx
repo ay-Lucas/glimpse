@@ -29,7 +29,7 @@ export async function getBackdrops() {
     trendingDaily.length > 0
       ? (
           await getRedisBlurValue(
-            trendingDaily[0]!.mediaType,
+            trendingDaily[0]!.mediaType!,
             trendingDaily[0]!.id
           )
         )?.backdropBlur

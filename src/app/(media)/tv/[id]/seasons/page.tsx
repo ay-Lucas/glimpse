@@ -2,6 +2,7 @@ import MediaBanner from "@/app/(media)/_components/media-banner";
 import SeasonCard from "@/app/(media)/_components/season-card";
 import { fetchDiscoverTvIds, fetchTvDetails } from "@/app/(media)/actions";
 import { bannerColor } from "@/lib/bannerColor";
+import { toDateString } from "@/lib/utils";
 
 export const revalidate = 43200; // 12 hours
 
@@ -14,19 +15,18 @@ export default async function Seasons({ params }: { params: { id: number } }) {
   const tmdbId = params.id;
   const tv = await fetchTvDetails(tmdbId);
   const backdropPath = tv.backdropPath ?? "";
-  const darkVibrantBackdropHex = tv.darkVibrantBackdropHex ?? "";
 
-  const color = await bannerColor(backdropPath, darkVibrantBackdropHex);
+  const firstAirDate = tv.firstAirDate ? new Date(tv.firstAirDate) : null;
 
   // console.log("Seasons page rendered!")
 
   return (
     <main className="pt-3">
       <MediaBanner
+        backdropPath={tv.backdropPath}
         name={tv.name}
-        firstAirDate={tv.firstAirDate ?? null}
-        id={tv.tmdbId}
-        color={color}
+        firstAirDate={firstAirDate}
+        id={tv.id}
         mediaType="tv"
       />
       <ul className="mt-6 grid place-content-center space-y-3 px-2">

@@ -87,6 +87,7 @@ export default async function SearchPage({
                 item?.media_type !== "person" ? item?.vote_count : undefined;
               return (
                 <SlideCard
+                  key={item?.id!}
                   alt={`poster of ${title}`}
                   aspectClass="aspect-[2/3]"
                   tmdbId={item?.id!}
