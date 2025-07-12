@@ -13,6 +13,12 @@ import {
   TvResult,
   VideosResponse,
   WatchProviderResponse,
+  PersonCombinedCreditsResponse,
+  PersonExternalIdsResponse,
+  PersonImagesResponse,
+  PersonMovieCreditsResponse,
+  PersonTaggedImagesResponse,
+  PersonTvCreditsResponse,
 } from "./request-types-camelcase";
 import { JustWatchInfo } from "./camel-index";
 
@@ -91,6 +97,31 @@ export interface TmdbMovieDetailsBackfilled
   justWatchInfo?: JustWatchInfo | null;
 }
 
+export interface TmdbPersonDetailsAppended extends TmdbPersonDetails {
+  combinedCredits: PersonCombinedCreditsResponse;
+  images: PersonImagesResponse;
+  taggedImages: PersonTaggedImagesResponse;
+  tvCredits: PersonTvCreditsResponse;
+  movieCredits: PersonMovieCreditsResponse;
+  externalIds?: PersonExternalIdsResponse;
+}
+
+export interface TmdbPersonDetails {
+  birthday?: string | null;
+  knownForDepartment?: string;
+  deathday?: string | null;
+  id: number;
+  name?: string;
+  alsoKnownAs?: string[];
+  gender?: number;
+  biography?: string;
+  popularity: number;
+  placeOfBirth?: string;
+  profilePath?: string;
+  adult?: boolean;
+  imdbId?: string;
+  homepage?: string | null;
+}
 export interface CreatedBy {
   id: number;
   creditId: string;

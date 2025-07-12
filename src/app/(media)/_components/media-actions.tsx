@@ -8,7 +8,6 @@ import WatchlistDropdown from "./watchlist-dropdown";
 
 interface Props {
   tmdbId: number;
-  data: TvResult | MovieResult | null;
   videoPath?: string;
   mediaType: "tv" | "movie";
   variant?: "default" | "icon";
@@ -16,7 +15,6 @@ interface Props {
 
 export default function MediaActions({
   tmdbId,
-  data,
   videoPath,
   mediaType,
   variant = "default",
@@ -33,7 +31,6 @@ export default function MediaActions({
         </Link>
       )}
       <WatchlistDropdown
-        data={data}
         mediaType={mediaType}
         tmdbId={tmdbId}
         variant={variant}

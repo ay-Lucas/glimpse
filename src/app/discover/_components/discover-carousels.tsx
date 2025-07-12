@@ -17,8 +17,16 @@ export async function TrendingSeriesCarousel(data: {
   return (
     <CarouselToggle
       options={[
-        { items: trendingTvDailyCards, label: "Today" },
-        { items: trendingTvWeeklyCards, label: "This Week" },
+        {
+          items: trendingTvDailyCards,
+          label: "Today",
+          breakpointType: "title",
+        },
+        {
+          items: trendingTvWeeklyCards,
+          label: "This Week",
+          breakpointType: "title",
+        },
       ]}
       title="Trending Series"
     />
@@ -39,8 +47,16 @@ export async function TrendingMoviesCarousel(data: {
   return (
     <CarouselToggle
       options={[
-        { items: trendingMoviesDailyCards, label: "Today" },
-        { items: trendingMoviesWeeklyCards, label: "This Week" },
+        {
+          items: trendingMoviesDailyCards,
+          label: "Today",
+          breakpointType: "title",
+        },
+        {
+          items: trendingMoviesWeeklyCards,
+          label: "This Week",
+          breakpointType: "title",
+        },
       ]}
       title="Trending Movies"
     />
@@ -60,8 +76,8 @@ export async function PopularMoviesAndSeriesCarousel(data: {
   return (
     <CarouselToggle
       options={[
-        { items: popularTvCards, label: "Series" },
-        { items: popularMovieCards, label: "Movies" },
+        { items: popularTvCards, label: "Series", breakpointType: "title" },
+        { items: popularMovieCards, label: "Movies", breakpointType: "title" },
       ]}
       title="Popular"
     />

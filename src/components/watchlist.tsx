@@ -223,7 +223,6 @@ function WatchlistCard({
       tmdbId={tmdbId!}
       imagePath={media.posterPath}
       baseUrl={BASE_POSTER_IMAGE_URL}
-      data={data}
     />
   );
 }

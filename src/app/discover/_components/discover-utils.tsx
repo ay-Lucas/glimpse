@@ -4,57 +4,13 @@ import { getRedisBlurValues } from "@/services/cache";
 import { DiscoverItem } from "@/types/camel-index";
 import { BlurMap } from "@/types/redis";
 import { MovieResult, TvResult } from "@/types/request-types-camelcase";
-import Link from "next/link";
-
-// export const convertToDiscoverItems = async (
-//   array: MovieResult[] | TvResult[],
-//   blurMap: BlurMap
-// ): Promise<DiscoverItem[]> => {
-//   const erroredItems: string[] = [];
-//   const promises = array.map(async (item) => {
-//
-//     // const posterBlurDataUrl = backfilledBlurData?.posterBlur
-//     //   ? backfilledBlurData.posterBlur : await getBlurData(`${BaseImageUrl.BLUR}${item.posterPath}`)
-//     const posterBlurDataUrl = backfilledBlurData?.posterBlur;
-//     const discoverItem: DiscoverItem = {
-//       tmdbId: item.id,
-//       title: title,
-//       voteAverage: item.voteAverage,
-//       voteCount: item.voteCount,
-//       releaseDate: releaseDate,
-//       posterPath: item.posterPath,
-//       backdropPath: item.backdropPath,
-//       posterBlurDataUrl,
-//       overview: item.overview,
-//       mediaType: item.mediaType,
-//
-//     }
-//
-//     return {
-//       tmdbId: item.id,
-//       title: title,
-//       voteAverage
-//       posterPath: item.posterPath,
-//       backdropPath: item.backdropPath,
-//       posterBlurDataUrl,
-//       overview: item.overview,
-//       mediaType: item.mediaType,
-//     };
-//   });
-//   if (erroredItems.length)
-//     console.warn(
-//       `\nPoster blur data not found for: \n${erroredItems.join("\n")}`
-//     );
-//
-//   return await Promise.all(promises);
-// };
 
 export const mkCards = (
   items: (TvResult | MovieResult)[],
   mediaType: "tv" | "movie",
   blurMap: BlurMap
 ): JSX.Element[] => {
-  return items.map((item) => {
+  return items.map((item, index) => {
     const title = (item as MovieResult).title || (item as TvResult).name;
     const backfilledBlurData = blurMap.get(item.id);
     const releaseDateStr =
@@ -66,13 +22,13 @@ export const mkCards = (
 
     return (
       <SlideCard
+        key={`${item.id}${index}`}
         rating={null}
         tmdbVoteAverage={item.voteAverage ?? undefined}
         tmdbVoteCount={item.voteCount ?? undefined}
         tmdbId={item.id}
         releaseDate={releaseDate}
         mediaType={mediaType}
-        data={item}
         aspectClass="aspect-[2/3]"
         alt={`poster of ${title}`}
         title={title}

@@ -4,11 +4,6 @@ import TmdbRating from "@/app/(media)/_components/tmdb-rating";
 import Image, { type ImageProps } from "next/image";
 import { useState } from "react";
 import MediaActions from "@/app/(media)/_components/media-actions";
-import {
-  MovieResult,
-  PersonResult,
-  TvResult,
-} from "@/types/request-types-camelcase";
 import Link from "next/link";
 import { Skeleton } from "./ui/skeleton";
 
@@ -30,7 +25,6 @@ export function SlideCard({
   loading = "lazy",
   className = "",
   rating,
-  data,
 }: {
   alt: string;
   aspectClass: string;
@@ -45,11 +39,10 @@ export function SlideCard({
   tmdbVoteCount?: number;
   tmdbId: number;
   mediaType: "tv" | "movie" | "person";
-  releaseDate: Date | null;
+  releaseDate?: Date | null;
   imagePath?: string | null;
   baseUrl: string;
-  rating: string | null;
-  data: TvResult | MovieResult | PersonResult | null;
+  rating?: string | null;
 }) {
   const [loaded, setLoaded] = useState(false);
   return (
@@ -104,11 +97,10 @@ export function SlideCard({
                   />
                 )}
             </div>
-            {mediaType !== "person" && data !== null && (
+            {mediaType !== "person" && (
               <MediaActions
                 variant="icon"
                 mediaType={mediaType}
-                data={data as TvResult | MovieResult}
                 tmdbId={tmdbId}
               />
             )}

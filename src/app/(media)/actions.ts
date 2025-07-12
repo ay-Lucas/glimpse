@@ -35,6 +35,7 @@ import { scrubByMaxRes } from "@/lib/scrub-streams";
 import { getJustWatchInfoFromDb } from "@/lib/actions";
 import {
   TmdbMovieDetailsResponseAppended,
+  TmdbPersonDetailsAppended,
   TmdbTvDetailsResponseAppended,
 } from "@/types/tmdb-camel";
 // Don't import React cache: /scripts/revalidate.ts throws error
@@ -43,7 +44,7 @@ export const fetchPersonDetails = unstable_cache(
   async (
     id: number,
     resOptions: RequestInit = options
-  ): Promise<FullPerson> => {
+  ): Promise<TmdbPersonDetailsAppended> => {
     const res = await fetch(
       `${BASE_API_URL}/person/${id}?append_to_response=combined_credits,movie_credits,tv_credits,images,tagged_images,external_ids`,
       resOptions
@@ -51,7 +52,7 @@ export const fetchPersonDetails = unstable_cache(
     const data = await res.json();
     const camel = camelcaseKeys(data, {
       deep: true,
-    }) as FullPerson;
+    }) as TmdbPersonDetailsAppended;
     return camel;
   }
 );

@@ -11,6 +11,7 @@ import camelcaseKeys from "camelcase-keys";
 import { Card } from "@/components/card";
 import { BASE_POSTER_IMAGE_URL } from "./constants";
 import Link from "next/link";
+import { SlideImageCard } from "@/components/slide-image-card";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));

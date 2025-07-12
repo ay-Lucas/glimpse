@@ -9,12 +9,10 @@ import Link from "next/link";
 
 export default function WatchlistDropdown({
   tmdbId,
-  data,
   mediaType,
   variant = "default",
 }: {
   tmdbId: number;
-  data: TvResult | MovieResult | null;
   mediaType: "tv" | "movie";
   variant?: "default" | "icon";
 }) {
@@ -24,7 +22,6 @@ export default function WatchlistDropdown({
       {user ? (
         <AddToWatchlistDropdown
           userId={user.id}
-          item={data}
           tmdbId={tmdbId}
           mediaType={mediaType}
           variant={variant}

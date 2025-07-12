@@ -18,13 +18,11 @@ import { MovieResult, TvResult } from "@/types/request-types-camelcase";
 export default function AddToWatchlistDropdown({
   userId,
   tmdbId,
-  item,
   mediaType,
   variant,
 }: {
   userId: string;
   tmdbId: number;
-  item: TvResult | MovieResult | null;
   mediaType: "tv" | "movie";
   variant: "default" | "icon";
 }) {
@@ -49,7 +47,6 @@ export default function AddToWatchlistDropdown({
       ...prevStates,
       [watchlistId]: checked,
     }));
-    if (!item) return;
     if (checked) {
       addItemToWatchlist(watchlistId, tmdbId, mediaType);
     } else {

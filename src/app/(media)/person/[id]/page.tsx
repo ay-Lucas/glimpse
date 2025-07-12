@@ -1,22 +1,17 @@
 import { fetchTopPeopleIds, fetchPersonDetails } from "@/app/(media)/actions";
 import {
-  BASE_ORIGINAL_IMAGE_URL,
   BASE_POSTER_IMAGE_URL,
-  BASE_PROFILE_IMAGE_URL,
   DEFAULT_BLUR_DATA_URL,
   TMDB_GENDERS,
 } from "@/lib/constants";
 import { PersonDetails } from "@/components/person-details";
 import Image from "next/image";
-import Link from "next/link";
-import { TvResult, MovieResult } from "@/types/request-types-camelcase";
-import ImageCarousel from "@/components/image-carousel";
-import { Card } from "@/components/card";
-import { getTopPopularCredits } from "./utils";
 import PersonRank from "./_components/person-rank";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import MediaLinks from "../../_components/media-links";
+import KnownForCredits from "./_components/person-credits-carousel";
+import ImagesToggleSection from "./_components/images-toggle";
 
 export const revalidate = 43200; // 12 hours
 
@@ -47,11 +42,12 @@ export default async function PersonPage({
       (item) => typeof item.id === "number" && item.id > 0
     )
   );
-  const top10PopularCredits = getTopPopularCredits(10, person.combinedCredits);
-  const knownForCredits =
-    top10PopularCredits && top10PopularCredits.length > 3
-      ? top10PopularCredits
-      : Array.from(uniqueCombinedCredits.values());
+  const showIdsAndTitles = person.combinedCredits.cast?.map((item) => {
+    return { id: item.id, title: (item as any).name || (item as any).title };
+  });
+  const showIdMap = new Map<number, string>(
+    showIdsAndTitles?.map((c) => [c.id, c.title])
+  );
   return (
     <main>
       <div className="h-full w-full overflow-x-hidden pb-20">
@@ -114,102 +110,13 @@ export default async function PersonPage({
                 mediaType="person"
               />
             )}
-            {person.taggedImages.results?.length ? (
-              <section className="media-card">
-                <ImageCarousel
-                  breakpoints="taggedImages"
-                  title={
-                    <h2 className={`text-2xl font-bold`}>Tagged Images</h2>
-                  }
-                  loading="lazy"
-                  items={(person.taggedImages.results ?? []).map((item) => {
-                    const mediaType = item.media?.mediaType;
-                    const isTv =
-                      mediaType === "tv" || mediaType === "tv_episode";
-
-                    return (
-                      <div key={item.id ?? item.filePath}>
-                        <Image
-                          src={`${BASE_ORIGINAL_IMAGE_URL}${item.filePath}`}
-                          width={300}
-                          height={240}
-                          alt={`tagged image of ${person.name}`}
-                          className="rounded-lg"
-                          unoptimized
-                        />
-
-                        {isTv && (
-                          <div className="mt-2">
-                            <p className="flex w-full items-center gap-x-5">
-                              <span>{(item.media as any).name}</span>
-                              {mediaType === "tv_episode" && (
-                                <span className="font-semibold">
-                                  S{item.media!.seasonNumber} E
-                                  {item.media!.episodeNumber}
-                                </span>
-                              )}
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                />
-              </section>
-            ) : (
-              ""
-            )}
-            {person.images.profiles?.length ? (
-              <section className="media-card">
-                <ImageCarousel
-                  breakpoints="page"
-                  title={<h2 className={`text-2xl font-bold`}>Images</h2>}
-                  loading="lazy"
-                  items={person.images.profiles?.map((item, index) => (
-                    <Image
-                      src={`${BASE_PROFILE_IMAGE_URL}${item.filePath}`}
-                      width={228}
-                      height={342}
-                      alt={`tagged image of ${person.name}`}
-                      unoptimized
-                      className="rounded-lg"
-                      key={index}
-                    />
-                  ))}
-                />
-              </section>
-            ) : (
-              <div />
-            )}
-            {knownForCredits.length > 0 && (
-              <div className="media-card">
-                <ImageCarousel
-                  breakpoints="page"
-                  title={<h2 className={`text-2xl font-bold`}>Known For</h2>}
-                  loading="lazy"
-                  items={
-                    knownForCredits.map(
-                      (item): JSX.Element => (
-                        <Link
-                          href={`/${item.mediaType}/${item.id}`}
-                          key={item.id}
-                        >
-                          <Card
-                            imagePath={item.posterPath ?? null}
-                            baseUrl={BASE_POSTER_IMAGE_URL}
-                            title={
-                              (item as MovieResult).title ??
-                              (item as TvResult).name
-                            }
-                            overview={item.overview}
-                          />
-                        </Link>
-                      )
-                    )!
-                  }
-                />
-              </div>
-            )}
+            <ImagesToggleSection
+              personName={person.name ?? ""}
+              profileImages={person.images.profiles ?? []}
+              taggedImages={person.taggedImages.results ?? []}
+              showIdMap={showIdMap}
+            />
+            <KnownForCredits credits={person.combinedCredits} />
           </div>
         </div>
       </div>
