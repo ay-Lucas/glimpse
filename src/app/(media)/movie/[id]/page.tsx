@@ -102,7 +102,7 @@ export default async function MoviePage({
               )}
             </div>
 
-            <div className="h-[6vh] md:h-[10vh]"></div>
+            <div className="md:h-[6vh]"></div>
             <div className="relative items-end px-3 pt-16 md:container">
               <div className="items-end space-y-5 px-0 pb-5 md:pt-0 lg:px-24">
                 <section>
@@ -130,7 +130,7 @@ export default async function MoviePage({
                     mediaType="movie"
                   />
                 </section>
-                <section className="grid grid-cols-[repeat(auto-fit,_minmax(0,_1fr))] gap-4">
+                <section className="grid gap-4 md:grid-cols-[repeat(auto-fit,_minmax(0,_1fr))]">
                   <MediaDetails items={detailItems} />
                   <Suspense
                     fallback={

@@ -48,16 +48,16 @@ export default async function PersonPage({
   const showIdMap = new Map<number, string>(
     showIdsAndTitles?.map((c) => [c.id, c.title])
   );
+
   return (
     <main>
       <div className="h-full w-full overflow-x-hidden pb-20">
         <div className="fixed left-0 top-0 z-0 h-full w-full items-center justify-center bg-gradient-to-t from-background via-background to-gray-800" />
-        <div className="h-[6vh] md:h-[10vh]"></div>
         <div className="relative items-end px-3 pt-16 md:container">
           <div className="items-end space-y-5 px-0 pb-5 md:pt-0 lg:px-40">
             <section className="media-card grid grid-cols-1 items-start gap-5 md:grid-cols-[238px,1fr]">
               {person.profilePath ? (
-                <figure className="w-full">
+                <figure className="relative mx-auto h-[238px] w-[159px] md:h-[357px] md:w-[238px]">
                   <Image
                     quality={60}
                     width={238}
