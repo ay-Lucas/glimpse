@@ -1,4 +1,3 @@
-import MediaBanner from "@/app/(media)/_components/media-banner";
 import { fetchMovieDetails, fetchTvDetails } from "@/app/(media)/actions";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Fragment } from "react";
@@ -6,6 +5,12 @@ import { Cast, Crew } from "@/types/request-types-camelcase";
 import Image from "next/image";
 import Link from "next/link";
 import { BASE_SMALL_BACKDROP_URL } from "@/lib/constants";
+import dynamic from "next/dynamic";
+
+const MediaBanner = dynamic(
+  () => import("@/app/(media)/_components/media-banner"),
+  { ssr: false }
+);
 
 export default async function CreditsPage({
   mediaType,
