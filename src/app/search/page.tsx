@@ -1,10 +1,12 @@
 import {
   SearchMultiRequest,
   SearchMultiResponse,
+  TvResult,
+  MovieResult,
 } from "@/types/request-types-snakecase";
 import { BASE_API_URL, options } from "@/lib/constants";
 // import { makeCarouselCards } from "../discover/page";
-import { makeCarouselCards } from "@/lib/utils";
+import { SlideCard } from "@/components/slide-card";
 
 const MAX_PAGES = 10;
 
@@ -64,14 +66,41 @@ export default async function SearchPage({
   const filteredRes = allRes.filter(
     (item: any) => item.poster_path || item.profile_path || item.backdrop_path
   );
-  const items: any = filteredRes;
 
   return (
     <main>
       <div className="pt-10 md:container">
         <div className="flex flex-shrink flex-wrap justify-center gap-4 md:gap-8">
           {filteredRes && filteredRes.length > 0 ? (
-            makeCarouselCards(items)
+            (filteredRes ?? []).map((item) => {
+              const title =
+                (item as MovieResult).title ?? (item as TvResult).name;
+              const imagePath =
+                item?.media_type !== "person"
+                  ? item?.poster_path
+                  : item.profile_path;
+              const overview =
+                item?.media_type !== "person" ? item?.overview : undefined;
+              const tmdbVoteAverage =
+                item?.media_type !== "person" ? item?.vote_average : undefined;
+              const tmdbVoteCount =
+                item?.media_type !== "person" ? item?.vote_count : undefined;
+              return (
+                <SlideCard
+                  alt={`poster of ${title}`}
+                  aspectClass="aspect-[2/3]"
+                  tmdbId={item?.id!}
+                  mediaType={item?.media_type!}
+                  baseUrl="/tmdb/t/p/w500"
+                  imagePath={imagePath}
+                  title={title}
+                  unoptimized
+                  overview={overview}
+                  tmdbVoteAverage={tmdbVoteAverage}
+                  tmdbVoteCount={tmdbVoteCount}
+                />
+              );
+            })
           ) : (
             <div>No Results</div>
           )}
