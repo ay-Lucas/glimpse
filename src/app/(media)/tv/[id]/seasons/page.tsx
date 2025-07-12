@@ -1,13 +1,8 @@
+import MediaBanner from "@/app/(media)/_components/media-banner";
 import SeasonCard from "@/app/(media)/_components/season-card";
 import { fetchDiscoverTvIds, fetchTvDetails } from "@/app/(media)/actions";
-import dynamic from "next/dynamic";
 
 export const revalidate = 43200; // 12 hours
-
-const MediaBanner = dynamic(
-  () => import("@/app/(media)/_components/media-banner"),
-  { ssr: false }
-);
 
 export async function generateStaticParams() {
   const discoverTvIds = await fetchDiscoverTvIds();

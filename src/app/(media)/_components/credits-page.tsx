@@ -5,12 +5,7 @@ import { Cast, Crew } from "@/types/request-types-camelcase";
 import Image from "next/image";
 import Link from "next/link";
 import { BASE_SMALL_BACKDROP_URL } from "@/lib/constants";
-import dynamic from "next/dynamic";
-
-const MediaBanner = dynamic(
-  () => import("@/app/(media)/_components/media-banner"),
-  { ssr: false }
-);
+import MediaBanner from "./media-banner";
 
 export default async function CreditsPage({
   mediaType,
