@@ -6,7 +6,7 @@ import Link from "next/link";
 export default function TopCast({ cast }: { cast: Cast[] }) {
   const items = cast
     ?.splice(0, 10)
-    .map((item) => <SlideCastCard cast={item} />);
+    .map((item, index) => <SlideCastCard cast={item} key={index} />);
 
   return (
     <section className="media-card">
