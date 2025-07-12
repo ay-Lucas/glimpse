@@ -40,10 +40,10 @@ export async function SimilarSection({
   return (
     <>
       {items?.length > 0 && (
-        <div className="space-y-4">
+        <section className="media-card space-y-4">
           <h2 className={`text-2xl font-bold`}>Similar</h2>
-          <MediaCarousel items={items} breakpointType="poster" />
-        </div>
+          <MediaCarousel items={items} breakpointType="posterCard" />
+        </section>
       )}
     </>
   );

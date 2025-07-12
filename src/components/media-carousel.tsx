@@ -12,6 +12,10 @@ import { useEffect, useRef, useState } from "react";
 import { Skeleton } from "./ui/skeleton";
 
 const breakpointOptions: {
+  posterCard: {
+    [width: number]: SwiperOptions;
+    [ratio: string]: SwiperOptions;
+  };
   poster: {
     [width: number]: SwiperOptions;
     [ratio: string]: SwiperOptions;
@@ -25,6 +29,38 @@ const breakpointOptions: {
     [ratio: string]: SwiperOptions;
   };
 } = {
+  posterCard: {
+    "@0.00": {
+      slidesPerView: 2,
+      slidesPerGroup: 2,
+      spaceBetween: 5,
+    },
+    "@.3": {
+      slidesPerView: 3,
+      slidesPerGroup: 3,
+      spaceBetween: 5,
+    },
+    "@0.45": {
+      slidesPerView: 4,
+      slidesPerGroup: 4,
+      spaceBetween: 5,
+    },
+    "@0.75": {
+      slidesPerView: 5,
+      slidesPerGroup: 5,
+      spaceBetween: 5,
+    },
+    "@1.25": {
+      slidesPerView: 6,
+      slidesPerGroup: 6,
+      spaceBetween: 10,
+    },
+    // "@1.50": {
+    //   slidesPerView: 7,
+    //   slidesPerGroup: 7,
+    //   spaceBetween: 5,
+    // },
+  },
   poster: {
     "@0.00": {
       slidesPerView: 2,
@@ -61,39 +97,43 @@ const breakpointOptions: {
   },
   title: {
     "@0.00": {
-      slidesPerView: 2,
-      slidesPerGroup: 2,
-      spaceBetween: 10,
-    },
-    "@0.6": {
       slidesPerView: 3,
       slidesPerGroup: 3,
       spaceBetween: 10,
     },
-    "@0.8": {
+    "@0.52": {
+      slidesPerView: 3,
+      slidesPerGroup: 3,
+      spaceBetween: 5,
+    },
+    "@0.75": {
       slidesPerView: 4,
       slidesPerGroup: 4,
-      spaceBetween: 20,
+      spaceBetween: 5,
     },
-    "@1.1": {
+    "@0.95": {
       slidesPerView: 5,
       slidesPerGroup: 5,
-      spaceBetween: 20,
+      spaceBetween: 2.5,
     },
-    "@1.25": {
-      slidesPerView: 6,
-      slidesPerGroup: 6,
-      spaceBetween: 10,
-    },
-    "@1.50": {
+    "@1.3": {
       slidesPerView: 7,
+      slidesPerGroup: 7,
+      spaceBetween: 5,
+    },
+    "@1.75": {
+      slidesPerView: 8,
       slidesPerGroup: 4,
-      spaceBetween: 20,
+      spaceBetween: 5,
     },
   },
 };
 //
-export type CarouselBreakpoints = "poster" | "backdrop" | "title";
+export type CarouselBreakpoints =
+  | "poster"
+  | "posterCard"
+  | "backdrop"
+  | "title";
 
 export default function MediaCarousel({
   items,

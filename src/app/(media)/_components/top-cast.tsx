@@ -1,27 +1,36 @@
-import CastCard from "@/components/cast-card";
 import MediaCarousel from "@/components/media-carousel";
-import { DEFAULT_BLUR_DATA_URL } from "@/lib/constants";
+import { SlideImageCard } from "@/components/slide-image-card";
 import { Cast } from "@/types/request-types-camelcase";
 import Link from "next/link";
 
 export default function TopCast({ cast }: { cast: Cast[] }) {
-  const items = cast?.splice(0, 10).map((item, index: number) => (
-    <Link href={`/person/${item.id}`} key={index}>
-      <CastCard
-        name={item.name}
-        character={item.character}
-        imagePath={item.profilePath}
-        index={index}
-        blurDataURL={DEFAULT_BLUR_DATA_URL}
-        className="pb-3 pt-2"
-      />
-    </Link>
-  ));
+  const items = cast
+    ?.splice(0, 10)
+    .map((item) => <SlideCastCard cast={item} />);
 
   return (
     <section className="media-card">
-      <h2 className={`text-2xl font-bold`}>Top Cast</h2>
-      <MediaCarousel items={items} breakpointType="poster" />
+      <h2 className={`pb-3 text-2xl font-bold`}>Top Cast</h2>
+      <MediaCarousel items={items} breakpointType="posterCard" />
     </section>
+  );
+}
+
+export function SlideCastCard({ cast }: { cast: Cast }) {
+  return (
+    <Link href={`/person/${cast.id}`}>
+      <SlideImageCard
+        key={cast.id}
+        src={`/tmdb/t/p/w342${cast.profilePath}`}
+        alt={`poster of ${cast.name}`}
+        aspectClass="aspect-[2/3]"
+      />
+      <div className="mt-2 text-start">
+        <p className="line-clamp-1 text-sm font-semibold">{cast.name}</p>
+        <p className="line-clamp-1 text-sm text-gray-500">
+          as {cast.character}
+        </p>
+      </div>
+    </Link>
   );
 }
