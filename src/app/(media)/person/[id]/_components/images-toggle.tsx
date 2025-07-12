@@ -1,6 +1,5 @@
 import CarouselToggle from "@/app/(media)/_components/carousel-toggle";
 import { PersonTaggedImage, Profile } from "@/types/request-types-camelcase";
-import { useMemo } from "react";
 import { TaggedSlide } from "./tagged-images";
 import Image from "next/image";
 import { BASE_PROFILE_IMAGE_URL } from "@/lib/constants";
@@ -16,17 +15,14 @@ export default function ImagesToggleSection({
   showIdMap: Map<number, string>;
   personName: string;
 }) {
-  const taggedImageSlides = useMemo(
-    () =>
-      taggedImages.map((item) => (
-        <TaggedSlide
-          key={item.id ?? item.filePath}
-          item={item}
-          showIdMap={showIdMap}
-        />
-      )),
-    [taggedImages, showIdMap]
-  );
+  const taggedImageSlides = taggedImages.map((item) => (
+    <TaggedSlide
+      key={item.id ?? item.filePath}
+      item={item}
+      showIdMap={showIdMap}
+    />
+  ));
+
   const profileSlides = profileImages?.map((item, index) => (
     <Image
       src={`${BASE_PROFILE_IMAGE_URL}${item.filePath}`}
