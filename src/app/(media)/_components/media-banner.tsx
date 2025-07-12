@@ -27,6 +27,7 @@ export default function MediaBanner({
   const src = `${BASE_SMALL_BACKDROP_URL}${backdropPath}`;
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
     const img = new Image();
     img.crossOrigin = "anonymous";
     img.src = src;
