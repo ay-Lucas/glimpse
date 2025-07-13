@@ -69,8 +69,9 @@ export default async function SearchPage({
 
   return (
     <main>
-      <div className="pt-10 md:container">
-        <div className="flex flex-shrink flex-wrap justify-center gap-4 md:gap-8">
+      <div className="px-2 pt-10 md:container">
+        {/* <div className="flex flex-shrink flex-wrap justify-start gap-4 md:gap-8"> */}
+        <div className="grid grid-cols-2 gap-2 xxs:grid-cols-3 sm:gap-4 md:grid-cols-4 md:gap-8 lg:grid-cols-5 xl:grid-cols-6">
           {filteredRes && filteredRes.length > 0 ? (
             (filteredRes ?? []).map((item) => {
               const title =
