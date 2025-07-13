@@ -10,9 +10,11 @@ import { ExternalLink } from "lucide-react";
 import {
   MovieResult,
   ReleaseDate,
+  ReleaseDateResponse,
   ReleasesReleaseDate,
 } from "@/types/request-types-camelcase";
 import { TmdbMovieDetailsResponseAppended } from "@/types/tmdb-camel";
+import { MovieRatingResponse } from "@/types/request-types-snakecase";
 
 export function buildMovieDetailItems(
   movie: TmdbMovieDetailsResponseAppended
@@ -215,46 +217,92 @@ export function buildMovieDetailItems(
 //     )[0];
 //   return newest ? (newest.certification ?? null) : null;
 // }
-
 export function pickMovieRating(
-  entries: Array<{
-    iso31661: string;
-    releaseDates: ReleaseDate[];
-  }>,
+  entries: ReleaseDateResponse[],
   preferred = "US",
   fallback?: string
-): string | null {
-  // 1️⃣ Flatten all releaseDates, retaining each country code
-  const allDates = entries.flatMap(({ iso31661, releaseDates }) =>
-    releaseDates.map((rd) => ({ ...rd, iso31661 }))
+): ReleaseDateResponse | null {
+  // 1️⃣ Flatten into pairs of (iso31661, rd)
+  type Flat = { iso31661: string; rd: ReleaseDate };
+  const all: Flat[] = entries.flatMap(({ iso31661, releaseDates }) =>
+    releaseDates.map((rd) => ({ iso31661, rd }))
   );
 
-  // 2️⃣ Filter out any blank certifications
-  const valid = allDates.filter((rd) => rd.certification.trim() !== "");
+  // 2️⃣ Keep only non-empty certifications
+  const valid = all.filter(({ rd }) => rd.certification.trim() !== "");
 
-  // 3️⃣ Build a region→certification map (last-write wins)
-  const byRegion = new Map<string, string>();
-  for (const rd of valid) {
-    byRegion.set(rd.iso31661, rd.certification);
+  // 3️⃣ Build a map region → rd (last-write wins)
+  const byRegion = new Map<string, ReleaseDate>();
+  for (const { iso31661, rd } of valid) {
+    byRegion.set(iso31661, rd);
   }
 
-  // 4️⃣ Try your preferred region
+  // 4️⃣ Pick which region key to use
+  let regionKey: string | undefined;
   if (byRegion.has(preferred)) {
-    return byRegion.get(preferred)!;
+    regionKey = preferred;
+  } else if (fallback && byRegion.has(fallback)) {
+    regionKey = fallback;
+  } else {
+    // 5️⃣ Fallback to the rd with the most recent date
+    const newest = valid
+      .slice()
+      .sort(
+        (a, b) =>
+          new Date(b.rd.releaseDate).getTime() -
+          new Date(a.rd.releaseDate).getTime()
+      )[0];
+    if (!newest) return null;
+    regionKey = newest.iso31661;
   }
 
-  // 5️⃣ Then a fallback region if given
-  if (fallback && byRegion.has(fallback)) {
-    return byRegion.get(fallback)!;
-  }
-
-  // 6️⃣ Finally, pick the entry with the most recent date
-  const newest = valid
-    .slice()
-    .sort(
-      (a, b) =>
-        new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime()
-    )[0];
-
-  return newest ? newest.certification : null;
+  // 6️⃣ Build and return the ReleaseDateResponse
+  const chosen = byRegion.get(regionKey);
+  if (!chosen) return null;
+  return {
+    iso31661: regionKey,
+    releaseDates: [chosen],
+  };
 }
+// export function pickMovieRating(
+//   entries: Array<{
+//     iso31661: string;
+//     releaseDates: ReleaseDate[];
+//   }>,
+//   preferred = "US",
+//   fallback?: string
+// ): string | null {
+//   // 1️⃣ Flatten all releaseDates, retaining each country code
+//   const allDates = entries.flatMap(({ iso31661, releaseDates }) =>
+//     releaseDates.map((rd) => ({ ...rd, iso31661 }))
+//   );
+//
+//   // 2️⃣ Filter out any blank certifications
+//   const valid = allDates.filter((rd) => rd.certification.trim() !== "");
+//
+//   // 3️⃣ Build a region→certification map (last-write wins)
+//   const byRegion = new Map<string, string>();
+//   for (const rd of valid) {
+//     byRegion.set(rd.iso31661, rd.certification);
+//   }
+//
+//   // 4️⃣ Try your preferred region
+//   if (byRegion.has(preferred)) {
+//     return byRegion.get(preferred)!;
+//   }
+//
+//   // 5️⃣ Then a fallback region if given
+//   if (fallback && byRegion.has(fallback)) {
+//     return byRegion.get(fallback)!;
+//   }
+//
+//   // 6️⃣ Finally, pick the entry with the most recent date
+//   const newest = valid
+//     .slice()
+//     .sort(
+//       (a, b) =>
+//         new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime()
+//     )[0];
+//
+//   return newest ? newest.certification : null;
+// }

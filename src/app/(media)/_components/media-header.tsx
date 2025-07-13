@@ -2,7 +2,6 @@ import Image from "next/image";
 import MediaActions from "./media-actions";
 import { BASE_POSTER_IMAGE_URL, DEFAULT_BLUR_DATA_URL } from "@/lib/constants";
 import { Genre } from "@/types/types";
-import { FullMovie, FullTv } from "@/types/camel-index";
 import { Expandable } from "./expandable";
 import MediaRatings from "./media-ratings";
 import LocalRating from "./local-rating";
@@ -10,6 +9,10 @@ import {
   TmdbMovieDetailsResponseAppended,
   TmdbTvDetailsResponseAppended,
 } from "@/types/tmdb-camel";
+import {
+  RatingResponse,
+  ReleaseDateResponse,
+} from "@/types/request-types-camelcase";
 
 export interface MediaHeaderProps {
   title: string;
@@ -19,7 +22,7 @@ export interface MediaHeaderProps {
   dateValue: string | undefined; // ISO date string
   dateValue2?: string; // ISO date string
   isReleased: boolean;
-  rating: string | null; // e.g. "PG-13"
+  rating: RatingResponse | ReleaseDateResponse | null; // e.g. "PG-13"
   posterPath: string | null;
   posterBlur: string | null;
   tmdbVoteAverage: number | null;

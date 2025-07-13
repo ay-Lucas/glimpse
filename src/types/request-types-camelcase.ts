@@ -139,6 +139,10 @@ export interface ReleaseDate {
   type: number;
 }
 
+export interface ReleaseDateResponse {
+  iso31661: string;
+  releaseDates: Array<ReleaseDate>;
+}
 /* ─────────────────────────────  Videos  ────────────────────────────── */
 
 export interface Video {

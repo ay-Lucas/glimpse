@@ -152,26 +152,56 @@ export function pickTvRating(
   entries: RatingResponse[],
   preferredRegion = "US",
   fallbackRegion?: string
-): string | null {
-  // 1. de-duplicate in case TMDB gives you two FR entries, etc.
-  const byRegion = entries.reduce((map, { iso31661, rating }) => {
-    // last one wins, but you could do `if (!map.has(iso31661))` to keep first
-    if (typeof iso31661 === "string" && typeof rating === "string")
-      map.set(iso31661, rating);
+): RatingResponse | null {
+  // 1. De-duplicate by region, keeping the last one seen for each ISO code
+  const byRegion = entries.reduce((map, entry) => {
+    if (
+      typeof entry.iso31661 === "string" &&
+      typeof entry.rating === "string"
+    ) {
+      map.set(entry.iso31661, entry);
+    }
     return map;
-  }, new Map<string, string>());
+  }, new Map<string, RatingResponse>());
 
-  // 2. try the preferred region
+  // 2. Preferred region
   if (byRegion.has(preferredRegion)) {
     return byRegion.get(preferredRegion)!;
   }
 
-  // 3. optional second fallback (e.g. `GB`, `CA`, whatever you like)
+  // 3. Optional fallback region
   if (fallbackRegion && byRegion.has(fallbackRegion)) {
     return byRegion.get(fallbackRegion)!;
   }
 
-  // 4. final fallback: the *first* entry in the Map
+  // 4. Final fallback: first entry in the map
   const first = byRegion.values().next();
   return first.done ? null : first.value;
 }
+// export function pickTvRating(
+//   entries: RatingResponse[],
+//   preferredRegion = "US",
+//   fallbackRegion?: string
+// ): string | null {
+//   // 1. de-duplicate in case TMDB gives you two FR entries, etc.
+//   const byRegion = entries.reduce((map, { iso31661, rating }) => {
+//     // last one wins, but you could do `if (!map.has(iso31661))` to keep first
+//     if (typeof iso31661 === "string" && typeof rating === "string")
+//       map.set(iso31661, rating);
+//     return map;
+//   }, new Map<string, string>());
+//
+//   // 2. try the preferred region
+//   if (byRegion.has(preferredRegion)) {
+//     return byRegion.get(preferredRegion)!;
+//   }
+//
+//   // 3. optional second fallback (e.g. `GB`, `CA`, whatever you like)
+//   if (fallbackRegion && byRegion.has(fallbackRegion)) {
+//     return byRegion.get(fallbackRegion)!;
+//   }
+//
+//   // 4. final fallback: the *first* entry in the Map
+//   const first = byRegion.values().next();
+//   return first.done ? null : first.value;
+// }

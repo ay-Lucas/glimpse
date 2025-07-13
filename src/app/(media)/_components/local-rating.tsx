@@ -1,5 +1,8 @@
 "use client";
-import { RatingResponse, ReleaseDate } from "@/types/request-types-camelcase";
+import {
+  RatingResponse,
+  ReleaseDateResponse,
+} from "@/types/request-types-camelcase";
 import { useEffect, useMemo, useState } from "react";
 import { pickTvRating } from "../tv/[id]/utils";
 import { pickMovieRating } from "../movie/[id]/utils";
@@ -9,18 +12,13 @@ export default function LocalRating({
   mediaType,
   initialValue,
 }: {
-  ratings:
-    | RatingResponse[]
-    | Array<{
-        iso31661: string;
-        releaseDates: Array<ReleaseDate>;
-      }>;
+  ratings: RatingResponse[] | ReleaseDateResponse[];
   mediaType: "tv" | "movie";
-  initialValue: string;
+  initialValue: RatingResponse | ReleaseDateResponse;
 }) {
   const userRegion = useUserRegion();
 
-  const rating = useMemo(() => {
+  const ratingResponse = useMemo(() => {
     if (ratings) {
       const local =
         mediaType === "tv"
@@ -30,10 +28,7 @@ export default function LocalRating({
               "US"
             )
           : pickMovieRating(
-              ratings as Array<{
-                iso31661: string;
-                releaseDates: Array<ReleaseDate>;
-              }>,
+              ratings as ReleaseDateResponse[],
               userRegion ?? undefined,
               "US"
             );
@@ -42,10 +37,15 @@ export default function LocalRating({
       return local ?? initialValue;
     }
   }, [ratings, mediaType, initialValue, userRegion]);
+  const region = ratingResponse?.iso31661;
+  const rating =
+    mediaType === "tv"
+      ? (ratingResponse as RatingResponse).rating
+      : (ratingResponse as ReleaseDateResponse).releaseDates[0]?.certification;
   return (
     <div className="mt-1 inline-block space-x-1.5 text-sm">
       <span className="border border-gray-200 px-1">{rating}</span>
-      <span className="text-gray-400">({userRegion})</span>
+      <span className="text-gray-400">({region})</span>
     </div>
   );
 }

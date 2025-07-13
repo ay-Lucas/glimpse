@@ -36,13 +36,14 @@ export default function MediaBanner({
       setBannerColor(color);
     };
   }, [src]);
+
   return (
     <div className="relative w-full overflow-hidden">
       <div
         className="absolute inset-0 transition-colors duration-200"
         style={{ backgroundColor: bannerColor }}
       />
-      <div className="relative flex h-full items-center justify-center py-2 shadow-md">
+      <div className="relative flex h-full items-center justify-center px-3 py-2 shadow-md">
         <div>
           <h1 className="text-3xl font-semibold text-white">
             {name}
