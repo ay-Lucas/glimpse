@@ -12,7 +12,7 @@ import { useEffect, useRef, useState } from "react";
 import { Skeleton } from "./ui/skeleton";
 
 const breakpointOptions: {
-  posterCard: {
+  cast: {
     [width: number]: SwiperOptions;
     [ratio: string]: SwiperOptions;
   };
@@ -29,13 +29,13 @@ const breakpointOptions: {
     [ratio: string]: SwiperOptions;
   };
 } = {
-  posterCard: {
+  cast: {
     "@0.00": {
       slidesPerView: 2,
       slidesPerGroup: 2,
       spaceBetween: 5,
     },
-    "@.3": {
+    "@0.35": {
       slidesPerView: 3,
       slidesPerGroup: 3,
       spaceBetween: 5,
@@ -45,37 +45,47 @@ const breakpointOptions: {
       slidesPerGroup: 4,
       spaceBetween: 5,
     },
-    "@0.75": {
+    "@0.6": {
       slidesPerView: 5,
       slidesPerGroup: 5,
       spaceBetween: 5,
     },
-    "@1.25": {
+    "@0.75": {
       slidesPerView: 6,
       slidesPerGroup: 6,
+      spaceBetween: 5,
+    },
+    "@1.25": {
+      slidesPerView: 7,
+      slidesPerGroup: 7,
       spaceBetween: 10,
     },
-    // "@1.50": {
-    //   slidesPerView: 7,
-    //   slidesPerGroup: 7,
-    //   spaceBetween: 5,
-    // },
   },
   poster: {
     "@0.00": {
+      slidesPerView: 1,
+      slidesPerGroup: 1,
+      spaceBetween: 5,
+    },
+    "@.3": {
       slidesPerView: 2,
       slidesPerGroup: 2,
-      spaceBetween: 10,
+      spaceBetween: 5,
     },
-    "@0.5": {
+    "@0.45": {
       slidesPerView: 3,
       slidesPerGroup: 3,
-      spaceBetween: 20,
+      spaceBetween: 5,
     },
-    "@1.50": {
+    "@0.75": {
       slidesPerView: 4,
       slidesPerGroup: 4,
-      spaceBetween: 20,
+      spaceBetween: 5,
+    },
+    "@1.25": {
+      slidesPerView: 5,
+      slidesPerGroup: 5,
+      spaceBetween: 10,
     },
   },
   backdrop: {
@@ -102,38 +112,34 @@ const breakpointOptions: {
       spaceBetween: 10,
     },
     "@0.52": {
-      slidesPerView: 3,
-      slidesPerGroup: 3,
-      spaceBetween: 5,
-    },
-    "@0.75": {
       slidesPerView: 4,
       slidesPerGroup: 4,
-      spaceBetween: 5,
+      spaceBetween: 10,
     },
-    "@0.95": {
+    "@0.75": {
       slidesPerView: 5,
       slidesPerGroup: 5,
-      spaceBetween: 2.5,
+      spaceBetween: 10,
+    },
+    "@0.95": {
+      slidesPerView: 6,
+      slidesPerGroup: 6,
+      spaceBetween: 10,
     },
     "@1.3": {
       slidesPerView: 7,
       slidesPerGroup: 7,
-      spaceBetween: 5,
+      spaceBetween: 10,
     },
     "@1.75": {
       slidesPerView: 8,
       slidesPerGroup: 4,
-      spaceBetween: 5,
+      spaceBetween: 10,
     },
   },
 };
 //
-export type CarouselBreakpoints =
-  | "poster"
-  | "posterCard"
-  | "backdrop"
-  | "title";
+export type CarouselBreakpoints = "poster" | "backdrop" | "title" | "cast";
 
 export default function MediaCarousel({
   items,
@@ -216,7 +222,7 @@ export default function MediaCarousel({
           swiperRef.current = swiper;
         }}
         onInit={handleSlideChange}
-        className={`mySwiper min-w-[500px] ${className}`}
+        className={`mySwiper ${className}`}
         watchSlidesProgress={true}
         simulateTouch={false}
         onLoad={() => setLoaded(true)}
