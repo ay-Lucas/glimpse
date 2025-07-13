@@ -49,6 +49,8 @@ export default function LocalRating({
 export function useUserRegion() {
   return useMemo(() => {
     // e.g. "en-US" or "fr" or "zh-Hant-HK"
+
+    if (typeof window === "undefined") return;
     const locale = navigator.language || "en-US";
     // Intl.Locale gives you a .region property if present
     try {
