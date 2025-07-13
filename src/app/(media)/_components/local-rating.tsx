@@ -1,6 +1,6 @@
 "use client";
 import { RatingResponse, ReleaseDate } from "@/types/request-types-camelcase";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { pickTvRating } from "../tv/[id]/utils";
 import { pickMovieRating } from "../movie/[id]/utils";
 
@@ -24,13 +24,17 @@ export default function LocalRating({
     if (ratings) {
       const local =
         mediaType === "tv"
-          ? pickTvRating(ratings as RatingResponse[], userRegion, "US")
+          ? pickTvRating(
+              ratings as RatingResponse[],
+              userRegion ?? undefined,
+              "US"
+            )
           : pickMovieRating(
               ratings as Array<{
                 iso31661: string;
                 releaseDates: Array<ReleaseDate>;
               }>,
-              userRegion,
+              userRegion ?? undefined,
               "US"
             );
       //: pickMovieRating(ratings as ReleasesReleaseDate[], userRegion, "US");
@@ -47,18 +51,18 @@ export default function LocalRating({
 }
 
 export function useUserRegion() {
-  return useMemo(() => {
-    // e.g. "en-US" or "fr" or "zh-Hant-HK"
+  const [region, setRegion] = useState<string | null>("US");
 
-    if (typeof window === "undefined") return;
+  useEffect(() => {
     const locale = navigator.language || "en-US";
-    // Intl.Locale gives you a .region property if present
+    let r: string;
     try {
-      return new Intl.Locale(locale).region || "US";
+      r = new Intl.Locale(locale).region || locale.split("-")[1] || "US";
     } catch {
-      // fallback: split on dash
-      const parts = locale.split("-");
-      return parts[1] || parts[0] || "US";
+      r = locale.split("-")[1] || locale.split("-")[0] || "US";
     }
+    setRegion(r);
   }, []);
+
+  return region;
 }
