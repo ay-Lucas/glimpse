@@ -25,9 +25,9 @@ export function SlideCastCard({ cast }: { cast: Cast }) {
         alt={`poster of ${cast.name}`}
         aspectClass="aspect-[2/3]"
       />
-      <div className="mt-2 text-start">
+      <div className="mt-2 pb-4 text-start">
         <p className="line-clamp-1 text-sm font-semibold">{cast.name}</p>
-        <p className="line-clamp-1 text-sm text-gray-500">
+        <p className="line-clamp-1 text-sm text-gray-400">
           as {cast.character}
         </p>
       </div>
