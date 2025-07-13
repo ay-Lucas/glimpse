@@ -2,7 +2,6 @@
 import MediaCarousel, {
   CarouselBreakpoints,
 } from "@/components/media-carousel";
-import { SlideCard } from "@/components/slide-card";
 import { SlideImageCard } from "@/components/slide-image-card";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Backdrop, Logo, Poster } from "@/types/request-types-camelcase";
@@ -22,7 +21,9 @@ export default function BackdropAndPosterCarousel({
   const posterItems = posters.map((p, i) => (
     <SlideImageCard
       key={i}
-      src={`/tmdb/t/p/w342${p.filePath}`}
+      baseUrl="/tmdb/t/p/w342"
+      imagePath={p.filePath}
+      unoptimized={true}
       alt={`poster of ${name}`}
       aspectClass="aspect-[2/3]"
     />
@@ -31,7 +32,9 @@ export default function BackdropAndPosterCarousel({
   const backdropItems = backdrops.map((b, i) => (
     <SlideImageCard
       key={i}
-      src={`/tmdb/t/p/w780${b.filePath}`}
+      baseUrl="/tmdb/t/p/w780"
+      imagePath={b.filePath}
+      unoptimized={true}
       alt={`backdrop of ${name}`}
       aspectClass="aspect-[16/9]"
     />

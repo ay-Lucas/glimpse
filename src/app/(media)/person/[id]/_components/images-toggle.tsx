@@ -1,8 +1,7 @@
 import CarouselToggle from "@/app/(media)/_components/carousel-toggle";
 import { PersonTaggedImage, Profile } from "@/types/request-types-camelcase";
 import { TaggedSlide } from "./tagged-images";
-import Image from "next/image";
-import { BASE_PROFILE_IMAGE_URL } from "@/lib/constants";
+import { SlideImageCard } from "@/components/slide-image-card";
 
 export default function ImagesToggleSection({
   taggedImages,
@@ -24,14 +23,14 @@ export default function ImagesToggleSection({
   ));
 
   const profileSlides = profileImages?.map((item, index) => (
-    <Image
-      src={`${BASE_PROFILE_IMAGE_URL}${item.filePath}`}
-      width={228}
-      height={342}
-      alt={`tagged image of ${personName}`}
-      unoptimized
-      className="rounded-lg"
-      key={index}
+    <SlideImageCard
+      key={item.filePath}
+      unoptimized={true}
+      baseUrl="/tmdb/t/p/w342"
+      imagePath={item.filePath}
+      alt={`profile image of ${personName}`}
+      aspectClass="aspect-[2/3]"
+      // className="max-h-[250px] max-w-[179px] sm:max-h-[350px] sm:max-w-full"
     />
   ));
   if (!taggedImages.length || !profileImages.length) return;
@@ -44,7 +43,11 @@ export default function ImagesToggleSection({
             label: "Tagged",
             breakpointType: "backdrop",
           },
-          { items: profileSlides, label: "Profile", breakpointType: "poster" },
+          {
+            items: profileSlides,
+            label: "Profile",
+            breakpointType: "poster",
+          },
         ]}
         title="Images"
       />

@@ -1,10 +1,11 @@
 "use client";
 import Image, { ImageProps } from "next/image";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Skeleton } from "./ui/skeleton";
 
 export function SlideImageCard({
-  src,
+  imagePath,
+  baseUrl,
   alt,
   aspectClass, // e.g. "aspect-[2/3]" or "aspect-[16/9]"
   className,
@@ -13,7 +14,8 @@ export function SlideImageCard({
   unoptimized = false,
   loading = "lazy",
 }: {
-  src: string;
+  imagePath: string | null | undefined;
+  baseUrl: string;
   alt: string;
   aspectClass: string;
   className?: string;
@@ -23,6 +25,8 @@ export function SlideImageCard({
   loading?: "lazy" | "eager";
 }) {
   const [loaded, setLoaded] = useState(false);
+  const src = `${baseUrl}${imagePath}`;
+
   return (
     <div
       className={`group relative inset-0 w-full overflow-hidden ${aspectClass} rounded-lg ${className}`}
@@ -35,19 +39,24 @@ export function SlideImageCard({
       {/* <div className="rounded-lg bg-gray-200" /> */}
 
       {/* Real image */}
-      <Image
-        {...props}
-        src={src}
-        alt={alt}
-        fill
-        loading={loading}
-        unoptimized={unoptimized}
-        placeholder={blurDataURL ? "blur" : "empty"}
-        blurDataURL={blurDataURL}
-        onLoad={() => setLoaded(true)} // ← use onLoad instead
-        className={`absolute inset-0 object-cover transition-opacity duration-300 ${loaded ? "opacity-100" : "opacity-0"} rounded-lg`}
-        sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 100vw"
-      />
+      {baseUrl ? (
+        <Image
+          {...props}
+          //        ref={imgRef}
+          src={src}
+          alt={alt}
+          fill
+          loading={loading}
+          unoptimized={unoptimized}
+          placeholder={blurDataURL ? "blur" : "empty"}
+          blurDataURL={blurDataURL}
+          onLoad={() => setLoaded(true)} // ← use onLoad instead
+          className={`absolute inset-0 object-cover transition-opacity duration-300 ${loaded ? "opacity-100" : "opacity-0"} rounded-lg`}
+          sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 100vw"
+        />
+      ) : (
+        <div className="h-full w-full" />
+      )}
     </div>
   );
 }

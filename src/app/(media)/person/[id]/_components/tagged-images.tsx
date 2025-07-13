@@ -38,7 +38,8 @@ export function TaggedSlide({ item, showIdMap }: TaggedSlideProps) {
   return (
     <div key={id ?? filePath} className="h-full pb-2">
       <SlideImageCard
-        src={`/tmdb/t/p/${srcSize}${filePath}`}
+        baseUrl={`/tmdb/t/p/${srcSize}`}
+        imagePath={filePath}
         alt={`backdrop of ${name}`}
         aspectClass={aspectClass}
         unoptimized

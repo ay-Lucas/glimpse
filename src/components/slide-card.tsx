@@ -46,12 +46,12 @@ export function SlideCard({
 }) {
   const [loaded, setLoaded] = useState(false);
   return (
-    <div className="h-full max-w-[200px]">
+    <div className="h-full">
       <Link
         href={`/${mediaType}/${tmdbId}`}
         key={tmdbId}
         prefetch={true}
-        className={`group relative inset-0 flex w-full items-end ${aspectClass} rounded-lg ${className} max-w-[200px]`}
+        className={`group relative inset-0 flex w-full items-end ${aspectClass} rounded-lg ${className} `}
       >
         {/* Skeleton */}
         {!loaded && !blurDataURL && (
@@ -84,19 +84,20 @@ export function SlideCard({
       </Link>
       <div className="z-20 w-full pb-3">
         <div className="flex flex-col">
-          <div className="flex justify-between">
-            <div>
-              {mediaType !== "person" &&
-                tmdbVoteAverage !== undefined &&
-                tmdbVoteAverage !== 0 && (
-                  <TmdbRating
-                    mediaType={mediaType}
-                    tmdbId={tmdbId}
-                    tmdbVoteAverage={tmdbVoteAverage}
-                    tmdbVoteCount={tmdbVoteCount}
-                  />
-                )}
-            </div>
+          <div className="flex items-center justify-between pt-1">
+            {mediaType !== "person" &&
+            tmdbVoteAverage !== undefined &&
+            tmdbVoteAverage !== 0 ? (
+              <TmdbRating
+                mediaType={mediaType}
+                tmdbId={tmdbId}
+                tmdbVoteAverage={tmdbVoteAverage}
+                tmdbVoteCount={tmdbVoteCount}
+                size="small"
+              />
+            ) : (
+              <div />
+            )}
             {mediaType !== "person" && (
               <MediaActions
                 variant="icon"
@@ -105,7 +106,7 @@ export function SlideCard({
               />
             )}
           </div>
-          <h2 className="!select-text text-lg font-semibold text-white">
+          <h2 className="text-md !select-text font-semibold text-white md:text-lg">
             {title}
           </h2>
         </div>

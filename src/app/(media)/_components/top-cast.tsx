@@ -11,7 +11,7 @@ export default function TopCast({ cast }: { cast: Cast[] }) {
   return (
     <section className="media-card">
       <h2 className={`pb-3 text-2xl font-bold`}>Top Cast</h2>
-      <MediaCarousel items={items} breakpointType="posterCard" />
+      <MediaCarousel items={items} breakpointType="cast" />
     </section>
   );
 }
@@ -21,9 +21,12 @@ export function SlideCastCard({ cast }: { cast: Cast }) {
     <Link href={`/person/${cast.id}`}>
       <SlideImageCard
         key={cast.id}
-        src={`/tmdb/t/p/w342${cast.profilePath}`}
+        unoptimized={true}
+        baseUrl="/tmdb/t/p/w342"
+        imagePath={cast.profilePath ?? null}
         alt={`poster of ${cast.name}`}
         aspectClass="aspect-[2/3]"
+        // className="max-h-[245px]"
       />
       <div className="mt-2 pb-4 text-start">
         <p className="line-clamp-1 text-sm font-semibold">{cast.name}</p>

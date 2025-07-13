@@ -124,11 +124,11 @@ export const WatchlistButton = forwardRef<
 >(({ variant, ...props }, ref) => {
   // pick the CVA size: "default" or "icon"
   const size = variant === "icon" ? "icon" : "default";
-
+  const buttonVariant = variant === "icon" ? "ghost" : "outline";
   return (
     <Button
       ref={ref}
-      variant="outline"
+      variant={buttonVariant}
       size={size}
       {...props} // now onClick etc. flow to the real <button>
     >

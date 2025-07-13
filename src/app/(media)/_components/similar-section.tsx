@@ -42,7 +42,7 @@ export async function SimilarSection({
       {items?.length > 0 && (
         <section className="media-card space-y-4">
           <h2 className={`text-2xl font-bold`}>Similar</h2>
-          <MediaCarousel items={items} breakpointType="posterCard" />
+          <MediaCarousel items={items} breakpointType="poster" />
         </section>
       )}
     </>

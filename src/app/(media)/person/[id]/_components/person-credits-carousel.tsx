@@ -40,7 +40,7 @@ export default function KnownForCredits({
     <div className="media-card">
       <h2 className={`pb-3 text-2xl font-bold`}>Known For</h2>
       <MediaCarousel
-        breakpointType="posterCard"
+        breakpointType="poster"
         items={(knownForCredits ?? []).map((item): JSX.Element => {
           const title = (item as MovieResult).title ?? (item as TvResult).name;
           const mediaType =
