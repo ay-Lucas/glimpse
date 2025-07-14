@@ -4,48 +4,39 @@ import {
   ReleaseDateResponse,
 } from "@/types/request-types-camelcase";
 import { useEffect, useMemo, useState } from "react";
-import { pickTvRating } from "../tv/[id]/utils";
-import { pickMovieRating } from "../movie/[id]/utils";
+import { Badge } from "@/components/ui/badge";
+import { ContentRating, pickMediaContentRating } from "@/lib/contentRating";
 
 export default function LocalRating({
   ratings,
   mediaType,
   initialValue,
 }: {
-  ratings: RatingResponse[] | ReleaseDateResponse[];
+  ratings: RatingResponse[] | ReleaseDateResponse[] | null;
   mediaType: "tv" | "movie";
-  initialValue: RatingResponse | ReleaseDateResponse;
+  initialValue: ContentRating | null;
 }) {
   const userRegion = useUserRegion();
 
-  const ratingResponse = useMemo(() => {
-    if (ratings) {
-      const local =
-        mediaType === "tv"
-          ? pickTvRating(
-              ratings as RatingResponse[],
-              userRegion ?? undefined,
-              "US"
-            )
-          : pickMovieRating(
-              ratings as ReleaseDateResponse[],
-              userRegion ?? undefined,
-              "US"
-            );
-      //: pickMovieRating(ratings as ReleasesReleaseDate[], userRegion, "US");
+  const ratingRes = ratings
+    ? useMemo(
+        () =>
+          pickMediaContentRating(ratings, mediaType, userRegion ?? undefined),
+        [ratings, mediaType, initialValue, userRegion]
+      )
+    : null;
 
-      return local ?? initialValue;
-    }
-  }, [ratings, mediaType, initialValue, userRegion]);
-  const region = ratingResponse?.iso31661;
-  const rating =
-    mediaType === "tv"
-      ? (ratingResponse as RatingResponse).rating
-      : (ratingResponse as ReleaseDateResponse).releaseDates[0]?.certification;
+  const contentRating = ratingRes ?? initialValue;
+
+  if (!contentRating) return <Badge variant="default">NR</Badge>;
+
   return (
-    <div className="mt-1 inline-block space-x-1.5 text-sm">
-      <span className="border border-gray-200 px-1">{rating}</span>
-      <span className="text-gray-400">({region})</span>
+    <div className="space-x-0.5 text-sm">
+      <Badge variant="default">{contentRating.rating}</Badge>
+      <Badge variant="default">{contentRating.region}</Badge>
+      {contentRating.descriptors.map((item) => (
+        <span>{item}</span>
+      ))}
     </div>
   );
 }

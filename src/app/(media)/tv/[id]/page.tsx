@@ -14,7 +14,7 @@ import { getRedisBlurValue } from "@/services/cache";
 import { MediaHeader } from "../../_components/media-header";
 import { MediaDetails } from "../../_components/media-details";
 import MediaProviders from "../../_components/media-providers";
-import { buildTvDetailItems, pickTvRating } from "./utils";
+import { buildTvDetailItems } from "./utils";
 import MediaLinks from "../../_components/media-links";
 import BackdropAndPosterCarousel from "../../_components/backdrop-and-poster-carousel";
 import TopCast from "../../_components/top-cast";
@@ -65,7 +65,6 @@ export default async function TvPage({ params }: { params: { id: number } }) {
   let videoPath;
   if (tv.videos !== undefined && tv.videos.results)
     videoPath = getTrailer(tv.videos.results)?.key;
-  const rating = pickTvRating(tv.contentRatings?.results ?? []);
   const isReleased: boolean =
     tv.firstAirDate !== undefined &&
     tv.firstAirDate !== null &&
@@ -88,7 +87,6 @@ export default async function TvPage({ params }: { params: { id: number } }) {
               <div className="items-end space-y-5 px-0 md:pt-0 lg:px-24">
                 <section>
                   <MediaHeader
-                    rating={rating}
                     dateValue={tv.firstAirDate?.toString()}
                     dateLabel={"First Aired"}
                     dateValue2={tv.lastAirDate?.toString()}
@@ -110,6 +108,8 @@ export default async function TvPage({ params }: { params: { id: number } }) {
                     data={tv}
                     runtime={null}
                     typeLabel="Series"
+                    isAdult={tv.adult}
+                    contentRatings={tv.contentRatings ?? null}
                     mediaType="tv"
                   />
                 </section>

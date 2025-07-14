@@ -4,15 +4,16 @@ import { BASE_POSTER_IMAGE_URL, DEFAULT_BLUR_DATA_URL } from "@/lib/constants";
 import { Genre } from "@/types/types";
 import { Expandable } from "./expandable";
 import MediaRatings from "./media-ratings";
-import LocalRating from "./local-rating";
 import {
   TmdbMovieDetailsResponseAppended,
   TmdbTvDetailsResponseAppended,
 } from "@/types/tmdb-camel";
 import {
-  RatingResponse,
-  ReleaseDateResponse,
+  MovieReleaseDatesResponse,
+  ShowContentRatingResponse,
 } from "@/types/request-types-camelcase";
+import MediaContentRating from "./media-content-rating";
+import { ContentRating } from "@/lib/contentRating";
 
 export interface MediaHeaderProps {
   title: string;
@@ -22,7 +23,6 @@ export interface MediaHeaderProps {
   dateValue: string | undefined; // ISO date string
   dateValue2?: string; // ISO date string
   isReleased: boolean;
-  rating: RatingResponse | ReleaseDateResponse | null; // e.g. "PG-13"
   posterPath: string | null;
   posterBlur: string | null;
   tmdbVoteAverage: number | null;
@@ -38,6 +38,8 @@ export interface MediaHeaderProps {
   runtime: number | null;
   typeLabel: string; // e.g. "Series" or "Movie"
   mediaType: "tv" | "movie";
+  isAdult: boolean;
+  contentRatings: ShowContentRatingResponse | MovieReleaseDatesResponse | null;
 }
 
 export async function MediaHeader({
@@ -48,7 +50,6 @@ export async function MediaHeader({
   dateLabel2,
   dateValue2,
   isReleased,
-  rating,
   status,
   posterPath,
   posterBlur,
@@ -64,6 +65,8 @@ export async function MediaHeader({
   runtime,
   typeLabel,
   mediaType,
+  isAdult,
+  contentRatings,
 }: MediaHeaderProps) {
   const formattedDate1 = dateValue
     ? new Intl.DateTimeFormat("en-US", {
@@ -95,6 +98,12 @@ export async function MediaHeader({
 
   const runtimeLabel = formatRuntime(runtime);
   const dateValueDate = dateValue ? new Date(dateValue) : null;
+  // const contentRatings =
+  //                   ((data as TmdbTvDetailsResponseAppended).contentRatings
+  //                     ?.results ??
+  //                     []) ||
+  //                   (data as TmdbMovieDetailsResponseAppended).releaseDates
+  //                     ?.results
   return (
     <div className="media-card grid grid-cols-1 items-start gap-5 md:grid-cols-[238px,1fr]">
       {posterPath ? (
@@ -178,27 +187,16 @@ export async function MediaHeader({
               <div className="mt-1">{status ?? "Unknown"}</div>
             </div>
 
-            {rating && (
-              <div>
-                <div className="text-xs font-medium uppercase text-gray-400">
-                  Rated
-                </div>
-                <LocalRating
-                  initialValue={rating}
-                  mediaType={mediaType}
-                  ratings={
-                    ((data as TmdbTvDetailsResponseAppended).contentRatings
-                      ?.results ??
-                      []) ||
-                    (data as TmdbMovieDetailsResponseAppended).releaseDates
-                      ?.results
-                  }
-                />
-                {/* <div className="mt-1 inline-block border px-1 text-sm"> */}
-                {/*   {rating} */}
-                {/* </div> */}
+            <div className="space-y-1">
+              <div className="text-xs font-medium uppercase text-gray-400">
+                Rated
               </div>
-            )}
+              <MediaContentRating
+                contentRatings={contentRatings}
+                isAdult={isAdult}
+                mediaType={mediaType}
+              />
+            </div>
 
             {runtimeLabel && (
               <div>

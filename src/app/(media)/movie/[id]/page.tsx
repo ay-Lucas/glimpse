@@ -18,7 +18,7 @@ import { getRedisBlurValue } from "@/services/cache";
 import { MediaHeader } from "../../_components/media-header";
 import MediaProviders from "../../_components/media-providers";
 import { MediaDetails } from "../../_components/media-details";
-import { buildMovieDetailItems, pickMovieRating } from "./utils";
+import { buildMovieDetailItems } from "./utils";
 import { ChevronRight } from "lucide-react";
 import MediaLinks from "../../_components/media-links";
 import TopCast from "../../_components/top-cast";
@@ -59,9 +59,6 @@ export default async function MoviePage({
   if (!movie) throw new Error("fetchMovieDetails returned undefined");
 
   const videoPath = getTrailer(movie?.videos?.results || [])?.key;
-  const rating = movie.releaseDates
-    ? pickMovieRating(movie.releaseDates.results)
-    : null;
   const isReleased: boolean =
     (movie?.releaseDate &&
       new Date(movie?.releaseDate!).valueOf() < Date.now()) ||
@@ -107,7 +104,6 @@ export default async function MoviePage({
               <div className="items-end space-y-5 px-0 pb-5 md:pt-0 lg:px-24">
                 <section>
                   <MediaHeader
-                    rating={rating}
                     dateValue={movie.releaseDate?.toString()}
                     dateLabel="Release"
                     isReleased={isReleased}
@@ -127,6 +123,8 @@ export default async function MoviePage({
                     data={movie}
                     runtime={movie.runtime ?? null}
                     typeLabel="Movie"
+                    isAdult={movie.adult}
+                    contentRatings={movie.releaseDates ?? null}
                     mediaType="movie"
                   />
                 </section>

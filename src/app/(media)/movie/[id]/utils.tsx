@@ -16,6 +16,7 @@ import {
 import { TmdbMovieDetailsResponseAppended } from "@/types/tmdb-camel";
 import { MovieRatingResponse } from "@/types/request-types-snakecase";
 import { capitalizeFirst } from "@/lib/strings";
+import AdultFlag from "../../_components/adult-flag";
 
 export function buildMovieDetailItems(
   movie: TmdbMovieDetailsResponseAppended
@@ -167,15 +168,6 @@ export function buildMovieDetailItems(
           {movie.productionCompanies.map((c) => c.name).join(" • ")}
         </div>
       ),
-    });
-  }
-
-  if (movie.adult !== undefined) {
-    const boolStr = String(movie.adult);
-    const boolStrCapitalized = capitalizeFirst(boolStr);
-    items.push({
-      label: "Adult",
-      value: boolStrCapitalized,
     });
   }
 
