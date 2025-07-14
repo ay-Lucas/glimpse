@@ -10,6 +10,7 @@ import { InvertibleLogo } from "../../_components/invertible-logo";
 import { BASE_MEDIUM_LOGO_URL } from "@/lib/constants";
 import { RatingResponse } from "@/types/request-types-camelcase";
 import { TmdbTvDetailsResponseAppended } from "@/types/tmdb-camel";
+import { capitalizeFirst } from "@/lib/strings";
 
 export function buildTvDetailItems(
   tv: TmdbTvDetailsResponseAppended
@@ -130,6 +131,15 @@ export function buildTvDetailItems(
           </div>
         </Expandable>
       ),
+    });
+  }
+
+  if (tv.adult !== undefined) {
+    const boolStr = String(tv.adult);
+    const boolStrCapitalized = capitalizeFirst(boolStr);
+    items.push({
+      label: "Adult",
+      value: boolStrCapitalized,
     });
   }
 

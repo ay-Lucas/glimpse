@@ -16,6 +16,7 @@ import { sortLanguages } from "@/lib/lang-utils";
 import { GiHeadphones } from "react-icons/gi";
 import { BsCcSquare } from "react-icons/bs";
 import { GroupedProvider } from "@/types/camel-index";
+import { capitalizeFirst } from "@/lib/strings";
 
 export default function JustWatchProviderList({
   info,
@@ -227,12 +228,6 @@ function ProviderCard({ provider }: { provider: StreamProvider }) {
       </a>
     </li>
   );
-}
-
-function capitalizeFirst(str: string): string {
-  if (!str) return "";
-  const lower = str.toLowerCase();
-  return lower[0]?.toUpperCase() + lower.slice(1);
 }
 
 function getHighestProviderResolution(resolutions: string[]) {
