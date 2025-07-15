@@ -8,6 +8,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { SupabaseProvider } from "@/context/supabase";
 import { Toaster } from "sonner";
 import { WatchlistProvider } from "@/context/watchlist";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -40,11 +41,13 @@ export default async function RootLayout({
               enableSystem
               disableTransitionOnChange
             >
-              <TopNav />
-              {children}
-              <Toaster />
-              <Analytics />
-              <Footer />
+              <TooltipProvider>
+                <TopNav />
+                {children}
+                <Toaster />
+                <Analytics />
+                <Footer />
+              </TooltipProvider>
             </ThemeProvider>
           </WatchlistProvider>
         </SupabaseProvider>

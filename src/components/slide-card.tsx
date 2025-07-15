@@ -6,6 +6,8 @@ import { useState } from "react";
 import MediaActions from "@/app/(media)/_components/media-actions";
 import Link from "next/link";
 import { Skeleton } from "./ui/skeleton";
+import AdultFlag from "@/app/(media)/_components/adult-flag";
+import { Badge } from "./ui/badge";
 
 export function SlideCard({
   alt,
@@ -24,6 +26,7 @@ export function SlideCard({
   blurDataURL,
   loading = "lazy",
   className = "",
+  isAdult,
   rating,
 }: {
   alt: string;
@@ -39,6 +42,7 @@ export function SlideCard({
   tmdbVoteCount?: number;
   tmdbId: number;
   mediaType: "tv" | "movie" | "person";
+  isAdult?: boolean;
   releaseDate?: Date | null;
   imagePath?: string | null;
   baseUrl: string;
@@ -72,6 +76,15 @@ export function SlideCard({
           className={`inset-0 object-cover transition-opacity duration-300 ${loaded ? "opacity-100" : "opacity-0"} rounded-lg`}
           sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 100vw"
         />
+        <>
+          {isAdult && (
+            <div className="absolute right-0 top-0">
+              <Badge variant={"destructive"}>
+                <AdultFlag isAdult={isAdult}></AdultFlag>
+              </Badge>
+            </div>
+          )}
+        </>
         {overview && (
           <div className="relative flex items-end bg-[linear-gradient(to_top,rgba(0,0,0,0.9)_90%,transparent)] p-2 opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100">
             <div className="">

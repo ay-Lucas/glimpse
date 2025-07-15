@@ -1,12 +1,17 @@
 import {
   SearchMultiRequest,
   SearchMultiResponse,
-  TvResult,
-  MovieResult,
 } from "@/types/request-types-snakecase";
 import { BASE_API_URL, options } from "@/lib/constants";
 // import { makeCarouselCards } from "../discover/page";
 import { SlideCard } from "@/components/slide-card";
+import {
+  PersonResult,
+  TvResult,
+  MovieResult,
+} from "@/types/request-types-camelcase";
+import { searchAndRank, SearchMediaType } from "./utils";
+import { NSFW_GENRE_ID } from "@/lib/title-genres";
 
 const MAX_PAGES = 10;
 
@@ -34,7 +39,7 @@ async function getMultiSearchPages(
     requests.push(
       getMultiSearch({
         query: request.query,
-        region: "en-US",
+        region: "US",
         include_adult: false,
         page: i + 1,
         language: "en-US",
@@ -47,52 +52,97 @@ async function getMultiSearchPages(
   return arrays;
 }
 
+function filterGenres(
+  item: MovieResult | TvResult | PersonResult,
+  includedGenreIds: number[] | null
+) {
+  // 1. no filter? keep everything
+  if (!includedGenreIds || includedGenreIds?.length === 0) return true;
+
+  // 2. only filter genres of movies & TV shows
+  if (item.mediaType === "person") return false;
+
+  // 3. guard against missing/empty genre_ids
+  const ids: number[] = Array.isArray(item?.genreIds) ? item.genreIds : [];
+
+  // 4. require at least one match
+  return ids.some((g) => includedGenreIds?.includes(g));
+}
+
 export default async function SearchPage({
   searchParams,
 }: {
-  searchParams?: { query: string; page?: string };
+  searchParams?: {
+    query: string;
+    page?: string;
+    genreIds?: string;
+    includeAdult?: boolean;
+    mediaType?: SearchMediaType;
+  };
 }) {
   if (searchParams === undefined || searchParams.query === "") throw Error;
+
   const params = {
     query: searchParams.query,
     region: "en-US",
-    include_adult: false,
+    genreIds: searchParams ? searchParams.genreIds?.split(",") : null,
+    includeAdult: searchParams.includeAdult ?? false,
+    mediaType: searchParams.mediaType ?? "titles",
     page: 1,
     language: "en-US",
     id: "",
   };
-  const res = await getMultiSearch(params);
-  const allRes = await getMultiSearchPages(params, res, MAX_PAGES);
-  const filteredRes = allRes.filter(
-    (item: any) => item.poster_path || item.profile_path || item.backdrop_path
+
+  // Process custom genres
+  const rawGenreIds = params.genreIds?.map(Number) ?? null;
+
+  if (rawGenreIds && rawGenreIds.find((id) => id === NSFW_GENRE_ID)) {
+    params.includeAdult = true;
+    params.genreIds = null; // reset genreIds, treat as if none
+  }
+
+  const genreIds = params.genreIds?.map(Number) ?? null;
+
+  const res = await searchAndRank(
+    params.query,
+    params.includeAdult,
+    params.mediaType
   );
 
+  const results = res.filter((item) => filterGenres(item, genreIds));
+
+  // const sorted = results.sort(
+  //   (a, b) => (b?.popularity ?? 0) - (a?.popularity ?? 0)
+  // );
+
   return (
-    <main>
+    <main className="relative min-h-[75vh] md:min-h-[85vh]">
       <div className="px-2 pt-10 md:container">
         {/* <div className="flex flex-shrink flex-wrap justify-start gap-4 md:gap-8"> */}
-        <div className="grid grid-cols-2 gap-2 xxs:grid-cols-3 sm:gap-4 md:grid-cols-4 md:gap-8 lg:grid-cols-5 xl:grid-cols-6">
-          {filteredRes && filteredRes.length > 0 ? (
-            (filteredRes ?? []).map((item) => {
+        {results && results.length > 0 ? (
+          <div className="grid grid-cols-2 gap-2 xxs:grid-cols-3 sm:gap-4 md:grid-cols-4 md:gap-8 lg:grid-cols-5 xl:grid-cols-6">
+            {(results ?? []).map((item) => {
               const title =
-                (item as MovieResult).title ?? (item as TvResult).name;
+                (item as TvResult).name ||
+                (item as MovieResult).title ||
+                (item as PersonResult).name;
               const imagePath =
-                item?.media_type !== "person"
-                  ? item?.poster_path
-                  : item.profile_path;
+                item?.mediaType !== "person"
+                  ? item?.posterPath
+                  : item.profilePath;
               const overview =
-                item?.media_type !== "person" ? item?.overview : undefined;
+                item?.mediaType !== "person" ? item?.overview : undefined;
               const tmdbVoteAverage =
-                item?.media_type !== "person" ? item?.vote_average : undefined;
+                item?.mediaType !== "person" ? item?.voteAverage : undefined;
               const tmdbVoteCount =
-                item?.media_type !== "person" ? item?.vote_count : undefined;
+                item?.mediaType !== "person" ? item?.voteCount : undefined;
               return (
                 <SlideCard
                   key={item?.id!}
                   alt={`poster of ${title}`}
                   aspectClass="aspect-[2/3]"
                   tmdbId={item?.id!}
-                  mediaType={item?.media_type!}
+                  mediaType={item.mediaType!}
                   baseUrl="/tmdb/t/p/w500"
                   imagePath={imagePath}
                   title={title}
@@ -100,13 +150,14 @@ export default async function SearchPage({
                   overview={overview}
                   tmdbVoteAverage={tmdbVoteAverage}
                   tmdbVoteCount={tmdbVoteCount}
+                  isAdult={item.adult}
                 />
               );
-            })
-          ) : (
-            <div>No Results</div>
-          )}
-        </div>
+            })}
+          </div>
+        ) : (
+          <div className="text-center text-2xl">No Results</div>
+        )}
       </div>
     </main>
   );
