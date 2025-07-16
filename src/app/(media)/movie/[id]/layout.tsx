@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import Image from "next/image";
-import { fetchTvDetails } from "@/app/(media)/actions";
+import { fetchMovieDetails } from "@/app/(media)/actions";
 import {
   BASE_ORIGINAL_IMAGE_URL,
   DEFAULT_BLUR_DATA_URL,
@@ -10,7 +10,7 @@ import { ContentRatingProvider } from "@/context/content-rating";
 
 export const revalidate = 43200; // 12 hours
 
-export default async function TvLayout({
+export default async function MovieLayout({
   params,
   children,
 }: {
@@ -18,24 +18,22 @@ export default async function TvLayout({
   children: ReactNode;
 }) {
   const tmdbId = params.id;
-  const tv = await fetchTvDetails(tmdbId);
-  const blurData = await getRedisBlurValue("tv", params.id);
-  // console.log(`TV layout rendered ${tv.name}`)
+  const movie = await fetchMovieDetails(tmdbId);
+  const blurData = await getRedisBlurValue("movie", params.id);
   return (
-    <div className="relative h-full">
-      <div className="absolute left-0 top-0 -z-50 mb-10 h-screen w-full">
-        {tv?.backdropPath ? (
+    <div className="h-full w-full overflow-x-hidden">
+      <div className="absolute left-0 top-0 mb-10 h-screen w-full">
+        {movie?.backdropPath ? (
           <div className="absolute h-full w-full bg-gradient-to-t from-background via-background/95 via-30% to-transparent">
             <div className="absolute h-full w-full bg-background/40"></div>
             <Image
               fill
-              src={`${BASE_ORIGINAL_IMAGE_URL}${tv.backdropPath}`}
+              src={`${BASE_ORIGINAL_IMAGE_URL}${movie.backdropPath}`}
               quality={70}
               alt="header image"
-              className={`-z-50 object-cover`}
+              className={`-z-10 object-cover`}
               sizes="100vw"
               placeholder="blur"
-              priority
               blurDataURL={blurData?.backdropBlur ?? DEFAULT_BLUR_DATA_URL}
             />
           </div>
@@ -44,19 +42,11 @@ export default async function TvLayout({
         )}
       </div>
       <ContentRatingProvider
-        ratings={tv.contentRatings?.results ?? []}
-        mediaType="tv"
+        ratings={movie.releaseDates?.results ?? []}
+        mediaType="movie"
       >
-        {/* <TvProvider tv={tv}> */}
         {children}
       </ContentRatingProvider>
-      {/* </TvProvider> */}
-      {/* <Suspense fallback={null}> */}
-      {/*   <PrefetchBannerColor */}
-      {/*     backdropPath={tv.backdropPath ?? ""} */}
-      {/*     darkVibrantBackdropHex={tv.darkVibrantBackdropHex ?? ""} */}
-      {/*   /> */}
-      {/* </Suspense> */}
     </div>
   );
 }

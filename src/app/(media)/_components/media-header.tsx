@@ -13,7 +13,8 @@ import {
   ShowContentRatingResponse,
 } from "@/types/request-types-camelcase";
 import MediaContentRating from "./media-content-rating";
-import { ContentRating } from "@/lib/contentRating";
+import { Badge } from "@/components/ui/badge";
+import AdultFlag from "./adult-flag";
 
 export interface MediaHeaderProps {
   title: string;
@@ -133,6 +134,11 @@ export async function MediaHeader({
           )}
         </div>
         <div className="mb-4 flex flex-wrap items-center gap-2">
+          {isAdult && (
+            <Badge variant={"destructive"}>
+              <AdultFlag isAdult={isAdult} />
+            </Badge>
+          )}
           {genres && genres.length > 0 && (
             <>
               {genres.map((g) => (
@@ -157,7 +163,7 @@ export async function MediaHeader({
           imdbId={imdbId}
         />
         <section className="flex flex-col space-y-4">
-          <div className="grid grid-cols-4 gap-6 md:grid-cols-5">
+          <div className="grid grid-cols-3 gap-5 md:grid-cols-5">
             {formattedDate1 && (
               <div>
                 <div className="text-xs font-medium uppercase text-gray-400">
@@ -192,8 +198,7 @@ export async function MediaHeader({
                 Rated
               </div>
               <MediaContentRating
-                contentRatings={contentRatings}
-                isAdult={isAdult}
+                contentRatings={contentRatings?.results ?? null}
                 mediaType={mediaType}
               />
             </div>

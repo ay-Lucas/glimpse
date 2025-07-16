@@ -22,7 +22,8 @@ import { buildMovieDetailItems } from "./utils";
 import { ChevronRight } from "lucide-react";
 import MediaLinks from "../../_components/media-links";
 import TopCast from "../../_components/top-cast";
-import { SimilarSection } from "../../_components/similar-section";
+import { RecommendedSection } from "../../_components/similar-section";
+import BackdropAndPosterCarousel from "../../_components/backdrop-and-poster-carousel";
 
 export const revalidate = 43200; // 12 hours
 
@@ -71,34 +72,14 @@ export default async function MoviePage({
   // console.log(movie.releases);
   // console.log(movie.watchProviders?.results)
   // console.log(`Movie page rendered! ${movie.title}`)
+  console.log(movie.releaseDates?.results[0]);
+  const similar = movie.similar?.results;
   // TODO: Add all watch providers
   return (
     <main>
       {movie && (
         <>
-          <div className="h-full w-full overflow-x-hidden">
-            <div className="absolute left-0 top-0 mb-10 h-screen w-full">
-              {movie?.backdropPath ? (
-                <div className="absolute h-full w-full bg-gradient-to-t from-background via-background/95 via-30% to-transparent">
-                  <div className="absolute h-full w-full bg-background/40"></div>
-                  <Image
-                    fill
-                    src={`${BASE_ORIGINAL_IMAGE_URL}${movie.backdropPath}`}
-                    quality={70}
-                    alt="header image"
-                    className={`-z-10 object-cover`}
-                    sizes="100vw"
-                    placeholder="blur"
-                    blurDataURL={
-                      blurData?.backdropBlur ?? DEFAULT_BLUR_DATA_URL
-                    }
-                  />
-                </div>
-              ) : (
-                <div className="absolute left-0 top-0 z-0 h-full w-full items-center justify-center bg-gradient-to-b from-background via-gray-900 to-background/50" />
-              )}
-            </div>
-
+          <div className="h-full w-full overflow-x-hidden pb-20">
             <div className="md:h-[6vh]"></div>
             <div className="relative items-end px-3 pt-16 md:container">
               <div className="items-end space-y-5 px-0 pb-5 md:pt-0 lg:px-24">
@@ -173,15 +154,22 @@ export default async function MoviePage({
                     mediaType="movie"
                   />
                 )}
+
+                <BackdropAndPosterCarousel
+                  backdrops={movie.images?.backdrops ?? []}
+                  logos={movie.images?.logos ?? []}
+                  posters={movie.images?.posters ?? []}
+                  name={movie.title}
+                />
                 <Suspense
                   fallback={
                     <Skeleton className="h-[356px] w-full rounded-xl" />
                   }
                 >
-                  {movie.similar?.results &&
-                    movie.similar.results.length > 0 && (
-                      <SimilarSection
-                        titles={movie.similar.results}
+                  {movie.recommendations?.results &&
+                    movie.recommendations?.results.length > 0 && (
+                      <RecommendedSection
+                        titles={movie.recommendations?.results}
                         mediaType="movie"
                       />
                     )}

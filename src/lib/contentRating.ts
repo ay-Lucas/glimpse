@@ -10,6 +10,7 @@ import { pickMovieRating } from "@/app/(media)/movie/[id]/utils";
 import { pickTvRating } from "@/app/(media)/tv/[id]/utils";
 import {
   RatingResponse,
+  ReleaseDate,
   ReleaseDateResponse,
 } from "@/types/request-types-camelcase";
 export function pickMediaContentRating(
@@ -51,4 +52,34 @@ export function pickMediaContentRating(
     };
   }
   return null;
+}
+/**
+ * Turn TMDB’s TV content_ratings into ContentRating[]
+ */
+export function mapTvRatingsToContentRatings(
+  tvRatings: RatingResponse[] | undefined
+): ContentRating[] {
+  if (!tvRatings) return [];
+  return tvRatings.map((r) => ({
+    region: r.iso31661,
+    rating: r.rating,
+    descriptors: r.descriptors,
+  }));
+}
+
+/**
+ * Turn TMDB’s Movie release_dates into ContentRating[]
+ */
+export function mapMovieReleaseDatesToContentRatings(
+  movieDates: ReleaseDateResponse[] | undefined
+): ContentRating[] {
+  if (!movieDates) return [];
+
+  return movieDates.flatMap((regionEntry) =>
+    regionEntry.releaseDates.map((rd: ReleaseDate) => ({
+      region: regionEntry.iso31661,
+      rating: rd.certification,
+      descriptors: rd.descriptors,
+    }))
+  );
 }
