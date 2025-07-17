@@ -1,62 +1,152 @@
 "use client";
-import {
-  RatingResponse,
-  ReleaseDateResponse,
-} from "@/types/request-types-camelcase";
-import { useEffect, useMemo, useState } from "react";
+import { ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
-import { pickMediaContentRating } from "@/lib/contentRating";
-import { InfoIcon } from "lucide-react";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { ChevronRight } from "lucide-react";
 import { useContentRating } from "@/context/content-rating";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { UniqueRegionContentRating } from "@/lib/contentRating";
+import { countryCodeToEnglishName } from "@/lib/utils";
 
-export default function MediaContentRating({
-  contentRatings,
-  mediaType,
-}: {
-  contentRatings: RatingResponse[] | ReleaseDateResponse[] | null;
-  mediaType: "tv" | "movie";
-}) {
-  const { contentRating } = useContentRating();
-  if (!contentRating) return <Badge variant="default">NR</Badge>;
+interface MediaContentProps {
+  region?: string;
+  rating: string[];
+  descriptors?: String[];
+  text?: "sm" | "md";
+  numColumns: number;
+}
 
+export function MediaContentRating({
+  rating,
+  region,
+  descriptors,
+  numColumns,
+  text = "sm",
+}: MediaContentProps) {
+  const descriptorsLabel = descriptors?.join(", ");
+  const fontSize = text === "sm" ? "text-sm" : "text-md";
   return (
-    <div className="flex flex-wrap justify-start space-x-1">
-      <Badge variant="default">{contentRating.rating}</Badge>
-      <Badge variant="outline">{contentRating.region}</Badge>
-      <div className="text-sm">
-        {contentRating.descriptors.map((item, index) => (
-          <span key={index}>{item}</span>
+    <>
+      {region && (
+        <Badge variant="outline" className={fontSize}>
+          {region}
+        </Badge>
+      )}
+      <div className="flex flex-wrap gap-1">
+        {rating.map((r, index) => (
+          <Badge
+            variant={`${index % 2 === 0 ? "default" : "secondary"}`}
+            className={fontSize}
+            key={index}
+          >
+            {r}
+          </Badge>
         ))}
       </div>
+      {descriptors && descriptors?.length > 0 ? (
+        <div className={fontSize}>{descriptorsLabel}</div>
+      ) : numColumns === 3 ? (
+        <div></div>
+      ) : (
+        <></>
+      )}
+    </>
+  );
+}
+
+export function LocalMediaContentRatingModal() {
+  const { contentRating } = useContentRating();
+  if (!contentRating) return <Badge variant="default">NR</Badge>;
+  const { rating } = contentRating;
+
+  return (
+    <AllContentRatingsModal>
+      <div className="flex flex-wrap justify-start gap-1">
+        <MediaContentRating rating={[rating]} numColumns={2} />
+        <button>
+          <Badge variant={"secondary"} className="hover:text-gray-400">
+            <span className="text-md flex items-center">
+              All
+              <span className="w-4">
+                <ChevronRight size={23} />
+              </span>
+            </span>
+          </Badge>
+        </button>
+      </div>
+    </AllContentRatingsModal>
+  );
+}
+
+export function ContentRatingList() {
+  const { allRatings } = useContentRating();
+  const regionMap = new Map<string, UniqueRegionContentRating>();
+  allRatings.forEach((r) => {
+    const regionContentRatings = regionMap.get(r.region);
+    const isDuplicate = regionContentRatings?.rating.includes(r.rating);
+    const ratingsArray =
+      regionContentRatings && !isDuplicate
+        ? [...regionContentRatings.rating, r.rating]
+        : [r.rating];
+
+    const uniqueRegion: UniqueRegionContentRating = {
+      region: r.region,
+      rating: ratingsArray,
+      descriptors: r.descriptors,
+    };
+    regionMap.set(r.region, uniqueRegion);
+  });
+  const uniqueRegionRatings = Array.from(regionMap.values());
+  console.log(uniqueRegionRatings);
+
+  const anyRatingHasDesc = allRatings.some(
+    (rating) => rating.descriptors.length > 0
+  );
+  const numColumns = anyRatingHasDesc ? 3 : 2;
+  return (
+    <div
+      // className={`grid ${anyRatingHasDesc ? "grid-cols-3" : "grid-cols-2"} gap-3`}
+      //className={`grid grid-cols-3 gap-3`}
+      className={`grid ${anyRatingHasDesc ? "grid-cols-[1fr_100px_1fr]" : "grid-cols-[1fr_1fr]"} gap-3`}
+    >
+      <div className="text-md font-bold">Country</div>
+      <div className="text-md font-bold">Rating</div>
+      {anyRatingHasDesc && <div className="text-md font-bold">Descriptors</div>}
+      {uniqueRegionRatings.map((contentRating, index) => {
+        const { rating, region, descriptors } = contentRating;
+        const fullRegionName = countryCodeToEnglishName(region);
+        return (
+          <MediaContentRating
+            rating={rating}
+            region={fullRegionName}
+            descriptors={descriptors}
+            text="md"
+            numColumns={numColumns}
+            key={index}
+          />
+        );
+      })}
     </div>
   );
 }
 
-export function ClickOrHoverRatingDesc({
-  description,
-}: {
-  description: string[];
-}) {
-  const [open, setOpen] = useState(false);
-  <Popover open={open} onOpenChange={setOpen}>
-    <PopoverTrigger asChild>
-      <button
-        onClick={() => setOpen((o) => !o)}
-        onMouseEnter={() => setOpen(true)}
-        onMouseLeave={() => setOpen(false)}
-        aria-label="More info"
-        className="rounded p-1 hover:bg-muted"
-      >
-        <InfoIcon className="h-4 w-4" />
-      </button>
-    </PopoverTrigger>
-    <PopoverContent side="top" align="start" className="w-56">
-      <p className="text-sm">{description}</p>
-    </PopoverContent>
-  </Popover>;
+export function AllContentRatingsModal({ children }: { children: ReactNode }) {
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <div>{children}</div>
+      </DialogTrigger>
+      <DialogContent className="max-h-[95vh] w-fit max-w-[95vw] justify-center overflow-y-auto overflow-x-hidden rounded-xl sm:max-w-[575px]">
+        <DialogHeader>
+          <DialogTitle>All Content Ratings By Country</DialogTitle>
+        </DialogHeader>
+        <ContentRatingList />
+      </DialogContent>
+    </Dialog>
+  );
 }

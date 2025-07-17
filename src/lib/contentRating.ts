@@ -1,3 +1,8 @@
+export interface UniqueRegionContentRating {
+  region: string;
+  rating: string[];
+  descriptors: String[];
+}
 export interface ContentRating {
   region: string;
   rating: string;
@@ -24,12 +29,10 @@ export function pickMediaContentRating(
       userRegion,
       FALLBACK_REGION
     );
-    console.log(res);
     const first = res?.releaseDates[0];
     const region = res?.iso31661;
 
     if (!first || !region) return null;
-
     return {
       region: region,
       rating: first.certification,
@@ -41,7 +44,6 @@ export function pickMediaContentRating(
       userRegion,
       FALLBACK_REGION
     );
-    console.log(res);
 
     if (!res) return null;
 

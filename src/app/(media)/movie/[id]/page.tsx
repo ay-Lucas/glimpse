@@ -72,8 +72,6 @@ export default async function MoviePage({
   // console.log(movie.releases);
   // console.log(movie.watchProviders?.results)
   // console.log(`Movie page rendered! ${movie.title}`)
-  console.log(movie.releaseDates?.results[0]);
-  const similar = movie.similar?.results;
   // TODO: Add all watch providers
   return (
     <main>

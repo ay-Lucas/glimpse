@@ -10,14 +10,11 @@ import { InvertibleLogo } from "../../_components/invertible-logo";
 import { BASE_MEDIUM_LOGO_URL } from "@/lib/constants";
 import { RatingResponse } from "@/types/request-types-camelcase";
 import { TmdbTvDetailsResponseAppended } from "@/types/tmdb-camel";
-import { capitalizeFirst } from "@/lib/strings";
-import AdultFlag from "../../_components/adult-flag";
 
 export function buildTvDetailItems(
   tv: TmdbTvDetailsResponseAppended
 ): DetailItem[] {
   const items: DetailItem[] = [];
-
   if (tv.createdBy?.length) {
     items.push({
       label: "Creators",

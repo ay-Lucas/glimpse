@@ -14,15 +14,11 @@ import {
   ReleasesReleaseDate,
 } from "@/types/request-types-camelcase";
 import { TmdbMovieDetailsResponseAppended } from "@/types/tmdb-camel";
-import { MovieRatingResponse } from "@/types/request-types-snakecase";
-import { capitalizeFirst } from "@/lib/strings";
-import AdultFlag from "../../_components/adult-flag";
 
 export function buildMovieDetailItems(
   movie: TmdbMovieDetailsResponseAppended
 ): DetailItem[] {
   const items: DetailItem[] = [];
-
   // 1) Directors
   const directors = movie.credits?.crew?.filter((c) => c.job === "Director");
   if (directors && directors.length > 0) {
@@ -224,48 +220,103 @@ export function pickMovieRating(
   preferred = "US",
   fallback?: string
 ): ReleaseDateResponse | null {
-  // 1️⃣ Flatten into pairs of (iso31661, rd)
-  type Flat = { iso31661: string; rd: ReleaseDate };
-  const all: Flat[] = entries.flatMap(({ iso31661, releaseDates }) =>
-    releaseDates.map((rd) => ({ iso31661, rd }))
-  );
+  if (entries.length === 0) return null;
 
-  // 2️⃣ Keep only non-empty certifications
-  const valid = all.filter(({ rd }) => rd.certification.trim() !== "");
+  // 1️⃣ Try preferred, then fallback
+  let regionEntry: ReleaseDateResponse | undefined =
+    entries.find((e) => e.iso31661 === preferred) ||
+    (fallback ? entries.find((e) => e.iso31661 === fallback) : undefined);
 
-  // 3️⃣ Build a map region → rd (last-write wins)
-  const byRegion = new Map<string, ReleaseDate>();
-  for (const { iso31661, rd } of valid) {
-    byRegion.set(iso31661, rd);
+  // 2️⃣ If neither, pick the region with the newest release date
+  if (!regionEntry) {
+    type Flat = { iso: string; rd: ReleaseDate };
+    const all: Flat[] = entries.flatMap((e) =>
+      e.releaseDates.map((rd) => ({ iso: e.iso31661, rd }))
+    );
+    if (all.length === 0) return null;
+
+    // Sort descending by date
+    all.sort(
+      (a, b) =>
+        new Date(b.rd.releaseDate).getTime() -
+        new Date(a.rd.releaseDate).getTime()
+    );
+    const newest = all[0];
+    regionEntry = entries.find((e) => e.iso31661 === newest?.iso);
+    if (!regionEntry) return null;
   }
 
-  // 4️⃣ Pick which region key to use
-  let regionKey: string | undefined;
-  if (byRegion.has(preferred)) {
-    regionKey = preferred;
-  } else if (fallback && byRegion.has(fallback)) {
-    regionKey = fallback;
-  } else {
-    // 5️⃣ Fallback to the rd with the most recent date
-    const newest = valid
-      .slice()
-      .sort(
-        (a, b) =>
-          new Date(b.rd.releaseDate).getTime() -
-          new Date(a.rd.releaseDate).getTime()
-      )[0];
-    if (!newest) return null;
-    regionKey = newest.iso31661;
-  }
+  // 3️⃣ Filter out empty certifications and sort ascending by releaseDate
+  const candidates: ReleaseDate[] = regionEntry.releaseDates
+    .filter((rd) => rd.certification.trim() !== "")
+    .sort(
+      (a, b) =>
+        new Date(a.releaseDate).getTime() - new Date(b.releaseDate).getTime()
+    );
 
-  // 6️⃣ Build and return the ReleaseDateResponse
-  const chosen = byRegion.get(regionKey);
+  if (candidates.length === 0) return null;
+
+  // 4️⃣ Pick the oldest non‐"NR", or fallback to the first (oldest)
+  const olderNonNR = candidates.find((rd) => rd.certification !== "NR");
+  const chosen = olderNonNR ?? candidates[0];
   if (!chosen) return null;
+  // 5️⃣ Return in the expected shape
   return {
-    iso31661: regionKey,
+    iso31661: regionEntry.iso31661,
     releaseDates: [chosen],
   };
 }
+// export function pickMovieRating(
+//   entries: ReleaseDateResponse[],
+//   preferred = "US",
+//   fallback?: string
+// ): ReleaseDateResponse | null {
+//   console.log(
+//     entries.filter((e) => e.iso31661 === "US").map((i) => i.releaseDates)
+//   );
+//   // 1️⃣ Flatten into pairs of (iso31661, rd)
+//   type Flat = { iso31661: string; rd: ReleaseDate };
+//   const all: Flat[] = entries.flatMap(({ iso31661, releaseDates }) =>
+//     releaseDates.map((rd) => ({ iso31661, rd }))
+//   );
+//
+//   // 2️⃣ Keep only non-empty certifications
+//   const valid = all.filter(({ rd }) => rd.certification.trim() !== "");
+//
+//   // 3️⃣ Build a map region → rd (last-write wins)
+//   const byRegion = new Map<string, ReleaseDate>();
+//   for (const { iso31661, rd } of valid) {
+//     byRegion.set(iso31661, rd);
+//   }
+//
+//   // 4️⃣ Pick which region key to use
+//   let regionKey: string | undefined;
+//   if (byRegion.has(preferred)) {
+//     regionKey = preferred;
+//   } else if (fallback && byRegion.has(fallback)) {
+//     regionKey = fallback;
+//   } else {
+//     // 5️⃣ Fallback to the rd with the most recent date
+//     const newest = valid
+//       .slice()
+//       .sort(
+//         (a, b) =>
+//           new Date(b.rd.releaseDate).getTime() -
+//           new Date(a.rd.releaseDate).getTime()
+//       )[0];
+//     if (!newest) return null;
+//     regionKey = newest.iso31661;
+//   }
+//
+//   // 6️⃣ Build and return the ReleaseDateResponse
+//   const chosen = byRegion.get(regionKey);
+//   console.log("chosen: " + JSON.stringify(chosen));
+//   if (!chosen) return null;
+//   return {
+//     iso31661: regionKey,
+//     releaseDates: [chosen],
+//   };
+// }
 // export function pickMovieRating(
 //   entries: Array<{
 //     iso31661: string;

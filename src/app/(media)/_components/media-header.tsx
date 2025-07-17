@@ -12,7 +12,10 @@ import {
   MovieReleaseDatesResponse,
   ShowContentRatingResponse,
 } from "@/types/request-types-camelcase";
-import MediaContentRating from "./media-content-rating";
+import {
+  LocalMediaContentRatingModal,
+  MediaContentRating,
+} from "./media-content-rating";
 import { Badge } from "@/components/ui/badge";
 import AdultFlag from "./adult-flag";
 
@@ -195,12 +198,9 @@ export async function MediaHeader({
 
             <div className="space-y-1">
               <div className="text-xs font-medium uppercase text-gray-400">
-                Rated
+                Age Rating
               </div>
-              <MediaContentRating
-                contentRatings={contentRatings?.results ?? null}
-                mediaType={mediaType}
-              />
+              <LocalMediaContentRatingModal />
             </div>
 
             {runtimeLabel && (
