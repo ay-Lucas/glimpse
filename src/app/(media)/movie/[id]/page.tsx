@@ -22,7 +22,7 @@ import { buildMovieDetailItems } from "./utils";
 import { ChevronRight } from "lucide-react";
 import MediaLinks from "../../_components/media-links";
 import TopCast from "../../_components/top-cast";
-import { RecommendedSection } from "../../_components/similar-section";
+import { RecommendationsSection } from "../../_components/recommendations-section";
 import BackdropAndPosterCarousel from "../../_components/backdrop-and-poster-carousel";
 
 export const revalidate = 43200; // 12 hours
@@ -166,7 +166,7 @@ export default async function MoviePage({
                 >
                   {movie.recommendations?.results &&
                     movie.recommendations?.results.length > 0 && (
-                      <RecommendedSection
+                      <RecommendationsSection
                         titles={movie.recommendations?.results}
                         mediaType="movie"
                       />

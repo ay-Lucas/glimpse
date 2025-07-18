@@ -2,18 +2,10 @@
 // import { getWatchlistsAndItems } from "@/lib/actions";
 import { BASE_API_URL, options } from "@/lib/constants";
 import {
-  FullMovie,
-  FullPerson,
-  FullTv,
-  GroupedProvider,
-} from "@/types/camel-index";
-import {
   MovieReviewsResponse,
   PersonResult,
-  ReleaseDate,
   SearchRequest,
   TvReviewsResponse,
-  TvSeasonResponse,
 } from "@/types/request-types-snakecase";
 import {
   MovieResult,
@@ -23,6 +15,7 @@ import {
   TvResultsResponse,
   ShowContentRatingResponse,
   MovieReleaseDatesResponse,
+  TvSeasonResponse,
 } from "@/types/request-types-camelcase";
 import camelcaseKeys from "camelcase-keys";
 import { unstable_cache } from "next/cache";
@@ -31,8 +24,6 @@ import {
   fetchTmdbTvLists,
   getTrendingPages,
 } from "@/app/discover/actions";
-import { scrubByMaxRes } from "@/lib/scrub-streams";
-import { getJustWatchInfoFromDb } from "@/lib/actions";
 import {
   TmdbMovieDetailsResponseAppended,
   TmdbPersonDetailsAppended,
@@ -64,7 +55,7 @@ export const fetchTvDetails = unstable_cache(
   ): Promise<TmdbTvDetailsResponseAppended> => {
     try {
       const res = await fetch(
-        `${BASE_API_URL}/tv/${id}?append_to_response=videos,images,releases,content_ratings,credits,aggregate_credits,episode_groups,watch/providers,external_ids,similar&language=en`,
+        `${BASE_API_URL}/tv/${id}?append_to_response=videos,images,releases,content_ratings,credits,aggregate_credits,episode_groups,watch/providers,external_ids,similar,recommendations&language=en`,
         resOptions
       );
       const data = await res.json();
@@ -83,6 +74,7 @@ export const fetchTvDetails = unstable_cache(
       // fix up dates, etc…
       if (camel.firstAirDate) camel.firstAirDate = new Date(camel.firstAirDate);
       camel.tmdbId = camel.id;
+      console.log("fetchTv called");
       return camel as TmdbTvDetailsResponseAppended;
     } catch (err) {
       console.error("fetchTvDetails failed for,", id, err);
@@ -104,7 +96,7 @@ export const fetchMovieDetails = unstable_cache(
       const res = await fetch(
         `${BASE_API_URL}/movie/${id}` +
           `?append_to_response=videos,images,releases,release_dates,credits,aggregate_credits,` +
-          `watch/providers,external_ids,similar&language=en`,
+          `watch/providers,external_ids,similar,recommendations&language=en`,
         resOptions
       );
       const data = await res.json();
@@ -236,7 +228,11 @@ export async function getSeasonData(
     `${BASE_API_URL}/tv/${id}/season/${seasonNumber}`,
     resOptions
   );
-  return res.json();
+  const data = await res.json();
+  const camel = camelcaseKeys(data, {
+    deep: true,
+  });
+  return camel;
 }
 
 export async function fetchNetworkDetails(id: number) {

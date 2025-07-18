@@ -43,7 +43,7 @@ export interface PersonResult {
   profilePath?: string;
   adult?: boolean;
   id?: number;
-  name?: string;
+  name: string;
   mediaType: "person"; // Not provided by API
   popularity?: number;
   knownFor?: Array<MovieResult | TvResult>;
@@ -803,6 +803,10 @@ export interface MovieImagesResponse extends Response {
   logos?: Array<TitleLogo>;
 }
 
+export interface PersonResultsResponse extends PaginatedResponse {
+  results?: Array<PersonResult>;
+}
+
 export interface MovieResultsResponse extends PaginatedResponse {
   results?: Array<MovieResult>;
 }
@@ -821,10 +825,25 @@ export interface MovieReleaseDatesResponse extends Response {
 
 export interface SimilarMovieResponse extends MovieRecommendationsResponse {}
 
+export interface TvRecommendationsResponse extends PaginatedResponse {
+  results?: Array<TvResult>;
+}
+
 export interface MovieRecommendationsResponse extends PaginatedResponse {
   results?: Array<MovieResult>;
 }
 
 export interface SimilarShowsResponse extends PaginatedResponse {
   results: Array<TvResult>;
+}
+
+export interface TvSeasonResponse extends Response {
+  _id?: string;
+  airDate?: string;
+  episodes?: Array<Episode>;
+  name?: string;
+  overview?: string;
+  id?: number;
+  posterPath?: string | null;
+  seasonNumber?: number;
 }

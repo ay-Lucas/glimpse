@@ -19,6 +19,8 @@ import {
   PersonMovieCreditsResponse,
   PersonTaggedImagesResponse,
   PersonTvCreditsResponse,
+  MovieRecommendationsResponse,
+  TvRecommendationsResponse,
 } from "./request-types-camelcase";
 import { JustWatchInfo } from "./camel-index";
 
@@ -41,6 +43,7 @@ export interface TmdbTvDetailsResponseAppended extends TmdbTvDetailsResponse {
   externalIds?: TvExternalIdsResponse;
   images?: TvImagesResponse;
   similar?: SimilarShowsResponse;
+  recommendations?: TvRecommendationsResponse;
 }
 
 export interface TmdbTvDetailsResponse extends TvResult {
@@ -90,6 +93,7 @@ export interface TmdbMovieDetailsResponseAppended
   externalIds?: MovieExternalIdsResponse;
   images?: MovieImagesResponse;
   similar?: SimilarShowsResponse;
+  recommendations?: MovieRecommendationsResponse;
 }
 
 export interface TmdbMovieDetailsBackfilled

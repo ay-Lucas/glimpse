@@ -3,7 +3,7 @@ import { SlideCard } from "@/components/slide-card";
 import { BASE_POSTER_IMAGE_URL } from "@/lib/constants";
 import { MovieResult, TvResult } from "@/types/request-types-camelcase";
 
-export async function SimilarSection({
+export async function RecommendationsSection({
   titles,
   mediaType,
 }: {
@@ -41,7 +41,7 @@ export async function SimilarSection({
     <>
       {items?.length > 0 && (
         <section className="media-card space-y-4">
-          <h2 className={`text-2xl font-bold`}>Similar</h2>
+          <h2 className={`text-2xl font-bold`}>Recommendations</h2>
           <MediaCarousel items={items} breakpointType="poster" />
         </section>
       )}

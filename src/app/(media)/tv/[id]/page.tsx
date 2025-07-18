@@ -18,7 +18,7 @@ import { buildTvDetailItems } from "./utils";
 import MediaLinks from "../../_components/media-links";
 import BackdropAndPosterCarousel from "../../_components/backdrop-and-poster-carousel";
 import TopCast from "../../_components/top-cast";
-import { SimilarSection } from "../../_components/similar-section";
+import { RecommendationsSection } from "../../_components/recommendations-section";
 
 function getTrailer(videoArray: Array<Video>) {
   const trailer: Array<Video> = videoArray.filter(
@@ -178,12 +178,13 @@ export default async function TvPage({ params }: { params: { id: number } }) {
                     <Skeleton className="h-[356px] w-full rounded-xl" />
                   }
                 >
-                  {tv.similar?.results && tv.similar.results.length > 0 && (
-                    <SimilarSection
-                      titles={tv.similar.results}
-                      mediaType="tv"
-                    />
-                  )}
+                  {tv.recommendations?.results &&
+                    tv.recommendations?.results.length > 0 && (
+                      <RecommendationsSection
+                        titles={tv.recommendations?.results}
+                        mediaType="tv"
+                      />
+                    )}
                 </Suspense>
                 <Suspense
                   fallback={
