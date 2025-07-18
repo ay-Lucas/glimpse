@@ -28,6 +28,7 @@ export function SlideCard({
   className = "",
   isAdult,
   rating,
+  enableSafeImage = false,
 }: {
   alt: string;
   aspectClass: string;
@@ -47,13 +48,15 @@ export function SlideCard({
   imagePath?: string | null;
   baseUrl: string;
   rating?: string | null;
+  enableSafeImage?: boolean;
 }) {
   const [loaded, setLoaded] = useState(false);
+  const src = `${baseUrl}${imagePath}`;
+
   return (
     <div className="h-full">
       <Link
         href={`/${mediaType}/${tmdbId}`}
-        key={tmdbId}
         prefetch={true}
         className={`group relative inset-0 flex w-full items-end ${aspectClass} rounded-lg ${className} `}
       >
@@ -62,10 +65,9 @@ export function SlideCard({
           <Skeleton className="absolute inset-0 rounded-lg" />
           //<div className="absolute inset-0 animate-pulse rounded-lg bg-black" />
         )}
-
         <Image
           {...props}
-          src={`${baseUrl}${imagePath}`}
+          src={src}
           alt={alt}
           fill
           loading={loading}
@@ -76,6 +78,7 @@ export function SlideCard({
           className={`inset-0 object-cover transition-opacity duration-300 ${loaded ? "opacity-100" : "opacity-0"} rounded-lg`}
           sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 100vw"
         />
+        {/* )} */}
         <>
           {isAdult && (
             <div className="absolute right-0 top-0">
