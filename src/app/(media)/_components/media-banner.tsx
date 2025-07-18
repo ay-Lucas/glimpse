@@ -2,8 +2,9 @@
 import { BASE_SMALL_BACKDROP_URL } from "@/lib/constants";
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import { Vibrant } from "node-vibrant/browser";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 export default function MediaBanner({
   name,
@@ -18,13 +19,18 @@ export default function MediaBanner({
   backdropPath: string;
   mediaType: "tv" | "movie";
 }) {
+  const [bannerColor, setBannerColor] = useState("transparent");
+
+  const params = useParams();
+  const { episodeNumber, seasonNumber } = params;
+  const baseHref = `/tv/${id}`;
+
+  const src = `${BASE_SMALL_BACKDROP_URL}${backdropPath}`;
   const formattedFirstAirDate = firstAirDate
     ? new Intl.DateTimeFormat("en-US", {
         year: "numeric",
       }).format(new Date(firstAirDate))
     : null;
-  const [bannerColor, setBannerColor] = useState("transparent");
-  const src = `${BASE_SMALL_BACKDROP_URL}${backdropPath}`;
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -36,6 +42,19 @@ export default function MediaBanner({
       setBannerColor(color);
     };
   }, [src]);
+
+  const { backLabel, href } = useMemo(() => {
+    if (seasonNumber && episodeNumber) {
+      return {
+        backLabel: "Back to episodes",
+        href: `${baseHref}/seasons/${seasonNumber}`,
+      };
+    }
+    if (seasonNumber) {
+      return { backLabel: "Back to seasons", href: `${baseHref}/seasons` };
+    }
+    return { backLabel: "Back to main", href: baseHref };
+  }, [baseHref, seasonNumber, episodeNumber]);
 
   return (
     <div className="relative w-full overflow-hidden">
@@ -50,11 +69,11 @@ export default function MediaBanner({
             {formattedFirstAirDate && ` (${formattedFirstAirDate})`}
           </h1>
           <Link
-            href={`/${mediaType}/${id}`}
+            href={href}
             className="-ml-1 mt-2 flex w-fit items-center text-white hover:text-gray-400"
           >
             <ChevronLeft size={24} />
-            <span className="text-lg font-semibold">Back to main</span>
+            <span className="text-lg font-semibold">{backLabel}</span>
           </Link>
         </div>
       </div>
