@@ -12,7 +12,7 @@ import {
   fetchDiscoverMovieIds,
   getRecommendations,
 } from "../../actions";
-import { getTrailer } from "@/lib/utils";
+import { countryCodeToEnglishName, getTrailer } from "@/lib/utils";
 import VideoPlayer from "../../_components/video-player";
 import { getRedisBlurValue } from "@/services/cache";
 import { MediaHeader } from "../../_components/media-header";
@@ -24,6 +24,7 @@ import MediaLinks from "../../_components/media-links";
 import TopCast from "../../_components/top-cast";
 import { RecommendationsSection } from "../../_components/recommendations-section";
 import BackdropAndPosterCarousel from "../../_components/backdrop-and-poster-carousel";
+import MovieReleases from "../../_components/movie-releases";
 
 export const revalidate = 43200; // 12 hours
 
@@ -164,6 +165,13 @@ export default async function MoviePage({
                     <Skeleton className="h-[356px] w-full rounded-xl" />
                   }
                 >
+                  <section className="media-card space-y-3">
+                    <h2 className={`text-2xl font-bold`}>Releases</h2>
+                    {movie.releaseDates?.results &&
+                      movie.releaseDates.results.length > 0 && (
+                        <MovieReleases releaseDatesRes={movie.releaseDates} />
+                      )}
+                  </section>
                   {movie.recommendations?.results &&
                     movie.recommendations?.results.length > 0 && (
                       <RecommendationsSection
