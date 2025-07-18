@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { UniqueRegionContentRating } from "@/lib/contentRating";
 import { countryCodeToEnglishName } from "@/lib/utils";
+import { FlagIcon } from "./flag-icon";
 
 interface MediaContentProps {
   region?: string;
@@ -30,12 +31,18 @@ export function MediaContentRating({
 }: MediaContentProps) {
   const descriptorsLabel = descriptors?.join(", ");
   const fontSize = text === "sm" ? "text-sm" : "text-md";
+  const fullRegionName = region ? countryCodeToEnglishName(region) : null;
   return (
     <>
       {region && (
-        <Badge variant="outline" className={fontSize}>
-          {region}
-        </Badge>
+        <div className={`${fontSize} flex items-center gap-3`}>
+          <FlagIcon
+            code={region}
+            className="h-6 w-9"
+            aria-label={fullRegionName || region}
+          />
+          {fullRegionName}
+        </div>
       )}
       <div className="flex flex-wrap gap-1">
         {rating.map((r, index) => (
@@ -95,40 +102,52 @@ export function ContentRatingList() {
         : [r.rating];
 
     const uniqueRegion: UniqueRegionContentRating = {
-      region: r.region,
+      countryCode: r.region,
+      country: countryCodeToEnglishName(r.region),
       rating: ratingsArray,
       descriptors: r.descriptors,
     };
     regionMap.set(r.region, uniqueRegion);
   });
-  const uniqueRegionRatings = Array.from(regionMap.values());
-  console.log(uniqueRegionRatings);
+  const uniqueRegionRatings = Array.from(regionMap.values()).sort((a, b) =>
+    a.country.localeCompare(b.country)
+  );
 
   const anyRatingHasDesc = allRatings.some(
     (rating) => rating.descriptors.length > 0
   );
   const numColumns = anyRatingHasDesc ? 3 : 2;
   return (
-    <div
-      // className={`grid ${anyRatingHasDesc ? "grid-cols-3" : "grid-cols-2"} gap-3`}
-      //className={`grid grid-cols-3 gap-3`}
-      className={`grid ${anyRatingHasDesc ? "grid-cols-[1fr_100px_1fr]" : "grid-cols-[1fr_1fr]"} gap-3`}
-    >
-      <div className="text-md font-bold">Country</div>
-      <div className="text-md font-bold">Rating</div>
-      {anyRatingHasDesc && <div className="text-md font-bold">Descriptors</div>}
+    <div className="grid gap-3">
+      <div
+        className={`grid ${anyRatingHasDesc ? "grid-cols-[minmax(150px,1fr)_minmax(75px,1fr)_minmax(100px,1fr)]" : "grid-cols-[1fr_1fr]"} gap-3`}
+      >
+        <div className="text-md font-bold">Country</div>
+        <div className="text-md font-bold">Rating</div>
+        {anyRatingHasDesc && (
+          <div className="text-md font-bold">Descriptors</div>
+        )}
+      </div>
       {uniqueRegionRatings.map((contentRating, index) => {
-        const { rating, region, descriptors } = contentRating;
-        const fullRegionName = countryCodeToEnglishName(region);
+        const { rating, countryCode: region, descriptors } = contentRating;
         return (
-          <MediaContentRating
-            rating={rating}
-            region={fullRegionName}
-            descriptors={descriptors}
-            text="md"
-            numColumns={numColumns}
-            key={index}
-          />
+          <>
+            <div
+              className={`grid ${anyRatingHasDesc ? "grid-cols-[minmax(150px,1fr)_minmax(75px,1fr)_minmax(100px,1fr)]" : "grid-cols-[1fr_1fr]"} gap-3`}
+            >
+              <MediaContentRating
+                rating={rating}
+                region={region}
+                descriptors={descriptors}
+                text="md"
+                numColumns={numColumns}
+                key={index}
+              />
+            </div>
+            {index !== uniqueRegionRatings.length - 1 && (
+              <div className="border-b border-r-gray-500"></div>
+            )}
+          </>
         );
       })}
     </div>
@@ -141,7 +160,7 @@ export function AllContentRatingsModal({ children }: { children: ReactNode }) {
       <DialogTrigger asChild>
         <div>{children}</div>
       </DialogTrigger>
-      <DialogContent className="max-h-[95vh] w-fit max-w-[95vw] justify-center overflow-y-auto overflow-x-hidden rounded-xl sm:max-w-[575px]">
+      <DialogContent className="max-h-[95vh] max-w-[99vw] justify-center overflow-y-auto overflow-x-hidden rounded-xl md:max-w-[500x] lg:w-fit">
         <DialogHeader>
           <DialogTitle>All Content Ratings By Country</DialogTitle>
         </DialogHeader>

@@ -1,5 +1,6 @@
 export interface UniqueRegionContentRating {
-  region: string;
+  countryCode: string;
+  country: string;
   rating: string[];
   descriptors: String[];
 }
