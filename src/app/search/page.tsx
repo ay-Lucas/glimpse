@@ -1,6 +1,7 @@
 import { SearchMediaType } from "./utils";
 import { NSFW_GENRE_ID } from "@/lib/title-genres";
 import { InfiniteSearchList } from "../(media)/_components/infinite-search-list";
+import { DiscoverSearch } from "../discover/_components/discover-search";
 
 export default async function SearchPage({
   searchParams,
@@ -39,6 +40,10 @@ export default async function SearchPage({
   return (
     <main className="relative min-h-[75vh] md:min-h-[85vh]">
       <div className="px-2 pt-10 md:container">
+        <div className="pb-5">
+          <DiscoverSearch />
+        </div>
+
         {/* <div className="flex flex-shrink flex-wrap justify-start gap-4 md:gap-8"> */}
         <InfiniteSearchList
           mediaType={params.mediaType}

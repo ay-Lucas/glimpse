@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { IoSearchOutline } from "react-icons/io5";
 
@@ -99,6 +99,17 @@ function GenreDropdown({ mediaType, value, onChange }: GenreDropdownProps) {
     return found ? found.label : "All Genres";
   }, [options, value]);
 
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // whenever the menu opens, focus the CommandInput
+  useEffect(() => {
+    if (open) {
+      // give Radix a tick to fully render the dropdown
+      requestAnimationFrame(() => {
+        inputRef.current?.focus();
+      });
+    }
+  }, [open]);
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
@@ -109,7 +120,7 @@ function GenreDropdown({ mediaType, value, onChange }: GenreDropdownProps) {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-56 p-0">
         <Command>
-          <CommandInput placeholder="Search genres…" />
+          <CommandInput placeholder="Search genres…" ref={inputRef} />
           <CommandList>
             <CommandEmpty>No genres found.</CommandEmpty>
             <CommandGroup>
