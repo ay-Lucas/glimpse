@@ -40,20 +40,18 @@ export function MovieReleasesTabs({ grouped }: { grouped: GroupedRelease[] }) {
       </TabsList>
 
       {grouped.map(({ type, dates }) => (
-        <TabsContent key={type} value={String(type)}>
-          <Accordion type="multiple" defaultValue={dates.map((d) => d.date)}>
-            {dates.map((group) => (
-              <>
-                {group.items.length > 9 ? (
-                  <Expandable lineHeight={50}>
-                    <ReleaseDatePanel key={group.date} group={group} />
-                  </Expandable>
-                ) : (
+        <TabsContent key={type} value={String(type)} className="space-y-3">
+          {dates.map((group) => (
+            <div key={group.date}>
+              {group.items.length > 9 ? (
+                <Expandable lineHeight={48}>
                   <ReleaseDatePanel key={group.date} group={group} />
-                )}
-              </>
-            ))}
-          </Accordion>
+                </Expandable>
+              ) : (
+                <ReleaseDatePanel key={group.date} group={group} />
+              )}
+            </div>
+          ))}
         </TabsContent>
       ))}
     </Tabs>
@@ -64,16 +62,18 @@ function ReleaseDatePanel({ group }: { group: DateGroup }) {
   const { date, formatted, items } = group;
 
   return (
-    <AccordionItem value={date}>
-      <AccordionTrigger>{formatted}</AccordionTrigger>
-      <AccordionContent className="space-y-2">
+    <div className="space-y-2">
+      <time dateTime={date} className="text-lg font-semibold">
+        {formatted}
+      </time>
+      <div className="space-y-1">
         <div className="grid grid-cols-1 gap-3 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
           {items.map(({ iso31661, certification }) => {
             const countryName = countryCodeToEnglishName(iso31661);
             return (
               <div
                 key={`${iso31661}-${certification}`}
-                className="flex items-center space-x-2"
+                className="flex items-center space-x-2 text-gray-300"
               >
                 <FlagIcon code={iso31661} className="h-6 w-9" />
                 <span className="flex-1">{countryName}</span>
@@ -82,7 +82,7 @@ function ReleaseDatePanel({ group }: { group: DateGroup }) {
             );
           })}
         </div>
-      </AccordionContent>
-    </AccordionItem>
+      </div>
+    </div>
   );
 }

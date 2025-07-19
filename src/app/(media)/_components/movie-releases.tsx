@@ -67,5 +67,3 @@ export default function MovieReleases({
   if (grouped.length === 0) return null;
   return <MovieReleasesTabs grouped={grouped} />;
 }
-
-// <div className="grid grid-cols-1 gap-3 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
