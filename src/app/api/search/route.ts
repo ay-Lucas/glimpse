@@ -19,7 +19,6 @@ export async function GET(request: Request) {
         .map((s) => parseInt(s, 10))
         .filter((n) => !isNaN(n))
     : null;
-  console.log(query, includeAdult, mediaType, genreIds, page);
 
   // 3) run your search
   const results = await searchAndRank(

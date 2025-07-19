@@ -8,7 +8,7 @@ import {
 } from "@/types/request-types-camelcase";
 import { useState, useEffect } from "react";
 
-type Item = any;
+type Item = MovieResult | TvResult | PersonResult;
 
 export function InfiniteSearchList({
   query,
@@ -56,9 +56,7 @@ export function InfiniteSearchList({
         if (!data.results.length) setHasMore(false);
       })
       .finally(() => setLoading(false));
-    console.log("page: " + page + "\n" + "results: \n");
-    console.log(JSON.stringify(results));
-  }, [query, mediaType, includeAdult, page, hasMore]);
+  }, [query, mediaType, includeAdult, page, hasMore, genreIds]);
 
   // scroll listener to load next page when near bottom
   useEffect(() => {
@@ -95,10 +93,10 @@ export function InfiniteSearchList({
           item?.mediaType !== "person" ? item?.voteAverage : undefined;
         const tmdbVoteCount =
           item?.mediaType !== "person" ? item?.voteCount : undefined;
-        if (!imagePath) return <div></div>;
+        if (!imagePath) return <div key={idx}></div>;
         return (
           <SlideCard
-            key={item?.id!}
+            key={`${item.id}${idx}`}
             alt={`poster of ${title}`}
             aspectClass="aspect-[2/3]"
             tmdbId={item?.id!}

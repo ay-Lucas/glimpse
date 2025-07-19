@@ -20,7 +20,7 @@ export function ToastListener() {
       newParams.delete("justSignedIn");
       router.replace(`/discover?${newParams.toString()}`, { scroll: false });
     }
-  }, [justSignedIn, params, router, toast]);
+  }, [justSignedIn, params, router]);
 
   return null;
 }

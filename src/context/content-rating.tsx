@@ -39,12 +39,13 @@ export function ContentRatingProvider({
   children,
 }: ContentRatingProviderProps) {
   const userRegion = useUserRegion();
-  const contentRating = ratings
-    ? useMemo(
-        () => pickMediaContentRating(ratings, mediaType, userRegion ?? "US"),
-        [ratings, mediaType, userRegion]
-      )
-    : null;
+  const contentRating = useMemo(
+    () =>
+      ratings
+        ? pickMediaContentRating(ratings, mediaType, userRegion ?? "US")
+        : null,
+    [ratings, mediaType, userRegion]
+  );
 
   const allRatings =
     mediaType === "tv"
@@ -54,7 +55,6 @@ export function ContentRatingProvider({
   const allRatingsSorted = allValidRatings.sort((a, b) =>
     a.region.localeCompare(b.region)
   );
-  console.log(allRatingsSorted);
   const value = useMemo<ContentRatingContextValue>(
     () => ({ allRatings: allRatingsSorted, contentRating }),
     [ratings, contentRating]

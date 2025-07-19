@@ -46,7 +46,7 @@ export function EditableWatchlistTitle({
 
   useEffect(() => {
     setOriginalTitle(title);
-  }, [isEditing]);
+  }, [isEditing, title]);
 
   const handleTitleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setTitle(e.target.value);
