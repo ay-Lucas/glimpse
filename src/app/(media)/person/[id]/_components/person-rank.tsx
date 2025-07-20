@@ -22,7 +22,7 @@ export default async function PersonRank({
   const total = scores.sortedScores.length;
 
   return (
-    <Tooltip>
+    <Tooltip delayDuration={100}>
       <TooltipTrigger>
         <div className="flex items-center space-x-3">
           <div className="flex items-center space-x-1 text-lg font-bold text-gray-400">

@@ -1,35 +1,24 @@
-import { fetchMovieDetails, fetchTvDetails } from "@/app/(media)/actions";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Fragment } from "react";
-import { Cast, Crew } from "@/types/request-types-camelcase";
+import { Cast, Crew, GuestStar } from "@/types/request-types-camelcase";
 import Image from "next/image";
 import Link from "next/link";
 import { BASE_SMALL_BACKDROP_URL } from "@/lib/constants";
-import MediaBanner from "./media-banner";
 
-export default async function CreditsPage({
+export default async function CreditsSection({
   mediaType,
-  id,
+  showId,
+  cast,
+  crew,
+  title,
+  releaseDate,
 }: {
   mediaType: "movie" | "tv";
-  id: string;
+  showId: number;
+  cast: Cast[] | GuestStar[];
+  crew: Crew[];
+  title: string;
+  releaseDate: string | null;
 }) {
-  const tmdbId = Number(id);
-  const data =
-    mediaType === "movie"
-      ? await fetchMovieDetails(tmdbId)
-      : await fetchTvDetails(tmdbId);
-  // const backdropPath = data.backdropPath ?? "";
-  // const darkVibrantBackdropHex = (data as any).darkVibrantBackdropHex ?? "";
-
-  // const color = await bannerColor(backdropPath, darkVibrantBackdropHex);
-
-  if (!data.credits) throw new Error("fetchTvDetails returned undefined");
-
-  const { cast, crew } = data.credits;
-  const title = (data as any).title || (data as any).name;
-  const releaseDate = (data as any).releaseDate || (data as any).firstAirDate;
-
   // console.log("Seasons page rendered!")
   const sortedCast = cast
     ?.filter(
@@ -59,61 +48,61 @@ export default async function CreditsPage({
     }, {});
 
   return (
-    <main className="pt-3">
-      <MediaBanner
-        name={title}
-        firstAirDate={releaseDate}
-        id={tmdbId}
-        backdropPath={data.backdropPath}
-        mediaType={mediaType}
-      />
-      <div className="container h-full pt-3">
-        {(cast || crew) && (
-          <Tabs
-            defaultValue="cast"
-            className="min-h-screen rounded-md bg-background/60 p-3 backdrop-blur-md"
-          >
-            <TabsList className="px-2 py-7">
-              <TabsTrigger value="cast" className="text-xl font-bold">
-                Cast
-              </TabsTrigger>
-              <TabsTrigger value="crew" className="text-xl font-bold">
-                Crew
-              </TabsTrigger>
-            </TabsList>
-            <TabsContent value="cast">
-              <div>
-                {/* <h2 className="text-2xl font-bold mb-4">Cast</h2> */}
-                <ul className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-                  {sortedCast?.map((c) => (
-                    <li key={c.id} className="space-y-2">
-                      {c.profilePath ? (
-                        <Link href={`/person/${c.id}`}>
-                          <Image
-                            src={`${BASE_SMALL_BACKDROP_URL}${c.profilePath}`}
-                            alt={c.name}
-                            width={185}
-                            height={278}
-                            className="rounded-md object-cover"
-                          />
-                        </Link>
-                      ) : (
-                        <div className="h-[278px] w-full rounded-md bg-gray-700" />
-                      )}
-                      <p className="truncate font-semibold">{c.name}</p>
-                      <p className="truncate text-sm text-gray-400">
+    <div className="h-full px-1 pt-3 md:container sm:px-2">
+      {(cast || crew) && (
+        <Tabs
+          defaultValue="cast"
+          className="min-h-screen rounded-md bg-background/60 p-3 backdrop-blur-md"
+        >
+          <TabsList className="px-2 py-7">
+            <TabsTrigger value="cast" className="text-xl font-bold">
+              Cast
+            </TabsTrigger>
+            <TabsTrigger value="crew" className="text-xl font-bold">
+              Crew
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="cast">
+            <div>
+              {/* <h2 className="text-2xl font-bold mb-4">Cast</h2> */}
+              <ul className="grid grid-cols-3 gap-6 xs:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7">
+                {sortedCast?.map((c) => (
+                  <li key={`${c.creditId}`} className="space-y-0">
+                    {c.profilePath ? (
+                      <Link href={`/person/${c.id}`}>
+                        <Image
+                          src={`${BASE_SMALL_BACKDROP_URL}${c.profilePath}`}
+                          alt={c.name ?? "cast"}
+                          width={185}
+                          height={278}
+                          className="rounded-md object-cover"
+                        />
+                      </Link>
+                    ) : (
+                      <div className="h-[278px] w-full rounded-md bg-gray-700" />
+                    )}
+                    <p className="flex-wrap pt-1 font-semibold">{c.name}</p>
+                    {c.character?.length && (
+                      <p className="flex-wrap text-sm text-gray-400">
                         as {c.character}
                       </p>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </TabsContent>
-            <TabsContent value="crew">
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </TabsContent>
+          <TabsContent value="crew" className="">
+            <div className="grid justify-center lg:grid-cols-2">
               {crewByDept &&
                 Object.entries(crewByDept).map(([dept, members]) => (
-                  <Fragment key={dept}>
-                    <h3 className="mb-2 mt-6 text-xl font-semibold">{dept}</h3>
+                  <div
+                    key={dept}
+                    className="mx-auto max-w-[500px] items-center"
+                  >
+                    <h3 className="my-2 flex-wrap text-xl font-semibold">
+                      {dept}
+                    </h3>
                     <table className="mb-6 w-full table-fixed">
                       <colgroup>
                         <col className="w-1/2" />
@@ -127,27 +116,29 @@ export default async function CreditsPage({
                       </thead>
                       <tbody>
                         {members.map((m) => (
-                          <tr key={m.id} className="border-t hover:bg-muted/50">
-                            <td className="py-2 text-blue-400">
+                          <tr
+                            key={m.creditId}
+                            className="border-t hover:bg-muted/50"
+                          >
+                            <td className="py-1 text-blue-400">
                               <Link
                                 href={`/person/${m.id}`}
-                                key={m.id}
                                 className="hover:underline"
                               >
                                 {m.name}
                               </Link>
                             </td>
-                            <td className="py-2">{m.job}</td>
+                            <td className="flex-wrap py-1">{m.job}</td>
                           </tr>
                         ))}
                       </tbody>
                     </table>
-                  </Fragment>
+                  </div>
                 ))}
-            </TabsContent>
-          </Tabs>
-        )}
-      </div>
-    </main>
+            </div>
+          </TabsContent>
+        </Tabs>
+      )}
+    </div>
   );
 }

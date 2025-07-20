@@ -29,14 +29,14 @@ export function MediaCard({
   children,
 }: MediaCardProps) {
   const isPoster = imageType === "poster";
-  const imgWidth = isPoster ? 125 : 200;
+  const imgWidth = isPoster ? 125 : 250;
   const imgAspect = isPoster ? "aspect-[2/3]" : "aspect-[16/9]";
   const colSpan = isPoster
     ? "xxs:col-span-1 sm:col-start-2"
     : "xxs:col-span-2 col-start-1";
   const gridCols = isPoster
     ? `xxs:grid-cols-[125px_1fr] `
-    : `xxs:grid-cols-[200px_1fr]`;
+    : `xxs:grid-cols-[250px_1fr]`;
   const formattedDate = airDate
     ? new Intl.DateTimeFormat("en-US", {
         month: "short",
@@ -59,6 +59,7 @@ export function MediaCard({
           <figure className={`${imgAspect} relative w-full`}>
             <Image
               fill
+              quality={90}
               src={imageSrc}
               alt={imageAlt}
               className="rounded-lg object-cover"

@@ -1,3 +1,4 @@
+import BackdropAndPosterCarousel from "@/app/(media)/_components/backdrop-and-poster-carousel";
 import { EpisodeHeader } from "@/app/(media)/_components/media-header";
 import { RecommendationsSection } from "@/app/(media)/_components/recommendations-section";
 import TopCast from "@/app/(media)/_components/top-cast";
@@ -22,7 +23,7 @@ export default async function EpisodePage({
   const firstAirDate =
     typeof tv.firstAirDate === "string" ? new Date(tv.firstAirDate) : null;
   const isCastValid = episode.guestStars && episode.guestStars?.length > 0;
-
+  console.log(episode);
   return (
     <main>
       {episode && (
@@ -53,6 +54,12 @@ export default async function EpisodePage({
                     <ChevronRight size={30} />
                   </Link>
                 </section>
+                <BackdropAndPosterCarousel
+                  backdrops={episode.images?.stills ?? []}
+                  posters={[]}
+                  logos={[]}
+                  name="Images"
+                />
                 {tv.recommendations?.results &&
                   tv.recommendations?.results.length > 0 && (
                     <RecommendationsSection

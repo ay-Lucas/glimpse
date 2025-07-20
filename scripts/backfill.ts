@@ -16,7 +16,7 @@ import { redis, writePopularPeopleScores } from "@/services/cache";
 import { revalidate } from "./revalidate";
 import { fetchPopularPeopleScores } from "@/app/(media)/person/[id]/actions";
 import { getJustWatchInfo } from "@/lib/justwatch";
-import { toDateString } from "@/lib/utils";
+import { toDateString } from "@/lib/dates";
 
 async function backfillAndRevalidate() {
   const backfillSuccessful = await backfill();

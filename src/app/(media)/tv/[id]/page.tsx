@@ -104,8 +104,6 @@ export default async function TvPage({ params }: { params: { id: number } }) {
                     tmdbVoteCount={tv.voteCount ?? null}
                     trailerPath={videoPath}
                     tagline={tv.tagline ?? null}
-                    homepage={tv.homepage ?? null}
-                    data={tv}
                     runtime={null}
                     typeLabel="Series"
                     isAdult={tv.adult}
@@ -133,7 +131,7 @@ export default async function TvPage({ params }: { params: { id: number } }) {
                 <section className="media-card space-y-10">
                   {tv.numberOfSeasons && tv.numberOfSeasons > 0 && (
                     <Link
-                      href={`/tv/${params.id}/seasons`}
+                      href={`/tv/${params.id}/season`}
                       className="flex items-end hover:text-gray-400"
                     >
                       <h2 className="text-2xl font-bold">
@@ -159,7 +157,9 @@ export default async function TvPage({ params }: { params: { id: number } }) {
                     </section>
                   </>
                 )}
-                {isCastValid && <TopCast cast={tv.credits?.cast!} />}
+                {isCastValid && (
+                  <TopCast cast={tv.credits?.cast!} title="Top Cast" />
+                )}
                 {tv.externalIds && (
                   <MediaLinks
                     externalIds={tv.externalIds}

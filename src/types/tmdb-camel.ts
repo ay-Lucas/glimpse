@@ -25,6 +25,8 @@ import {
   GuestStar,
   Person,
   Episode,
+  Image,
+  Backdrop,
 } from "./request-types-camelcase";
 import { JustWatchInfo } from "./camel-index";
 import { EpisodeExternalIdsResponse } from "./request-types-snakecase";
@@ -134,7 +136,7 @@ export interface TmdbPersonDetails {
 
 export interface TmdbEpisodeDetailsAppended extends Episode {
   externalIds?: TvExternalIdsResponse;
-  images?: TvImagesResponse;
+  images?: { stills: Backdrop[] };
   credits?: CreditsResponse;
   videos?: VideosResponse;
 }

@@ -1,5 +1,5 @@
 import { TvSeasonResponse } from "@/types/request-types-snakecase";
-import { getSeasonData } from "@/app/(media)/actions";
+import { fetchSeasonData } from "@/app/(media)/actions";
 import { EpisodeWithBlur, SeasonAccordion } from "./season-accordion";
 import { BaseImageUrl } from "@/lib/constants";
 import { appendBlurDataToMediaArray } from "@/lib/blur-data-generator";
@@ -13,7 +13,7 @@ export async function Seasons({
 }) {
   const episodesData: Array<TvSeasonResponse> = [];
   for (let i = 0; i < numberOfSeasons!; i++) {
-    const episodeData = await getSeasonData(id, i + 1);
+    const episodeData = await fetchSeasonData(id, i + 1);
     episodesData.push(episodeData);
   }
 

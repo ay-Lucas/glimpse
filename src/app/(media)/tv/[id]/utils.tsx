@@ -177,30 +177,3 @@ export function pickTvRating(
   const first = byRegion.values().next();
   return first.done ? null : first.value;
 }
-// export function pickTvRating(
-//   entries: RatingResponse[],
-//   preferredRegion = "US",
-//   fallbackRegion?: string
-// ): string | null {
-//   // 1. de-duplicate in case TMDB gives you two FR entries, etc.
-//   const byRegion = entries.reduce((map, { iso31661, rating }) => {
-//     // last one wins, but you could do `if (!map.has(iso31661))` to keep first
-//     if (typeof iso31661 === "string" && typeof rating === "string")
-//       map.set(iso31661, rating);
-//     return map;
-//   }, new Map<string, string>());
-//
-//   // 2. try the preferred region
-//   if (byRegion.has(preferredRegion)) {
-//     return byRegion.get(preferredRegion)!;
-//   }
-//
-//   // 3. optional second fallback (e.g. `GB`, `CA`, whatever you like)
-//   if (fallbackRegion && byRegion.has(fallbackRegion)) {
-//     return byRegion.get(fallbackRegion)!;
-//   }
-//
-//   // 4. final fallback: the *first* entry in the Map
-//   const first = byRegion.values().next();
-//   return first.done ? null : first.value;
-// }

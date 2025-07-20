@@ -1,18 +1,13 @@
 import Link from "next/link";
-import Image from "next/image";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  BASE_ORIGINAL_IMAGE_URL,
-  DEFAULT_BLUR_DATA_URL,
-} from "@/lib/constants";
 import ReviewSection from "@/app/(media)/_components/ReviewSection";
 import {
   fetchMovieDetails,
   fetchDiscoverMovieIds,
   getRecommendations,
 } from "../../actions";
-import { countryCodeToEnglishName, getTrailer } from "@/lib/utils";
+import { getTrailer } from "@/lib/utils";
 import VideoPlayer from "../../_components/video-player";
 import { getRedisBlurValue } from "@/services/cache";
 import { MediaHeader } from "../../_components/media-header";
@@ -99,8 +94,6 @@ export default async function MoviePage({
                     tmdbVoteCount={movie.voteCount ?? null}
                     trailerPath={videoPath}
                     tagline={movie.tagline ?? null}
-                    homepage={movie.homepage ?? null}
-                    data={movie}
                     runtime={movie.runtime ?? null}
                     typeLabel="Movie"
                     isAdult={movie.adult}
@@ -142,7 +135,9 @@ export default async function MoviePage({
                         <Skeleton className="h-[356px] w-full rounded-xl" />
                       }
                     >
-                      {isCastValid && <TopCast cast={movie.credits?.cast!} />}
+                      {isCastValid && (
+                        <TopCast cast={movie.credits?.cast!} title="Top Cast" />
+                      )}
                     </Suspense>
                   </>
                 )}

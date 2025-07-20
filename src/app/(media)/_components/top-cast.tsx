@@ -1,22 +1,28 @@
 import MediaCarousel from "@/components/media-carousel";
 import { SlideImageCard } from "@/components/slide-image-card";
-import { Cast } from "@/types/request-types-camelcase";
+import { Cast, GuestStar } from "@/types/request-types-camelcase";
 import Link from "next/link";
 
-export default function TopCast({ cast }: { cast: Cast[] }) {
+export default function TopCast({
+  cast,
+  title,
+}: {
+  cast: Cast[] | GuestStar[];
+  title: string;
+}) {
   const items = cast
     ?.splice(0, 10)
     .map((item, index) => <SlideCastCard cast={item} key={index} />);
 
   return (
     <section className="media-card">
-      <h2 className={`pb-3 text-2xl font-bold`}>Top Cast</h2>
+      <h2 className={`pb-3 text-2xl font-bold`}>{title}</h2>
       <MediaCarousel items={items} breakpointType="cast" />
     </section>
   );
 }
 
-export function SlideCastCard({ cast }: { cast: Cast }) {
+export function SlideCastCard({ cast }: { cast: Cast | GuestStar }) {
   return (
     <Link href={`/person/${cast.id}`}>
       <SlideImageCard
