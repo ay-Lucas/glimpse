@@ -1,5 +1,5 @@
 "use client";
-import { ReactNode } from "react";
+import { Fragment, ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
 import { ChevronRight } from "lucide-react";
 import { useContentRating } from "@/context/content-rating";
@@ -117,6 +117,7 @@ export function ContentRatingList() {
     (rating) => rating.descriptors.length > 0
   );
   const numColumns = anyRatingHasDesc ? 3 : 2;
+  console.log(allRatings);
   return (
     <div className="grid gap-3">
       <div
@@ -131,7 +132,7 @@ export function ContentRatingList() {
       {uniqueRegionRatings.map((contentRating, index) => {
         const { rating, countryCode: region, descriptors } = contentRating;
         return (
-          <>
+          <Fragment key={contentRating.countryCode}>
             <div
               className={`grid ${anyRatingHasDesc ? "grid-cols-[minmax(150px,1fr)_minmax(75px,1fr)_minmax(100px,1fr)]" : "grid-cols-[1fr_1fr]"} gap-3`}
             >
@@ -147,7 +148,7 @@ export function ContentRatingList() {
             {index !== uniqueRegionRatings.length - 1 && (
               <div className="border-b border-r-gray-500"></div>
             )}
-          </>
+          </Fragment>
         );
       })}
     </div>
