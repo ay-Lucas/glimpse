@@ -2,7 +2,7 @@
 import { BASE_SMALL_BACKDROP_URL } from "@/lib/constants";
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import { Vibrant } from "node-vibrant/browser";
 import { useEffect, useMemo, useState } from "react";
 
@@ -15,15 +15,16 @@ export default function MediaBanner({
 }: {
   name: string;
   id: number;
-  firstAirDate: Date | null;
+  firstAirDate: string | null;
   backdropPath: string;
-  mediaType: "tv" | "movie";
+  mediaType: "tv" | "movie" | "episode";
 }) {
   const [bannerColor, setBannerColor] = useState("transparent");
 
   const params = useParams();
+  const path = usePathname();
   const { episodeNumber, seasonNumber } = params;
-  const baseHref = `/tv/${id}`;
+  const baseHref = `/${mediaType}/${id}`;
 
   const src = `${BASE_SMALL_BACKDROP_URL}${backdropPath}`;
   const formattedFirstAirDate = firstAirDate
@@ -45,16 +46,26 @@ export default function MediaBanner({
 
   const { backLabel, href } = useMemo(() => {
     if (seasonNumber && episodeNumber) {
+      const split = path.split("/");
+      const currentRoute = split[split.length - 1];
+      if (currentRoute === "credits")
+        return {
+          backLabel: `Episode ${episodeNumber}`,
+          href: `${baseHref}/season/${seasonNumber}`,
+        };
       return {
-        backLabel: "Back to episodes",
-        href: `${baseHref}/seasons/${seasonNumber}`,
+        backLabel: `Season ${seasonNumber} Episodes`,
+        href: `${baseHref}/season/${seasonNumber}`,
       };
     }
     if (seasonNumber) {
-      return { backLabel: "Back to seasons", href: `${baseHref}/seasons` };
+      return {
+        backLabel: "All Seasons",
+        href: `${baseHref}/season`,
+      };
     }
-    return { backLabel: "Back to main", href: baseHref };
-  }, [baseHref, seasonNumber, episodeNumber]);
+    return { backLabel: `${name}`, href: baseHref };
+  }, [baseHref, seasonNumber, episodeNumber, path]);
 
   return (
     <div className="relative w-full overflow-hidden">
