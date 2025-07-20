@@ -23,7 +23,6 @@ export default async function EpisodePage({
   const firstAirDate =
     typeof tv.firstAirDate === "string" ? new Date(tv.firstAirDate) : null;
   const isCastValid = episode.guestStars && episode.guestStars?.length > 0;
-  console.log(episode);
   return (
     <main>
       {episode && (

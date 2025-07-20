@@ -45,7 +45,6 @@ export function MediaCard({
         year: "numeric",
       }).format(new Date(airDate))
     : "TBD";
-  console.log(imageSrc);
   return (
     <section
       className={`media-card grid grid-cols-1 gap-2 ${gridCols} sm:gap-4`}

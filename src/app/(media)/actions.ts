@@ -76,7 +76,6 @@ export const fetchTvDetails = unstable_cache(
       // fix up dates, etc…
       if (camel.firstAirDate) camel.firstAirDate = new Date(camel.firstAirDate);
       camel.tmdbId = camel.id;
-      console.log("fetchTv called");
       return camel as TmdbTvDetailsResponseAppended;
     } catch (err) {
       console.error("fetchTvDetails failed for,", id, err);

@@ -65,9 +65,6 @@ export default async function MoviePage({
   const isCastValid = movie.credits?.cast && movie.credits.cast.length > 0;
   const releaseDate =
     typeof movie.releaseDate === "string" ? new Date(movie.releaseDate) : null;
-  // console.log(movie.releases);
-  // console.log(movie.watchProviders?.results)
-  // console.log(`Movie page rendered! ${movie.title}`)
   // TODO: Add all watch providers
   return (
     <main>

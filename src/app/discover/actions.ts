@@ -287,7 +287,6 @@ export async function fetchAllTv(reqOptions?: RequestInit) {
     ...lists.trendingTvWeekly,
     ...lists.trendingTvDaily,
   ];
-  // console.log(lists)
   // Dedupe (weekly and daily trending)
   const seen = new Set<number>();
   return combined.filter((m) => {

@@ -71,12 +71,11 @@ export default async function TvPage({ params }: { params: { id: number } }) {
     new Date(tv.firstAirDate).valueOf() < Date.now();
   const blurData = await getRedisBlurValue("tv", params.id);
 
-  // console.log(tv)
   const detailItems = buildTvDetailItems(tv);
   const isCastValid = tv.credits?.cast && tv.credits.cast.length > 0;
   const firstAirDate =
     typeof tv.firstAirDate === "string" ? new Date(tv.firstAirDate) : null;
-  // console.log(`Tv page rendered! ${tv.name}`)
+
   return (
     <main>
       {tv && (

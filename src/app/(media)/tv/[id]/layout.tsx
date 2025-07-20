@@ -20,7 +20,6 @@ export default async function TvLayout({
   const tmdbId = params.id;
   const tv = await fetchTvDetails(tmdbId);
   const blurData = await getRedisBlurValue("tv", params.id);
-  // console.log(`TV layout rendered ${tv.name}`)
   return (
     <div className="relative h-full">
       <div className="absolute left-0 top-0 -z-50 mb-10 h-screen w-full">
@@ -47,16 +46,8 @@ export default async function TvLayout({
         ratings={tv.contentRatings?.results ?? []}
         mediaType="tv"
       >
-        {/* <TvProvider tv={tv}> */}
         {children}
       </ContentRatingProvider>
-      {/* </TvProvider> */}
-      {/* <Suspense fallback={null}> */}
-      {/*   <PrefetchBannerColor */}
-      {/*     backdropPath={tv.backdropPath ?? ""} */}
-      {/*     darkVibrantBackdropHex={tv.darkVibrantBackdropHex ?? ""} */}
-      {/*   /> */}
-      {/* </Suspense> */}
     </div>
   );
 }

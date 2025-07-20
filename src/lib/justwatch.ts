@@ -26,12 +26,9 @@ export const fetchJustWatchData = async (
         (releaseYear ? item.originalReleaseYear === releaseYear : true)
     );
     const firstMatch = matches[0];
-    // console.log(searchResults)
-    // console.log(firstMatch)
     const data =
       firstMatch?.fullPath &&
       (await justwatch.getData(firstMatch.fullPath, "US"));
-    // console.log(JSON.stringify(data, null, 2))
     return data ? data : undefined;
   } catch (err) {
     console.error(
