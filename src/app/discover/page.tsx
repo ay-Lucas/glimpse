@@ -41,8 +41,8 @@ export default async function DiscoverPage() {
           <h1 className="text-center text-xl font-semibold sm:text-2xl">
             Discover Movies &amp; TV Shows
           </h1>
-          <DiscoverSearch />
         </div>
+        <DiscoverSearch />
         <TrendingSeriesCarousel
           daily={trendingTvDaily}
           weekly={trendingTvWeekly}

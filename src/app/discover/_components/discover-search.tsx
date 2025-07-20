@@ -40,31 +40,36 @@ function MediaTypeToggle({ mediaType, onChange }: MediaTypeToggleProps) {
   return (
     <ToggleGroup
       type="single"
+      size={"sm"}
       value={mediaType}
       onValueChange={(v) => onChange(v as MediaType)}
       className="inline-flex rounded-md bg-muted p-1"
     >
       <ToggleGroupItem
         value="titles"
-        className="rounded-md px-3 py-1 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+        size={"sm"}
+        className="rounded-lg px-1.5 py-0 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
       >
         Titles
       </ToggleGroupItem>
       <ToggleGroupItem
         value="tv"
-        className="rounded-md px-3 py-1 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+        size={"sm"}
+        className="w-20 rounded-lg px-1.5 py-0 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
       >
         TV Shows
       </ToggleGroupItem>
       <ToggleGroupItem
         value="movie"
-        className="rounded-md px-3 py-1 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+        size={"sm"}
+        className="rounded-lg px-1.5 py-0 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
       >
         Movies
       </ToggleGroupItem>
       <ToggleGroupItem
         value="person"
-        className="rounded-md px-3 py-1 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+        size={"sm"}
+        className="rounded-lg px-1.5 py-0 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
       >
         People
       </ToggleGroupItem>
@@ -170,32 +175,32 @@ export function DiscoverSearch() {
   };
 
   return (
-    <div className="flex items-center space-x-2">
+    <div className="flex flex-col items-baseline justify-between gap-3 md:flex-row">
       <MediaTypeToggle
         mediaType={filter.mediaType}
         onChange={(mt) => setFilter({ mediaType: mt, genreId: undefined })}
       />
-
-      {filter.mediaType !== "person" && (
-        <GenreDropdown
-          mediaType={filter.mediaType as Exclude<MediaType, "person">}
-          value={filter.genreId}
-          onChange={(g) => setFilter((f) => ({ ...f, genreId: g }))}
+      <div className="flex w-full items-center space-x-3">
+        {filter.mediaType !== "person" && (
+          <GenreDropdown
+            mediaType={filter.mediaType as Exclude<MediaType, "person">}
+            value={filter.genreId}
+            onChange={(g) => setFilter((f) => ({ ...f, genreId: g }))}
+          />
+        )}
+        <input
+          type="search"
+          className="flex-1 rounded-md border bg-secondary px-3 py-2 text-sm"
+          placeholder="Search for titles or people…"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && onSearch()}
         />
-      )}
 
-      <input
-        type="search"
-        className="flex-1 rounded-md border px-3 py-2 text-sm"
-        placeholder="Search for titles or people…"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        onKeyDown={(e) => e.key === "Enter" && onSearch()}
-      />
-
-      <Button onClick={onSearch} size="sm">
-        <IoSearchOutline size={18} />
-      </Button>
+        <Button onClick={onSearch} size="sm" className="hidden xs:flex">
+          <IoSearchOutline size={18} />
+        </Button>
+      </div>
     </div>
   );
 }
