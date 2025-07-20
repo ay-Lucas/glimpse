@@ -6,7 +6,7 @@ import {
 } from "@/types/tmdb-camel";
 import { InferInsertModel } from "drizzle-orm";
 import { WatchlistWithItems, MovieModel, TvShowModel } from "./watchlist";
-import { toDateString } from "../utils";
+import { toDateString } from "../dates";
 
 /**
  * Returns true if a movie with the given TMDb ID already exists in your `movies` table.

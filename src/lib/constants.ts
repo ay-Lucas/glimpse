@@ -15,6 +15,7 @@ export const BASE_API_URL = "https://api.themoviedb.org/3";
 
 export const BASE_ORIGINAL_IMAGE_URL = "https://image.tmdb.org/t/p/original";
 export const BASE_SMALL_BACKDROP_URL = "https://image.tmdb.org/t/p/w300";
+export const BASE_MEDIUM_STILL_IMAGE_URL = "https://image.tmdb.org/t/p/w300";
 export const BASE_MEDIUM_BACKDROP_URL = "https://image.tmdb.org/t/p/w780";
 export const BASE_POSTER_IMAGE_URL = "https://image.tmdb.org/t/p/w342"; // 342w x 513h
 export const BASE_PROFILE_IMAGE_URL = "https://image.tmdb.org/t/p/h632";

@@ -1,3 +1,4 @@
+import { Season } from "./tmdb-camel";
 import { Response } from "./types";
 
 /* ────────────────────  Search / Movie / TV Results ──────────────────── */
@@ -50,7 +51,7 @@ export interface PersonResult {
 }
 
 export interface EpisodeResult extends SimpleEpisode {
-  mediaType: "tv_episode";
+  mediaType?: "tv_episode";
   runtime?: string;
 }
 
@@ -837,13 +838,6 @@ export interface SimilarShowsResponse extends PaginatedResponse {
   results: Array<TvResult>;
 }
 
-export interface TvSeasonResponse extends Response {
-  _id?: string;
-  airDate?: string;
+export interface TvSeasonResponse extends Season {
   episodes?: Array<Episode>;
-  name?: string;
-  overview?: string;
-  id?: number;
-  posterPath?: string | null;
-  seasonNumber?: number;
 }

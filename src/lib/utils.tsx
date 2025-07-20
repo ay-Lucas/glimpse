@@ -257,22 +257,6 @@ export function stripJustWatchTracking(raw: string): string {
   }
 }
 
-export function isValidDateString(s: string | null | undefined): boolean {
-  if (!s) return false;
-  const d = new Date(s);
-  return !isNaN(d.getTime());
-}
-
-export function toDateString(value?: string | Date | null): string | null {
-  if (value == null) return null; // catch undefined or null
-  // if it’s already a Date, use it; otherwise parse the string
-  const d = value instanceof Date ? value : new Date(value);
-  // invalid‐date guard
-  if (isNaN(d.getTime())) return null;
-  // return only the YYYY-MM-DD part
-  return d.toISOString().split("T")[0] ?? null;
-}
-
 export function pause(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }

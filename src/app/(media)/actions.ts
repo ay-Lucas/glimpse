@@ -16,6 +16,7 @@ import {
   ShowContentRatingResponse,
   MovieReleaseDatesResponse,
   TvSeasonResponse,
+  Episode,
 } from "@/types/request-types-camelcase";
 import camelcaseKeys from "camelcase-keys";
 import { unstable_cache } from "next/cache";
@@ -25,6 +26,7 @@ import {
   getTrendingPages,
 } from "@/app/discover/actions";
 import {
+  TmdbEpisodeDetailsAppended,
   TmdbMovieDetailsResponseAppended,
   TmdbPersonDetailsAppended,
   TmdbTvDetailsResponseAppended,
@@ -219,7 +221,7 @@ export async function fetchMovieReleaseDates(
   }
 }
 
-export async function getSeasonData(
+export async function fetchSeasonData(
   id: number,
   seasonNumber: number,
   resOptions: RequestInit = options
@@ -234,6 +236,29 @@ export async function getSeasonData(
   });
   return camel;
 }
+
+export const fetchEpisodeData = unstable_cache(
+  async (
+    id: number,
+    seasonNumber: number,
+    episodeNumber: number,
+    resOptions: RequestInit = options
+  ): Promise<TmdbEpisodeDetailsAppended> => {
+    const res = await fetch(
+      `${BASE_API_URL}/tv/${id}/season/${seasonNumber}/episode/${episodeNumber}?append_to_response=videos,images,credits,external_ids,translations`,
+      resOptions
+    );
+    const data = await res.json();
+    const camel = camelcaseKeys(data, {
+      deep: true,
+    });
+    return camel;
+  },
+  [],
+  {
+    revalidate: 36000, // 10 hours
+  }
+);
 
 export async function fetchNetworkDetails(id: number) {
   const res = await fetch(`${BASE_API_URL}/network/${id}`);

@@ -14,15 +14,16 @@ export default function TmdbRating({
   tmdbVoteCount?: number;
   size?: "small" | "default";
 }) {
-  const logoSize = size === "default" ? 40 : 30;
+  const width = size === "default" ? 40 : 30;
+  const height = size === "default" ? 20 : 13;
   return (
     <Metric
       href={`https://www.themoviedb.org/${mediaType}/${tmdbId}`}
       Icon={
         <TmdbLogo
           alt="TMDB Logo"
-          width={logoSize}
-          height={logoSize}
+          width={width}
+          height={height}
           className="mr-2 opacity-75"
         />
       }

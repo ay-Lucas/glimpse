@@ -21,8 +21,13 @@ import {
   PersonTvCreditsResponse,
   MovieRecommendationsResponse,
   TvRecommendationsResponse,
+  Crew,
+  GuestStar,
+  Person,
+  Episode,
 } from "./request-types-camelcase";
 import { JustWatchInfo } from "./camel-index";
+import { EpisodeExternalIdsResponse } from "./request-types-snakecase";
 
 export type TmdbTvDetailsResponseAppendedWatchlist =
   TmdbTvDetailsResponseAppended & WatchlistItemModel;
@@ -126,6 +131,14 @@ export interface TmdbPersonDetails {
   imdbId?: string;
   homepage?: string | null;
 }
+
+export interface TmdbEpisodeDetailsAppended extends Episode {
+  externalIds?: TvExternalIdsResponse;
+  images?: TvImagesResponse;
+  credits?: CreditsResponse;
+  videos?: VideosResponse;
+}
+
 export interface CreatedBy {
   id: number;
   creditId: string;
@@ -174,14 +187,14 @@ export interface ProductionCountry {
 }
 
 export interface Season {
-  airDate: string;
-  episodeCount: number;
-  id: number;
-  name: string;
-  overview: string;
-  posterPath: string;
-  seasonNumber: number;
-  voteAverage: number;
+  airDate?: string;
+  episodeCount?: number;
+  id?: number;
+  name?: string;
+  overview?: string;
+  posterPath?: string;
+  seasonNumber?: number;
+  voteAverage?: number;
 }
 
 export interface SpokenLanguage {

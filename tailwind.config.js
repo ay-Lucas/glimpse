@@ -25,6 +25,9 @@ export const theme = {
     fontFamily: {
       sans: ["var(--font-sans)", ...defaultTheme.fontFamily.sans],
     },
+    fontSize: {
+      md: [".925rem", { lineHeight: "1.3rem" }],
+    },
     colors: {
       border: "hsl(var(--border))",
       input: "hsl(var(--input))",
@@ -61,6 +64,7 @@ export const theme = {
       },
     },
     screens: {
+      xxxs: "300px",
       xxs: "400px",
       xs: "500px",
       ...defaultTheme.screens,
