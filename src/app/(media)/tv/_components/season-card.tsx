@@ -42,6 +42,15 @@ export default function SeasonCard({
         ),
     },
   ];
+
+  const formattedDate = s.airDate
+    ? new Intl.DateTimeFormat("en-US", {
+        month: "short",
+        day: "numeric",
+        weekday: "short",
+        year: "numeric",
+      }).format(new Date(s.airDate))
+    : "TBD";
   return (
     <MediaCard
       href={`/tv/${showId}/season/${s.seasonNumber}`}
@@ -51,7 +60,19 @@ export default function SeasonCard({
       imageType="poster"
       airDate={s.airDate}
       imageAlt={`${s.name} poster`}
-      title={title}
+      title={
+        <>
+          <div className="flex w-full flex-col xs:flex-row xs:justify-between">
+            <span>{title}</span>
+            <time
+              dateTime={s.airDate}
+              className="flex items-center text-sm font-normal text-gray-400"
+            >
+              {formattedDate}
+            </time>
+          </div>
+        </>
+      }
       meta={meta}
     >
       <Expandable lineHeight={21}>

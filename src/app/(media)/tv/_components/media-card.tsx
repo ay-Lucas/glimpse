@@ -31,9 +31,11 @@ export function MediaCard({
   const isPoster = imageType === "poster";
   const imgWidth = isPoster ? 125 : 200;
   const imgAspect = isPoster ? "aspect-[2/3]" : "aspect-[16/9]";
-  const colSpan = isPoster ? "xxs:col-span-1" : "col-span-1 xxs:col-span-2";
+  const colSpan = isPoster
+    ? "xxs:col-span-1 sm:col-start-2"
+    : "xxs:col-span-2 col-start-1";
   const gridCols = isPoster
-    ? `xxs:grid-cols-[125px_1fr]`
+    ? `xxs:grid-cols-[125px_1fr] `
     : `xxs:grid-cols-[200px_1fr]`;
   const formattedDate = airDate
     ? new Intl.DateTimeFormat("en-US", {
@@ -70,14 +72,16 @@ export function MediaCard({
       )}
       <div className="flex items-start gap-4">
         <div className="flex w-full flex-col space-y-2">
-          <div className="flex flex-col items-start justify-between sm:flex-row">
-            <Link href={href} className="flex items-center hover:text-gray-400">
-              <h2 className="text-xl font-bold">{title}</h2>
+          <div className="flex flex-col items-start justify-between xs:flex-row">
+            <Link
+              href={href}
+              className="flex w-full items-center hover:text-gray-400"
+            >
+              <h2 className="flex w-full flex-col text-xl font-bold">
+                {title}
+              </h2>
               {/* <ChevronRight className="ml-1" /> */}
             </Link>
-            <time dateTime={airDate} className="text-sm text-gray-400">
-              {formattedDate}
-            </time>
           </div>
 
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
@@ -94,13 +98,7 @@ export function MediaCard({
           </div>
         </div>
       </div>
-      {children && (
-        <div
-          className={`col-start-1 mt-2 flex ${colSpan} sm:col-span-1 sm:col-start-2`}
-        >
-          {children}
-        </div>
-      )}
+      {children && <div className={`mt-2 flex ${colSpan}`}>{children}</div>}
     </section>
   );
 }

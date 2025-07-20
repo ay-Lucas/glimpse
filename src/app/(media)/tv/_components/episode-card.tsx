@@ -32,6 +32,14 @@ export function EpisodeCard({
       ? `S${e.seasonNumber}.E${e.episodeNumber}`
       : `Special E${e.episodeNumber}`;
 
+  const formattedDate = e.airDate
+    ? new Intl.DateTimeFormat("en-US", {
+        month: "short",
+        day: "numeric",
+        weekday: "short",
+        year: "numeric",
+      }).format(new Date(e.airDate))
+    : "TBD";
   return (
     <MediaCard
       href={`/tv/${showId}/season/${e.seasonNumber}/episode/${e.episodeNumber}`}
@@ -42,10 +50,18 @@ export function EpisodeCard({
       airDate={e.airDate}
       imageAlt={`${e.name} still`}
       title={
-        <div className="flex flex-col">
-          <span className="text-gray-400">{episodeTitle}</span>
+        <>
+          <div className="flex w-full flex-col xs:flex-row xs:justify-between">
+            <span className="text-gray-400">{episodeTitle}</span>
+            <time
+              dateTime={e.airDate}
+              className="flex items-center text-sm font-normal text-gray-400"
+            >
+              {formattedDate}
+            </time>
+          </div>
           <span className="">{e.name}</span>
-        </div>
+        </>
       }
       meta={meta}
     >
