@@ -5,8 +5,7 @@ export const revalidate = 43200; // 12 hours
 
 export default async function HomePage() {
   return (
-    <div>
-      {/* <div className="min-h-screen w-full flex flex-col justify-center items-center text-center pb-20 px-4 bg-gradient-to-t from-background from-35% via-background/95 via-40% to-transparent"> */}
+    <div className="px-3">
       <h1 className="mb-4 text-6xl font-bold">Welcome to Glimpse</h1>
       <p className="mb-6 max-w-lg text-xl font-semibold">
         Discover your next favorite TV show or movie...
