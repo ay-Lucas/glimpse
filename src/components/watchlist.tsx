@@ -149,7 +149,7 @@ export function Watchlist({ watchlist }: { watchlist: WatchlistWithMedia }) {
   const media = [...tvShows, ...movies];
   if (!watchlist) return <div>You have 0 watchlists</div>;
   return (
-    <div className="rounded-2xl border border-secondary bg-background p-3 backdrop-blur-3xl">
+    <div className="rounded-2xl border border-secondary bg-background p-1 backdrop-blur-3xl sm:p-3">
       <div className="flex flex-row space-x-5 pb-2">
         <div className="items-start">
           <WatchlistDeleteConfirmation
@@ -163,7 +163,7 @@ export function Watchlist({ watchlist }: { watchlist: WatchlistWithMedia }) {
       </div>
       {media.length > 0 ? (
         <>
-          <div className="flex flex-row space-x-4">
+          <div className="grid grid-cols-2 gap-6 xxs:grid-cols-3 xs:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7">
             {media.map((media, index) => (
               <WatchlistCard
                 mediaType={getMediaType(media.tvId)}
@@ -211,7 +211,6 @@ function WatchlistCard({
     mediaType === "tv" ? (media as TvResult) : (media as MovieResult);
   return (
     <SlideCard
-      rating={null}
       alt={`poster of ${title}`}
       aspectClass="aspect-[2/3]"
       title={title}

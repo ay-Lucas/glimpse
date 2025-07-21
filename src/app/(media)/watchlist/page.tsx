@@ -9,16 +9,14 @@ export default async function WatchlistPage() {
 
   return (
     <main>
-      <div className="pt-10 md:container">
-        <div className="grid grid-cols-3 items-center">
-          <h1 className="col-start-2 col-end-3 text-center text-2xl">
-            Watchlists
-          </h1>
-          <div className="col-start-3 col-end-4 justify-self-end">
+      <div className="pt-3 md:container md:pt-10">
+        <div className="flex justify-center pb-2">
+          <div className="flex items-center space-x-2">
+            <h1 className="text-center text-2xl font-bold">Watchlists</h1>
             <CreateWatchlist />
           </div>
         </div>
-        <div className="mx-auto grid gap-6 pt-10">
+        <div className="mx-auto grid gap-6 md:pt-10">
           <WatchlistSection initialWatchlists={watchlists} />
         </div>
       </div>

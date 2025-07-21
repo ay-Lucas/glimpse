@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Watchlist } from "@/components/watchlist";
 import { useWatchlist } from "@/context/watchlist";
 import type { WatchlistWithMedia } from "@/lib/repositories/watchlist";
+import CreateWatchlist from "./create-watchlist";
 
 export default function WatchlistSection({
   initialWatchlists,
@@ -32,13 +33,15 @@ export default function WatchlistSection({
 
   return (
     <Tabs defaultValue="all">
-      <TabsList>
-        {tabs.map(({ key, label }) => (
-          <TabsTrigger value={key} key={key}>
-            {label}
-          </TabsTrigger>
-        ))}
-      </TabsList>
+      <div className="flex w-full flex-wrap-reverse items-center justify-center gap-2 xs:justify-between">
+        <TabsList>
+          {tabs.map(({ key, label }) => (
+            <TabsTrigger value={key} key={key}>
+              {label}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </div>
       <div className="relative grid">
         {tabs.map(({ key, items }) => (
           <TabsContent

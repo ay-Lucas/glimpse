@@ -130,6 +130,7 @@ export const WatchlistButton = forwardRef<
       ref={ref}
       variant={buttonVariant}
       size={size}
+      className={`${size === "icon" ? "h-6 w-6" : ""}`}
       {...props} // now onClick etc. flow to the real <button>
     >
       {variant === "default" ? (

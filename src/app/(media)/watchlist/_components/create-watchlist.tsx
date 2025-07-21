@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import WatchlistForm from "./watchlist-form";
 import { useState } from "react";
+import { Plus, PlusSquare, PlusSquareIcon } from "lucide-react";
 
 export default function CreateWatchlist() {
   const [open, setOpen] = useState(false);
@@ -18,7 +19,9 @@ export default function CreateWatchlist() {
     <Dialog open={open} onOpenChange={setOpen}>
       <form>
         <DialogTrigger asChild>
-          <Button variant="default">Create Watchlist</Button>
+          <Button variant="default" size={"sm"}>
+            <PlusSquareIcon /> Create Watchlist
+          </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
