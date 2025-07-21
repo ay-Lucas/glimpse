@@ -35,17 +35,17 @@ const breakpointOptions: {
       slidesPerGroup: 2,
       spaceBetween: 5,
     },
-    "@0.35": {
+    "@0.3": {
       slidesPerView: 3,
       slidesPerGroup: 3,
       spaceBetween: 5,
     },
-    "@0.45": {
+    "@0.6": {
       slidesPerView: 4,
       slidesPerGroup: 4,
       spaceBetween: 5,
     },
-    "@0.6": {
+    "@0.7": {
       slidesPerView: 5,
       slidesPerGroup: 5,
       spaceBetween: 5,
@@ -238,7 +238,7 @@ export default function MediaCarousel({
           swiperRef.current = swiper;
         }}
         onInit={handleSlideChange}
-        className={`mySwiper ${className}`}
+        className={`mySwiper ${className} !pb-4`}
         watchSlidesProgress={true}
         simulateTouch={false}
         onLoad={() => setLoaded(true)}

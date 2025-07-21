@@ -98,7 +98,7 @@ export function SlideCard({
           </div>
         )}
       </Link>
-      <div className="z-20 w-full pb-3">
+      <div className="z-20 w-full">
         <div className="flex flex-col">
           <div className="flex items-center justify-between pt-1">
             {mediaType !== "person" &&

@@ -94,13 +94,7 @@ export default function BackdropAndPosterCarousel({
           )}
         </ToggleGroup>
       </div>
-      <div
-        key={breakpointType}
-        className={`animate-fade-in`}
-        //className={`transition-opacity duration-300 ${
-        //  show ? "opacity-100" : "opacity-0"
-        //}`}
-      >
+      <div key={breakpointType} className={`animate-fade-in`}>
         <MediaCarousel breakpointType={breakpointType} items={carouselItems} />
       </div>
     </section>
