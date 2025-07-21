@@ -6,7 +6,7 @@ import { ALLOWED_BOT_UA, BLOCKED_BOT_UA } from "./lib/constants";
 import { isRateLimitedEdge } from "./lib/rateLimit";
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|tmdb).*)"],
 };
 
 export async function middleware(request: NextRequest) {
