@@ -114,7 +114,7 @@ export function EpisodeHeader({
   const statusLabel = isReleased
     ? "Released"
     : (e.productionCode ?? "Unreleased");
-  const title = `S${e.episodeNumber}.E${e.seasonNumber} ${e.name}`;
+  const title = `S${e.seasonNumber}.E${e.episodeNumber} ${e.name}`;
   return (
     <div className="media-card grid grid-cols-1 gap-5 md:grid-cols-[238px,1fr]">
       <MediaStill stillPath={e.stillPath ?? null} title={e.name ?? ""} />

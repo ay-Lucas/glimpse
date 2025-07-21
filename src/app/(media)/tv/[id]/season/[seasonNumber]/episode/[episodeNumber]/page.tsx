@@ -11,7 +11,7 @@ export default async function EpisodePage({
 }: {
   params: { id: number; seasonNumber: number; episodeNumber: number };
 }) {
-  const seasonNumber = params.episodeNumber;
+  const seasonNumber = params.seasonNumber;
   const seriesId = params.id;
   const episodeNumber = params.episodeNumber;
   const episode = await fetchEpisodeData(seriesId, seasonNumber, episodeNumber);
