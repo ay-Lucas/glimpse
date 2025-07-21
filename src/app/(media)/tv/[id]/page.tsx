@@ -82,8 +82,8 @@ export default async function TvPage({ params }: { params: { id: number } }) {
         <>
           <div className="h-full w-full overflow-x-hidden pb-20">
             <div className="md:h-[6vh]"></div>
-            <div className="relative items-end px-3 pt-16 md:container">
-              <div className="items-end space-y-5 px-0 md:pt-0 lg:px-24">
+            <div className="relative items-end pt-16 md:container">
+              <div className="items-end space-y-5 lg:px-24">
                 <section>
                   <MediaHeader
                     dateValue={tv.firstAirDate?.toString()}
