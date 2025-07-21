@@ -155,7 +155,7 @@ function GenreDropdown({ mediaType, value, onChange }: GenreDropdownProps) {
   );
 }
 
-export function DiscoverSearch() {
+export function DiscoverSearch({ className }: { className?: string }) {
   const [filter, setFilter] = useState<{
     mediaType: SearchMediaType;
     genreId?: number[];
@@ -175,7 +175,9 @@ export function DiscoverSearch() {
   };
 
   return (
-    <div className="flex flex-col items-baseline justify-between gap-3 md:flex-row">
+    <div
+      className={`flex flex-col items-center justify-between gap-2 md:flex-row md:items-baseline ${className ? className : ""}`}
+    >
       <MediaTypeToggle
         mediaType={filter.mediaType}
         onChange={(mt) => setFilter({ mediaType: mt, genreId: undefined })}
