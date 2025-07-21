@@ -39,7 +39,7 @@ export function EpisodeCard({
         weekday: "short",
         year: "numeric",
       }).format(new Date(e.airDate))
-    : "TBD";
+    : null;
   return (
     <MediaCard
       href={`/tv/${showId}/season/${e.seasonNumber}/episode/${e.episodeNumber}`}

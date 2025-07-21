@@ -50,7 +50,7 @@ export default function SeasonCard({
         weekday: "short",
         year: "numeric",
       }).format(new Date(s.airDate))
-    : "TBD";
+    : null;
   return (
     <MediaCard
       href={`/tv/${showId}/season/${s.seasonNumber}`}
