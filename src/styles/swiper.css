@@ -3,9 +3,13 @@
  */
 :root {
   --swiper-navigation-size: 66px;
+  --swiper-navigation-size: 66px;
   --swiper-pagination-bullet-size: 12px;
   --swiper-scrollbar-bg-color: rgba(255, 255, 255, 0.1);
   --swiper-scrollbar-drag-bg-color: rgba(255, 255, 255, 0.8);
+  --swiper-scrollbar-size: 8px;
+  --swiper-scrollbar-sides-offset: 0%;
+  --swiper-scrollbar-right: 4px;
 
   /* --swiper-scrollbar-top: 0px; */
   /* --swiper-scrollbar-bottom: auto; */

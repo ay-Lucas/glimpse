@@ -212,6 +212,7 @@ export default function MediaCarousel({
         scrollbar={{
           enabled: true,
           draggable: true,
+          hide: true,
         }}
         // key={breakpointType} // ← force remount on each toggle
         breakpoints={breakpointOptions[breakpointType]}
