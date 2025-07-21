@@ -1,9 +1,6 @@
 "use client";
 
-import CastCard from "@/components/cast-card";
-import ImageCarousel from "@/components/image-carousel";
 import { Button } from "@/components/ui/button";
-import { BASE_CAST_IMAGE_URL, DEFAULT_BLUR_DATA_URL } from "@/lib/constants";
 import { Cast, Crew } from "@/types/request-types-camelcase";
 import {
   Dialog,

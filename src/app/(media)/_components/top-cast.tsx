@@ -1,7 +1,6 @@
 import MediaCarousel from "@/components/media-carousel";
-import { SlideImageCard } from "@/components/slide-image-card";
+import { SlideCastCard } from "@/components/slide-cast-card";
 import { Cast, GuestStar } from "@/types/request-types-camelcase";
-import Link from "next/link";
 
 export default function TopCast({
   cast,
@@ -19,27 +18,5 @@ export default function TopCast({
       <h2 className={`pb-3 text-2xl font-bold`}>{title}</h2>
       <MediaCarousel items={items} breakpointType="cast" />
     </section>
-  );
-}
-
-export function SlideCastCard({ cast }: { cast: Cast | GuestStar }) {
-  return (
-    <Link href={`/person/${cast.id}`}>
-      <SlideImageCard
-        key={cast.id}
-        unoptimized={true}
-        baseUrl="/tmdb/t/p/w342"
-        imagePath={cast.profilePath ?? null}
-        alt={`poster of ${cast.name}`}
-        aspectClass="aspect-[2/3]"
-        // className="max-h-[245px]"
-      />
-      <div className="mt-2 pb-4 text-start">
-        <p className="line-clamp-1 text-sm font-semibold">{cast.name}</p>
-        <p className="line-clamp-1 text-sm text-gray-400">
-          as {cast.character}
-        </p>
-      </div>
-    </Link>
   );
 }
