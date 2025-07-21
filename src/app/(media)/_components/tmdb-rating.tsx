@@ -24,7 +24,7 @@ export default function TmdbRating({
           alt="TMDB Logo"
           width={width}
           height={height}
-          className="mr-2 opacity-75"
+          className="opacity-75 sm:mr-2"
         />
       }
       value={`${Math.round(tmdbVoteAverage * 10)}%`}

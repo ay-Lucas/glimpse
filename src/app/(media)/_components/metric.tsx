@@ -15,14 +15,14 @@ export default function Metric({
   count,
   size,
 }: MetricProps) {
-  const fontSize = size === "default" ? "text-lg" : "text-mg";
+  const fontSize = size === "default" ? "text-lg" : "text-sm";
   const voteCount = count && count > 1000 ? roundHundred(count) : count;
   return (
     <div className="flex items-center space-x-1">
       <OptionalLink href={href}>{Icon}</OptionalLink>
       <span className={fontSize}>{value}</span>
       {count !== undefined && (
-        <span className="text-gray-400">({voteCount})</span>
+        <span className={`text-gray-400 ${fontSize}`}>({voteCount})</span>
       )}
     </div>
   );
