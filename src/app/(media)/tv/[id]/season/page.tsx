@@ -16,10 +16,10 @@ export default async function SeasonPage({
   const tmdbId = params.id;
   const tv = await fetchTvDetails(tmdbId);
   return (
-    <ul className="mt-6 grid place-content-center space-y-3 px-2">
+    <ul className="mt-6 flex flex-col items-center justify-center space-y-3 px-2">
       {tv.seasons.length > 0 &&
         tv.seasons?.map((s, index) => (
-          <li key={index} className="max-w-4xl">
+          <li key={index} className="w-full max-w-4xl">
             <SeasonCard showId={tmdbId} season={s} />
           </li>
         ))}
