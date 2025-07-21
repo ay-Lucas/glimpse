@@ -162,7 +162,7 @@ export function AllContentRatingsModal({ children }: { children: ReactNode }) {
         <div>{children}</div>
       </DialogTrigger>
       <DialogContent className="max-h-[95vh] max-w-[99vw] justify-center overflow-y-auto overflow-x-hidden rounded-xl md:max-w-[500x] lg:w-fit">
-        <DialogHeader>
+        <DialogHeader className="pt-3">
           <DialogTitle>All Content Ratings By Country</DialogTitle>
         </DialogHeader>
         <ContentRatingList />
