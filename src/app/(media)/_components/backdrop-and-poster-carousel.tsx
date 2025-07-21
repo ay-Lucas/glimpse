@@ -87,7 +87,7 @@ export default function BackdropAndPosterCarousel({
             <ToggleGroupItem
               value="posters"
               aria-label="Toggle posters"
-              onClick={() => toggle("poster", posterItems)}
+              onClick={() => toggle("largePoster", posterItems)}
             >
               <h2>Posters</h2>
             </ToggleGroupItem>

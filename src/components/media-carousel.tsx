@@ -20,6 +20,10 @@ const breakpointOptions: {
     [width: number]: SwiperOptions;
     [ratio: string]: SwiperOptions;
   };
+  largePoster: {
+    [width: number]: SwiperOptions;
+    [ratio: string]: SwiperOptions;
+  };
   backdrop: {
     [width: number]: SwiperOptions;
     [ratio: string]: SwiperOptions;
@@ -88,13 +92,40 @@ const breakpointOptions: {
       spaceBetween: 10,
     },
   },
+  largePoster: {
+    "@0.00": {
+      slidesPerView: 1,
+      slidesPerGroup: 1,
+      spaceBetween: 5,
+    },
+    "@.3": {
+      slidesPerView: 2,
+      slidesPerGroup: 2,
+      spaceBetween: 5,
+    },
+    "@0.6": {
+      slidesPerView: 3,
+      slidesPerGroup: 3,
+      spaceBetween: 5,
+    },
+    "@0.75": {
+      slidesPerView: 4,
+      slidesPerGroup: 4,
+      spaceBetween: 5,
+    },
+    "@1.25": {
+      slidesPerView: 5,
+      slidesPerGroup: 5,
+      spaceBetween: 10,
+    },
+  },
   backdrop: {
     "@0.00": {
       slidesPerView: 1,
       slidesPerGroup: 1,
       spaceBetween: 10,
     },
-    "@0.5": {
+    "@0.6": {
       slidesPerView: 2,
       slidesPerGroup: 2,
       spaceBetween: 20,
@@ -153,7 +184,12 @@ const breakpointOptions: {
   },
 };
 //
-export type CarouselBreakpoints = "poster" | "backdrop" | "title" | "cast";
+export type CarouselBreakpoints =
+  | "poster"
+  | "largePoster"
+  | "backdrop"
+  | "title"
+  | "cast";
 
 export default function MediaCarousel({
   items,
