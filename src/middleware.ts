@@ -78,14 +78,15 @@ export async function middleware(request: NextRequest) {
   } = await supabase.auth.getSession();
 
   // In dev, just skip everything
-  if (
-    process.env.NODE_ENV !== "production" ||
-    hostname === "localhost" ||
-    hostname === "127.0.0.1"
-  ) {
-    return response;
-  }
-
+  // if (
+  //   process.env.NODE_ENV !== "production" ||
+  //   process.env.VERCEL_ENV !== "production" ||
+  //   hostname === "localhost" ||
+  //   hostname === "127.0.0.1"
+  // ) {
+  //   return response;
+  // }
+  //
   // Public‐route test
   const isAuth = !!session;
   const isExact = PUBLIC_ROUTES.includes(pathname);
