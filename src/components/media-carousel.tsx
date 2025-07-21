@@ -107,11 +107,16 @@ const breakpointOptions: {
   },
   title: {
     "@0.00": {
+      slidesPerView: 2.5,
+      slidesPerGroup: 2.5,
+      spaceBetween: 10,
+    },
+    "@0.6": {
       slidesPerView: 3,
       slidesPerGroup: 3,
       spaceBetween: 10,
     },
-    "@0.52": {
+    "@0.65": {
       slidesPerView: 4,
       slidesPerGroup: 4,
       spaceBetween: 10,
