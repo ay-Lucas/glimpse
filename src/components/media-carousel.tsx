@@ -110,16 +110,25 @@ const breakpointOptions: {
       slidesPerView: 2.5,
       slidesPerGroup: 2.5,
       spaceBetween: 10,
+      scrollbar: {
+        dragSize: 100,
+      },
     },
     "@0.6": {
       slidesPerView: 3,
       slidesPerGroup: 3,
       spaceBetween: 10,
+      scrollbar: {
+        dragSize: 100,
+      },
     },
     "@0.65": {
       slidesPerView: 4,
       slidesPerGroup: 4,
       spaceBetween: 10,
+      scrollbar: {
+        dragSize: 100,
+      },
     },
     "@0.75": {
       slidesPerView: 5,
@@ -213,6 +222,7 @@ export default function MediaCarousel({
           enabled: true,
           draggable: true,
           hide: true,
+          snapOnRelease: false,
         }}
         // key={breakpointType} // ← force remount on each toggle
         breakpoints={breakpointOptions[breakpointType]}
