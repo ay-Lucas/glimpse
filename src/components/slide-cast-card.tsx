@@ -16,7 +16,7 @@ export function SlideCastCard({ cast }: { cast: Cast | GuestStar }) {
       <div className="mt-2 pb-4 text-start">
         <p className="text-sm font-semibold">{cast.name}</p>
         {cast.character && cast.character?.length > 0 && (
-          <p className="text-sm text-gray-400">as {cast.character}</p>
+          <p className="text-sm text-gray-400">{cast.character}</p>
         )}
       </div>
     </Link>
