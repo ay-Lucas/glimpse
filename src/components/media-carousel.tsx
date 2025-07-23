@@ -191,15 +191,17 @@ export type CarouselBreakpoints =
   | "title"
   | "cast";
 
+export interface MediaCarouselProps {
+  items: Array<JSX.Element>;
+  breakpointType: CarouselBreakpoints;
+  className?: string;
+}
+
 export default function MediaCarousel({
   items,
   breakpointType,
   className = "",
-}: {
-  items: Array<JSX.Element>;
-  breakpointType: CarouselBreakpoints;
-  className?: string;
-}) {
+}: MediaCarouselProps) {
   const swiperRef = useRef<SwiperCore>();
   const [isPrevDisabled, setPrevDisabled] = useState(true);
   const [isNextDisabled, setNextDisabled] = useState(false);

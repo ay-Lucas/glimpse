@@ -17,13 +17,14 @@ import {
   TvResult,
   UpcomingMoviesResponse,
 } from "@/types/request-types-camelcase";
+import { TMDB_TV_GENRES_MAP, TV_GENRES } from "@/lib/title-genres";
 
 export const getTrending = async (
   request: TrendingRequest,
   reqOptions: RequestInit = options
 ): Promise<TrendingResponse> => {
   const res = await fetch(
-    `${BASE_API_URL}/trending/${request.media_type}/${request.time_window}?&page=${request.page}`,
+    `${BASE_API_URL}/trending/${request.media_type}/${request.time_window}?page=${request.page}&language=en-US`,
     reqOptions
   );
   return res.json();
@@ -196,13 +197,6 @@ export async function fetchTmdbTvLists(reqOptions: RequestInit = options) {
 }
 
 export async function fetchTrendingTv(reqOptions: RequestInit = options) {
-  function isAnime(item: TvResult) {
-    return (
-      item.originalLanguage?.toUpperCase() === "JA" &&
-      item.originCountry?.some((country) => country.toUpperCase() === "JP")
-    );
-  }
-
   const [trendingTvDailyRes, trendingTvWeeklyRes] = await Promise.all([
     getTrendingPages(
       { media_type: "tv", time_window: "day", page: 1 },
@@ -220,15 +214,16 @@ export async function fetchTrendingTv(reqOptions: RequestInit = options) {
 
   const trendingTvWeekly = trendingTvWeeklyRes.filter(
     (item) =>
-      (isAnime(item) || item.originalLanguage?.toUpperCase() === "EN") &&
+      item.originalLanguage?.toUpperCase() === "EN" &&
       new Date(item.firstAirDate ?? Date.now()).valueOf() < new Date().valueOf()
   );
 
   const trendingTvDaily = trendingTvDailyRes.filter(
     (item) =>
-      (isAnime(item) || item.originalLanguage?.toUpperCase() === "EN") &&
+      item.originalLanguage?.toUpperCase() === "EN" &&
       new Date(item.firstAirDate ?? Date.now()).valueOf() < new Date().valueOf()
   );
+
   return { trendingTvDaily, trendingTvWeekly };
 }
 

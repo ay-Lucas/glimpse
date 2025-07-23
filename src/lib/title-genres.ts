@@ -171,3 +171,87 @@ export function getTitlesGenres(): GenreOption[] {
   combined.unshift(CUSTOM_GENRES[0]!);
   return combined;
 }
+
+export const GENRES = {
+  movie: {
+    ACTION: 28,
+    ADVENTURE: 12,
+    ANIMATION: 16,
+    COMEDY: 35,
+    CRIME: 80,
+    DOCUMENTARY: 99,
+    DRAMA: 18,
+    FAMILY: 10751,
+    FANTASY: 14,
+    HISTORY: 36,
+    HORROR: 27,
+    MUSIC: 10402,
+    MYSTERY: 9648,
+    ROMANCE: 10749,
+    SCIENCE_FICTION: 878,
+    TV_MOVIE: 10770,
+    THRILLER: 53,
+    WAR: 10752,
+    WESTERN: 37,
+  },
+  tv: {
+    ACTION_ADVENTURE: 10759,
+    ANIMATION: 16,
+    COMEDY: 35,
+    CRIME: 80,
+    DOCUMENTARY: 99,
+    DRAMA: 18,
+    FAMILY: 10751,
+    KIDS: 10762,
+    MYSTERY: 9648,
+    NEWS: 10763,
+    REALITY: 10764,
+    SCI_FI_FANTASY: 10765,
+    SOAP: 10766,
+    TALK: 10767,
+    WAR_POLITICS: 10768,
+    WESTERN: 37,
+  },
+  custom: {
+    NSFW: 69,
+  },
+} as const;
+
+// ------------------------------------------------------------
+// 2) Labels (shared keys for both movie/tv enums above)
+// ------------------------------------------------------------
+export const GENRE_LABELS = {
+  // Movie
+  ACTION: "Action",
+  ADVENTURE: "Adventure",
+  ANIMATION: "Animation",
+  COMEDY: "Comedy",
+  CRIME: "Crime",
+  DOCUMENTARY: "Documentary",
+  DRAMA: "Drama",
+  FAMILY: "Family",
+  FANTASY: "Fantasy",
+  HISTORY: "History",
+  HORROR: "Horror",
+  MUSIC: "Music",
+  MYSTERY: "Mystery",
+  ROMANCE: "Romance",
+  SCIENCE_FICTION: "Science Fiction",
+  TV_MOVIE: "TV Movie",
+  THRILLER: "Thriller",
+  WAR: "War",
+  WESTERN: "Western",
+
+  // TV
+  ACTION_ADVENTURE: "Action & Adventure",
+  KIDS: "Kids",
+  NEWS: "News",
+  REALITY: "Reality",
+  SCI_FI_FANTASY: "Sci-Fi & Fantasy",
+  SOAP: "Soap",
+  TALK: "Talk",
+  WAR_POLITICS: "War & Politics",
+
+  // Custom
+  NSFW: "NSFW",
+} as const;

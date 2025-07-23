@@ -8,11 +8,11 @@ import { MovieResult, TvResult } from "@/types/request-types-camelcase";
 export const mkCards = (
   items: (TvResult | MovieResult)[],
   mediaType: "tv" | "movie",
-  blurMap: BlurMap
+  blurMap?: BlurMap
 ): JSX.Element[] => {
   return items.map((item, index) => {
     const title = (item as MovieResult).title || (item as TvResult).name;
-    const backfilledBlurData = blurMap.get(item.id);
+    const backfilledBlurData = blurMap?.get(item.id);
     const releaseDateStr =
       (item as MovieResult).releaseDate || (item as TvResult).firstAirDate;
     const releaseDate =

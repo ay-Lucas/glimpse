@@ -52,7 +52,13 @@ export function SlideCard({
 }) {
   const [loaded, setLoaded] = useState(false);
   const src = `${baseUrl}${imagePath}`;
-
+  const dateLabel = releaseDate
+    ? new Intl.DateTimeFormat("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      }).format(new Date(releaseDate))
+    : null;
   return (
     <div className="h-full">
       <Link
@@ -122,6 +128,7 @@ export function SlideCard({
               />
             )}
           </div>
+          {dateLabel && <time dateTime={dateLabel}>{dateLabel}</time>}
           <h2 className="text-md !select-text font-semibold text-white md:text-lg">
             {title}
           </h2>
