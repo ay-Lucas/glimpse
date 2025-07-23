@@ -42,14 +42,15 @@ export function TopNav() {
           </Link>
           <Search />
         </section>
-        <div className="flex flex-nowrap items-center justify-center space-x-0.5 md:opacity-100">
+        <div className="flex flex-nowrap items-center justify-center space-x-1 md:opacity-100">
           {items.map(({ href, icon: Icon, label }) => {
             const active = isActive({ href, icon: Icon, label });
             return (
               <Button
                 key={href}
                 asChild
-                variant={active ? "default" : "ghost"} // pick any “pressed” style you like
+                size={"sm"}
+                variant={active ? "default" : "ghost"}
                 className={cn(
                   "items-center font-semibold sm:text-lg",
                   active && "text-primary-foreground data-[state=on]:bg-primary"
