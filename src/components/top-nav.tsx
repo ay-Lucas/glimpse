@@ -21,7 +21,7 @@ type Item = {
 const items: Item[] = [
   { href: "/discover", icon: TelescopeIcon, label: "Discover" },
   { href: "/tv", icon: Tv, label: "TV" },
-  { href: "/movie", icon: Film, label: "Movie" },
+  // { href: "/movie", icon: Film, label: "Movie" },
   { href: "/watchlist", icon: List, label: "Watchlist" },
 ];
 
@@ -35,7 +35,7 @@ export function TopNav() {
   };
   return (
     <div className="sticky left-0 top-0 z-10 w-full border-b border-transparent/10 bg-background/80 backdrop-blur-sm">
-      <nav className="text-md grid grid-cols-3 items-center p-1 font-bold sm:px-4">
+      <nav className="grid grid-cols-3 items-center p-1 text-md font-bold sm:px-4">
         <section className="z-10 flex items-center lg:space-x-5">
           <Link className="hidden lg:inline" href="/">
             Glimpse
