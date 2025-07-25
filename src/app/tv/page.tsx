@@ -20,6 +20,7 @@ import {
   trendingTvByGenreSmart,
 } from "./actions";
 import { GENRES } from "@/lib/title-genres";
+import TitleCarousel from "@/components/title-carousel";
 
 export const revalidate = 43200; // 12 hours
 
@@ -36,14 +37,24 @@ export default async function TvPage() {
     fetchTmdbTvLists(),
   ]);
 
-  const [onTheAir, topRated, upcoming, actionAndAdventure, sciFiFantasy] =
-    await Promise.all([
-      getOnTheAirTvList(),
-      getTopRatedTvList(),
-      getUpcomingTvList(),
-      trendingTvByGenreSmart(GENRES.tv.ACTION_ADVENTURE, 4),
-      getSciFiFantasy(3),
-    ]);
+  const [
+    onTheAir,
+    topRated,
+    upcoming,
+    actionAndAdventure,
+    sciFiFantasy,
+    comedy,
+    hentai,
+  ] = await Promise.all([
+    getOnTheAirTvList(),
+    getTopRatedTvList(),
+    getUpcomingTvList(),
+    trendingTvByGenreSmart(GENRES.tv.ACTION_ADVENTURE, 5, 6, [], 50),
+    trendingTvByGenreSmart(GENRES.tv.SCI_FI_FANTASY),
+    trendingTvByGenreSmart(GENRES.tv.COMEDY),
+    trendingTvByGenreSmart(GENRES.tv.CRIME),
+    // getSciFiFantasy(3),
+  ]);
 
   return (
     <main className="mx-auto w-screen max-w-[1920px]">
@@ -51,17 +62,24 @@ export default async function TvPage() {
         <ToastListener />
       </Suspense>
       <div className="space-y-3 overflow-hidden px-1 sm:py-6 md:px-5 lg:px-10">
-        <TopRatedTvCarousel tv={topRated} />
-        <UpcomingTvCarousel tv={upcoming} />
         <ActionAndAdventureTvCarousel tv={actionAndAdventure} />
+        <TitleCarousel title="Comedy" titles={comedy} breakpointType="title" />
         <SciFiAndFantasyTvCarousel tv={sciFiFantasy} />
+        <TitleCarousel
+          title="Crime"
+          titles={hentai}
+          breakpointType="title"
+          englishOnly={false}
+        />
+        <UpcomingTvCarousel tv={upcoming} />
         <OnTheAirTvCarousel tv={onTheAir} />
-        <PopularSeriesCarousel tv={popularTv} blurMap={blurMap} />
         <TrendingSeriesCarousel
           daily={trendingTvDaily}
           weekly={trendingTvWeekly}
           blurMap={blurMap}
         />
+        <TopRatedTvCarousel tv={topRated} />
+        <PopularSeriesCarousel tv={popularTv} blurMap={blurMap} />
       </div>
     </main>
   );

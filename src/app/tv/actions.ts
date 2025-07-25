@@ -2,6 +2,7 @@ import { BASE_API_URL, options } from "@/lib/constants";
 import { hasGenre, hasPoster, isEnglish } from "@/lib/filters";
 import {
   TvResult,
+  MovieResult,
   TvResultsResponse,
   DiscoverTvResponse,
 } from "@/types/request-types-camelcase";
@@ -124,34 +125,32 @@ export async function getTrendingTvByGenre(
 
 export async function trendingTvByGenreSmart(
   genreId: number,
-  pages: number
+  trendingPages: number = 1,
+  discoverPages: number = 6,
+  keywords: number[] = [],
+  limit = 40
 ): Promise<TvResult[]> {
-  const trending = await getTrendingTvByGenre(genreId, "week", 4);
+  const trending = await getTrendingTvByGenre(genreId, "week", trendingPages);
 
-  // if (trending.length >= 20) return trending;
+  const discoverTvReq: DiscoverTvRequest = {
+    with_genres: String(genreId),
+    language: "en-US",
+    sort_by: "popularity.desc",
+    without_genres: String([GENRES.tv.KIDS, GENRES.tv.FAMILY].join("|")),
+    watch_region: "US",
+    with_keywords: String(keywords ? keywords.join("|") : ""),
+  };
 
   const requests = [];
-  for (let i = 0; i < pages; i++) {
-    requests.push(
-      fetchDiscoverTv({
-        with_genres: String(genreId),
-        language: "en-US",
-        sort_by: "popularity.desc",
-        without_genres: String([GENRES.tv.KIDS, GENRES.tv.FAMILY].join("|")),
-        watch_region: "US",
-        page: i + 1,
-      })
-    );
+  for (let i = 0; i < discoverPages; i++) {
+    requests.push(fetchDiscoverTv({ ...discoverTvReq, page: i + 1 }));
   }
+
   const discover = (await Promise.all(requests)).flatMap((page) => page ?? []);
   console.log(discover);
   const unique = uniqueById([...trending, ...discover]);
-  console.log(unique.length);
-  unique.forEach((item) => {
-    console.log(item.name, item.genreIds);
-  });
-
-  return unique;
+  const filteredTitles = unique.filter((t) => isEnglish(t) && hasPoster(t));
+  return filteredTitles.slice(0, limit);
   // return unique.sort((a, b) => b.popularity - a.popularity);
 }
 
@@ -161,6 +160,7 @@ export async function getSciFiFantasy(pages: number) {
     requests.push(
       fetchDiscoverTv({
         with_genres: String(GENRES.tv.SCI_FI_FANTASY),
+        without_genres: String([GENRES.tv.KIDS, GENRES.tv.FAMILY].join("|")),
         page: i + 1,
       })
     );
