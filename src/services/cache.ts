@@ -9,6 +9,13 @@ export const redis = new Redis({
   cache: "force-cache",
 });
 
+export const redisUncached = new Redis({
+  url: process.env.KV_REST_API_URL,
+  token: process.env.KV_REST_API_TOKEN,
+  enableTelemetry: false,
+  cache: "no-store",
+});
+
 export const getRedisBlurValue = async (
   mediaType: "movie" | "tv",
   id: number

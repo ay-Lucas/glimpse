@@ -841,3 +841,14 @@ export interface SimilarShowsResponse extends PaginatedResponse {
 export interface TvSeasonResponse extends Season {
   episodes?: Array<Episode>;
 }
+
+export interface TrendingResponse extends PaginatedResponse {
+  results: Array<MovieResult | TvResult | PersonResult>;
+}
+
+export interface SearchKeywordResponse extends PaginatedResponse {
+  results?: Array<{
+    id?: number;
+    name?: string;
+  }>;
+}

@@ -238,3 +238,22 @@ export interface FullPerson extends Person {
   movieCredits: PersonMovieCreditsResponse;
   externalIds?: PersonExternalIdsResponse;
 }
+
+export interface Candidate {
+  id: number;
+  title: string;
+  year: number;
+  overview: string | null;
+  keywords: string[];
+  posterPath: string | null;
+  voteAverage: number;
+  voteCount: number;
+  mediaType: "tv" | "movie";
+}
+
+export interface CandidateResponse extends Candidate {
+  score: number;
+  reason: string;
+  title: string;
+  voteAverage: number;
+}

@@ -4,7 +4,14 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { AvatarDropdown } from "./avatar-dropdown";
 import { Search } from "./search";
-import { Film, List, TelescopeIcon, Tv } from "lucide-react";
+import {
+  Film,
+  Lightbulb,
+  List,
+  Sparkles,
+  TelescopeIcon,
+  Tv,
+} from "lucide-react";
 import { useSupabase } from "@/context/supabase";
 
 import type { LucideIcon } from "lucide-react";
@@ -21,6 +28,7 @@ type Item = {
 const items: Item[] = [
   { href: "/discover", icon: TelescopeIcon, label: "Discover" },
   { href: "/tv", icon: Tv, label: "TV" },
+  { href: "/match", icon: Sparkles, label: "MoodMatch" },
   // { href: "/movie", icon: Film, label: "Movie" },
   { href: "/watchlist", icon: List, label: "Watchlist" },
 ];
