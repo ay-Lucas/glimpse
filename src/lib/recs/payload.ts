@@ -41,7 +41,9 @@ export interface MoodState {
   avoid?: string[]; // optional triggers
 }
 
+// ─── helper ────────────────────────────────────────────────────────────
 export function buildPayload(state: MoodState): MatchPayload {
+  // 1) concatenate & normalise tags
   const tags = [
     state.mood,
     ...state.vibe,
@@ -51,20 +53,18 @@ export function buildPayload(state: MoodState): MatchPayload {
     .filter(Boolean)
     .map((t) => t!.trim().toLowerCase());
 
-  return {
-    tags: Array.from(new Set(tags)),
-    filters: {
-      media: state.includeSeries ? "either" : "movie",
-      years: state.yearRange,
-      runtime_max: state.runtime,
-      language: state.language?.length ? state.language : ["en"],
+  // de-duplicate while preserving order
+  const deduped = Array.from(new Set(tags));
 
-      // ⬇️  ADD THESE THREE ARRAYS
-      vibe: state.vibe,
-      aesthetic: state.aesthetic,
-      interests: state.interests,
-
-      avoid: state.avoid?.length ? state.avoid : undefined,
-    },
+  // 2) derive filters
+  const filters: MatchPayload["filters"] = {
+    media: state.includeSeries ? "either" : "movie",
+    years: state.yearRange,
+    runtime_max: state.runtime,
+    language: state.language?.length ? state.language : ["en"],
+    ...(state.avoid?.length && { avoid: state.avoid }),
+    interests: state.interests,
   };
+
+  return { tags: deduped, filters };
 }

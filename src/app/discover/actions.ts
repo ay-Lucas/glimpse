@@ -5,37 +5,41 @@ import {
   DiscoverMovieRequest,
   DiscoverTvRequest,
   TrendingRequest,
-  TrendingResponse,
   UpcomingMoviesRequest,
 } from "@/types/request-types-snakecase";
 
 import camelcaseKeys from "camelcase-keys";
 import {
-  Cast,
   MovieResult,
   PersonResult,
   TvResult,
   UpcomingMoviesResponse,
+  TrendingResponse,
 } from "@/types/request-types-camelcase";
-import { TMDB_TV_GENRES_MAP, TV_GENRES } from "@/lib/title-genres";
 
 export const getTrending = async (
   request: TrendingRequest,
   reqOptions: RequestInit = options
-): Promise<TrendingResponse> => {
-  const res = await fetch(
-    `${BASE_API_URL}/trending/${request.media_type}/${request.time_window}?page=${request.page}&language=en-US`,
-    reqOptions
-  );
-  return res.json();
+): Promise<(MovieResult | TvResult | PersonResult)[]> => {
+  try {
+    const res = await fetch(
+      `${BASE_API_URL}/trending/${request.media_type}/${request.time_window}?page=${request.page}&language=en-US`,
+      reqOptions
+    );
+    const data = await res.json();
+    const camel = camelcaseKeys(data, { deep: true }) as TrendingResponse;
+    return camel.results;
+  } catch (err) {
+    console.error("Error fetching TMDB trendingl getTrending", err);
+    return [];
+  }
 };
 
 export const getTrendingPages = async (
   request: TrendingRequest,
   numberOfPages: number,
-  camelcase?: boolean,
   reqOptions: RequestInit = options
-) => {
+): Promise<MovieResult[] | TvResult[] | PersonResult[]> => {
   const requests = [];
   for (let i = 0; i < numberOfPages; i++) {
     requests.push(
@@ -50,15 +54,8 @@ export const getTrendingPages = async (
     );
   }
   const array = await Promise.all(requests);
-  const arrays = array.flatMap((page) => page.results);
-
-  if (camelcase) {
-    return camelcaseKeys(arrays as any, { deep: true }) as
-      | MovieResult[]
-      | TvResult[]
-      | PersonResult[];
-  }
-  return arrays;
+  const flat = array.flat() as MovieResult[] | TvResult[] | PersonResult[];
+  return flat;
 };
 
 export const getPopular = async (
@@ -201,13 +198,11 @@ export async function fetchTrendingTv(reqOptions: RequestInit = options) {
     getTrendingPages(
       { media_type: "tv", time_window: "day", page: 1 },
       NUM_TMDB_PAGES,
-      true,
       reqOptions
     ) as Promise<TvResult[]>,
     getTrendingPages(
       { media_type: "tv", time_window: "week", page: 1 },
       NUM_TMDB_PAGES,
-      true,
       reqOptions
     ) as Promise<TvResult[]>,
   ]);
@@ -232,13 +227,11 @@ export async function fetchTrendingMovies(reqOptions: RequestInit = options) {
     getTrendingPages(
       { media_type: "movie", time_window: "day", page: 1 },
       NUM_TMDB_PAGES,
-      true,
       reqOptions
     ) as Promise<MovieResult[]>,
     getTrendingPages(
       { media_type: "movie", time_window: "week", page: 1 },
       NUM_TMDB_PAGES,
-      true,
       reqOptions
     ) as Promise<MovieResult[]>,
   ]);

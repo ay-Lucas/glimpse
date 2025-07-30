@@ -6,6 +6,8 @@ import { Candidate, CandidateResponse } from "@/types/camel-index";
 import { buildSmartPool } from "@/lib/recs/build-smart-pool";
 import { ChatCompletionMessageParam } from "openai/resources/index";
 import { sha1Base64url } from "@/lib/recs/sha1";
+import { hydrateKeywords } from "@/lib/recs/keywords";
+import { uniqueBy } from "@/lib/utils";
 
 // --- Config -------------------------------------------------------------
 const MODEL = "gpt-4o-mini" as const; // switch to gpt-4.1-mini if preferred
@@ -14,7 +16,7 @@ const MODEL = "gpt-4o-mini" as const; // switch to gpt-4.1-mini if preferred
 
 type Body = z.infer<typeof BodySchema>;
 
-type RankResult = {
+export type RankResult = {
   id: number;
   score: number;
   reason: string;
@@ -22,27 +24,61 @@ type RankResult = {
 
 const BodySchema = z.object({
   tags: z.array(z.string()).min(1),
+  // descriptions: z.array(z.string()),
   filters: z.object({
     media: z.enum(["movie", "series", "either"]),
     years: z.tuple([z.number(), z.number()]),
     runtime_max: z.number().int().positive(),
     language: z.array(z.string()).min(1),
     avoid: z.array(z.string()).optional(),
+    interests: z.array(z.string()),
   }),
 });
 // --- Helpers ------------------------------------------------------------
-function buildPrompt(tags: string[], pool: Candidate[]) {
+export function buildPrompt(
+  tags: string[],
+  interests: string[],
+  pool: Candidate[]
+): ChatCompletionMessageParam[] {
   return [
     {
-      role: "system" as const,
-      content:
-        "You are GlimpseRanker, an assistant that selects movies and TV shows that best fit the user's mood, vibe, and hobbies. The popularity is important. Return EXACTLY 15 unique results in JSON only: [{id:int, score:0-1, reason:str≤25w}].",
+      role: "system",
+      content: `
+You are **GlimpseRanker**.
+
+TASK
+・Choose the 15 strongest matches for the user's mood, vibe, and interests **from the CANDIDATES array I give you.**
+・If two titles are equally relevant, prefer the one with the higher pop-score (voteAverage × voteCount).
+・No duplicate IDs; include a healthy mix of movies / series when both types are allowed.
+・Heavily prioritize interests if the array is not empty
+
+OUTPUT
+Return one line of pure JSON with this exact shape:
+{
+  "results": [
+    {
+      "id": 123 // unique integer,
+      "score": 0.92,
+      "reason": "why in ≤ 25 words"
+    },
+    … (15 total)
+  ]
+}
+
+RULES
+1 score ∈ 0-1 (1 = perfect fit)
+2 reason ≤ 25 English words, no newline, no quotes inside
+3 No extra keys, no trailing commas, no markdown
+4 NO DUPLICATES, every id and reason must be unique
+5 Every result must have a unique id, score, and reason, if not, regenerate
+      `.trim(),
     },
     {
-      role: "user" as const,
+      role: "user",
       content: JSON.stringify({
         MOOD_TAGS: tags,
         CANDIDATES: pool,
+        INTERESTS: interests,
       }),
     },
   ];
@@ -83,6 +119,8 @@ export async function POST(req: Request) {
 
   console.log("tags: ", tags);
   const pool = await buildSmartPool(tags, filters); // add filters param
+  console.log(uniqueBy(pool).length);
+  await hydrateKeywords(pool); // fills keywords in-place
   if (!pool) {
     return NextResponse.json(
       { error: "Candidate pool empty. Try again later." },
@@ -91,9 +129,10 @@ export async function POST(req: Request) {
   }
 
   // 3) Build prompt & call OpenAI
-  const messages = buildPrompt(tags, pool);
+  const interests = filters.interests;
+  const messages = buildPrompt(tags, interests, pool);
   let toolCall;
-  let ranked;
+  let ranked: RankResult[];
   try {
     toolCall = await getOpenAiCompletions(messages);
   } catch (err) {
@@ -104,16 +143,31 @@ export async function POST(req: Request) {
     const { results } = JSON.parse(toolCall.function.arguments) as {
       results: RankResult[];
     };
-    if (!results.length) {
-      throw new Error("No Results");
-    }
     ranked = results;
+
+    // ranked = dedupeAndTopUp(ranked, pool, 15); // ← ensures uniqueness
+    // const seen = new Set<number>();
+    // ranked = results.filter(r => {
+    //   if (seen.has(r.id)) return false;
+    //   seen.add(r.id);
+    //   return true;
+    // });
+    //
+    // let i = 0;
+    // while (ranked.length < 15 && i < pool.length) {
+    //   const c = pool[i++]!;                      // ← non-null assertion
+    //   if (!seen.has(c.id)) {
+    //     ranked.push({ id: c.id, score: 0.4, reason: "additional pick" });
+    //     seen.add(c.id);
+    //   }
+    // }
   } catch {
     return NextResponse.json(
       { error: "Malformed LLM response" },
       { status: 500 }
     );
   }
+  // if we lost some due to duplicates, top-up from the scored pool:
 
   // 5) Join extra metadata for the client cards
   const byId = Object.fromEntries(pool.map((c) => [c.id, c]));
@@ -142,40 +196,40 @@ export async function POST(req: Request) {
   return NextResponse.json(payload);
 }
 
+const RETURN_RECS_TOOL: OpenAI.Chat.Completions.ChatCompletionTool = {
+  type: "function",
+  function: {
+    name: "return_recs",
+    parameters: {
+      type: "object",
+      properties: {
+        results: {
+          type: "array",
+          minItems: 1,
+          maxItems: 15,
+          items: {
+            type: "object",
+            properties: {
+              id: { type: "integer" },
+              score: { type: "number" },
+              reason: { type: "string" },
+            },
+            required: ["id", "score", "reason"],
+          },
+          uniqueItems: true, // whole objects must differ
+        },
+      },
+      required: ["results"],
+    },
+  },
+};
 async function getOpenAiCompletions(messages: ChatCompletionMessageParam[]) {
   let toolCall;
   const openai = new OpenAI();
   const completion = await openai.chat.completions.create({
     model: MODEL,
     temperature: 0.2,
-    tools: [
-      {
-        type: "function",
-        function: {
-          name: "return_recs",
-          parameters: {
-            type: "object",
-            properties: {
-              results: {
-                type: "array",
-                items: {
-                  type: "object",
-                  properties: {
-                    id: { type: "integer" },
-                    score: { type: "number" },
-                    reason: { type: "string" },
-                  },
-                  required: ["id", "score", "reason"],
-                },
-                minItems: 15,
-                maxItems: 15,
-              },
-            },
-            required: ["results"],
-          },
-        },
-      },
-    ],
+    tools: [RETURN_RECS_TOOL],
     tool_choice: { type: "function", function: { name: "return_recs" } },
     messages,
   });

@@ -5,12 +5,16 @@ import {
   MovieResult,
   TvResultsResponse,
   DiscoverTvResponse,
+  DiscoverMovieResponse,
 } from "@/types/request-types-camelcase";
 import camelcaseKeys from "camelcase-keys";
 import { getTrendingPages } from "../discover/actions";
 import { GENRES } from "@/lib/title-genres";
 import { uniqueById } from "@/components/title-carousel";
-import { DiscoverTvRequest } from "@/types/request-types-snakecase";
+import {
+  DiscoverMovieRequest,
+  DiscoverTvRequest,
+} from "@/types/request-types-snakecase";
 const NUM_TV_PAGES = 3;
 export const fetchTopRatedTv = async (
   page: number
@@ -91,6 +95,22 @@ export function buildUpcomingTvUrl() {
   return `${BASE_API_URL}/discover/tv?${params.toString()}`;
 }
 
+export async function fetchDiscover(
+  params: DiscoverTvRequest | DiscoverMovieRequest,
+  mediaType: "movie" | "tv"
+): Promise<TvResult[] | MovieResult[]> {
+  const discoverParams = new URLSearchParams(Object.entries(params));
+  const res = await fetch(
+    `${BASE_API_URL}/discover/tv?${discoverParams}`,
+    options
+  );
+  const json = await res.json();
+  const camel = camelcaseKeys(json, { deep: true }) as
+    | DiscoverTvResponse
+    | DiscoverMovieResponse;
+  return camel.results ?? [];
+}
+
 export async function fetchDiscoverTv(
   params: DiscoverTvRequest
 ): Promise<TvResult[]> {
@@ -112,8 +132,7 @@ export async function getTrendingTvByGenre(
 ): Promise<TvResult[]> {
   const res = (await getTrendingPages(
     { media_type: "tv", page: 1, time_window: timeWindow },
-    pages,
-    true
+    pages
   )) as TvResult[];
   // de-dupe & filter
   const uniq = uniqueById(res);

@@ -255,5 +255,4 @@ export interface CandidateResponse extends Candidate {
   score: number;
   reason: string;
   title: string;
-  voteAverage: number;
 }

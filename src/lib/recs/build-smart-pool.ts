@@ -1,6 +1,7 @@
-import { options } from "@/lib/constants";
+import pLimit from "p-limit";
+import { BASE_API_URL, options } from "@/lib/constants";
 import { toDateString } from "@/lib/dates";
-import { hasPoster, isEnglish, isAnime } from "@/lib/filters";
+import { hasPoster, isAnime, isEnglish } from "@/lib/filters";
 import { Candidate } from "@/types/camel-index";
 import {
   DiscoverMovieResponse,
@@ -9,62 +10,56 @@ import {
   SearchKeywordResponse,
   TvResult,
 } from "@/types/request-types-camelcase";
-import camelcaseKeys from "camelcase-keys";
-import { TAG2ID } from "../keywords";
-import { redisUncached } from "@/services/cache";
-import { fetchNetworkDetails } from "@/app/(media)/actions";
+import { redisUncached as redis } from "@/services/cache";
+import { fetchJSON } from "../tmdb";
+import { TAG2ID } from "./tag-catalog";
+import { uniqueBy } from "../utils";
+import { uniqueById } from "@/components/title-carousel";
 
-type Media = "movie" | "tv";
+/* ───  tunables  ────────────────────────────────────────────────────── */
+export type Media = "movie" | "tv";
 
-const TARGET = 200;
-const PAGE_SIZE = 20;
+export const TMDB_MEAN = 6.8;
+export const CONF_FLOOR = 1_000;
+export const PAGES_KEYWORD = 3;
+export const PAGES_POPULAR = 5;
+export const TARGET = 200;
+const CONCURRENCY = 10;
+const limit = pLimit(CONCURRENCY);
 
+/* ───  filters  ─────────────────────────────────────────────────────── */
 export interface PoolFilters {
   media: "movie" | "series" | "either";
   years: [number, number];
-  runtime_max: number; // minutes
-  language: string[]; // ISO 639-1 codes
-  avoid?: string[]; // trigger warnings
+  runtime_max: number;
+  language: string[];
+  avoid?: string[];
 }
 
-async function fetchKeywordIdsFromTmdb(tag: string) {
-  const url = `https://api.themoviedb.org/3/search/keyword?query=${encodeURIComponent(
-    tag
-  )}&language=en-US&page=1`;
-  const res = await fetch(url, options).then((x) => x.json());
-  const camel = camelcaseKeys(res, { deep: true }) as SearchKeywordResponse;
+/* ───  helpers  ─────────────────────────────────────────────────────── */
+export async function fetchKeywordIds(tag: string) {
+  const cacheKey = `kw:${tag.toLowerCase()}`;
+  let ids = await redis.get<number[]>(cacheKey);
+  if (ids) return ids;
 
-  const slice = camel.results?.slice(0, 3);
-  if (!slice) return [];
-  const ids = slice.map((k) => k.id ?? 0).filter(Boolean);
-  const valid = ids.flatMap((item) => item);
-  return valid;
-}
-
-async function keywordIdsFor(tag: string) {
-  const key = `kw:${tag.toLowerCase()}`;
-  let ids = await redisUncached.get<number[]>(key);
-  if (!ids) {
-    ids = await fetchKeywordIdsFromTmdb(tag);
-    await redisUncached.set(key, ids, { ex: 60 * 60 * 24 });
-  }
+  const url = `${BASE_API_URL}/search/keyword?query=${encodeURIComponent(tag)}&page=1`;
+  const res = await fetchJSON<SearchKeywordResponse>(url, options);
+  ids = (res.results ?? [])
+    .slice(0, 3)
+    .map((k) => k.id)
+    .filter((k) => k !== undefined);
+  await redis.set(cacheKey, ids, { ex: 60 * 60 * 24 });
   return ids;
 }
 
-async function discover(
-  media: Media,
-  page: number,
-  kwIds: number[],
-  f: PoolFilters
-) {
-  const qs = new URLSearchParams({
-    page: String(page),
-    language: f.language[0] ?? "en-US",
-    sort_by: "popularity.desc",
-    vote_count_gte: "100",
-  });
+function buildQS(media: Media, page: number, kwIds: number[], f: PoolFilters) {
+  const qs = new URLSearchParams();
+  qs.set("page", String(page));
+  qs.set("language", f.language[0] ?? "en-US");
+  qs.set("sort_by", "popularity.desc");
+  qs.set("vote_count_gte", "100");
+  if (kwIds.length) qs.set("with_keywords", kwIds.join(","));
 
-  // year range
   if (media === "movie") {
     qs.set("primary_release_date.gte", `${f.years[0]}-01-01`);
     qs.set("primary_release_date.lte", `${f.years[1]}-12-31`);
@@ -73,31 +68,44 @@ async function discover(
     qs.set("first_air_date.gte", `${f.years[0]}-01-01`);
     qs.set("first_air_date.lte", `${f.years[1]}-12-31`);
   }
-
-  if (kwIds.length) qs.set("with_keywords", kwIds.join("|"));
-
-  const url = `https://api.themoviedb.org/3/discover/${media}?${qs}`;
-  const res = await fetch(url, options).then((x) => x.json());
-  const camel = camelcaseKeys(res, { deep: true }) as
-    | DiscoverMovieResponse
-    | DiscoverTvResponse;
-  return camel.results ?? [];
+  return qs;
 }
 
-function toCandidate(r: MovieResult | TvResult, media: Media): Candidate {
+async function discover(
+  media: Media,
+  page: number,
+  kwIds: number[],
+  f: PoolFilters
+) {
+  const qs = buildQS(media, page, kwIds, f);
+  qs.forEach((v, k) => v === "undefined" && qs.delete(k)); // strip empties
+
+  const url = `${BASE_API_URL}/discover/${media}?${qs}`;
+  const res = await fetchJSON<DiscoverMovieResponse | DiscoverTvResponse>(
+    url,
+    options
+  );
+  return res.results ?? [];
+}
+
+export function toCandidate(
+  r: MovieResult | TvResult,
+  media: Media
+): Candidate {
   const title =
     media === "movie" ? (r as MovieResult).title : (r as TvResult).name;
   const date =
     media === "movie"
       ? (r as MovieResult).releaseDate
       : (r as TvResult).firstAirDate;
-  const dateStr = toDateString(date);
+  const year = date ? Number(toDateString(date)?.slice(0, 4)) : 0;
+
   return {
     id: r.id,
     title,
-    year: dateStr ? Number(dateStr.slice(0, 4) || 0) : 0,
+    year,
     overview: r.overview.slice(0, 200),
-    keywords: [], // you can hydrate later
+    keywords: [],
     posterPath: r.posterPath,
     voteAverage: r.voteAverage,
     voteCount: r.voteCount,
@@ -113,97 +121,90 @@ function passLocalFilters(
   if ((r.voteCount ?? 0) === 0) return false;
   if (!hasPoster(r)) return false;
 
-  // allow anime in any language
-  if (media === "tv" && isAnime(r as TvResult)) {
-    // and respect user movie-only choice
-    return f.media !== "movie";
-  }
+  // anime bypasses language gate
+  if (media === "tv" && isAnime(r as TvResult)) return f.media !== "movie";
 
-  // enforce language
-  if (!f.language.includes(r.originalLanguage)) return false;
-
-  // media-type gating
+  if (!isEnglish(r) && !f.language.includes(r.originalLanguage)) return false;
   if (media === "tv" && f.media === "movie") return false;
   if (media === "movie" && f.media === "series") return false;
-
   return true;
 }
-/**
- * score(c, tags) → higher = better
- * ------------------------------------------------------------
- * WR = (v / (v + m)) * R + (m / (v + m)) * C
- *   R = voteAverage (0–10)
- *   v = voteCount
- *   m = confidence floor (e.g. 1 000 votes)
- *   C = global mean rating (≈ 6.8 on TMDB dataset)
- *
- * Then add small boosts for semantic tag hits.
- */
-function score(c: Candidate, tags: string[]): number {
-  const R = c.voteAverage;
-  const v = c.voteCount ?? 0; // ensure you populate this field
-  const m = 1_000; // tune: higher m favours blockbusters
-  const C = 6.8; // average TMDB rating
 
-  const weightedRating = (v / (v + m)) * R + (m / (v + m)) * C;
+export function score(c: Candidate, tags: (string | undefined)[]): number {
+  /* 1. weighted rating ---------------------------------------------- */
+  const v = c.voteCount ?? 0;
+  const WR =
+    (v / (v + CONF_FLOOR)) * c.voteAverage +
+    (CONF_FLOOR / (v + CONF_FLOOR)) * TMDB_MEAN;
 
-  // — semantic boost —
-  const title = c.title.toLowerCase();
-  const ov = c.overview?.toLowerCase();
+  /* 2. semantic boost ------------------------------------------------ */
+  const blob = `${c.title} ${c.overview}`.toLowerCase();
   let boost = 0;
 
-  for (const tRaw of tags) {
-    const t = tRaw.toLowerCase();
-    if (title.includes(t)) boost += 1;
-    else if (ov?.includes(t)) boost += 0.5;
-    if (boost >= 2) break;
+  for (const raw of tags) {
+    if (boost >= 2) break; // cap reached
+    if (!raw) continue; // skip undefined / empty
+    const tag = raw.toLowerCase();
+
+    if (!blob.includes(tag)) continue;
+
+    boost += c.title.toLowerCase().includes(tag) ? 1 : 0.5;
   }
 
-  return weightedRating + boost;
+  return WR + boost;
 }
 
+/* ───  main  ────────────────────────────────────────────────────────── */
 export async function buildSmartPool(tags: string[], f: PoolFilters) {
-  // 0. Build keyword + genre id list
-  const kwIds = (await Promise.all(tags.map(keywordIdsFor))).flat();
-  for (const t of tags) kwIds.push(...(TAG2ID[t] ?? []));
+  /* 1.  keyword id set (dedup) */
+  const kwSet = new Set<number>();
+  (await Promise.all(tags.map(fetchKeywordIds)))
+    .flat()
+    .forEach((id) => kwSet.add(id));
+  tags.forEach((t) => TAG2ID[t]?.forEach((id) => kwSet.add(id)));
+  const kwBatches = [...kwSet].map((id) => [id]);
 
+  /* 2.  prepare collectors */
   const medias: Media[] =
-    f.media === "movie"
-      ? ["movie"]
-      : f.media === "series"
-        ? ["tv"]
-        : ["movie", "tv"];
+    f.media === "either"
+      ? ["movie", "tv"]
+      : f.media === "movie"
+        ? ["movie"]
+        : ["tv"];
 
   const map = new Map<number, Candidate>();
-  const push = (raw: MovieResult | TvResult, m: Media) => {
-    if (!passLocalFilters(raw, m, f)) return;
-    map.set(raw.id, toCandidate(raw, m));
-  };
+  const push = (raw: MovieResult | TvResult, m: Media) =>
+    passLocalFilters(raw, m, f) && map.set(raw.id, toCandidate(raw, m));
 
-  // 1. keyword OR pass
-  for (let page = 1; map.size < TARGET && page <= 3; page++) {
-    await Promise.all(
-      kwIds.map((id) =>
-        Promise.all(
-          medias.map((m) =>
-            discover(m, page, [id], f).then((r) => r.forEach((x) => push(x, m)))
+  /* 3.  helper inside to access map.size */
+  async function collectPages(
+    meds: Media[],
+    pages: number,
+    kwLists: number[][]
+  ) {
+    for (let p = 1; p <= pages && map.size < TARGET; p++) {
+      await Promise.all(
+        meds.flatMap((m) =>
+          kwLists.map((kw) =>
+            limit(() => discover(m, p, kw, f)).then((res) =>
+              res.forEach((r) => push(r, m))
+            )
           )
         )
-      )
-    );
+      );
+    }
   }
 
-  // 2. popularity back-fill (still filtered by era/runtime)
-  for (let page = 1; map.size < TARGET && page <= 5; page++) {
-    await Promise.all(
-      medias.map((m) =>
-        discover(m, page, [], f).then((r) => r.forEach((x) => push(x, m)))
-      )
-    );
-  }
-  // 3. score & trim
-  const scored = [...map.values()].sort(
-    (a, b) => score(b, tags) - score(a, tags)
-  );
-  return scored.slice(0, TARGET);
+  /* 4.  run passes */
+  await collectPages(medias, PAGES_KEYWORD, kwBatches);
+  await collectPages(medias, PAGES_POPULAR, [[]]);
+  const pool = [...map.values()]
+    .sort((a, b) => score(b, tags) - score(a, tags))
+    .slice(0, TARGET);
+
+  console.log("length: " + pool.length);
+  const unique = uniqueBy(pool);
+  console.log("New length: " + unique.length);
+  /* 5.  score & trim */
+  return pool;
 }

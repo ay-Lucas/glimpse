@@ -5,7 +5,7 @@
  * • Collapsible "Advanced" footer for power filters
  * • Frosted-glass cards on a subtle aurora gradient background
  */
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Sparkles, SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -21,32 +21,14 @@ import { buildPayload, MoodState } from "@/lib/recs/payload";
 import { CandidateResponse } from "@/types/camel-index";
 import ResultsGrid from "./_components/results-grid";
 import { payloadToSearch } from "@/lib/recs/query";
+import {
+  AESTHETICS,
+  EXTRA_AESTHETICS_LIST,
+  EXTRA_VIBES_LIST,
+  VIBES,
+} from "@/lib/recs/tag-catalog";
 
 // ───────── placeholder data ─────────────────────────────────────────
-const VIBES = [
-  "dark comedy",
-  "slow-burn",
-  "slice-of-life",
-  "coming-of-age",
-  "high-octane",
-  "bittersweet",
-  "surreal",
-  "campy",
-  "gritty",
-  "heart-warming",
-] as const;
-const AESTHETICS = [
-  "rainy-day",
-  "retro-80s",
-  "film-noir",
-  "neon",
-  "cottagecore",
-  "cyberpunk",
-  "road-trip",
-  "holiday",
-  "coastal",
-  "space-opera",
-] as const;
 
 export function searchToState(qs: URLSearchParams): MoodState {
   const mood = qs.get("mo");
@@ -81,8 +63,11 @@ export default function MoodMatchPage() {
   const [includeSeries, setIncludeSeries] = useState(initial.includeSeries);
   const [loading, start] = useTransition();
   const [results, setResults] = useState<CandidateResponse[]>([]);
+  const [showMoreVibe, setShowMoreVibe] = useState(false);
+  const [showMoreAesthetic, setShowMoreAesthetic] = useState(false);
 
   async function submit() {
+    setResults([]);
     start(async () => {
       const payload = buildPayload({
         mood,
@@ -95,7 +80,6 @@ export default function MoodMatchPage() {
         language: ["en"],
         avoid: [],
       });
-      setResults([]);
       const qs = payloadToSearch(payload);
       router.replace(`/match?${qs}`); // updates URL without full reload
       const res = await fetch("/api/recommend", {
@@ -110,6 +94,7 @@ export default function MoodMatchPage() {
       setResults(json);
     });
   }
+  console.log(results);
 
   return (
     <div className="relative min-h-screen w-full bg-gradient-to-br from-[#141e30] via-[#243b55] to-[#1a2a49] text-slate-100">
@@ -146,7 +131,7 @@ export default function MoodMatchPage() {
         {/* Panel 1 – Mood */}
         <Card className={panelClass() + (mood ? " ring-2 ring-cyan-400" : "")}>
           <CardContent className="space-y-4 p-6">
-            <h2 className="text-lg font-medium">1. Pick the core feeling</h2>
+            <h2 className="text-lg font-medium">1. Mood (required)</h2>
             <MoodGrid selected={mood} onSelect={setMood} />
           </CardContent>
         </Card>
@@ -154,28 +139,56 @@ export default function MoodMatchPage() {
         {/* Panel 2 – Vibe / Aesthetic */}
         <Card className={panelClass()}>
           <CardContent className="space-y-4 p-6">
-            <h2 className="text-lg font-medium">2. Fine-tune the vibe</h2>
-            <ChipMultiSelect
-              label="Vibe"
-              options={VIBES}
-              selected={vibe}
-              onChange={setVibe}
-              max={3}
-            />
-            <ChipMultiSelect
-              label="Aesthetic"
-              options={AESTHETICS}
-              selected={aesthetic}
-              onChange={setAesthetic}
-              max={2}
-            />
+            <h2 className="text-lg font-medium">2. Vibe</h2>
+            <div>
+              <ChipMultiSelect
+                label=""
+                options={showMoreVibe ? [...VIBES, ...EXTRA_VIBES_LIST] : VIBES}
+                selected={vibe}
+                onChange={setVibe}
+                max={3}
+              />
+              <Button
+                variant="link"
+                className="px-0 text-xs"
+                onClick={() => setShowMoreVibe(!showMoreVibe)}
+              >
+                {showMoreVibe ? "Show fewer" : "More vibes…"}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className={panelClass()}>
+          <CardContent className="space-y-4 p-6">
+            <h2 className="text-lg font-medium">3. Aesthetic</h2>
+            <div>
+              <ChipMultiSelect
+                label=""
+                options={
+                  showMoreAesthetic
+                    ? [...AESTHETICS, ...EXTRA_AESTHETICS_LIST]
+                    : AESTHETICS
+                }
+                selected={aesthetic}
+                onChange={setAesthetic}
+                max={2}
+              />
+              <Button
+                variant="link"
+                className="px-0 text-xs"
+                onClick={() => setShowMoreAesthetic(!showMoreAesthetic)}
+              >
+                {showMoreAesthetic ? "Show fewer" : "More aesthetics…"}
+              </Button>
+            </div>
           </CardContent>
         </Card>
 
         {/* Panel 3 – Interests */}
         <Card className={panelClass()}>
           <CardContent className="space-y-4 p-6">
-            <h2 className="text-lg font-medium">3. Interests & topics</h2>
+            <h2 className="text-lg font-medium">4. Interests & topics</h2>
             <TagInput
               selected={interests}
               onChange={setInterests}
@@ -230,6 +243,7 @@ type AdvProps = {
   includeSeries: boolean;
   setIncludeSeries: (v: boolean) => void;
 };
+
 function AdvancedPanel({
   yearRange,
   setYearRange,

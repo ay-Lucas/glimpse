@@ -3,7 +3,6 @@
 import { BASE_API_URL, options } from "@/lib/constants";
 import {
   MovieReviewsResponse,
-  PersonResult,
   SearchRequest,
   TvReviewsResponse,
 } from "@/types/request-types-snakecase";
@@ -16,7 +15,7 @@ import {
   ShowContentRatingResponse,
   MovieReleaseDatesResponse,
   TvSeasonResponse,
-  Episode,
+  PersonResult,
 } from "@/types/request-types-camelcase";
 import camelcaseKeys from "camelcase-keys";
 import { unstable_cache } from "next/cache";
@@ -345,7 +344,6 @@ export async function fetchTopPeopleIds(reqOptions: RequestInit = options) {
   const trendingPeople = (await getTrendingPages(
     { media_type: "person", time_window: "day", page: 1 },
     6,
-    true,
     reqOptions
   )) as PersonResult[];
 

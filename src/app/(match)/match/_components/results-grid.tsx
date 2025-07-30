@@ -6,6 +6,7 @@ import { capitalizeFirst } from "@/lib/strings";
 import { CandidateResponse } from "@/types/camel-index";
 import Image from "next/image";
 import Link from "next/link";
+import { useId } from "react";
 
 export default function ResultsGrid({
   items,
@@ -23,9 +24,9 @@ export default function ResultsGrid({
   loading: boolean;
 }) {
   return (
-    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
       {loading
-        ? Array.from({ length: 12 }).map((_, i) => (
+        ? Array.from({ length: 15 }).map((_, i) => (
             <div
               key={i}
               className="aspect-[2/3] animate-pulse rounded-xl bg-white/10 backdrop-blur-sm"
@@ -33,7 +34,7 @@ export default function ResultsGrid({
           ))
         : items.map((m) => (
             <Card
-              key={m.id}
+              key={useId()}
               className="group relative overflow-hidden rounded-xl bg-white/5 backdrop-blur-sm transition hover:ring-2 hover:ring-cyan-400"
             >
               {m.posterPath ? (
@@ -63,9 +64,9 @@ export default function ResultsGrid({
                 {/* {m.reason.length > 30 ? m.reason.slice(0, 27) + "…" : m.reason} */}
               </div>
 
-              {/* <Badge className="absolute right-2 top-2 bg-cyan-600/80 text-[10px] backdrop-blur-md"> */}
-              {/*   {m.score} */}
-              {/* </Badge> */}
+              <Badge className="absolute right-2 top-2 bg-cyan-600/80 text-[10px] backdrop-blur-md">
+                {m.score}
+              </Badge>
 
               {/* media ribbon */}
               {/* {m.mediaType === "tv" && ( */}
