@@ -62,6 +62,13 @@ export const theme = {
         DEFAULT: "hsl(var(--card))",
         foreground: "hsl(var(--card-foreground))",
       },
+      sidebar: "hsl(var(--sidebar) / <alpha-value>)",
+      "sidebar-foreground": "hsl(var(--sidebar-foreground) / <alpha-value>)",
+      "sidebar-border": "hsl(var(--sidebar-border) / <alpha-value>)",
+      "sidebar-accent": "hsl(var(--sidebar-accent) / <alpha-value>)",
+      "sidebar-accent-foreground":
+        "hsl(var(--sidebar-accent-foreground) / <alpha-value>)",
+      "sidebar-ring": "hsl(var(--sidebar-ring) / <alpha-value>)",
     },
     screens: {
       xxxs: "300px",
@@ -83,6 +90,14 @@ export const theme = {
         from: { height: "var(--radix-accordion-content-height)" },
         to: { height: "0" },
       },
+      "collapsible-down": {
+        from: { height: "0" },
+        to: { height: "var(--radix-collapsible-content-height)" },
+      },
+      "collapsible-up": {
+        from: { height: "var(--radix-collapsible-content-height)" },
+        to: { height: "0" },
+      },
       fadeIn: {
         "0%": { opacity: "0" },
         "100%": { opacity: "1" },
@@ -91,6 +106,8 @@ export const theme = {
     animation: {
       "accordion-down": "accordion-down 0.2s ease-out",
       "accordion-up": "accordion-up 0.2s ease-out",
+      "collapsible-down": "collapsible-down 0.2s ease-out",
+      "collapsible-up": "collapsible-up 0.2s ease-in",
       "fade-in": "fadeIn 0.8s ease-out forwards",
     },
   },

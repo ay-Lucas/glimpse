@@ -11,30 +11,27 @@ import type { LucideIcon } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
-type Item = {
-  href: string;
-  icon?: LucideIcon;
-  label: string;
-  match?: (path: string) => boolean; // optional custom matcher
-};
-
 export function TopNav() {
   const { session } = useSupabase();
+
   return (
     <div className="sticky left-0 top-0 z-10 w-full border-b border-transparent/10 bg-background/90 backdrop-blur-sm">
-      <nav className="grid grid-cols-2 items-center p-1 sm:grid-cols-3 sm:px-4">
-        <section className="z-10 flex items-center lg:space-x-5">
-          <Link className="hidden text-md font-bold lg:inline" href="/">
+      <nav className="grid grid-cols-1 items-center p-1 sm:px-4 md:grid-cols-3">
+        {/* 1 Logo + search (desktop) */}
+        <section className="z-10 hidden items-center space-x-5 md:flex">
+          <Link className="text-md font-bold" href="/">
             Glimpse
           </Link>
           <Search />
         </section>
-        <section className="col-span-2 flex w-full justify-center sm:col-span-1">
+
+        {/* 2 Center nav (desktop) */}
+        <section className="hidden justify-center md:flex">
           <TopNavigationMenu />
         </section>
-        <section className="col-start-2 row-start-1 grid items-center justify-end space-x-4 sm:col-start-3 sm:row-start-1">
-          {/* {status === "loading" ? ( */}
-          {/* <div>Checking…</div> */}
+
+        {/* 3 Auth / avatar (desktop) */}
+        <section className="flex items-center justify-end space-x-4">
           {session?.user ? (
             <AvatarDropdown />
           ) : (
@@ -42,7 +39,6 @@ export function TopNav() {
               <Link href="/signin">Sign in</Link>
             </Button>
           )}
-          {/* )} */}
         </section>
       </nav>
     </div>
@@ -61,10 +57,9 @@ import {
 } from "@/components/ui/navigation-menu";
 import { TV_GENRES } from "@/lib/title-genres";
 import React, { useCallback } from "react";
-import { Separator } from "@radix-ui/react-dropdown-menu";
 
-type SubItem = { href: string; label: string };
-type NavItem = {
+export type SubItem = { href: string; label: string };
+export type NavItem = {
   href: string;
   label: string;
   icon?: React.ElementType;
@@ -73,7 +68,7 @@ type NavItem = {
 
 const TV_LISTS = ["Upcoming TV", "On The Air", "Top Rated", "Popular"] as const;
 
-const navigationMenuItems: NavItem[] = [
+export const navigationMenuItems: NavItem[] = [
   { href: "/discover", icon: TelescopeIcon, label: "Discover" },
   {
     href: "/tv",
@@ -100,7 +95,7 @@ const navigationMenuItems: NavItem[] = [
   { href: "/watchlist", icon: List, label: "Watchlist" },
 ];
 
-const useIsActive = () => {
+export const useIsActive = () => {
   const pathname = usePathname();
   return useCallback(
     (item: NavItem) =>
@@ -144,7 +139,7 @@ function MenuEntry({ item }: { item: NavItem }) {
       <NavigationMenuContent>
         <ul className="grid gap-2 p-4 md:w-[400px] lg:w-[400px]">
           {item.submenus.map((sub) => (
-            <ul className="grid lg:grid-cols-2">
+            <ul className="grid lg:grid-cols-2" key={sub.label}>
               <div className="col-span-2 p-2 text-xl font-bold">
                 {sub.label}
               </div>
