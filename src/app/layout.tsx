@@ -46,9 +46,6 @@ export default async function RootLayout({
               <TooltipProvider>
                 <SidebarProvider>
                   <div className="h-full w-screen">
-                    <section className="fixed left-3 top-2 z-50 md:hidden">
-                      <SidebarTrigger />
-                    </section>
                     <TopNav />
                     <MobileNav />
                     {children}

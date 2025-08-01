@@ -11,11 +11,10 @@ import {
   SidebarMenuSub,
   SidebarMenuSubItem,
   SidebarMenuSubButton,
-  SidebarHeader,
-  SidebarRail,
+  useSidebar,
 } from "@/components/ui/sidebar";
 
-import { navigationMenuItems, NavItem, useIsActive } from "./top-nav";
+import { navigationMenuItems, NavItem } from "./top-nav";
 import { cn } from "@/lib/utils";
 
 import Link from "next/link";
@@ -57,6 +56,7 @@ export function MobileNav() {
 /* -------------------------------------------------------------------------- */
 
 function MenuEntry({ item }: { item: NavItem }) {
+  const sidebar = useSidebar();
   const pathname = usePathname();
   const active = pathname === item.href || pathname.startsWith(item.href + "/");
 
@@ -68,7 +68,7 @@ function MenuEntry({ item }: { item: NavItem }) {
   const common = cn(
     "flex w-full items-center gap-2 rounded-md px-2 py-2 transition-colors",
     (active || childIsActive) &&
-      "bg-gray-700/80 backdrop-blur-xl shadow-xl text-accent-foreground"
+      "!bg-sidebar-ring backdrop-blur-xl shadow-xl text-accent-foreground"
   );
 
   const Icon = item.icon;
@@ -78,7 +78,7 @@ function MenuEntry({ item }: { item: NavItem }) {
     return (
       <SidebarMenuItem>
         <SidebarMenuButton asChild className={common}>
-          <Link href={item.href}>
+          <Link href={item.href} onClick={() => sidebar.toggleSidebar()}>
             {Icon && <Icon className="h-5 w-5" />}
             {item.label}
           </Link>
@@ -91,7 +91,6 @@ function MenuEntry({ item }: { item: NavItem }) {
   return (
     <Collapsible defaultOpen={childIsActive} className="group/collapsible">
       <SidebarMenuItem>
-        <SidebarRail />
         <CollapsibleTrigger asChild>
           {/* add `group` here ↓ */}
           <SidebarMenuButton
@@ -124,7 +123,12 @@ function MenuEntry({ item }: { item: NavItem }) {
                       asChild
                       isActive={pathname === it.href}
                     >
-                      <Link href={it.href}>{it.label}</Link>
+                      <Link
+                        href={it.href}
+                        onClick={() => sidebar.toggleSidebar()}
+                      >
+                        {it.label}
+                      </Link>
                     </SidebarMenuSubButton>
                   </SidebarMenuSubItem>
                 ))}

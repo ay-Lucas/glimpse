@@ -7,7 +7,6 @@ import { Search } from "./search";
 import { List, Sparkles, TelescopeIcon, Tv } from "lucide-react";
 import { useSupabase } from "@/context/supabase";
 
-import type { LucideIcon } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
@@ -16,13 +15,16 @@ export function TopNav() {
 
   return (
     <div className="sticky left-0 top-0 z-10 w-full border-b border-transparent/10 bg-background/90 backdrop-blur-sm">
-      <nav className="grid grid-cols-1 items-center p-1 sm:px-4 md:grid-cols-3">
+      <nav className="grid grid-cols-2 items-center p-1 sm:px-4 md:grid-cols-3">
         {/* 1 Logo + search (desktop) */}
         <section className="z-10 hidden items-center space-x-5 md:flex">
           <Link className="text-md font-bold" href="/">
             Glimpse
           </Link>
           <Search />
+        </section>
+        <section className="md:hidden">
+          <SidebarTrigger />
         </section>
 
         {/* 2 Center nav (desktop) */}
@@ -57,6 +59,7 @@ import {
 } from "@/components/ui/navigation-menu";
 import { TV_GENRES } from "@/lib/title-genres";
 import React, { useCallback } from "react";
+import { SidebarTrigger } from "./ui/sidebar";
 
 export type SubItem = { href: string; label: string };
 export type NavItem = {
@@ -107,7 +110,7 @@ export const useIsActive = () => {
 function MenuEntry({ item }: { item: NavItem }) {
   const isActive = useIsActive();
   const activePathCss =
-    "!bg-gray-700/80 backdrop-blur-xl shadow-xl transition-colors duration-200 !text-accent-foreground !outline-none";
+    "!bg-sidebar-ring backdrop-blur-xl shadow-xl transition-colors duration-200 !text-accent-foreground !outline-none";
   const common = cn(
     navigationMenuTriggerStyle(),
     isActive(item) && activePathCss
