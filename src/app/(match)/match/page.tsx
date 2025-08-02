@@ -5,7 +5,7 @@
  * • Collapsible "Advanced" footer for power filters
  * • Frosted-glass cards on a subtle aurora gradient background
  */
-import { useMemo, useState, useTransition } from "react";
+import { Suspense, useMemo, useState, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Sparkles, SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -30,7 +30,7 @@ import {
 
 // ───────── placeholder data ─────────────────────────────────────────
 
-export function searchToState(qs: URLSearchParams): MoodState {
+function searchToState(qs: URLSearchParams): MoodState {
   const mood = qs.get("mo");
   return {
     mood,
@@ -47,7 +47,15 @@ export function searchToState(qs: URLSearchParams): MoodState {
   };
 }
 
-export default function MoodMatchPage() {
+export default function MatchPage() {
+  return (
+    <Suspense fallback={<div className="h-screen" />}>
+      <MatchContent />
+    </Suspense>
+  );
+}
+
+function MatchContent() {
   const router = useRouter();
   const params = useSearchParams();
   const initial = useMemo(() => searchToState(params), [params]);

@@ -35,7 +35,7 @@ const BodySchema = z.object({
   }),
 });
 // --- Helpers ------------------------------------------------------------
-export function buildPrompt(
+function buildPrompt(
   tags: string[],
   interests: string[],
   pool: Candidate[]

@@ -34,7 +34,7 @@ export default function ResultsGrid({
           ))
         : items.map((m) => (
             <Card
-              key={useId()}
+              key={m.id}
               className="group relative overflow-hidden rounded-xl bg-white/5 backdrop-blur-sm transition hover:ring-2 hover:ring-cyan-400"
             >
               {m.posterPath ? (

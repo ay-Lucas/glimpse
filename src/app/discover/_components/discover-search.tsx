@@ -59,7 +59,7 @@ export function MediaTypeToggle({ mediaType, onChange }: MediaTypeToggleProps) {
       onValueChange={(v) => onChange(v as MediaType)}
     >
       {mediaTypeToggleItems.map((m) => (
-        <ToggleGroupItem value={m.value} size={"sm"}>
+        <ToggleGroupItem value={m.value} size={"sm"} key={m.value}>
           {m.label}
         </ToggleGroupItem>
       ))}
