@@ -36,7 +36,7 @@ export function dedupeAndTopUp(
     unique.push({
       id: c.id,
       score: 0.4,
-      reason: "additional pick",
+      reason: "Additional pick",
     });
     seen.add(c.id);
     if (unique.length === target) break;

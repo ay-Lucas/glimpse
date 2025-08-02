@@ -8,6 +8,7 @@ import { ChatCompletionMessageParam } from "openai/resources/index";
 import { sha1Base64url } from "@/lib/recs/sha1";
 import { hydrateKeywords } from "@/lib/recs/keywords";
 import { uniqueBy } from "@/lib/utils";
+import { dedupeAndTopUp } from "@/lib/recs/ranked";
 
 // --- Config -------------------------------------------------------------
 const MODEL = "gpt-4o-mini" as const; // switch to gpt-4.1-mini if preferred
@@ -51,6 +52,7 @@ TASK
 ・If two titles are equally relevant, prefer the one with the higher pop-score (voteAverage × voteCount).
 ・No duplicate IDs; include a healthy mix of movies / series when both types are allowed.
 ・Heavily prioritize interests if the array is not empty
+・The Candidate array is already sorted in descending order based on how well the tags match, popularity, and vote average.
 
 OUTPUT
 Return one line of pure JSON with this exact shape:
@@ -104,8 +106,6 @@ export async function POST(req: Request) {
 
   const RESULT_KEY = `match:${TAG_KEY}`;
   const cachedRanked = await redisUncached.get<CandidateResponse[]>(RESULT_KEY);
-  console.log("result_key: " + RESULT_KEY);
-  console.log("cachedRanked: " + cachedRanked);
   if (cachedRanked) {
     return new Response(JSON.stringify(cachedRanked), {
       headers: {
@@ -116,11 +116,7 @@ export async function POST(req: Request) {
       },
     });
   }
-
-  console.log("tags: ", tags);
   const pool = await buildSmartPool(tags, filters); // add filters param
-  console.log(uniqueBy(pool).length);
-  await hydrateKeywords(pool); // fills keywords in-place
   if (!pool) {
     return NextResponse.json(
       { error: "Candidate pool empty. Try again later." },
@@ -132,7 +128,7 @@ export async function POST(req: Request) {
   const interests = filters.interests;
   const messages = buildPrompt(tags, interests, pool);
   let toolCall;
-  let ranked: RankResult[];
+  let rawRanked: RankResult[];
   try {
     toolCall = await getOpenAiCompletions(messages);
   } catch (err) {
@@ -143,24 +139,7 @@ export async function POST(req: Request) {
     const { results } = JSON.parse(toolCall.function.arguments) as {
       results: RankResult[];
     };
-    ranked = results;
-
-    // ranked = dedupeAndTopUp(ranked, pool, 15); // ← ensures uniqueness
-    // const seen = new Set<number>();
-    // ranked = results.filter(r => {
-    //   if (seen.has(r.id)) return false;
-    //   seen.add(r.id);
-    //   return true;
-    // });
-    //
-    // let i = 0;
-    // while (ranked.length < 15 && i < pool.length) {
-    //   const c = pool[i++]!;                      // ← non-null assertion
-    //   if (!seen.has(c.id)) {
-    //     ranked.push({ id: c.id, score: 0.4, reason: "additional pick" });
-    //     seen.add(c.id);
-    //   }
-    // }
+    rawRanked = results;
   } catch {
     return NextResponse.json(
       { error: "Malformed LLM response" },
@@ -171,6 +150,10 @@ export async function POST(req: Request) {
 
   // 5) Join extra metadata for the client cards
   const byId = Object.fromEntries(pool.map((c) => [c.id, c]));
+  const validRanked = rawRanked.filter(
+    (c) => byId[c.id]?.posterPath && byId[c.id]?.overview && byId[c.id]?.title
+  );
+  const ranked = dedupeAndTopUp(validRanked, pool, 15); // ← ensures uniqueness
   const payload: CandidateResponse[] = ranked.slice(0, 15).map((r) => {
     const meta = byId[r.id];
     return {
@@ -188,9 +171,6 @@ export async function POST(req: Request) {
     };
   });
 
-  payload.forEach((c) =>
-    console.log("title: " + c.title + "\n" + "keywords: " + c.keywords)
-  );
   await redis.set(RESULT_KEY, payload, { ex: 60 * 60 * 24 }); // 24 h
 
   return NextResponse.json(payload);

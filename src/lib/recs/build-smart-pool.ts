@@ -14,7 +14,7 @@ import { redisUncached as redis } from "@/services/cache";
 import { fetchJSON } from "../tmdb";
 import { TAG2ID } from "./tag-catalog";
 import { uniqueBy } from "../utils";
-import { uniqueById } from "@/components/title-carousel";
+import { hydrateKeywords } from "./keywords";
 
 /* ───  tunables  ────────────────────────────────────────────────────── */
 export type Media = "movie" | "tv";
@@ -58,7 +58,7 @@ function buildQS(media: Media, page: number, kwIds: number[], f: PoolFilters) {
   qs.set("language", f.language[0] ?? "en-US");
   qs.set("sort_by", "popularity.desc");
   qs.set("vote_count_gte", "100");
-  if (kwIds.length) qs.set("with_keywords", kwIds.join(","));
+  if (kwIds.length) qs.set("with_keywords", kwIds.join("|"));
 
   if (media === "movie") {
     qs.set("primary_release_date.gte", `${f.years[0]}-01-01`);
@@ -124,7 +124,7 @@ function passLocalFilters(
   // anime bypasses language gate
   if (media === "tv" && isAnime(r as TvResult)) return f.media !== "movie";
 
-  if (!isEnglish(r) && !f.language.includes(r.originalLanguage)) return false;
+  if (!f.language.includes(r.originalLanguage)) return false;
   if (media === "tv" && f.media === "movie") return false;
   if (media === "movie" && f.media === "series") return false;
   return true;
@@ -197,14 +197,14 @@ export async function buildSmartPool(tags: string[], f: PoolFilters) {
 
   /* 4.  run passes */
   await collectPages(medias, PAGES_KEYWORD, kwBatches);
-  await collectPages(medias, PAGES_POPULAR, [[]]);
-  const pool = [...map.values()]
+  // await collectPages(medias, PAGES_POPULAR, [[]]);
+  const candidates = Array.from(map.values());
+  await hydrateKeywords(candidates); // fills keywords in-place
+
+  /* 5.  score & trim */
+  const pool = [...candidates]
     .sort((a, b) => score(b, tags) - score(a, tags))
     .slice(0, TARGET);
 
-  console.log("length: " + pool.length);
-  const unique = uniqueBy(pool);
-  console.log("New length: " + unique.length);
-  /* 5.  score & trim */
-  return pool;
+  return uniqueBy(pool);
 }

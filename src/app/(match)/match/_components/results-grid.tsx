@@ -52,7 +52,7 @@ export default function ResultsGrid({
 
                 {/* reason pill */}
                 {/* <Badge className="absolute left-0 top-0 bg-cyan-600/80 text-[11px] backdrop-blur-md"> */}
-                <div className="absolute left-0 top-0 flex bg-black/60 backdrop-blur-sm">
+                <div className="absolute left-0 top-0 flex w-full bg-black/60 backdrop-blur-sm">
                   <div className="flex w-full items-center justify-between px-2 py-1 text-xs text-white">
                     {m.reason && m.reason}
                     {/* {m.reason.length > 30 ? m.reason.slice(0, 27) + "…" : m.reason} */}
