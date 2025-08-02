@@ -24,15 +24,12 @@ export default function ResultsGrid({
             />
           ))
         : items.map((m) => (
-            <div className="group">
+            <div className="group" key={m.id}>
               <div className="hidden h-0 w-full justify-center text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 md:flex md:h-fit">
                 {/* <Badge className="absolute bottom-full left-1/2 z-10 bg-cyan-600/80 text-[10px] backdrop-blur-md"> */}
                 <span>{m.score}</span>
               </div>
-              <Card
-                key={m.id}
-                className="group relative overflow-hidden rounded-xl bg-white/5 backdrop-blur-sm transition hover:ring-2 hover:ring-cyan-400"
-              >
+              <Card className="group relative overflow-hidden rounded-xl bg-white/5 backdrop-blur-sm transition hover:ring-2 hover:ring-cyan-400">
                 {m.posterPath ? (
                   <Link href={`/${m.mediaType}/${m.id}`}>
                     <Image
