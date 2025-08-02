@@ -29,50 +29,40 @@ import {
 } from "@/lib/title-genres";
 import { SearchMediaType } from "@/app/search/utils";
 
-type MediaType = "titles" | "movie" | "tv" | "person";
+export type MediaType = "titles" | "movie" | "tv" | "person";
 
 // 1) MediaType toggle
 interface MediaTypeToggleProps {
   mediaType: SearchMediaType;
   onChange: (m: MediaType) => void;
 }
-function MediaTypeToggle({ mediaType, onChange }: MediaTypeToggleProps) {
+
+export const mediaTypeToggleItems = [
+  { label: "Titles", value: "titles" },
+  { label: "TV Shows", value: "tv" },
+  { label: "Movies", value: "movie" },
+  { label: "People", value: "person" },
+];
+
+export function getMediaTypeToggleLabel(value: string) {
+  return (
+    mediaTypeToggleItems.find((m) => m.value === value)?.label ?? "unknown"
+  );
+}
+
+export function MediaTypeToggle({ mediaType, onChange }: MediaTypeToggleProps) {
   return (
     <ToggleGroup
       type="single"
       size={"sm"}
       value={mediaType}
       onValueChange={(v) => onChange(v as MediaType)}
-      className="inline-flex rounded-md bg-muted p-1"
     >
-      <ToggleGroupItem
-        value="titles"
-        size={"sm"}
-        className="rounded-lg px-1.5 py-0 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
-      >
-        Titles
-      </ToggleGroupItem>
-      <ToggleGroupItem
-        value="tv"
-        size={"sm"}
-        className="w-20 rounded-lg px-1.5 py-0 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
-      >
-        TV Shows
-      </ToggleGroupItem>
-      <ToggleGroupItem
-        value="movie"
-        size={"sm"}
-        className="rounded-lg px-1.5 py-0 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
-      >
-        Movies
-      </ToggleGroupItem>
-      <ToggleGroupItem
-        value="person"
-        size={"sm"}
-        className="rounded-lg px-1.5 py-0 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
-      >
-        People
-      </ToggleGroupItem>
+      {mediaTypeToggleItems.map((m) => (
+        <ToggleGroupItem value={m.value} size={"sm"}>
+          {m.label}
+        </ToggleGroupItem>
+      ))}
     </ToggleGroup>
   );
 }
@@ -83,7 +73,11 @@ interface GenreDropdownProps {
   onChange: (ids?: number[]) => void;
 }
 
-function GenreDropdown({ mediaType, value, onChange }: GenreDropdownProps) {
+export function GenreDropdown({
+  mediaType,
+  value,
+  onChange,
+}: GenreDropdownProps) {
   const [open, setOpen] = useState(false);
 
   // pick which to show

@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { AvatarDropdown } from "./avatar-dropdown";
-import { Search } from "./search";
 import { List, Sparkles, TelescopeIcon, Tv } from "lucide-react";
 import { useSupabase } from "@/context/supabase";
 
@@ -15,25 +14,27 @@ export function TopNav() {
 
   return (
     <div className="sticky left-0 top-0 z-10 w-full border-b border-transparent/10 bg-background/90 backdrop-blur-sm">
-      <nav className="grid grid-cols-2 items-center p-1 sm:px-4 md:grid-cols-3">
+      <nav className="flex items-center justify-between p-1 sm:px-1 lg:px-3 xl:grid xl:grid-cols-3">
         {/* 1 Logo + search (desktop) */}
-        <section className="z-10 hidden items-center space-x-5 md:flex">
-          <Link className="text-md font-bold" href="/">
-            Glimpse
+        <section className="z-10 flex items-center space-x-5 sm:space-x-0">
+          <div className="md:hidden">
+            <SidebarTrigger />
+          </div>
+          <Link href="/">
+            <Button variant={"link"} className="p-2 text-md font-bold">
+              Glimpse
+            </Button>
           </Link>
-          <Search />
-        </section>
-        <section className="md:hidden">
-          <SidebarTrigger />
         </section>
 
         {/* 2 Center nav (desktop) */}
-        <section className="hidden justify-center md:flex">
+        <section className="hidden items-center justify-center space-x-2 md:flex">
           <TopNavigationMenu />
         </section>
 
         {/* 3 Auth / avatar (desktop) */}
         <section className="flex items-center justify-end space-x-4">
+          <SearchCommand />
           {session?.user ? (
             <AvatarDropdown />
           ) : (
@@ -60,6 +61,7 @@ import {
 import { TV_GENRES } from "@/lib/title-genres";
 import React, { useCallback } from "react";
 import { SidebarTrigger } from "./ui/sidebar";
+import { SearchCommand } from "./search-command-dialog";
 
 export type SubItem = { href: string; label: string };
 export type NavItem = {
