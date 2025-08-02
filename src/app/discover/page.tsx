@@ -37,12 +37,9 @@ export default async function DiscoverPage() {
         <ToastListener />
       </Suspense>
       <div className="space-y-3 overflow-hidden px-1 sm:py-6 md:px-5 lg:px-10">
-        <div className="space-y-3 pb-3 pt-1">
-          <h1 className="text-center text-2xl font-bold">
-            Discover Movies &amp; TV Shows
-          </h1>
-          <DiscoverSearch />
-        </div>
+        <h1 className="text-center text-2xl font-bold">
+          Discover Movies &amp; TV Shows
+        </h1>
         <TrendingSeriesCarousel
           daily={trendingTvDaily}
           weekly={trendingTvWeekly}
