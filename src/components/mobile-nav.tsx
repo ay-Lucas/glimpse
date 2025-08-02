@@ -12,6 +12,9 @@ import {
   SidebarMenuSubItem,
   SidebarMenuSubButton,
   useSidebar,
+  SidebarRail,
+  SidebarTrigger,
+  SidebarClose,
 } from "@/components/ui/sidebar";
 
 import { navigationMenuItems, NavItem } from "./top-nav";
@@ -37,6 +40,7 @@ export function MobileNav() {
     /*  lg:hidden keeps the sidebar strictly on mobile / tablet  */
     <Sidebar className="md:hidden">
       <SidebarContent>
+        <SidebarClose className="w-full justify-end pr-2 pt-3" />
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
