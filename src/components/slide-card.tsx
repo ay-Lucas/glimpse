@@ -3,11 +3,18 @@
 import TmdbRating from "@/app/(media)/_components/tmdb-rating";
 import Image, { type ImageProps } from "next/image";
 import { useState } from "react";
-import MediaActions from "@/app/(media)/_components/media-actions";
 import Link from "next/link";
 import { Skeleton } from "./ui/skeleton";
 import AdultFlag from "@/app/(media)/_components/adult-flag";
 import { Badge } from "./ui/badge";
+import dynamic from "next/dynamic";
+import { useSupabase } from "@/context/supabase";
+import MediaActions from "@/app/(media)/_components/media-actions";
+
+// const MediaActions = dynamic(
+//   () => import("@/app/(media)/_components/media-actions"),
+//   { ssr: false }
+// );
 
 export function SlideCard({
   alt,
@@ -59,8 +66,16 @@ export function SlideCard({
         year: "numeric",
       }).format(new Date(releaseDate))
     : null;
+  const { user } = useSupabase();
   return (
-    <div className="h-full">
+    <div className="group h-full">
+      {mediaType !== "person" && (
+        <div
+          className={`absolute right-0 top-0 z-10 transition-opacity duration-300 ease-out ${user ? "opacity-100 md:opacity-0 md:group-hover:opacity-100" : "opacity-100"}`}
+        >
+          <MediaActions variant="icon" mediaType={mediaType} tmdbId={tmdbId} />
+        </div>
+      )}
       <Link
         href={`/${mediaType}/${tmdbId}`}
         prefetch={true}
@@ -84,18 +99,15 @@ export function SlideCard({
           className={`inset-0 object-cover transition-opacity duration-300 ${loaded ? "opacity-100" : "opacity-0"} rounded-lg`}
           sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 100vw"
         />
-        {/* )} */}
-        <>
-          {isAdult && (
-            <div className="absolute right-0 top-0">
-              <Badge variant={"destructive"}>
-                <AdultFlag isAdult={isAdult}></AdultFlag>
-              </Badge>
-            </div>
-          )}
-        </>
+        {isAdult && (
+          <div className="absolute right-0 top-0">
+            <Badge variant={"destructive"}>
+              <AdultFlag isAdult={isAdult}></AdultFlag>
+            </Badge>
+          </div>
+        )}
         {overview && (
-          <div className="relative flex items-end bg-[linear-gradient(to_top,rgba(0,0,0,0.9)_90%,transparent)] p-2 opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100">
+          <div className="relative flex items-end bg-[linear-gradient(to_top,rgba(0,0,0,0.9)_90%,transparent)] p-2 opacity-0 transition-opacity duration-300 ease-out md:group-hover:opacity-100">
             <div className="">
               <p className="line-clamp-5 pt-2 text-sm text-gray-200">
                 {overview}
@@ -120,16 +132,9 @@ export function SlideCard({
             ) : (
               <div />
             )}
-            {mediaType !== "person" && (
-              <MediaActions
-                variant="icon"
-                mediaType={mediaType}
-                tmdbId={tmdbId}
-              />
-            )}
           </div>
           {dateLabel && <time dateTime={dateLabel}>{dateLabel}</time>}
-          <h2 className="text-md !select-text font-semibold text-white md:text-lg">
+          <h2 className="!select-text text-md font-semibold text-white md:text-lg">
             {title}
           </h2>
         </div>
