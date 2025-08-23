@@ -1,5 +1,4 @@
 import { fetchTmdbMovieLists, fetchTmdbTvLists } from "@/app/discover/actions";
-import { DiscoverSearch } from "./_components/discover-search";
 import { getAllDiscoverTitles } from "@/lib/actions";
 import {
   PopularMoviesAndSeriesCarousel,
@@ -37,7 +36,7 @@ export default async function DiscoverPage() {
         <ToastListener />
       </Suspense>
       <div className="space-y-3 overflow-hidden px-1 sm:py-6 md:px-5 lg:px-10">
-        <h1 className="text-center text-2xl font-bold">
+        <h1 className="pb-4 text-start text-3xl font-bold">
           Discover Movies &amp; TV Shows
         </h1>
         <TrendingSeriesCarousel

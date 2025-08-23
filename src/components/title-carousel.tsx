@@ -20,7 +20,7 @@ export default function TitleCarousel({
   const sortedTitles = sortByDate(uniqueTitles);
   return (
     <>
-      <h2 id={title} className="scroll-mt-16 text-2xl font-bold sm:pl-2">
+      <h2 id={title} className="scroll-mt-16 text-2xl font-bold">
         {title}
       </h2>
       <MediaCarousel

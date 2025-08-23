@@ -42,7 +42,7 @@ export default function CarouselToggle({
   return (
     <div className="space-y-4">
       <div className={`w-full items-center ${css}`}>
-        <h2 className="text-2xl font-bold sm:pl-2">{title}</h2>
+        <h2 className="text-2xl font-bold">{title}</h2>
         <ToggleGroup
           variant="outline"
           type="single"
