@@ -164,27 +164,22 @@ const breakpointOptions: {
     "@0.75": {
       slidesPerView: 5,
       slidesPerGroup: 5,
-      spaceBetween: 10,
+      spaceBetween: 15,
     },
     "@0.95": {
       slidesPerView: 6,
       slidesPerGroup: 6,
-      spaceBetween: 10,
+      spaceBetween: 15,
     },
-    "@1.2": {
+    "@1.5": {
       slidesPerView: 7,
       slidesPerGroup: 7,
-      spaceBetween: 10,
+      spaceBetween: 15,
     },
-    "@1.3": {
+    "@1.9": {
       slidesPerView: 8,
       slidesPerGroup: 8,
-      spaceBetween: 10,
-    },
-    "@1.75": {
-      slidesPerView: 9,
-      slidesPerGroup: 4,
-      spaceBetween: 10,
+      spaceBetween: 15,
     },
   },
 };
