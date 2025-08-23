@@ -71,7 +71,7 @@ export function SlideCard({
     <div className="group h-full">
       {mediaType !== "person" && (
         <div
-          className={`absolute right-0 top-0 z-10 transition-opacity duration-300 ease-out ${user ? "opacity-100 md:opacity-0 md:group-hover:opacity-100" : "opacity-100"}`}
+          className={`absolute right-0 top-0 z-10 transition-opacity duration-300 ease-out ${user ? "opacity-100 md:opacity-0 md:group-hover:opacity-100" : "opacity-0"}`}
         >
           <MediaActions variant="icon" mediaType={mediaType} tmdbId={tmdbId} />
         </div>
