@@ -1,7 +1,10 @@
-import { fetchTrendingMovies, fetchTrendingTv } from "@/app/discover/actions";
 import { getBlurData } from "@/lib/blur-data-generator";
 import { BASE_BLUR_IMAGE_URL } from "@/lib/constants";
 import { getRedisBlurValue } from "@/services/cache";
+import {
+  fetchTrendingMovies,
+  fetchTrendingTv,
+} from "../(browse)/discover/actions";
 
 export async function getBackdrops() {
   const [{ trendingMoviesDaily }, { trendingTvDaily }] = await Promise.all([

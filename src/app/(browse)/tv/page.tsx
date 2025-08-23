@@ -1,8 +1,3 @@
-import { fetchTmdbTvLists } from "@/app/discover/actions";
-import { getAllDiscoverTitles } from "@/lib/actions";
-import { TrendingSeriesCarousel } from "../discover/_components/discover-carousels";
-import { getBlurDataMap } from "../discover/_components/discover-utils";
-import { ToastListener } from "../discover/_components/discover-toast-listener";
 import { Suspense } from "react";
 import {
   ActionAndAdventureTvCarousel,
@@ -21,6 +16,11 @@ import {
 } from "./actions";
 import { GENRES } from "@/lib/title-genres";
 import TitleCarousel from "@/components/title-carousel";
+import { getAllDiscoverTitles } from "@/lib/actions";
+import { TrendingSeriesCarousel } from "../discover/_components/discover-carousels";
+import { ToastListener } from "../discover/_components/discover-toast-listener";
+import { getBlurDataMap } from "../discover/_components/discover-utils";
+import { fetchTmdbTvLists } from "../discover/actions";
 
 export const revalidate = 43200; // 12 hours
 

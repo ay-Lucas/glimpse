@@ -10,13 +10,13 @@ import { IoSearchOutline } from "react-icons/io5";
 import { Input } from "./ui/input";
 import { useRouter } from "next/navigation";
 import { DialogTitle } from "./ui/dialog";
-import {
-  GenreDropdown,
-  getMediaTypeToggleLabel,
-  MediaType,
-  MediaTypeToggle,
-} from "@/app/discover/_components/discover-search";
 import { SearchMediaType } from "@/app/search/utils";
+import {
+  getMediaTypeToggleLabel,
+  MediaTypeToggle,
+  GenreDropdown,
+  MediaType,
+} from "@/app/(browse)/discover/_components/discover-search";
 //TODO: add auto complete
 
 export function SearchCommandDialog({

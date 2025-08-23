@@ -1,4 +1,3 @@
-import { fetchTmdbMovieLists, fetchTmdbTvLists } from "@/app/discover/actions";
 import { getAllDiscoverTitles } from "@/lib/actions";
 import {
   PopularMoviesAndSeriesCarousel,
@@ -9,6 +8,7 @@ import {
 import { getBlurDataMap } from "./_components/discover-utils";
 import { ToastListener } from "./_components/discover-toast-listener";
 import { Suspense } from "react";
+import { fetchTmdbTvLists, fetchTmdbMovieLists } from "./actions";
 
 export const revalidate = 43200; // 12 hours
 

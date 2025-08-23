@@ -7,7 +7,6 @@ import {
 import { getBlurData } from "@/lib/blur-data-generator.ts";
 import { MovieResult, TvResult } from "@/types/request-types-camelcase.ts";
 import { movieSummaries, tvSummaries } from "@/db/schema.ts";
-import { fetchAllMovies, fetchAllTv } from "@/app/discover/actions.ts";
 import { inArray } from "drizzle-orm";
 import { getAllMovies, getAllTv } from "@/lib/actions";
 import { db } from "@/db/index";
@@ -17,6 +16,7 @@ import { revalidate } from "./revalidate";
 import { fetchPopularPeopleScores } from "@/app/(media)/person/[id]/actions";
 import { getJustWatchInfo } from "@/lib/justwatch";
 import { toDateString } from "@/lib/dates";
+import { fetchAllMovies, fetchAllTv } from "@/app/(browse)/discover/actions";
 
 async function backfillAndRevalidate() {
   const backfillSuccessful = await backfill();

@@ -20,16 +20,16 @@ import {
 import camelcaseKeys from "camelcase-keys";
 import { unstable_cache } from "next/cache";
 import {
-  fetchTmdbMovieLists,
-  fetchTmdbTvLists,
-  getTrendingPages,
-} from "@/app/discover/actions";
-import {
   TmdbEpisodeDetailsAppended,
   TmdbMovieDetailsResponseAppended,
   TmdbPersonDetailsAppended,
   TmdbTvDetailsResponseAppended,
 } from "@/types/tmdb-camel";
+import {
+  fetchTmdbMovieLists,
+  fetchTmdbTvLists,
+  getTrendingPages,
+} from "../(browse)/discover/actions";
 // Don't import React cache: /scripts/revalidate.ts throws error
 
 export const fetchPersonDetails = unstable_cache(

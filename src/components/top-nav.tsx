@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { AvatarDropdown } from "./avatar-dropdown";
-import { List, Sparkles, TelescopeIcon, Tv } from "lucide-react";
+import { HomeIcon, List, Sparkles, TelescopeIcon, Tv } from "lucide-react";
 import { useSupabase } from "@/context/supabase";
 
 import { usePathname } from "next/navigation";
@@ -74,7 +74,7 @@ export type NavItem = {
 const TV_LISTS = ["Upcoming TV", "On The Air", "Top Rated", "Popular"] as const;
 
 export const navigationMenuItems: NavItem[] = [
-  { href: "/discover", icon: TelescopeIcon, label: "Discover" },
+  { href: "/discover", icon: HomeIcon, label: "Home" },
   {
     href: "/tv",
     icon: Tv,

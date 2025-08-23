@@ -1,7 +1,7 @@
 import { MovieResult, TvResult } from "@/types/request-types-camelcase";
 import MediaCarousel, { MediaCarouselProps } from "./media-carousel";
-import { mkCards } from "@/app/discover/_components/discover-utils";
 import { hasPoster, isEnglish } from "@/lib/filters";
+import { mkCards } from "@/app/(browse)/discover/_components/discover-utils";
 
 interface TitleCarouselProps extends Omit<MediaCarouselProps, "items"> {
   title: string;
