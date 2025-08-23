@@ -1,7 +1,7 @@
 import { SearchMediaType } from "./utils";
 import { NSFW_GENRE_ID } from "@/lib/title-genres";
 import { InfiniteSearchList } from "../(media)/_components/infinite-search-list";
-import { DiscoverSearch } from "../discover/_components/discover-search";
+import { DiscoverSearch } from "../(browse)/discover/_components/discover-search";
 
 export default async function SearchPage({
   searchParams,
