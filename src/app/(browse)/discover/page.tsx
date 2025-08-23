@@ -6,8 +6,6 @@ import {
   UpcomingMoviesCarousel,
 } from "./_components/discover-carousels";
 import { getBlurDataMap } from "./_components/discover-utils";
-import { ToastListener } from "./_components/discover-toast-listener";
-import { Suspense } from "react";
 import { fetchTmdbTvLists, fetchTmdbMovieLists } from "./actions";
 
 export const revalidate = 43200; // 12 hours
@@ -31,31 +29,26 @@ export default async function DiscoverPage() {
     },
   ] = await Promise.all([fetchTmdbTvLists(), fetchTmdbMovieLists()]);
   return (
-    <main className="mx-auto w-full max-w-[1920px]">
-      <Suspense>
-        <ToastListener />
-      </Suspense>
-      <div className="space-y-3 overflow-hidden px-1 sm:py-6 md:px-5 lg:px-10">
-        <h1 className="pb-4 text-start text-3xl font-bold">
-          Discover Movies &amp; TV Shows
-        </h1>
-        <TrendingSeriesCarousel
-          daily={trendingTvDaily}
-          weekly={trendingTvWeekly}
-          blurMap={blurMap}
-        />
-        <TrendingMoviesCarousel
-          daily={trendingMoviesDaily}
-          weekly={trendingMoviesWeekly}
-          blurMap={blurMap}
-        />
-        <PopularMoviesAndSeriesCarousel
-          tv={popularTv}
-          movies={popularMovies}
-          blurMap={blurMap}
-        />
-        <UpcomingMoviesCarousel movies={upcomingMovies} blurMap={blurMap} />
-      </div>
-    </main>
+    <>
+      <h1 className="pb-4 text-start text-3xl font-bold">
+        Discover Movies &amp; TV Shows
+      </h1>
+      <TrendingSeriesCarousel
+        daily={trendingTvDaily}
+        weekly={trendingTvWeekly}
+        blurMap={blurMap}
+      />
+      <TrendingMoviesCarousel
+        daily={trendingMoviesDaily}
+        weekly={trendingMoviesWeekly}
+        blurMap={blurMap}
+      />
+      <PopularMoviesAndSeriesCarousel
+        tv={popularTv}
+        movies={popularMovies}
+        blurMap={blurMap}
+      />
+      <UpcomingMoviesCarousel movies={upcomingMovies} blurMap={blurMap} />
+    </>
   );
 }
