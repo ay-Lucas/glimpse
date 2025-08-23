@@ -45,7 +45,7 @@ export default async function RootLayout({
             >
               <TooltipProvider>
                 <SidebarProvider>
-                  <div className="h-full w-screen">
+                  <div className="h-full w-full">
                     <TopNav />
                     <MobileNav />
                     {children}

@@ -32,7 +32,7 @@ export default async function DiscoverPage() {
     },
   ] = await Promise.all([fetchTmdbTvLists(), fetchTmdbMovieLists()]);
   return (
-    <main className="mx-auto w-screen max-w-[1920px]">
+    <main className="mx-auto w-full max-w-[1920px]">
       <Suspense>
         <ToastListener />
       </Suspense>
