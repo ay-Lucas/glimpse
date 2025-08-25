@@ -25,7 +25,7 @@ export function Footer() {
             Discover
           </Link>
           <Link
-            href="https://github.com/your-username/glimpse"
+            href="https://github.com/ay-lucas/glimpse"
             target="_blank"
             rel="noopener noreferrer"
             className="text-sm hover:text-white"
