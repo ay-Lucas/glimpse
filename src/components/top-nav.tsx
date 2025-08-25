@@ -80,7 +80,13 @@ export type NavItem = {
   submenus?: { items: SubItem[]; label?: string }[];
 };
 
-const TV_LISTS = ["Upcoming TV", "On The Air", "Top Rated", "Popular"] as const;
+const TV_LISTS = [
+  "Trending",
+  "Popular",
+  "Top Rated",
+  "Upcoming TV",
+  "On The Air",
+] as const;
 
 export const navigationMenuItems: NavItem[] = [
   { href: "/discover", icon: HomeIcon, label: "Home" },
@@ -91,14 +97,14 @@ export const navigationMenuItems: NavItem[] = [
     submenus: [
       {
         items: TV_LISTS.map((l) => ({
-          href: `/tv#${l}`,
+          href: `/tv/lists#${l}`,
           label: l,
         })),
         label: "Lists",
       },
       {
         items: TV_GENRES.map((g) => ({
-          href: `/tv#${g.label}`,
+          href: `/tv/genres#${g.label}`,
           label: g.label,
         })),
         label: "Genres",

@@ -147,7 +147,8 @@ export async function trendingTvByGenreSmart(
   trendingPages: number = 1,
   discoverPages: number = 6,
   keywords: number[] = [],
-  limit = 40
+  limit = 40,
+  withoutGenres = [GENRES.tv.KIDS, GENRES.tv.FAMILY]
 ): Promise<TvResult[]> {
   const trending = await getTrendingTvByGenre(genreId, "week", trendingPages);
 
@@ -155,7 +156,7 @@ export async function trendingTvByGenreSmart(
     with_genres: String(genreId),
     language: "en-US",
     sort_by: "popularity.desc",
-    without_genres: String([GENRES.tv.KIDS, GENRES.tv.FAMILY].join("|")),
+    without_genres: String(withoutGenres.join("|")),
     watch_region: "US",
     with_keywords: String(keywords ? keywords.join("|") : ""),
   };
