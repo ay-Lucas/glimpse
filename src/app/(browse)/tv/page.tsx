@@ -41,7 +41,7 @@ export default async function TvPage() {
     actionAndAdventure,
     sciFiFantasy,
     comedy,
-    hentai,
+    crime,
   ] = await Promise.all([
     getOnTheAirTvList(),
     getTopRatedTvList(),
@@ -60,7 +60,7 @@ export default async function TvPage() {
       <SciFiAndFantasyTvCarousel tv={sciFiFantasy} />
       <TitleCarousel
         title="Crime"
-        titles={hentai}
+        titles={crime}
         breakpointType="title"
         englishOnly={false}
       />
