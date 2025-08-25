@@ -30,12 +30,13 @@ export default async function TvGenrePage() {
   return (
     <>
       <h1 className="pb-4 text-start text-3xl font-bold">TV Genres</h1>
-      {genreLists.map((l) => (
+      {genreLists.map((l, index) => (
         <TitleCarousel
           title={l.genre}
           titles={l.titles}
           breakpointType="title"
           englishOnly={false}
+          key={index}
         />
       ))}
     </>
