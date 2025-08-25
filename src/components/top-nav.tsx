@@ -120,7 +120,7 @@ export const useIsActive = () => {
 
 function MenuEntry({ item }: { item: NavItem }) {
   const isActive = useIsActive();
-  const activePathCss = "bg-accent/15 text-foreground rounded-md";
+  const activePathCss = "bg-accent text-foreground rounded-md";
   const common = cn(
     navigationMenuTriggerStyle(),
     isActive(item) && activePathCss
