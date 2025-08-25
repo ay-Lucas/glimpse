@@ -158,7 +158,7 @@ function MenuEntry({ item }: { item: NavItem }) {
             {item.submenus.map((sub) => (
               <div key={sub.label}>
                 {sub.label && (
-                  <p className="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  <p className="mb-2 ml-1 px-1 text-xs font-semibold uppercase tracking-wide">
                     {sub.label}
                   </p>
                 )}
