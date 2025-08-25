@@ -13,28 +13,37 @@ export function TopNav() {
   const { session } = useSupabase();
 
   return (
-    <div className="sticky left-0 top-0 z-10 w-full border-b border-transparent/10 bg-background/90 backdrop-blur-sm">
-      <nav className="flex items-center justify-between p-1 sm:px-1 lg:px-3 xl:grid xl:grid-cols-3">
+    <div className="sticky top-0 z-50 w-full border-b bg-background/60 backdrop-blur supports-[backdrop-filter]:bg-background/50">
+      <nav className="mx-auto grid h-14 max-w-[1920px] grid-cols-[auto_1fr_auto] items-center gap-3 px-1 md:grid-cols-[auto_1fr_1fr_auto] md:gap-5 md:px-5 lg:px-10">
         {/* 1 Logo + search (desktop) */}
-        <section className="z-10 flex items-center space-x-5 sm:space-x-0">
-          <div className="md:hidden">
+        <section className="z-10 flex items-center justify-start gap-2 sm:gap-3">
+          <div className="flex justify-center md:hidden">
             <SidebarTrigger />
           </div>
           <Link href="/">
-            <Button variant={"link"} className="p-2 text-md font-bold">
+            <Button
+              variant={"link"}
+              className="p-1 text-base font-bold md:text-lg"
+            >
               Glimpse
             </Button>
           </Link>
         </section>
+        {/* 2 Center nav (desktop) */}
+        <div className="hidden items-center justify-start md:flex">
+          <TopNavigationMenu />
+        </div>
 
         {/* 2 Center nav (desktop) */}
-        <section className="hidden items-center justify-center space-x-2 md:flex">
-          <TopNavigationMenu />
-        </section>
+        {/* <section className="hidden items-center justify-center md:flex"> */}
+        {/*   <TopNavigationMenu /> */}
+        {/* </section> */}
 
-        {/* 3 Auth / avatar (desktop) */}
-        <section className="flex items-center justify-end space-x-4">
+        <div className="flex justify-end">
           <SearchCommand />
+        </div>
+        {/* 3 Auth / avatar (desktop) */}
+        <section className="flex items-center justify-end">
           {session?.user ? (
             <AvatarDropdown />
           ) : (
@@ -111,8 +120,7 @@ export const useIsActive = () => {
 
 function MenuEntry({ item }: { item: NavItem }) {
   const isActive = useIsActive();
-  const activePathCss =
-    "!bg-sidebar-ring backdrop-blur-xl shadow-xl transition-colors duration-200 !text-accent-foreground !outline-none";
+  const activePathCss = "bg-accent/15 text-foreground rounded-md";
   const common = cn(
     navigationMenuTriggerStyle(),
     isActive(item) && activePathCss
@@ -124,7 +132,10 @@ function MenuEntry({ item }: { item: NavItem }) {
     return (
       <NavigationMenuItem>
         <NavigationMenuLink asChild className={common}>
-          <Link href={item.href}>
+          <Link
+            href={item.href}
+            aria-current={isActive(item) ? "page" : undefined}
+          >
             {Icon && <Icon className="mr-2 h-5 w-5" />}
             {item.label}
           </Link>
@@ -142,24 +153,29 @@ function MenuEntry({ item }: { item: NavItem }) {
       </NavigationMenuTrigger>
 
       <NavigationMenuContent>
-        <ul className="grid gap-2 p-4 md:w-[400px] lg:w-[400px]">
-          {item.submenus.map((sub) => (
-            <ul className="grid lg:grid-cols-2" key={sub.label}>
-              <div className="col-span-2 p-2 text-xl font-bold">
-                {sub.label}
+        <div className="p-4 md:w-[520px] lg:w-[560px]">
+          <div className="grid gap-3 lg:grid-cols-2">
+            {item.submenus.map((sub) => (
+              <div key={sub.label}>
+                {sub.label && (
+                  <p className="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    {sub.label}
+                  </p>
+                )}
+                <ul className="space-y-1">
+                  {sub.items.map((it) => (
+                    <ListItem
+                      key={it.href}
+                      href={it.href}
+                      title={it.label}
+                      className="px-2 py-2 text-gray-400"
+                    />
+                  ))}
+                </ul>
               </div>
-
-              {sub.items.map((it) => (
-                <ListItem
-                  key={it.href}
-                  href={it.href}
-                  title={it.label}
-                  className="px-2 py-2 text-gray-400"
-                />
-              ))}
-            </ul>
-          ))}
-        </ul>
+            ))}
+          </div>
+        </div>
       </NavigationMenuContent>
     </NavigationMenuItem>
   );
