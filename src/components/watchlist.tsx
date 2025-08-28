@@ -210,18 +210,20 @@ function WatchlistCard({
   const data =
     mediaType === "tv" ? (media as TvResult) : (media as MovieResult);
   return (
-    <SlideCard
-      alt={`poster of ${title}`}
-      aspectClass="aspect-[2/3]"
-      title={title}
-      overview={media.overview}
-      tmdbVoteAverage={media.voteAverage}
-      tmdbVoteCount={media.voteCount}
-      releaseDate={releaseDate}
-      mediaType={mediaType}
-      tmdbId={tmdbId!}
-      imagePath={media.posterPath}
-      baseUrl={BASE_POSTER_IMAGE_URL}
-    />
+    <div className="relative">
+      <SlideCard
+        alt={`poster of ${title}`}
+        aspectClass="aspect-[2/3]"
+        title={title}
+        overview={media.overview}
+        tmdbVoteAverage={media.voteAverage}
+        tmdbVoteCount={media.voteCount}
+        releaseDate={releaseDate}
+        mediaType={mediaType}
+        tmdbId={tmdbId!}
+        imagePath={media.posterPath}
+        baseUrl={BASE_POSTER_IMAGE_URL}
+      />
+    </div>
   );
 }
