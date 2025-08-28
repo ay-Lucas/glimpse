@@ -2,7 +2,7 @@ import { MovieResult, TvResult } from "@/types/request-types-camelcase";
 import { mkCards } from "./discover-utils";
 import CarouselToggle from "@/app/(media)/_components/carousel-toggle";
 import { BlurMap } from "@/types/redis";
-import MediaCarousel from "@/components/media-carousel";
+import LazyMediaCarousel from "@/components/lazy-media-carousel";
 
 export async function TrendingSeriesCarousel(data: {
   daily: TvResult[];
@@ -93,7 +93,7 @@ export async function UpcomingMoviesCarousel(data: {
   return (
     <>
       <h2 className="text-2xl font-bold sm:pl-2">Upcoming Movies</h2>
-      <MediaCarousel items={upcomingMovieCards} breakpointType="title" />
+      <LazyMediaCarousel items={upcomingMovieCards} breakpointType="title" />
     </>
   );
 }

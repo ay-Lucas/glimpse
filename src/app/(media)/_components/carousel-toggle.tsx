@@ -1,9 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import MediaCarousel, {
-  CarouselBreakpoints,
-} from "@/components/media-carousel";
+import { CarouselBreakpoints } from "@/components/media-carousel";
+import LazyMediaCarousel from "@/components/lazy-media-carousel";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 interface CarouselToggleProps {
@@ -63,7 +62,10 @@ export default function CarouselToggle({
         </ToggleGroup>
       </div>
       <div key={breakpointType} className={`animate-fade-in`}>
-        <MediaCarousel breakpointType={breakpointType} items={carouselItems} />
+        <LazyMediaCarousel
+          breakpointType={breakpointType}
+          items={carouselItems}
+        />
       </div>
     </div>
   );

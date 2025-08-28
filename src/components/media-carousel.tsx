@@ -1,5 +1,5 @@
 "use client";
-import { Keyboard, Mousewheel, Pagination, Scrollbar } from "swiper/modules";
+import { Keyboard, Mousewheel, Scrollbar } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Swiper as SwiperCore, SwiperOptions } from "swiper/types";
 
@@ -206,6 +206,7 @@ export default function MediaCarousel({
   const [isPrevDisabled, setPrevDisabled] = useState(true);
   const [isNextDisabled, setNextDisabled] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [hovered, setHovered] = useState(false);
 
   const handleSlideChange = () => {
     const swiper = swiperRef.current;
@@ -267,19 +268,21 @@ export default function MediaCarousel({
         //pagination={{
         //  type: "progressbar",
         //}}
-        mousewheel={true}
+        mousewheel={hovered}
         keyboard={true}
-        lazyPreloadPrevNext={3}
-        modules={[Mousewheel, Pagination, Keyboard, Scrollbar]}
+        lazyPreloadPrevNext={1}
+        modules={[Mousewheel, Keyboard, Scrollbar]}
         onSlideChange={handleSlideChange}
         onBeforeInit={(swiper) => {
           swiperRef.current = swiper;
         }}
         onInit={handleSlideChange}
         className={`mySwiper ${className} !pb-4`}
-        watchSlidesProgress={true}
+        watchSlidesProgress={false}
         simulateTouch={false}
         onLoad={() => setLoaded(true)}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
       >
         <button
           className={`absolute left-0 top-1/2 z-10 mt-[calc(0px-var(--swiper-navigation-size)/2)] h-[var(--swiper-navigation-size)] items-center rounded-md border border-primary bg-background/80 px-1 transition-opacity ${prevOpacity} invisible xs:visible`}

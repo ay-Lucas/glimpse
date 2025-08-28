@@ -1,5 +1,6 @@
 import { MovieResult, TvResult } from "@/types/request-types-camelcase";
-import MediaCarousel, { MediaCarouselProps } from "./media-carousel";
+import type { MediaCarouselProps } from "./media-carousel";
+import LazyMediaCarousel from "./lazy-media-carousel";
 import { hasPoster, isEnglish } from "@/lib/filters";
 import { mkCards } from "@/app/(browse)/discover/_components/discover-utils";
 
@@ -23,7 +24,7 @@ export default function TitleCarousel({
       <h2 id={title} className="scroll-mt-16 text-2xl font-bold">
         {title}
       </h2>
-      <MediaCarousel
+      <LazyMediaCarousel
         items={mkCards(sortedTitles, "tv")}
         breakpointType={breakpointType}
       />
