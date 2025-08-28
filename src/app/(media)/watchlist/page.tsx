@@ -10,11 +10,9 @@ export default async function WatchlistPage() {
   return (
     <main>
       <div className="pt-3 md:container md:pt-10">
-        <div className="flex justify-center pb-2">
-          <div className="flex items-center space-x-2">
-            <h1 className="text-center text-2xl font-bold">Watchlists</h1>
-            <CreateWatchlist />
-          </div>
+        <div className="flex justify-between">
+          <h1 className="text-3xl font-bold">Watchlists</h1>
+          <CreateWatchlist />
         </div>
         <div className="mx-auto grid gap-6 md:pt-10">
           <WatchlistSection initialWatchlists={watchlists} />
