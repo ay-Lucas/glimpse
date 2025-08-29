@@ -8,6 +8,7 @@ interface TitleCarouselProps extends Omit<MediaCarouselProps, "items"> {
   title: string;
   titles: (MovieResult | TvResult)[];
   englishOnly?: boolean;
+  mediaType?: "tv" | "movie";
 }
 
 export default function TitleCarousel({
@@ -15,6 +16,7 @@ export default function TitleCarousel({
   breakpointType,
   className,
   title,
+  mediaType = "tv",
 }: TitleCarouselProps) {
   const filteredTitles = titles.filter((t) => isEnglish(t) && hasPoster(t));
   const uniqueTitles = uniqueById(filteredTitles);
@@ -25,7 +27,7 @@ export default function TitleCarousel({
         {title}
       </h2>
       <LazyMediaCarousel
-        items={mkCards(sortedTitles, "tv")}
+        items={mkCards(sortedTitles, mediaType)}
         breakpointType={breakpointType}
       />
     </>
