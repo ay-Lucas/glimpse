@@ -3,7 +3,14 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { AvatarDropdown } from "./avatar-dropdown";
-import { HomeIcon, List, Sparkles, TelescopeIcon, Tv } from "lucide-react";
+import {
+  Film,
+  HomeIcon,
+  List,
+  Sparkles,
+  TelescopeIcon,
+  Tv,
+} from "lucide-react";
 import { useSupabase } from "@/context/supabase";
 
 import { usePathname } from "next/navigation";
@@ -67,7 +74,7 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
-import { TV_GENRES } from "@/lib/title-genres";
+import { MOVIE_GENRES, TV_GENRES } from "@/lib/title-genres";
 import React, { useCallback } from "react";
 import { SidebarTrigger } from "./ui/sidebar";
 import { SearchCommand } from "./search-command-dialog";
@@ -88,6 +95,14 @@ const TV_LISTS = [
   "On The Air",
 ] as const;
 
+const MOVIE_LISTS = [
+  "Trending",
+  "Popular",
+  "Top Rated",
+  "Upcoming",
+  "Now Playing",
+] as const;
+
 export const navigationMenuItems: NavItem[] = [
   { href: "/discover", icon: HomeIcon, label: "Home" },
   {
@@ -105,6 +120,27 @@ export const navigationMenuItems: NavItem[] = [
       {
         items: TV_GENRES.map((g) => ({
           href: `/tv/genres#${g.label}`,
+          label: g.label,
+        })),
+        label: "Genres",
+      },
+    ],
+  },
+  {
+    href: "/movie",
+    icon: Film,
+    label: "Movies",
+    submenus: [
+      {
+        items: MOVIE_LISTS.map((l) => ({
+          href: `/movie/lists#${l}`,
+          label: l,
+        })),
+        label: "Lists",
+      },
+      {
+        items: MOVIE_GENRES.map((g) => ({
+          href: `/movie/genres#${g.label}`,
           label: g.label,
         })),
         label: "Genres",
