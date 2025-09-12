@@ -141,14 +141,7 @@ export function SearchCommandDialog({
       </div>
       <CommandList>
         <DialogTitle hidden>Search</DialogTitle>
-        <CommandEmpty>
-          {loading
-            ? "Searching..."
-            : error
-              ? "Couldn’t fetch results."
-              : "No results found."}
-        </CommandEmpty>
-        <CommandGroup heading="Results">
+        <CommandGroup>
           {results.map((item) => {
             const view = normalizeSearchResult(item);
             const href = resultToHref(item, query);
@@ -170,6 +163,13 @@ export function SearchCommandDialog({
             );
           })}
         </CommandGroup>
+        <CommandEmpty>
+          {loading
+            ? "Searching..."
+            : error
+              ? "Couldn’t fetch results."
+              : "No results found."}
+        </CommandEmpty>
       </CommandList>
     </CommandDialog>
   );
