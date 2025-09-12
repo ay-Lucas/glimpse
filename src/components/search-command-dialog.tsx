@@ -26,6 +26,7 @@ import {
 import { CommandItem } from "cmdk";
 import { BASE_SMALL_POSTER_IMAGE_URL } from "@/lib/constants";
 import Image from "next/image";
+import Link from "next/link";
 //TODO: add auto complete
 type SearchResult = MovieResult | TvResult | PersonResult;
 export function SearchCommandDialog({
@@ -152,45 +153,59 @@ export function SearchCommandDialog({
             const view = normalizeSearchResult(item);
             const href = resultToHref(item, query);
             return (
-              <CommandItem
-                key={`${item.mediaType}-${item.id}`}
-                value={view.title || ""}
-                aria-label={view.title || "Result"}
-                onMouseEnter={() => router.prefetch(href)}
-                onSelect={() => {
-                  router.push(href);
-                  setOpen(false);
-                }}
-              >
-                <div className="flex w-full items-center gap-3">
-                  <div className="shrink-0">
-                    {view.poster ? (
-                      <Image
-                        src={`${BASE_SMALL_POSTER_IMAGE_URL}${view.poster}`}
-                        alt={`${view.title} poster`}
-                        width={60}
-                        height={90}
-                        className="rounded"
-                        loading="lazy"
-                      />
-                    ) : (
-                      <div className="h-[90px] w-[60px] rounded bg-muted" />
-                    )}
-                  </div>
-                  <div className="min-w-0">
-                    <div className="truncate">{view.title}</div>
-                    <div className="flex gap-2 text-xs text-muted-foreground">
-                      <span className="uppercase">{item.mediaType}</span>
-                      {view.year && <span>{view.year}</span>}
-                    </div>
-                  </div>
-                </div>
-              </CommandItem>
+              <Link href={href} key={`${item.mediaType}-${item.id}`}>
+                <CommandItem
+                  value={view.title || ""}
+                  aria-label={view.title || "Result"}
+                  // onMouseEnter={() => router.prefetch(href)}
+                  onSelect={() => {
+                    // router.push(href);
+                    setOpen(false);
+                  }}
+                  className="rounded-md hover:bg-muted"
+                >
+                  <SearchResult item={item} view={view} />
+                </CommandItem>
+              </Link>
             );
           })}
         </CommandGroup>
       </CommandList>
     </CommandDialog>
+  );
+}
+
+function SearchResult({
+  item,
+  view,
+}: {
+  item: SearchResult;
+  view: SearchView;
+}) {
+  return (
+    <div className="flex w-full items-center gap-3">
+      <div className="shrink-0">
+        {view.poster ? (
+          <Image
+            src={`${BASE_SMALL_POSTER_IMAGE_URL}${view.poster}`}
+            alt={`${view.title} poster`}
+            width={60}
+            height={90}
+            className="rounded"
+            loading="lazy"
+          />
+        ) : (
+          <div className="h-[90px] w-[60px] rounded bg-muted" />
+        )}
+      </div>
+      <div className="min-w-0">
+        <div className="truncate">{view.title}</div>
+        <div className="flex gap-2 text-xs text-muted-foreground">
+          <span className="uppercase">{item.mediaType}</span>
+          {view.year && <span>{view.year}</span>}
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -239,7 +254,12 @@ export function SearchCommand() {
   );
 }
 
-function normalizeSearchResult(result: SearchResult) {
+interface SearchView {
+  title: string;
+  poster: string | null;
+  year?: number;
+}
+function normalizeSearchResult(result: SearchResult): SearchView {
   if (result.mediaType === "movie") {
     const movie = result as MovieResult;
     return {
