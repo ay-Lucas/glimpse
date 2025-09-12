@@ -2,6 +2,7 @@
 import { SetStateAction, useEffect, useState } from "react";
 import {
   CommandDialog,
+  CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandList,
@@ -17,8 +18,16 @@ import {
   GenreDropdown,
   MediaType,
 } from "@/app/(browse)/discover/_components/discover-search";
+import {
+  PersonResult,
+  MovieResult,
+  TvResult,
+} from "@/types/request-types-camelcase";
+import { CommandItem } from "cmdk";
+import { BASE_SMALL_POSTER_IMAGE_URL } from "@/lib/constants";
+import Image from "next/image";
 //TODO: add auto complete
-
+type SearchResult = MovieResult | TvResult | PersonResult;
 export function SearchCommandDialog({
   open,
   setOpen,
@@ -27,11 +36,18 @@ export function SearchCommandDialog({
   setOpen: (value: SetStateAction<boolean>) => void;
 }) {
   const [query, setQuery] = useState("");
+  const [results, setResults] = useState<SearchResult[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   const handleEnter = async (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.code === "Enter" && query !== "") {
-      router.push(`/search?query=${query}`);
+    if (event.key === "Enter" && query.trim()) {
+      const params = new URLSearchParams({ query: query.trim() });
+      params.set("mediaType", filter.mediaType);
+      if (filter.genreId?.length)
+        params.set("genreIds", filter.genreId.join(","));
+      router.push(`/search?${params.toString()}`);
       setOpen(false);
     }
   };
@@ -43,11 +59,10 @@ export function SearchCommandDialog({
 
   const onSearch = () => {
     if (!query.trim()) return;
-    const params = new URLSearchParams({ query });
+    const params = new URLSearchParams({ query: query.trim() });
     params.set("mediaType", filter.mediaType);
-    if (filter.genreId?.length) {
-      params.set("genreIds", filter.genreId.toString());
-    }
+    if (filter.genreId?.length)
+      params.set("genreIds", filter.genreId.join(","));
     router.push(`/search?${params.toString()}`);
   };
 
@@ -56,9 +71,56 @@ export function SearchCommandDialog({
       ? "TV Shows and Movies"
       : getMediaTypeToggleLabel(filter.mediaType);
 
+  useEffect(() => {
+    if (!open) return;
+
+    const q = query.trim();
+    if (q.length < 2) {
+      setResults([]);
+      setLoading(false);
+      setError(null);
+      return;
+    }
+
+    const ac = new AbortController();
+    setLoading(true);
+    setError(null);
+
+    const timeoutId = setTimeout(async () => {
+      try {
+        const params = new URLSearchParams({
+          query: q,
+          mediaType: filter.mediaType,
+          includeAdult: "false",
+          page: "1",
+        });
+        if (filter.genreId?.length)
+          params.set("genreIds", filter.genreId.join(","));
+
+        const res = await fetch(`/api/search?${params.toString()}`, {
+          signal: ac.signal,
+        });
+        if (!res.ok) throw new Error(`Search failed: ${res.status}`);
+        const data: { results: SearchResult[] } = await res.json();
+        setResults(data.results);
+      } catch (e: any) {
+        if (e?.name !== "AbortError")
+          setError(e?.message ?? "Something went wrong");
+      } finally {
+        setLoading(false);
+      }
+    }, 250);
+
+    return () => {
+      ac.abort();
+      clearTimeout(timeoutId);
+    };
+  }, [open, query, filter.mediaType, (filter.genreId || []).join(",")]);
+
   return (
     <CommandDialog open={open} onOpenChange={setOpen}>
       <CommandInput
+        value={query}
         placeholder={`Search for ${placeholderText}`}
         onValueChange={setQuery}
         onKeyDown={handleEnter}
@@ -78,12 +140,55 @@ export function SearchCommandDialog({
       </div>
       <CommandList>
         <DialogTitle hidden>Search</DialogTitle>
-        {/* <CommandEmpty>No results found.</CommandEmpty> */}
-        {/* <CommandGroup heading="Results"> */}
-        {/*   <CommandItem>Calendar</CommandItem> */}
-        {/*   <CommandItem>Search Emoji</CommandItem> */}
-        {/*   <CommandItem>Calculator</CommandItem> */}
-        {/* </CommandGroup> */}
+        <CommandEmpty>
+          {loading
+            ? "Searching..."
+            : error
+              ? "Couldn’t fetch results."
+              : "No results found."}
+        </CommandEmpty>
+        <CommandGroup heading="Results">
+          {results.map((item) => {
+            const view = normalizeSearchResult(item);
+            const href = resultToHref(item, query);
+            return (
+              <CommandItem
+                key={`${item.mediaType}-${item.id}`}
+                value={view.title || ""}
+                aria-label={view.title || "Result"}
+                onMouseEnter={() => router.prefetch(href)}
+                onSelect={() => {
+                  router.push(href);
+                  setOpen(false);
+                }}
+              >
+                <div className="flex w-full items-center gap-3">
+                  <div className="shrink-0">
+                    {view.poster ? (
+                      <Image
+                        src={`${BASE_SMALL_POSTER_IMAGE_URL}${view.poster}`}
+                        alt={`${view.title} poster`}
+                        width={60}
+                        height={90}
+                        className="rounded"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="h-[90px] w-[60px] rounded bg-muted" />
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="truncate">{view.title}</div>
+                    <div className="flex gap-2 text-xs text-muted-foreground">
+                      <span className="uppercase">{item.mediaType}</span>
+                      {view.year && <span>{view.year}</span>}
+                    </div>
+                  </div>
+                </div>
+              </CommandItem>
+            );
+          })}
+        </CommandGroup>
       </CommandList>
     </CommandDialog>
   );
@@ -111,22 +216,67 @@ export function SearchCommand() {
 
   return (
     <div className="w-full md:max-w-md">
-      <a
+      <button
+        type="button"
         onClick={() => setOpen(true)}
         className="flex w-full items-center space-x-2 rounded-md bg-secondary px-2"
+        aria-label="Open search"
       >
         <IoSearchOutline size={22} />
         <Input
+          readOnly
           className={`h-8 border-none bg-transparent px-0`}
           placeholder="Search for a series or movie"
         />
         <p className="text-center text-muted-foreground">
-          <kbd className="pointer-events-none inline-flex select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-sm font-medium text-muted-foreground opacity-100 slide-out-to-bottom-36">
+          <kbd className="pointer-events-none inline-flex select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-sm font-medium text-muted-foreground opacity-100">
             <span className="text-lg">⌘</span>K
           </kbd>
         </p>
-      </a>
+      </button>
       <SearchCommandDialog open={open} setOpen={setOpen} />
     </div>
   );
+}
+
+function normalizeSearchResult(result: SearchResult) {
+  if (result.mediaType === "movie") {
+    const movie = result as MovieResult;
+    return {
+      title: movie.title,
+      poster: movie.posterPath || null,
+      year: movie.releaseDate
+        ? new Date(movie.releaseDate).getFullYear()
+        : undefined,
+    };
+  }
+  if (result.mediaType === "tv") {
+    const tv = result as TvResult;
+    return {
+      title: (tv as any).name,
+      poster: tv.posterPath || null,
+      year: (tv as any).firstAirDate
+        ? new Date((tv as any).firstAirDate).getFullYear()
+        : undefined,
+    };
+  }
+  const person = result as PersonResult;
+  return {
+    title: (person as any).name,
+    poster: (person as any).profilePath || null,
+    year: undefined,
+  };
+}
+
+function resultToHref(r: SearchResult, currentQuery: string) {
+  switch (r.mediaType) {
+    case "movie":
+      return `/movie/${r.id}`;
+    case "tv":
+      return `/tv/${r.id}`;
+    case "person":
+      return `/person/${r.id}`;
+    default:
+      return `/search?query=${encodeURIComponent(currentQuery)}`;
+  }
 }

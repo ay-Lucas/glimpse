@@ -32,7 +32,7 @@ const CommandDialog = ({ children, ...props }: DialogProps) => {
           "overflow-hidden p-0 shadow-lg",
 
           /* 🚩 override the positioning */
-          "fixed left-1/2 top-1/4 -translate-x-1/2 translate-y-0" //  ← no -translate-y-1/2
+          "fixed left-1/2 top-[10%] -translate-x-1/2 translate-y-0" //  ← no -translate-y-1/2
           // optional tweaks
           // "max-h-[80vh] w-full max-w-lg" // cap height & width
         )}
@@ -70,7 +70,7 @@ const CommandList = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <CommandPrimitive.List
     ref={ref}
-    className={cn("max-h-[300px] overflow-y-auto overflow-x-hidden", className)}
+    className={cn("max-h-[70vh] overflow-y-auto overflow-x-hidden", className)}
     {...props}
   />
 ));
