@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { SignInForm } from "../_components/signin-form";
 import Link from "next/link";
+import { DemoUser } from "../_components/demo-user";
 
 export default async function SignInPage() {
   return (
@@ -20,19 +21,7 @@ export default async function SignInPage() {
             </Link>
           </div>
         </div>
-        <div className="rounded-lg bg-gray-800/75 px-8 py-8 shadow-2xl backdrop-blur sm:px-12">
-          <div className="mb-2 flex flex-col space-y-3 font-bold">
-            Demo Account
-          </div>
-          <div>
-            Email:
-            <span className="font-bold"> demo@lucasanderson.dev</span>
-          </div>
-          <div>
-            Password:
-            <span className="font-bold"> 12345678</span>
-          </div>
-        </div>
+        <DemoUser />
       </div>
     </div>
   );
